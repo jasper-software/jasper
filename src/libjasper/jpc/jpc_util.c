@@ -102,7 +102,7 @@ int jpc_atoaf(const char *s, int *numvalues, double **values)
 	if ((cp = strtok(buf, delim))) {
 		++n;
 		while ((cp = strtok(0, delim))) {
-			if (cp != '\0') {
+			if (*cp != '\0') {
 				++n;
 			}
 		}
@@ -120,7 +120,7 @@ int jpc_atoaf(const char *s, int *numvalues, double **values)
 			vs[n] = atof(cp);
 			++n;
 			while ((cp = strtok(0, delim))) {
-				if (cp != '\0') {
+				if (*cp != '\0') {
 					vs[n] = atof(cp);
 					++n;
 				}
