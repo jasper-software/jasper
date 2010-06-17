@@ -119,8 +119,8 @@
 #define	JPC_POW2(n)	\
   (1 << (n))
 
-jpc_enc_tile_t *jpc_enc_tile_create(jpc_enc_cp_t *cp, jas_image_t *image, int tileno);
-void jpc_enc_tile_destroy(jpc_enc_tile_t *tile);
+static jpc_enc_tile_t *jpc_enc_tile_create(jpc_enc_cp_t *cp, jas_image_t *image, int tileno);
+static void jpc_enc_tile_destroy(jpc_enc_tile_t *tile);
 
 static jpc_enc_tcmpt_t *tcmpt_create(jpc_enc_tcmpt_t *tcmpt, jpc_enc_cp_t *cp,
   jas_image_t *image, jpc_enc_tile_t *tile);
@@ -1949,7 +1949,7 @@ int rateallocate(jpc_enc_t *enc, int numlyrs, uint_fast32_t *cumlens)
 * Tile constructors and destructors.
 \******************************************************************************/
 
-jpc_enc_tile_t *jpc_enc_tile_create(jpc_enc_cp_t *cp, jas_image_t *image, int tileno)
+static jpc_enc_tile_t *jpc_enc_tile_create(jpc_enc_cp_t *cp, jas_image_t *image, int tileno)
 {
 	jpc_enc_tile_t *tile;
 	uint_fast32_t htileno;
@@ -2054,7 +2054,7 @@ error:
 
 /* Note: I don't think that it is necessary to marked destroyed subobjects
 as such in this function. */
-void jpc_enc_tile_destroy(jpc_enc_tile_t *tile)
+static void jpc_enc_tile_destroy(jpc_enc_tile_t *tile)
 {
 	jpc_enc_tcmpt_t *tcmpt;
 	uint_fast16_t cmptno;
