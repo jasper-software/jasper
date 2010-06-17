@@ -137,22 +137,23 @@ typedef struct {
 
 static int jpc_dec_dump(jpc_dec_t *dec, FILE *out);
 
-jpc_ppxstab_t *jpc_ppxstab_create(void);
-void jpc_ppxstab_destroy(jpc_ppxstab_t *tab);
-int jpc_ppxstab_grow(jpc_ppxstab_t *tab, int maxents);
-int jpc_ppxstab_insert(jpc_ppxstab_t *tab, jpc_ppxstabent_t *ent);
-jpc_streamlist_t *jpc_ppmstabtostreams(jpc_ppxstab_t *tab);
-int jpc_pptstabwrite(jas_stream_t *out, jpc_ppxstab_t *tab);
-jpc_ppxstabent_t *jpc_ppxstabent_create(void);
-void jpc_ppxstabent_destroy(jpc_ppxstabent_t *ent);
+static jpc_ppxstab_t *jpc_ppxstab_create(void);
+static void jpc_ppxstab_destroy(jpc_ppxstab_t *tab);
+static int jpc_ppxstab_grow(jpc_ppxstab_t *tab, int maxents);
+static int jpc_ppxstab_insert(jpc_ppxstab_t *tab, jpc_ppxstabent_t *ent);
+static jpc_streamlist_t *jpc_ppmstabtostreams(jpc_ppxstab_t *tab);
+static int jpc_pptstabwrite(jas_stream_t *out, jpc_ppxstab_t *tab);
+static jpc_ppxstabent_t *jpc_ppxstabent_create(void);
+static void jpc_ppxstabent_destroy(jpc_ppxstabent_t *ent);
 
-int jpc_streamlist_numstreams(jpc_streamlist_t *streamlist);
-jpc_streamlist_t *jpc_streamlist_create(void);
-int jpc_streamlist_insert(jpc_streamlist_t *streamlist, int streamno,
+static int jpc_streamlist_numstreams(jpc_streamlist_t *streamlist);
+static jpc_streamlist_t *jpc_streamlist_create(void);
+
+static int jpc_streamlist_insert(jpc_streamlist_t *streamlist, int streamno,
   jas_stream_t *stream);
-jas_stream_t *jpc_streamlist_remove(jpc_streamlist_t *streamlist, int streamno);
-void jpc_streamlist_destroy(jpc_streamlist_t *streamlist);
-jas_stream_t *jpc_streamlist_get(jpc_streamlist_t *streamlist, int streamno);
+static jas_stream_t *jpc_streamlist_remove(jpc_streamlist_t *streamlist, int streamno);
+static void jpc_streamlist_destroy(jpc_streamlist_t *streamlist);
+static jas_stream_t *jpc_streamlist_get(jpc_streamlist_t *streamlist, int streamno);
 
 static void jpc_dec_cp_resetflags(jpc_dec_cp_t *cp);
 static jpc_dec_cp_t *jpc_dec_cp_create(uint_fast16_t numcomps);
@@ -2172,7 +2173,7 @@ static int jpc_dec_dump(jpc_dec_t *dec, FILE *out)
 	return 0;
 }
 
-jpc_streamlist_t *jpc_streamlist_create()
+static jpc_streamlist_t *jpc_streamlist_create()
 {
 	jpc_streamlist_t *streamlist;
 	int i;
@@ -2193,7 +2194,7 @@ jpc_streamlist_t *jpc_streamlist_create()
 	return streamlist;
 }
 
-int jpc_streamlist_insert(jpc_streamlist_t *streamlist, int streamno,
+static int jpc_streamlist_insert(jpc_streamlist_t *streamlist, int streamno,
   jas_stream_t *stream)
 {
 	jas_stream_t **newstreams;
@@ -2221,7 +2222,7 @@ int jpc_streamlist_insert(jpc_streamlist_t *streamlist, int streamno,
 	return 0;
 }
 
-jas_stream_t *jpc_streamlist_remove(jpc_streamlist_t *streamlist, int streamno)
+static jas_stream_t *jpc_streamlist_remove(jpc_streamlist_t *streamlist, int streamno)
 {
 	jas_stream_t *stream;
 	int i;
@@ -2236,7 +2237,7 @@ jas_stream_t *jpc_streamlist_remove(jpc_streamlist_t *streamlist, int streamno)
 	return stream;
 }
 
-void jpc_streamlist_destroy(jpc_streamlist_t *streamlist)
+static void jpc_streamlist_destroy(jpc_streamlist_t *streamlist)
 {
 	int streamno;
 	if (streamlist->streams) {
@@ -2249,18 +2250,18 @@ void jpc_streamlist_destroy(jpc_streamlist_t *streamlist)
 	jas_free(streamlist);
 }
 
-jas_stream_t *jpc_streamlist_get(jpc_streamlist_t *streamlist, int streamno)
+static jas_stream_t *jpc_streamlist_get(jpc_streamlist_t *streamlist, int streamno)
 {
 	assert(streamno < streamlist->numstreams);
 	return streamlist->streams[streamno];
 }
 
-int jpc_streamlist_numstreams(jpc_streamlist_t *streamlist)
+static int jpc_streamlist_numstreams(jpc_streamlist_t *streamlist)
 {
 	return streamlist->numstreams;
 }
 
-jpc_ppxstab_t *jpc_ppxstab_create()
+static jpc_ppxstab_t *jpc_ppxstab_create()
 {
 	jpc_ppxstab_t *tab;
 
@@ -2273,7 +2274,7 @@ jpc_ppxstab_t *jpc_ppxstab_create()
 	return tab;
 }
 
-void jpc_ppxstab_destroy(jpc_ppxstab_t *tab)
+static void jpc_ppxstab_destroy(jpc_ppxstab_t *tab)
 {
 	int i;
 	for (i = 0; i < tab->numents; ++i) {
@@ -2285,7 +2286,7 @@ void jpc_ppxstab_destroy(jpc_ppxstab_t *tab)
 	jas_free(tab);
 }
 
-int jpc_ppxstab_grow(jpc_ppxstab_t *tab, int maxents)
+static int jpc_ppxstab_grow(jpc_ppxstab_t *tab, int maxents)
 {
 	jpc_ppxstabent_t **newents;
 	if (tab->maxents < maxents) {
@@ -2300,7 +2301,7 @@ int jpc_ppxstab_grow(jpc_ppxstab_t *tab, int maxents)
 	return 0;
 }
 
-int jpc_ppxstab_insert(jpc_ppxstab_t *tab, jpc_ppxstabent_t *ent)
+static int jpc_ppxstab_insert(jpc_ppxstab_t *tab, jpc_ppxstabent_t *ent)
 {
 	int inspt;
 	int i;
@@ -2327,7 +2328,7 @@ int jpc_ppxstab_insert(jpc_ppxstab_t *tab, jpc_ppxstabent_t *ent)
 	return 0;
 }
 
-jpc_streamlist_t *jpc_ppmstabtostreams(jpc_ppxstab_t *tab)
+static jpc_streamlist_t *jpc_ppmstabtostreams(jpc_ppxstab_t *tab)
 {
 	jpc_streamlist_t *streams;
 	jas_uchar *dataptr;
@@ -2407,7 +2408,7 @@ error:
 	return 0;
 }
 
-int jpc_pptstabwrite(jas_stream_t *out, jpc_ppxstab_t *tab)
+static int jpc_pptstabwrite(jas_stream_t *out, jpc_ppxstab_t *tab)
 {
 	int i;
 	jpc_ppxstabent_t *ent;
@@ -2420,7 +2421,7 @@ int jpc_pptstabwrite(jas_stream_t *out, jpc_ppxstab_t *tab)
 	return 0;
 }
 
-jpc_ppxstabent_t *jpc_ppxstabent_create()
+static jpc_ppxstabent_t *jpc_ppxstabent_create()
 {
 	jpc_ppxstabent_t *ent;
 	if (!(ent = jas_malloc(sizeof(jpc_ppxstabent_t)))) {
@@ -2432,7 +2433,7 @@ jpc_ppxstabent_t *jpc_ppxstabent_create()
 	return ent;
 }
 
-void jpc_ppxstabent_destroy(jpc_ppxstabent_t *ent)
+static void jpc_ppxstabent_destroy(jpc_ppxstabent_t *ent)
 {
 	if (ent->data) {
 		jas_free(ent->data);

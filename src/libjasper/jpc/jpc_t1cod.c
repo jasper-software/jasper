@@ -84,7 +84,7 @@
 #include "jpc_t1cod.h"
 #include "jpc_tsfb.h"
 
-double jpc_pow2i(int n);
+static double jpc_pow2i(int n);
 
 /******************************************************************************\
 * Global data.
@@ -106,7 +106,7 @@ jpc_mqctx_t jpc_mqctxs[JPC_NUMCTXS];
 *
 \******************************************************************************/
 
-void jpc_initmqctxs(void);
+static void jpc_initmqctxs(void);
 
 /******************************************************************************\
 * Code.
@@ -474,13 +474,13 @@ void jpc_initctxs(jpc_mqctx_t *ctxs)
 	}
 }
 
-void jpc_initmqctxs()
+static void jpc_initmqctxs()
 {
 	jpc_initctxs(jpc_mqctxs);
 }
 
 /* Calculate the real quantity exp2(n), where x is an integer. */
-double jpc_pow2i(int n)
+static double jpc_pow2i(int n)
 {
 	double x;
 	double a;
