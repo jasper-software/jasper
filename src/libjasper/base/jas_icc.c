@@ -1011,7 +1011,6 @@ static int jas_icccurv_input(jas_iccattrval_t *attrval, jas_stream_t *in,
 	return 0;
 
 error:
-	jas_icccurv_destroy(attrval);
 	return -1;
 }
 
@@ -1129,7 +1128,6 @@ static int jas_icctxtdesc_input(jas_iccattrval_t *attrval, jas_stream_t *in,
 #endif
 	return 0;
 error:
-	jas_icctxtdesc_destroy(attrval);
 	return -1;
 }
 
@@ -1208,8 +1206,6 @@ static int jas_icctxt_input(jas_iccattrval_t *attrval, jas_stream_t *in,
 		goto error;
 	return 0;
 error:
-	if (txt->string)
-		jas_free(txt->string);
 	return -1;
 }
 
@@ -1330,7 +1326,6 @@ static int jas_icclut8_input(jas_iccattrval_t *attrval, jas_stream_t *in,
 		goto error;
 	return 0;
 error:
-	jas_icclut8_destroy(attrval);
 	return -1;
 }
 
@@ -1499,7 +1494,6 @@ static int jas_icclut16_input(jas_iccattrval_t *attrval, jas_stream_t *in,
 		goto error;
 	return 0;
 error:
-	jas_icclut16_destroy(attrval);
 	return -1;
 }
 
