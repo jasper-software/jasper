@@ -781,11 +781,10 @@ void jpc_enc_cp_destroy(jpc_enc_cp_t *cp)
 
 int ratestrtosize(char *s, uint_fast32_t rawsize, uint_fast32_t *size)
 {
-	char *cp;
 	jpc_flt_t f;
 
 	/* Note: This function must not modify output size on failure. */
-	if ((cp = strchr(s, 'B'))) {
+	if (strchr(s, 'B')) {
 		*size = atoi(s);
 	} else {
 		f = atof(s);
