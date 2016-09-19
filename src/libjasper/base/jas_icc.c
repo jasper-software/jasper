@@ -299,6 +299,7 @@ jas_iccprof_t *jas_iccprof_load(jas_stream_t *in)
 				if (jas_iccprof_setattr(prof, tagtabent->tag, attrval))
 					goto error;
 				jas_iccattrval_destroy(attrval);
+				attrval = 0;
 			} else {
 #if 0
 				jas_eprintf("warning: skipping unknown tag type\n");
