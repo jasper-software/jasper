@@ -2267,7 +2267,9 @@ jpc_streamlist_t *jpc_ppmstabtostreams(jpc_ppxstab_t *tab)
 	return streams;
 
 error:
-	jpc_streamlist_destroy(streams);
+	if (streams) {
+		jpc_streamlist_destroy(streams);
+	}
 	return 0;
 }
 
