@@ -266,7 +266,6 @@ jas_iccprof_t *jas_iccprof_load(jas_stream_t *in)
 	jas_iccattrval_t *attrval;
 	jas_iccattrval_t *prevattrval;
 	jas_icctagtabent_t *tagtabent;
-	jas_iccattrvalinfo_t *attrvalinfo;
 	int i;
 	int len;
 
@@ -325,7 +324,7 @@ jas_iccprof_t *jas_iccprof_load(jas_stream_t *in)
 			goto error;
 		}
 		curoff += 8;
-		if (!(attrvalinfo = jas_iccattrvalinfo_lookup(type))) {
+		if (!jas_iccattrvalinfo_lookup(type)) {
 #if 0
 			jas_eprintf("warning: skipping unknown tag type\n");
 #endif
