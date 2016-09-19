@@ -301,7 +301,6 @@ jp2_box_t *jp2_box_get(jas_stream_t *in)
 	}
 
 	return box;
-	abort();
 
 error:
 	if (box) {
@@ -511,7 +510,6 @@ int jp2_box_put(jp2_box_t *box, jas_stream_t *out)
 	}
 
 	return 0;
-	abort();
 
 error:
 
