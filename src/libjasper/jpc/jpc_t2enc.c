@@ -335,7 +335,9 @@ assert(jpc_firstone(datalen) < cblk->numlenbits + jpc_floorlog2(passcount));
 		if (!(ms = jpc_ms_create(JPC_MS_EPH))) {
 			return -1;
 		}
-		jpc_putms(out, enc->cstate, ms);
+		if (jpc_putms(out, enc->cstate, ms)) {
+			return -1;
+		}
 		jpc_ms_destroy(ms);
 	}
 
