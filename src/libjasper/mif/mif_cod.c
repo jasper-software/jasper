@@ -570,13 +570,13 @@ static int mif_process_cmpt(mif_hdr_t *hdr, char *buf)
 			break;
 		}
 	}
-	jas_tvparser_destroy(tvp);
 	if (!cmpt->sampperx || !cmpt->samppery) {
 		goto error;
 	}
 	if (mif_hdr_addcmpt(hdr, hdr->numcmpts, cmpt)) {
 		goto error;
 	}
+	jas_tvparser_destroy(tvp);
 	return 0;
 
 error:
