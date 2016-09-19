@@ -399,6 +399,8 @@ src/libjasper/pgx/Makefile
 src/libjasper/pnm/Makefile
 src/libjasper/ras/Makefile
 src/msvc/Makefile
+pkgconfig/Makefile
+pkgconfig/jasper.pc
 jasper.spec
 ])
 AC_OUTPUT
