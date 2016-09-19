@@ -64,7 +64,7 @@ EXTRA_DIST = README INSTALL COPYRIGHT LICENSE NEWS ChangeLog data doc \
 # Note: We need to put the derived file "jasper.spec" in the distribution
 # in order to facilitate RPM building.
 
-SUBDIRS = src
+SUBDIRS = src pkgconfig
 
 rpm: dist
 	for i in BUILD RPMS SRPMS SOURCES SPECS; do \
