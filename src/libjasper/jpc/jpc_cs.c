@@ -898,11 +898,15 @@ static int jpc_qcc_getparms(jpc_ms_t *ms, jpc_cstate_t *cstate, jas_stream_t *in
 	int len;
 	len = ms->len;
 	if (cstate->numcomps <= 256) {
-		jpc_getuint8(in, &tmp);
+		if (jpc_getuint8(in, &tmp)) {
+			return -1;
+		}
 		qcc->compno = tmp;
 		--len;
 	} else {
-		jpc_getuint16(in, &qcc->compno);
+		if (jpc_getuint16(in, &qcc->compno)) {
+			return -1;
+		}
 		len -= 2;
 	}
 	if (jpc_qcx_getcompparms(&qcc->compparms, cstate, in, len)) {
@@ -919,9 +923,13 @@ static int jpc_qcc_putparms(jpc_ms_t *ms, jpc_cstate_t *cstate, jas_stream_t *ou
 {
 	jpc_qcc_t *qcc = &ms->parms.qcc;
 	if (cstate->numcomps <= 256) {
-		jpc_putuint8(out, qcc->compno);
+		if (jpc_putuint8(out, qcc->compno)) {
+			return -1;
+		}
 	} else {
-		jpc_putuint16(out, qcc->compno);
+		if (jpc_putuint16(out, qcc->compno)) {
+			return -1;
+		}
 	}
 	if (jpc_qcx_putcompparms(&qcc->compparms, cstate, out)) {
 		return -1;
@@ -966,7 +974,9 @@ static int jpc_qcx_getcompparms(jpc_qcxcp_t *compparms, jpc_cstate_t *cstate,
 	cstate = 0;
 
 	n = 0;
-	jpc_getuint8(in, &tmp);
+	if (jpc_getuint8(in, &tmp)) {
+		return -1;
+	}
 	++n;
 	compparms->qntsty = tmp & 0x1f;
 	compparms->numguard = (tmp >> 5) & 7;
@@ -988,10 +998,14 @@ static int jpc_qcx_getcompparms(jpc_qcxcp_t *compparms, jpc_cstate_t *cstate,
 		assert(compparms->stepsizes);
 		for (i = 0; i < compparms->numstepsizes; ++i) {
 			if (compparms->qntsty == JPC_QCX_NOQNT) {
-				jpc_getuint8(in, &tmp);
+				if (jpc_getuint8(in, &tmp)) {
+					return -1;
+				}
 				compparms->stepsizes[i] = JPC_QCX_EXPN(tmp >> 3);
 			} else {
-				jpc_getuint16(in, &compparms->stepsizes[i]);
+				if (jpc_getuint16(in, &compparms->stepsizes[i])) {
+					return -1;
+				}
 			}
 		}
 	} else {
@@ -1015,10 +1029,14 @@ static int jpc_qcx_putcompparms(jpc_qcxcp_t *compparms, jpc_cstate_t *cstate,
 	jpc_putuint8(out, ((compparms->numguard & 7) << 5) | compparms->qntsty);
 	for (i = 0; i < compparms->numstepsizes; ++i) {
 		if (compparms->qntsty == JPC_QCX_NOQNT) {
-			jpc_putuint8(out, JPC_QCX_GETEXPN(
-			  compparms->stepsizes[i]) << 3);
+			if (jpc_putuint8(out, JPC_QCX_GETEXPN(
+			  compparms->stepsizes[i]) << 3)) {
+				return -1;
+			}
 		} else {
-			jpc_putuint16(out, compparms->stepsizes[i]);
+			if (jpc_putuint16(out, compparms->stepsizes[i])) {
+				return -1;
+			}
 		}
 	}
 	return 0;
