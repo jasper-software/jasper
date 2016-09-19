@@ -242,8 +242,10 @@ static int ras_putdatastd(jas_stream_t *out, ras_hdr_t *hdr, jas_image_t *image,
 
 	for (y = 0; y < hdr->height; y++) {
 		for (i = 0; i < numcmpts; ++i) {
-			jas_image_readcmpt(image, cmpts[i], 0, y, jas_image_width(image),
-			  1, data[i]);
+			if (jas_image_readcmpt(image, cmpts[i], 0, y,
+					jas_image_width(image), 1, data[i])) {
+				return -1;
+			}
 		}
 		z = 0;
 		nz = 0;
