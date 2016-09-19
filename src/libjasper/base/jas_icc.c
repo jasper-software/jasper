@@ -1699,6 +1699,8 @@ jas_iccprof_t *jas_iccprof_createfrombuf(uchar *buf, int len)
 	jas_stream_close(in);
 	return prof;
 error:
+	if (in)
+		jas_stream_close(in);
 	return 0;
 }
 
