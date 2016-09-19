@@ -245,7 +245,7 @@ HAVE_OPENGL=no
 OPENGL_LIBS=""
 if test $ENABLE_OPENGL = yes; then
 	if test $HAVE_OPENGL = no; then
-		TMPLIBS="-lglut -lGL -lGLU $X_PRE_LIBS -lX11 -lXmu -lXi -lXext -lXt $X_EXTRA_LIBS $X_LIBS"
+		TMPLIBS="-lglut -lGL -lGLU"
 		AC_CHECK_LIB(glut, glutInit, [HAVE_OPENGL=yes;
 		  OPENGL_LIBS=$TMPLIBS], HAVE_OPENGL=no, $TMPLIBS)
 	fi
