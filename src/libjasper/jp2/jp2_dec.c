@@ -386,6 +386,11 @@ jas_image_t *jp2_decode(jas_stream_t *in, char *optstr)
 	/* Determine the type of each component. */
 	if (dec->cdef) {
 		for (i = 0; i < dec->numchans; ++i) {
+			/* Is the channel number reasonable? */
+			if (dec->cdef->data.cdef.ents[i].channo >= dec->numchans) {
+				jas_eprintf("error: invalid channel number in CDEF box\n");
+				goto error;
+			}
 			jas_image_setcmpttype(dec->image,
 			  dec->chantocmptlut[dec->cdef->data.cdef.ents[i].channo],
 			  jp2_getct(jas_image_clrspc(dec->image),
