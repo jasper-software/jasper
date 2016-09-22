@@ -76,4 +76,4 @@ EXTRA_libjpg_la_SOURCES = \
 	jpg_enc.c \
 	jpg_dummy.c
 
-INCLUDES = -I$(top_srcdir)/src/libjasper/include
+AM_CPPFLAGS = -I$(top_srcdir)/src/libjasper/include

@@ -78,7 +78,7 @@ jiv_SOURCES = jiv.c
 man_MANS = imgcmp.1 imginfo.1 jasper.1 jiv.1
 EXTRA_DIST = $(man_MANS)
 
-INCLUDES = -I$(top_srcdir)/src/libjasper/include
+AM_CPPFLAGS = -I$(top_srcdir)/src/libjasper/include
 
 MYLDFLAGS = ../libjasper/libjasper.la
 jasper_LDADD = $(MYLDFLAGS)

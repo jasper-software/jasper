@@ -102,4 +102,4 @@ libjpc_la_SOURCES = \
 	jpc_t2enc.c \
 	jpc_util.c
 
-INCLUDES = -I$(top_srcdir)/src/libjasper/include
+AM_CPPFLAGS = -I$(top_srcdir)/src/libjasper/include

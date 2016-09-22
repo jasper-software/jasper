@@ -112,7 +112,7 @@ AH_TEMPLATE([JAS_CONFIGURE], [JasPer configure])
 AH_TEMPLATE([JAS_VERSION], [JasPer version])
 AH_TEMPLATE([DEBUG_MEMALLOC], [Debugging memory allocator])
 AH_TEMPLATE([DEBUG], [Extra debugging support])
-AH_TEMPLATE([HAVE_VLA], [Have variable length arrays])
+dnl AH_TEMPLATE([HAVE_VLA], [Have variable length arrays])
 
 AH_TOP([
 /* Avoid problems due to multiple inclusion. */
@@ -157,15 +157,10 @@ AC_PROG_LIBTOOL
 
 AC_PATH_XTRA
 
-AC_MSG_CHECKING(whether variable-length arrays are supported)
-AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[
-	int n; int foo[n];
-]])],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_VLA)],[AC_MSG_RESULT(no)])
-
-dnl AC_TRY_COMPILE is obsolete
-dnl AC_TRY_COMPILE([], [
+dnl AC_MSG_CHECKING(whether variable-length arrays are supported)
+dnl AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[
 dnl 	int n; int foo[n];
-dnl ], [AC_MSG_RESULT(yes); AC_DEFINE(HAVE_VLA)], AC_MSG_RESULT(no))
+dnl ]])],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_VLA)],[AC_MSG_RESULT(no)])
 
 ############################################################
 # Check for the IJG JPEG library.

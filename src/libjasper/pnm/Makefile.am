@@ -64,4 +64,4 @@ libpnm_la_SOURCES = \
 	pnm_dec.c \
 	pnm_enc.c
 
-INCLUDES = -I$(top_srcdir)/src/libjasper/include
+AM_CPPFLAGS = -I$(top_srcdir)/src/libjasper/include
