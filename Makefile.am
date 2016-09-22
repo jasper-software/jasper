@@ -56,7 +56,7 @@
 # 
 # __END_OF_JASPER_LICENSE__
 
-AUTOMAKE_OPTIONS = foreign dist-zip dist-tarZ
+AUTOMAKE_OPTIONS = foreign
 
 EXTRA_DIST = README INSTALL COPYRIGHT LICENSE NEWS ChangeLog data doc \
   jasper.spec.in jasper.spec acaux
