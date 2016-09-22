@@ -429,7 +429,7 @@ static int jpc_pi_nextcprl(register jpc_pi_t *pi)
 	}
 
 	for (pi->compno = pchg->compnostart, pi->picomp =
-	  &pi->picomps[pi->compno]; pi->compno < JAS_CAST(int, pchg->compnoend); ++pi->compno,
+	  &pi->picomps[pi->compno]; pi->compno < JAS_CAST(int, pchg->compnoend) && pi->compno < pi->numcomps; ++pi->compno,
 	  ++pi->picomp) {
 		pirlvl = pi->picomp->pirlvls;
 		pi->xstep = pi->picomp->hsamp * (1 << (pirlvl->prcwidthexpn +
