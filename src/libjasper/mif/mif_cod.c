@@ -107,7 +107,7 @@ static int mif_hdr_put(mif_hdr_t *hdr, jas_stream_t *out);
 static int mif_hdr_addcmpt(mif_hdr_t *hdr, int cmptno, mif_cmpt_t *cmpt);
 static mif_cmpt_t *mif_cmpt_create(void);
 static void mif_cmpt_destroy(mif_cmpt_t *cmpt);
-static char *mif_getline(jas_stream_t *jas_stream, char *buf, int bufsize);
+static char *mif_getline(jas_stream_t *jas_stream, char *buf, size_t bufsize);
 static int mif_getc(jas_stream_t *in);
 static mif_hdr_t *mif_makehdrfromimage(jas_image_t *image);
 
@@ -658,7 +658,7 @@ static void mif_cmpt_destroy(mif_cmpt_t *cmpt)
 * MIF parsing code.
 \******************************************************************************/
 
-static char *mif_getline(jas_stream_t *stream, char *buf, int bufsize)
+static char *mif_getline(jas_stream_t *stream, char *buf, size_t bufsize)
 {
 	int c;
 	char *bufptr;
