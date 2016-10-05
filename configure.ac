@@ -66,7 +66,14 @@ AC_PREREQ(2.59)
 AC_CONFIG_SRCDIR(README)
 dnl Note: Avoid the temptation to call the auxiliary directory "aux" because
 dnl Microsoft Windows will barf if you try to use "aux" as a directory name. :-(
-AC_CONFIG_AUX_DIR(acaux)
+AC_CONFIG_AUX_DIR([ac_aux])
+AC_CONFIG_MACRO_DIR([ac_m4])
+
+m4_include([ac_m4/m4_ax_generate_changelog.m4])
+
+AX_GENERATE_CHANGELOG
+
+LT_INIT([shared static])
 
 # Detect the canonical host and target build environment.
 # Note: This precedes automake initialization to avoid warnings.
@@ -147,7 +154,7 @@ AH_BOTTOM([
 
 AC_PROG_CC
 AC_PROG_INSTALL
-AC_PROG_RANLIB
+# AC_PROG_RANLIB
 # AC_PROG_AWK
 # AC_PROG_CPP
 # AC_PROG_LN_S
