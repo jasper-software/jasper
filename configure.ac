@@ -16,7 +16,7 @@ dnl ************************************************************
 dnl The major, minor, and micro version numbers of the package.
 define(AC_JAS_MAJOR_VERSION, 1)
 define(AC_JAS_MINOR_VERSION, 900)
-define(AC_JAS_MICRO_VERSION, 1)
+define(AC_JAS_MICRO_VERSION, 2)
 
 dnl The package version.
 define(AC_JAS_VERSION,
@@ -73,6 +73,7 @@ m4_include([ac_m4/m4_ax_generate_changelog.m4])
 
 AX_GENERATE_CHANGELOG
 
+# Initialize libtool.
 LT_INIT([shared static])
 
 # Detect the canonical host and target build environment.
@@ -154,7 +155,6 @@ AH_BOTTOM([
 
 AC_PROG_CC
 AC_PROG_INSTALL
-# AC_PROG_RANLIB
 # AC_PROG_AWK
 # AC_PROG_CPP
 # AC_PROG_LN_S
