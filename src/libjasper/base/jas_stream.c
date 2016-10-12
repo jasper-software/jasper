@@ -99,7 +99,7 @@ static int jas_strtoopenmode(const char *s);
 static void jas_stream_destroy(jas_stream_t *stream);
 static jas_stream_t *jas_stream_create(void);
 static void jas_stream_initbuf(jas_stream_t *stream, int bufmode, char *buf,
-  int bufsize);
+  size_t bufsize);
 
 static int mem_read(jas_stream_obj_t *obj, char *buf, int cnt);
 static int mem_write(jas_stream_obj_t *obj, char *buf, int cnt);
@@ -168,7 +168,7 @@ static jas_stream_t *jas_stream_create()
 	return stream;
 }
 
-jas_stream_t *jas_stream_memopen(char *buf, int bufsize)
+jas_stream_t *jas_stream_memopen(char *buf, size_t bufsize)
 {
 	jas_stream_t *stream;
 	jas_stream_memobj_t *obj;
@@ -570,7 +570,7 @@ int jas_stream_puts(jas_stream_t *stream, const char *s)
 	return 0;
 }
 
-char *jas_stream_gets(jas_stream_t *stream, char *buf, int bufsize)
+char *jas_stream_gets(jas_stream_t *stream, char *buf, size_t bufsize)
 {
 	int c;
 	char *bufptr;
@@ -694,7 +694,7 @@ long jas_stream_tell(jas_stream_t *stream)
 \******************************************************************************/
 
 static void jas_stream_initbuf(jas_stream_t *stream, int bufmode, char *buf,
-  int bufsize)
+  size_t bufsize)
 {
 	/* If this function is being called, the buffer should not have been
 	  initialized yet. */
@@ -987,7 +987,7 @@ static int mem_read(jas_stream_obj_t *obj, char *buf, int cnt)
 	return cnt;
 }
 
-static int mem_resize(jas_stream_memobj_t *m, int bufsize)
+static int mem_resize(jas_stream_memobj_t *m, size_t bufsize)
 {
 	unsigned char *buf;
 

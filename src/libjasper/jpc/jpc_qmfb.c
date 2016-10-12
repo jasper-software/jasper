@@ -305,7 +305,7 @@ jpc_qmfb2d_t jpc_ns_qmfb2d = {
 void jpc_qmfb_split_row(jpc_fix_t *a, int numcols, int parity)
 {
 
-	int bufsize = JPC_CEILDIVPOW2(numcols, 1);
+	size_t bufsize = JPC_CEILDIVPOW2(numcols, 1);
 	jpc_fix_t splitbuf[QMFB_SPLITBUFSIZE];
 	jpc_fix_t *buf = splitbuf;
 	register jpc_fix_t *srcptr;
@@ -365,7 +365,7 @@ void jpc_qmfb_split_col(jpc_fix_t *a, int numrows, int stride,
   int parity)
 {
 
-	int bufsize = JPC_CEILDIVPOW2(numrows, 1);
+	size_t bufsize = JPC_CEILDIVPOW2(numrows, 1);
 	jpc_fix_t splitbuf[QMFB_SPLITBUFSIZE];
 	jpc_fix_t *buf = splitbuf;
 	register jpc_fix_t *srcptr;
@@ -425,7 +425,7 @@ void jpc_qmfb_split_colgrp(jpc_fix_t *a, int numrows, int stride,
   int parity)
 {
 
-	int bufsize = JPC_CEILDIVPOW2(numrows, 1);
+	size_t bufsize = JPC_CEILDIVPOW2(numrows, 1);
 	jpc_fix_t splitbuf[QMFB_SPLITBUFSIZE * JPC_QMFB_COLGRPSIZE];
 	jpc_fix_t *buf = splitbuf;
 	jpc_fix_t *srcptr;
@@ -506,7 +506,7 @@ void jpc_qmfb_split_colres(jpc_fix_t *a, int numrows, int numcols,
   int stride, int parity)
 {
 
-	int bufsize = JPC_CEILDIVPOW2(numrows, 1);
+	size_t bufsize = JPC_CEILDIVPOW2(numrows, 1);
 	jpc_fix_t splitbuf[QMFB_SPLITBUFSIZE * JPC_QMFB_COLGRPSIZE];
 	jpc_fix_t *buf = splitbuf;
 	jpc_fix_t *srcptr;
@@ -586,7 +586,7 @@ void jpc_qmfb_split_colres(jpc_fix_t *a, int numrows, int numcols,
 void jpc_qmfb_join_row(jpc_fix_t *a, int numcols, int parity)
 {
 
-	int bufsize = JPC_CEILDIVPOW2(numcols, 1);
+	size_t bufsize = JPC_CEILDIVPOW2(numcols, 1);
 	jpc_fix_t joinbuf[QMFB_JOINBUFSIZE];
 	jpc_fix_t *buf = joinbuf;
 	register jpc_fix_t *srcptr;
@@ -643,7 +643,7 @@ void jpc_qmfb_join_col(jpc_fix_t *a, int numrows, int stride,
   int parity)
 {
 
-	int bufsize = JPC_CEILDIVPOW2(numrows, 1);
+	size_t bufsize = JPC_CEILDIVPOW2(numrows, 1);
 	jpc_fix_t joinbuf[QMFB_JOINBUFSIZE];
 	jpc_fix_t *buf = joinbuf;
 	register jpc_fix_t *srcptr;
@@ -700,7 +700,7 @@ void jpc_qmfb_join_colgrp(jpc_fix_t *a, int numrows, int stride,
   int parity)
 {
 
-	int bufsize = JPC_CEILDIVPOW2(numrows, 1);
+	size_t bufsize = JPC_CEILDIVPOW2(numrows, 1);
 	jpc_fix_t joinbuf[QMFB_JOINBUFSIZE * JPC_QMFB_COLGRPSIZE];
 	jpc_fix_t *buf = joinbuf;
 	jpc_fix_t *srcptr;
@@ -778,7 +778,7 @@ void jpc_qmfb_join_colres(jpc_fix_t *a, int numrows, int numcols,
   int stride, int parity)
 {
 
-	int bufsize = JPC_CEILDIVPOW2(numrows, 1);
+	size_t bufsize = JPC_CEILDIVPOW2(numrows, 1);
 	jpc_fix_t joinbuf[QMFB_JOINBUFSIZE * JPC_QMFB_COLGRPSIZE];
 	jpc_fix_t *buf = joinbuf;
 	jpc_fix_t *srcptr;
