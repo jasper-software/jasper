@@ -351,7 +351,6 @@ int sgnd;
 	}
 
 	return 0;
-	abort();
 
 error:
 
