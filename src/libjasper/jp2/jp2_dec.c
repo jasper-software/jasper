@@ -291,7 +291,10 @@ jas_image_t *jp2_decode(jas_stream_t *in, char *optstr)
 	case JP2_COLR_ICC:
 		iccprof = jas_iccprof_createfrombuf(dec->colr->data.colr.iccp,
 		  dec->colr->data.colr.iccplen);
-		assert(iccprof);
+		if (!iccprof) {
+			jas_eprintf("error: failed to parse ICC profile\n");
+			goto error;
+		}
 		jas_iccprof_gethdr(iccprof, &icchdr);
 		jas_eprintf("ICC Profile CS %08x\n", icchdr.colorspc);
 		jas_image_setclrspc(dec->image, fromiccpcs(icchdr.colorspc));

@@ -972,8 +972,10 @@ static void jas_iccxyz_dump(jas_iccattrval_t *attrval, FILE *out)
 static void jas_icccurv_destroy(jas_iccattrval_t *attrval)
 {
 	jas_icccurv_t *curv = &attrval->data.curv;
-	if (curv->ents)
+	if (curv->ents) {
 		jas_free(curv->ents);
+		curv->ents = 0;
+	}
 }
 
 static int jas_icccurv_copy(jas_iccattrval_t *attrval,
@@ -1060,10 +1062,14 @@ static void jas_icccurv_dump(jas_iccattrval_t *attrval, FILE *out)
 static void jas_icctxtdesc_destroy(jas_iccattrval_t *attrval)
 {
 	jas_icctxtdesc_t *txtdesc = &attrval->data.txtdesc;
-	if (txtdesc->ascdata)
+	if (txtdesc->ascdata) {
 		jas_free(txtdesc->ascdata);
-	if (txtdesc->ucdata)
+		txtdesc->ascdata = 0;
+	}
+	if (txtdesc->ucdata) {
 		jas_free(txtdesc->ucdata);
+		txtdesc->ucdata = 0;
+	}
 }
 
 static int jas_icctxtdesc_copy(jas_iccattrval_t *attrval,
@@ -1180,8 +1186,10 @@ static void jas_icctxtdesc_dump(jas_iccattrval_t *attrval, FILE *out)
 static void jas_icctxt_destroy(jas_iccattrval_t *attrval)
 {
 	jas_icctxt_t *txt = &attrval->data.txt;
-	if (txt->string)
+	if (txt->string) {
 		jas_free(txt->string);
+		txt->string = 0;
+	}
 }
 
 static int jas_icctxt_copy(jas_iccattrval_t *attrval,
@@ -1208,8 +1216,7 @@ static int jas_icctxt_input(jas_iccattrval_t *attrval, jas_stream_t *in,
 		goto error;
 	return 0;
 error:
-	if (txt->string)
-		jas_free(txt->string);
+	jas_icctxt_destroy(attrval);
 	return -1;
 }
 
@@ -1241,16 +1248,26 @@ static void jas_icctxt_dump(jas_iccattrval_t *attrval, FILE *out)
 static void jas_icclut8_destroy(jas_iccattrval_t *attrval)
 {
 	jas_icclut8_t *lut8 = &attrval->data.lut8;
-	if (lut8->clut)
+	if (lut8->clut) {
 		jas_free(lut8->clut);
-	if (lut8->intabs)
+		lut8->clut = 0;
+	}
+	if (lut8->intabs) {
 		jas_free(lut8->intabs);
-	if (lut8->intabsbuf)
+		lut8->intabs = 0;
+	}
+	if (lut8->intabsbuf) {
 		jas_free(lut8->intabsbuf);
-	if (lut8->outtabs)
+		lut8->intabsbuf = 0;
+	}
+	if (lut8->outtabs) {
 		jas_free(lut8->outtabs);
-	if (lut8->outtabsbuf)
+		lut8->outtabs = 0;
+	}
+	if (lut8->outtabsbuf) {
 		jas_free(lut8->outtabsbuf);
+		lut8->outtabsbuf = 0;
+	}
 }
 
 static int jas_icclut8_copy(jas_iccattrval_t *attrval,
@@ -1411,16 +1428,26 @@ static void jas_icclut8_dump(jas_iccattrval_t *attrval, FILE *out)
 static void jas_icclut16_destroy(jas_iccattrval_t *attrval)
 {
 	jas_icclut16_t *lut16 = &attrval->data.lut16;
-	if (lut16->clut)
+	if (lut16->clut) {
 		jas_free(lut16->clut);
-	if (lut16->intabs)
+		lut16->clut = 0;
+	}
+	if (lut16->intabs) {
 		jas_free(lut16->intabs);
-	if (lut16->intabsbuf)
+		lut16->intabs = 0;
+	}
+	if (lut16->intabsbuf) {
 		jas_free(lut16->intabsbuf);
-	if (lut16->outtabs)
+		lut16->intabsbuf = 0;
+	}
+	if (lut16->outtabs) {
 		jas_free(lut16->outtabs);
-	if (lut16->outtabsbuf)
+		lut16->outtabs = 0;
+	}
+	if (lut16->outtabsbuf) {
 		jas_free(lut16->outtabsbuf);
+		lut16->outtabsbuf = 0;
+	}
 }
 
 static int jas_icclut16_copy(jas_iccattrval_t *attrval,
