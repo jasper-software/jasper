@@ -153,7 +153,9 @@ AH_BOTTOM([
 # Checks for programs.
 ############################################################
 
-AC_PROG_CC
+#AC_PROG_CC
+#AC_PROG_CC_C11
+AC_PROG_CC_C99
 AC_PROG_INSTALL
 # AC_PROG_AWK
 # AC_PROG_CPP
