@@ -512,6 +512,16 @@ static int jpc_siz_getparms(jpc_ms_t *ms, jpc_cstate_t *cstate,
 			jas_free(siz->comps);
 			return -1;
 		}
+		if (siz->comps[i].hsamp == 0 || siz->comps[i].hsamp > 255) {
+			jas_eprintf("invalid XRsiz value %d\n", siz->comps[i].hsamp);
+			jas_free(siz->comps);
+			return -1;
+		}
+		if (siz->comps[i].vsamp == 0 || siz->comps[i].vsamp > 255) {
+			jas_eprintf("invalid YRsiz value %d\n", siz->comps[i].vsamp);
+			jas_free(siz->comps);
+			return -1;
+		}
 		siz->comps[i].sgnd = (tmp >> 7) & 1;
 		siz->comps[i].prec = (tmp & 0x7f) + 1;
 	}
