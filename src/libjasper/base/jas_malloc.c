@@ -96,7 +96,7 @@
 \******************************************************************************/
 
 /* Compute the product of two size_t integers with overflow checking. */
-inline bool jas_safe_size_mul(size_t x, size_t y, size_t* result)
+inline static bool jas_safe_size_mul(size_t x, size_t y, size_t* result)
 {
 	/* Check if overflow would occur */
 	if (x && y > SIZE_MAX / x) {
