@@ -391,7 +391,10 @@ int mif_validate(jas_stream_t *in)
 	}
 
 	/* Compute the signature value. */
-	magic = (buf[0] << 24) | (buf[1] << 16) | (buf[2] << 8) | buf[3];
+	magic = (JAS_CAST(uint_fast32_t, buf[0]) << 24) |
+	  (JAS_CAST(uint_fast32_t, buf[1]) << 16) |
+	  (JAS_CAST(uint_fast32_t, buf[2]) << 8) |
+	  buf[3];
 
 	/* Ensure that the signature is correct for this format. */
 	if (magic != MIF_MAGIC) {

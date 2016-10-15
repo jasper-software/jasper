@@ -209,7 +209,10 @@ int ras_validate(jas_stream_t *in)
 		return -1;
 	}
 
-	magic = (buf[0] << 24) | (buf[1] << 16) | (buf[2] << 8) | buf[3];
+	magic = (JAS_CAST(uint_fast32_t, buf[0]) << 24) |
+	  (JAS_CAST(uint_fast32_t, buf[1]) << 16) |
+	  (JAS_CAST(uint_fast32_t, buf[2]) << 8) |
+	  buf[3];
 
 	/* Is the signature correct for the Sun Rasterfile format? */
 	if (magic != RAS_MAGIC) {
