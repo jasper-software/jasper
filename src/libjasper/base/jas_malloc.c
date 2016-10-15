@@ -73,6 +73,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
+#include <stdbool.h>
 
 /* We need the prototype for memset. */
 #include <string.h>
@@ -89,26 +91,30 @@
 
 #if !defined(DEBUG_MEMALLOC)
 
-#define MEMALLOC_ALIGNMENT	32
-#define MEMALLOC_ALIGN2
-#undef MEMALLOC_ALIGN2
+/******************************************************************************\
+* Safe integer arithmetic (i.e., with overflow checking).
+\******************************************************************************/
+
+/* Compute the product of two size_t integers with overflow checking. */
+inline bool jas_safe_size_mul(size_t x, size_t y, size_t* result)
+{
+	/* Check if overflow would occur */
+	if (x && y > SIZE_MAX / x) {
+		/* Overflow would occur. */
+		*result = 0;
+		return false;
+	}
+	*result = x * y;
+	return true;
+}
+
+/******************************************************************************\
+* Basic memory allocation and deallocation primitives.
+\******************************************************************************/
 
 void *jas_malloc(size_t size)
 {
-#if defined(MEMALLOC_ALIGN2)
-	void *ptr;
-abort();
-	if (posix_memalign(&ptr, MEMALLOC_ALIGNMENT, size)) {
-		return 0;
-	}
-	return ptr;
-#endif
 	return malloc(size);
-}
-
-void jas_free(void *ptr)
-{
-	free(ptr);
 }
 
 void *jas_realloc(void *ptr, size_t size)
@@ -116,15 +122,55 @@ void *jas_realloc(void *ptr, size_t size)
 	return realloc(ptr, size);
 }
 
-void *jas_calloc(size_t nmemb, size_t size)
+void jas_free(void *ptr)
 {
-	void *ptr;
-	size_t n;
-	n = nmemb * size;
-	if (!(ptr = jas_malloc(n * sizeof(char)))) {
+	free(ptr);
+}
+
+/******************************************************************************\
+* Additional memory allocation and deallocation primitives
+* (mainly for overflow checking).
+\******************************************************************************/
+
+void *jas_alloc2(size_t num_elements, size_t element_size)
+{
+	size_t size;
+	if (!jas_safe_size_mul(num_elements, element_size, &size)) {
 		return 0;
 	}
-	memset(ptr, 0, n);
+	return jas_malloc(size);
+}
+
+void *jas_alloc3(size_t num_arrays, size_t array_size, size_t element_size)
+{
+	size_t size;
+	if (!jas_safe_size_mul(array_size, element_size, &size) ||
+	  !jas_safe_size_mul(size, num_arrays, &size)) {
+		return 0;
+	}
+	return jas_malloc(size);
+}
+
+void *jas_realloc2(void *ptr, size_t num_elements, size_t element_size)
+{
+	size_t size;
+	if (!jas_safe_size_mul(num_elements, element_size, &size)) {
+		return 0;
+	}
+	return realloc(ptr, size);
+}
+
+void *jas_calloc(size_t num_elements, size_t element_size)
+{
+	void *ptr;
+	size_t size;
+	if (!jas_safe_size_mul(num_elements, element_size, &size)) {
+		return 0;
+	}
+	if (!(ptr = jas_malloc(size))) {
+		return 0;
+	}
+	memset(ptr, 0, size);
 	return ptr;
 }
 

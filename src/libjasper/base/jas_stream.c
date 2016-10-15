@@ -212,7 +212,7 @@ jas_stream_t *jas_stream_memopen(char *buf, int bufsize)
 	if (buf) {
 		obj->buf_ = (unsigned char *) buf;
 	} else {
-		obj->buf_ = jas_malloc(obj->bufsize_ * sizeof(char));
+		obj->buf_ = jas_malloc(obj->bufsize_);
 		obj->myalloc_ = 1;
 	}
 	if (!obj->buf_) {
@@ -992,7 +992,7 @@ static int mem_resize(jas_stream_memobj_t *m, int bufsize)
 	unsigned char *buf;
 
 	assert(m->buf_);
-	if (!(buf = jas_realloc(m->buf_, bufsize * sizeof(unsigned char)))) {
+	if (!(buf = jas_realloc2(m->buf_, bufsize, sizeof(unsigned char)))) {
 		return -1;
 	}
 	m->buf_ = buf;

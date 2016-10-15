@@ -438,8 +438,8 @@ static int mif_hdr_growcmpts(mif_hdr_t *hdr, int maxcmpts)
 	int cmptno;
 	mif_cmpt_t **newcmpts;
 	assert(maxcmpts >= hdr->numcmpts);
-	newcmpts = (!hdr->cmpts) ? jas_malloc(maxcmpts * sizeof(mif_cmpt_t *)) :
-	  jas_realloc(hdr->cmpts, maxcmpts * sizeof(mif_cmpt_t *));
+	newcmpts = (!hdr->cmpts) ? jas_alloc2(maxcmpts, sizeof(mif_cmpt_t *)) :
+	  jas_realloc2(hdr->cmpts, maxcmpts, sizeof(mif_cmpt_t *));
 	if (!newcmpts) {
 		return -1;
 	}

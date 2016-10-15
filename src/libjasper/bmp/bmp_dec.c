@@ -283,7 +283,7 @@ static bmp_info_t *bmp_getinfo(jas_stream_t *in)
 	}
 
 	if (info->numcolors > 0) {
-		if (!(info->palents = jas_malloc(info->numcolors *
+		if (!(info->palents = jas_alloc2(info->numcolors,
 		  sizeof(bmp_palent_t)))) {
 			bmp_info_destroy(info);
 			return 0;

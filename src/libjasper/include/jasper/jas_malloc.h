@@ -113,7 +113,16 @@ void jas_free(void *ptr);
 void *jas_realloc(void *ptr, size_t size);
 
 /* Allocate a block of memory and initialize the contents to zero. */
-void *jas_calloc(size_t nmemb, size_t size);
+void *jas_calloc(size_t num_elements, size_t element_size);
+
+/* Allocate array (with overflow checking) . */
+void *jas_alloc2(size_t num_elements, size_t element_size);
+
+/* Allocate array of arrays (with overflow checking) . */
+void *jas_alloc3(size_t num_arrays, size_t array_size, size_t element_size);
+
+/* Resize a block of allocated memory (with overflow checking) . */
+void *jas_realloc2(void *ptr, size_t num_elements, size_t element_size);
 
 #endif
 
