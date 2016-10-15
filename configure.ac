@@ -329,7 +329,11 @@ yes)
 	AC_DEFINE(DEBUG)
 	AC_DEFINE(DEBUG_OVERFLOW)
 	if test "$GCC" = yes; then
-		CFLAGS="-g -O0"
+		CFLAGS=""
+		CFLAGS="$CFLAGS -g -O0"
+		CFLAGS="$CFLAGS -fsanitize=address"
+		CFLAGS="$CFLAGS -fsanitize=leak"
+		CFLAGS="$CFLAGS -fsanitize=undefined"
 	fi
 	;;
 no)
