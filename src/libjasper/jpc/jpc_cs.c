@@ -754,24 +754,30 @@ static int jpc_cox_getcompparms(jpc_ms_t *ms, jpc_cstate_t *cstate,
 		return -1;
 	}
 	compparms->numrlvls = compparms->numdlvls + 1;
+	if (compparms->numrlvls > JPC_MAXRLVLS) {
+		goto error;
+	}
 	if (prtflag) {
 		for (i = 0; i < compparms->numrlvls; ++i) {
 			if (jpc_getuint8(in, &tmp)) {
-				jpc_cox_destroycompparms(compparms);
-				return -1;
+				goto error;
 			}
 			compparms->rlvls[i].parwidthval = tmp & 0xf;
 			compparms->rlvls[i].parheightval = (tmp >> 4) & 0xf;
 		}
-/* Sigh.  This bit should be in the same field in both COC and COD mrk segs. */
-compparms->csty |= JPC_COX_PRT;
-	} else {
+		/* Sigh.
+		This bit should be in the same field in both COC and COD mrk segs. */
+		compparms->csty |= JPC_COX_PRT;
 	}
 	if (jas_stream_eof(in)) {
-		jpc_cox_destroycompparms(compparms);
-		return -1;
+		goto error;
 	}
 	return 0;
+error:
+	if (compparms) {
+		jpc_cox_destroycompparms(compparms);
+	}
+	return -1;
 }
 
 static int jpc_cox_putcompparms(jpc_ms_t *ms, jpc_cstate_t *cstate,
@@ -1356,7 +1362,7 @@ static int jpc_crg_getparms(jpc_ms_t *ms, jpc_cstate_t *cstate, jas_stream_t *in
 	jpc_crgcomp_t *comp;
 	uint_fast16_t compno;
 	crg->numcomps = cstate->numcomps;
-	if (!(crg->comps = jas_alloc2(cstate->numcomps, sizeof(uint_fast16_t)))) {
+	if (!(crg->comps = jas_alloc2(cstate->numcomps, sizeof(jpc_crgcomp_t)))) {
 		return -1;
 	}
 	for (compno = 0, comp = crg->comps; compno < cstate->numcomps;
