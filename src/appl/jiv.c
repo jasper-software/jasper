@@ -829,11 +829,13 @@ static void pixmap_clear(pixmap_t *p)
 
 static int pixmap_resize(pixmap_t *p, int w, int h)
 {
-	p->width = w;
-	p->height = h;
-	if (!(p->data = realloc(p->data, w * h * 4 * sizeof(GLshort)))) {
+	GLshort* buf;
+	if (!(buf = realloc(p->data, w * h * 4 * sizeof(GLshort)))) {
 		return -1;
 	}
+	p->width = w;
+	p->height = h;
+	p->data = buf;
 	return 0;
 }
 
