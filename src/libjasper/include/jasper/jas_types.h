@@ -92,103 +92,14 @@
 
 #endif
 
-#if defined(HAVE_STDLIB_H)
-#undef false
-#undef true
+/* Note: The immediately following header files should eventually be removed. */
 #include <stdlib.h>
-#endif
-#if defined(HAVE_STDDEF_H)
 #include <stddef.h>
-#endif
+#include <stdbool.h>
+#include <stdint.h>
+
 #if defined(HAVE_SYS_TYPES_H)
 #include <sys/types.h>
-#endif
-
-#ifndef __cplusplus
-#if defined(HAVE_STDBOOL_H)
-/*
- * The C language implementation does correctly provide the standard header
- * file "stdbool.h".
- */
-#include <stdbool.h>
-#else
-
-/*
- * The C language implementation does not provide the standard header file
- * "stdbool.h" as required by ISO/IEC 9899:1999.  Try to compensate for this
- * braindamage below.
- */
-#if !defined(bool)
-#define	bool	int
-#endif
-#if !defined(true)
-#define true	1
-#endif
-#if !defined(false)
-#define	false	0
-#endif
-#endif
-
-#endif
-
-#if defined(HAVE_STDINT_H)
-/*
- * The C language implementation does correctly provide the standard header
- * file "stdint.h".
- */
-#include <stdint.h>
-#else
-/*
- * The C language implementation does not provide the standard header file
- * "stdint.h" as required by ISO/IEC 9899:1999.  Try to compensate for this
- * braindamage below.
- */
-#include <limits.h>
-/**********/
-#if !defined(INT_FAST8_MIN)
-typedef signed char int_fast8_t;
-#define INT_FAST8_MIN	(-127)
-#define INT_FAST8_MAX	128
-#endif
-/**********/
-#if !defined(UINT_FAST8_MAX)
-typedef unsigned char uint_fast8_t;
-#define UINT_FAST8_MAX	255
-#endif
-/**********/
-#if !defined(INT_FAST16_MIN)
-typedef short int_fast16_t;
-#define INT_FAST16_MIN	SHRT_MIN
-#define INT_FAST16_MAX	SHRT_MAX
-#endif
-/**********/
-#if !defined(UINT_FAST16_MAX)
-typedef unsigned short uint_fast16_t;
-#define UINT_FAST16_MAX	USHRT_MAX
-#endif
-/**********/
-#if !defined(INT_FAST32_MIN)
-typedef int int_fast32_t;
-#define INT_FAST32_MIN	INT_MIN
-#define INT_FAST32_MAX	INT_MAX
-#endif
-/**********/
-#if !defined(UINT_FAST32_MAX)
-typedef unsigned int uint_fast32_t;
-#define UINT_FAST32_MAX	UINT_MAX
-#endif
-/**********/
-#if !defined(INT_FAST64_MIN)
-typedef longlong int_fast64_t;
-#define INT_FAST64_MIN	LLONG_MIN
-#define INT_FAST64_MAX	LLONG_MAX
-#endif
-/**********/
-#if !defined(UINT_FAST64_MAX)
-typedef ulonglong uint_fast64_t;
-#define UINT_FAST64_MAX	ULLONG_MAX
-#endif
-/**********/
 #endif
 
 /* Hopefully, these macro definitions will fix more problems than they cause. */
