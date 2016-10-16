@@ -449,8 +449,10 @@ static int jpc_dec_process_sot(jpc_dec_t *dec, jpc_ms_t *ms)
 
 	if (dec->state == JPC_MH) {
 
-		compinfos = jas_alloc2(dec->numcomps, sizeof(jas_image_cmptparm_t));
-		assert(compinfos);
+		if (!(compinfos = jas_alloc2(dec->numcomps,
+		  sizeof(jas_image_cmptparm_t)))) {
+			abort();
+		}
 		for (cmptno = 0, cmpt = dec->cmpts, compinfo = compinfos;
 		  cmptno < dec->numcomps; ++cmptno, ++cmpt, ++compinfo) {
 			compinfo->tlx = 0;
@@ -465,6 +467,7 @@ static int jpc_dec_process_sot(jpc_dec_t *dec, jpc_ms_t *ms)
 
 		if (!(dec->image = jas_image_create(dec->numcomps, compinfos,
 		  JAS_CLRSPC_UNKNOWN))) {
+			jas_free(compinfos);
 			return -1;
 		}
 		jas_free(compinfos);
@@ -1490,11 +1493,10 @@ static jpc_dec_cp_t *jpc_dec_cp_create(uint_fast16_t numcomps)
 	cp->mctid = 0;
 	cp->csty = 0;
 	if (!(cp->ccps = jas_alloc2(cp->numcomps, sizeof(jpc_dec_ccp_t)))) {
-		return 0;
+		goto error;
 	}
 	if (!(cp->pchglist = jpc_pchglist_create())) {
-		jas_free(cp->ccps);
-		return 0;
+		goto error;
 	}
 	for (compno = 0, ccp = cp->ccps; compno < cp->numcomps;
 	  ++compno, ++ccp) {
@@ -1509,6 +1511,11 @@ static jpc_dec_cp_t *jpc_dec_cp_create(uint_fast16_t numcomps)
 		ccp->cblkctx = 0;
 	}
 	return cp;
+error:
+	if (cp) {
+		jpc_dec_cp_destroy(cp);
+	}
+	return 0;
 }
 
 static jpc_dec_cp_t *jpc_dec_cp_copy(jpc_dec_cp_t *cp)

@@ -568,7 +568,7 @@ static int mif_process_cmpt(mif_hdr_t *hdr, char *buf)
 			break;
 		case MIF_DATA:
 			if (!(cmpt->data = jas_strdup(jas_tvparser_getval(tvp)))) {
-				return -1;
+				goto error;
 			}
 			break;
 		}

@@ -355,6 +355,8 @@ jas_cmprof_t *jas_cmprof_copy(jas_cmprof_t *prof)
 	}
 	return newprof;
 error:
+	if (newprof)
+		jas_cmprof_destroy(newprof);
 	return 0;
 }
 
@@ -458,6 +460,8 @@ jas_cmxform_t *jas_cmxform_create(jas_cmprof_t *inprof, jas_cmprof_t *outprof,
 	}
 	return xform;
 error:
+	if (xform)
+		jas_cmxform_destroy(xform);
 	return 0;
 }
 
@@ -614,6 +618,8 @@ static jas_cmpxformseq_t *jas_cmpxformseq_copy(jas_cmpxformseq_t *pxformseq)
 		goto error;
 	return newpxformseq;
 error:
+	if (newpxformseq)
+		jas_cmpxformseq_destroy(newpxformseq);
 	return 0;
 }
 

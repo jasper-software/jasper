@@ -488,6 +488,7 @@ jas_image_t *makediffimage(jas_matrix_t *origdata, jas_matrix_t *recondata)
 	jas_seqent_t a;
 	jas_seqent_t b;
 
+	diffimage = 0;
 	width = jas_matrix_numcols(origdata);
 	height = jas_matrix_numrows(origdata);
 
@@ -502,13 +503,14 @@ jas_image_t *makediffimage(jas_matrix_t *origdata, jas_matrix_t *recondata)
 		compparms[i].sgnd = false;
 	}
 	if (!(diffimage = jas_image_create(3, compparms, JAS_CLRSPC_SRGB))) {
-		abort();
+		fprintf(stderr, "cannot create image\n");
+		goto error;
 	}
 
 	for (i = 0; i < 3; ++i) {
 		if (!(diffdata[i] = jas_matrix_create(height, width))) {
-			fprintf(stderr, "internal error\n");
-			return 0;
+			fprintf(stderr, "cannot create matrix\n");
+			goto error;
 		}
 	}
 
@@ -534,11 +536,18 @@ jas_image_t *makediffimage(jas_matrix_t *origdata, jas_matrix_t *recondata)
 
 	for (i = 0; i < 3; ++i) {
 		if (jas_image_writecmpt(diffimage, i, 0, 0, width, height, diffdata[i])) {
-			return 0;
+			fprintf(stderr, "cannot write image component\n");
+			goto error;
 		}
 	}
 
 	return diffimage;
+
+error:
+	if (diffimage) {
+		jas_image_destroy(diffimage);
+	}
+	return 0;
 }
 
 /******************************************************************************\
