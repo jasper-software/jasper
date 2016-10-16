@@ -1041,7 +1041,7 @@ static int mem_write(jas_stream_obj_t *obj, char *buf, int cnt)
 	if (m->pos_ > m->len_) {
 		m->len_ = m->pos_;
 	}
-assert(ret == cnt);
+	assert(ret == cnt);
 	return ret;
 }
 
