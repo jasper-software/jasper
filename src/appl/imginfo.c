@@ -85,7 +85,8 @@ typedef enum {
 	OPT_HELP,
 	OPT_VERSION,
 	OPT_VERBOSE,
-	OPT_INFILE
+	OPT_INFILE,
+	OPT_DEBUG
 } optid_t;
 
 /******************************************************************************\
@@ -104,6 +105,7 @@ static jas_opt_t opts[] = {
 	{OPT_VERSION, "version", 0},
 	{OPT_VERBOSE, "verbose", 0},
 	{OPT_INFILE, "f", JAS_OPT_HASARG},
+	{OPT_DEBUG, "debug-level", JAS_OPT_HASARG},
 	{-1, 0, 0}
 };
 
@@ -126,6 +128,7 @@ int main(int argc, char **argv)
 	int numcmpts;
 	int verbose;
 	char *fmtname;
+	int debug;
 
 	if (jas_init()) {
 		abort();
@@ -135,6 +138,7 @@ int main(int argc, char **argv)
 
 	infile = 0;
 	verbose = 0;
+	debug = 0;
 
 	/* Parse the command line options. */
 	while ((id = jas_getopt(argc, argv, opts)) >= 0) {
@@ -146,6 +150,9 @@ int main(int argc, char **argv)
 			printf("%s\n", JAS_VERSION);
 			exit(EXIT_SUCCESS);
 			break;
+		case OPT_DEBUG:
+			debug = atoi(jas_optarg);
+			break;
 		case OPT_INFILE:
 			infile = jas_optarg;
 			break;
@@ -155,6 +162,8 @@ int main(int argc, char **argv)
 			break;
 		}
 	}
+
+	jas_setdbglevel(debug);
 
 	/* Open the image file. */
 	if (infile) {
@@ -177,6 +186,7 @@ int main(int argc, char **argv)
 
 	/* Decode the image. */
 	if (!(image = jas_image_decode(instream, fmtid, 0))) {
+		jas_stream_close(instream);
 		fprintf(stderr, "cannot load image\n");
 		return EXIT_FAILURE;
 	}
