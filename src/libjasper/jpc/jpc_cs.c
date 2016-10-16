@@ -1008,10 +1008,16 @@ static int jpc_qcx_getcompparms(jpc_qcxcp_t *compparms, jpc_cstate_t *cstate,
 		compparms->numstepsizes = (len - n) / 2;
 		break;
 	}
+	/* Ensure that the step size array is sufficiently large. */
+	if (compparms->numstepsizes > 3 * JPC_MAXRLVLS + 1) {
+		jpc_qcx_destroycompparms(compparms);
+		return -1;
+	}
 	if (compparms->numstepsizes > 0) {
-		compparms->stepsizes = jas_alloc2(compparms->numstepsizes,
-		  sizeof(uint_fast16_t));
-		assert(compparms->stepsizes);
+		if (!(compparms->stepsizes = jas_alloc2(compparms->numstepsizes,
+		  sizeof(uint_fast16_t)))) {
+			abort();
+		}
 		for (i = 0; i < compparms->numstepsizes; ++i) {
 			if (compparms->qntsty == JPC_QCX_NOQNT) {
 				if (jpc_getuint8(in, &tmp)) {
