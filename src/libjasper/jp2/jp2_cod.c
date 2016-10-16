@@ -480,7 +480,9 @@ int jp2_box_put(jp2_box_t *box, jas_stream_t *out)
 	dataflag = !(box->info->flags & (JP2_BOX_SUPER | JP2_BOX_NODATA));
 
 	if (dataflag) {
-		tmpstream = jas_stream_memopen(0, 0);
+		if (!(tmpstream = jas_stream_memopen(0, 0))) {
+			goto error;
+		}
 		if (box->ops->putdata) {
 			if ((*box->ops->putdata)(box, tmpstream)) {
 				goto error;

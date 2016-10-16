@@ -210,7 +210,10 @@ jas_image_t *jas_image_copy(jas_image_t *image)
 	jas_image_t *newimage;
 	int cmptno;
 
-	newimage = jas_image_create0();
+	if (!(newimage = jas_image_create0())) {
+		goto error;
+	}
+
 	if (jas_image_growcmpts(newimage, image->numcmpts_)) {
 		goto error;
 	}
