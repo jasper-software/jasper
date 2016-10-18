@@ -674,8 +674,9 @@ int jas_image_addcmpt(jas_image_t *image, int cmptno,
   jas_image_cmptparm_t *cmptparm)
 {
 	jas_image_cmpt_t *newcmpt;
-	if (cmptno < 0)
+	if (cmptno < 0) {
 		cmptno = image->numcmpts_;
+	}
 	assert(cmptno >= 0 && cmptno <= image->numcmpts_);
 	if (image->numcmpts_ >= image->maxcmpts_) {
 		if (jas_image_growcmpts(image, image->maxcmpts_ + 128)) {
@@ -790,7 +791,8 @@ static int jas_image_growcmpts(jas_image_t *image, int maxcmpts)
 	jas_image_cmpt_t **newcmpts;
 	int cmptno;
 
-	newcmpts = (!image->cmpts_) ? jas_alloc2(maxcmpts, sizeof(jas_image_cmpt_t *)) :
+	newcmpts = (!image->cmpts_) ? jas_alloc2(maxcmpts,
+	  sizeof(jas_image_cmpt_t *)) :
 	  jas_realloc2(image->cmpts_, maxcmpts, sizeof(jas_image_cmpt_t *));
 	if (!newcmpts) {
 		return -1;
@@ -803,8 +805,8 @@ static int jas_image_growcmpts(jas_image_t *image, int maxcmpts)
 	return 0;
 }
 
-int jas_image_copycmpt(jas_image_t *dstimage, int dstcmptno, jas_image_t *srcimage,
-  int srccmptno)
+int jas_image_copycmpt(jas_image_t *dstimage, int dstcmptno,
+  jas_image_t *srcimage, int srccmptno)
 {
 	jas_image_cmpt_t *newcmpt;
 	if (dstimage->numcmpts_ >= dstimage->maxcmpts_) {
