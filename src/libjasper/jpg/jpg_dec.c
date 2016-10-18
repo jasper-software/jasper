@@ -202,6 +202,7 @@ jas_image_t *jpg_decode(jas_stream_t *in, char *optstr)
 	jas_matrix_destroy(dest_mgr->data);
 
 	fclose(input_file);
+	input_file = 0;
 
 	if (dest_mgr->error) {
 		goto error;

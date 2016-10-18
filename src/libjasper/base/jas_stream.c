@@ -979,6 +979,8 @@ long jas_stream_length(jas_stream_t *stream)
 static int mem_read(jas_stream_obj_t *obj, char *buf, int cnt)
 {
 	int n;
+	assert(cnt >= 0);
+	assert(buf);
 	jas_stream_memobj_t *m = (jas_stream_memobj_t *)obj;
 	n = m->len_ - m->pos_;
 	cnt = JAS_MIN(n, cnt);
@@ -992,6 +994,7 @@ static int mem_resize(jas_stream_memobj_t *m, int bufsize)
 	unsigned char *buf;
 
 	assert(m->buf_);
+	assert(bufsize >= 0);
 	if (!(buf = jas_realloc2(m->buf_, bufsize, sizeof(unsigned char)))) {
 		return -1;
 	}
@@ -1008,6 +1011,8 @@ static int mem_write(jas_stream_obj_t *obj, char *buf, int cnt)
 	long newbufsize;
 	long newpos;
 
+	assert(buf);
+	assert(cnt >= 0);
 	newpos = m->pos_ + cnt;
 	if (newpos > m->bufsize_ && m->growable_) {
 		newbufsize = m->bufsize_;
