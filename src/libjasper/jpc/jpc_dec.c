@@ -709,12 +709,14 @@ static int jpc_dec_tileinit(jpc_dec_t *dec, jpc_dec_tile_t *tile)
 		  tcomp->numrlvls - 1))) {
 			return -1;
 		}
-{
-	jpc_tsfb_getbands(tcomp->tsfb, jas_seq2d_xstart(tcomp->data), jas_seq2d_ystart(tcomp->data), jas_seq2d_xend(tcomp->data), jas_seq2d_yend(tcomp->data), bnds);
-}
+		{
+			jpc_tsfb_getbands(tcomp->tsfb, jas_seq2d_xstart(tcomp->data),
+			  jas_seq2d_ystart(tcomp->data), jas_seq2d_xend(tcomp->data),
+			  jas_seq2d_yend(tcomp->data), bnds);
+		}
 		for (rlvlno = 0, rlvl = tcomp->rlvls; rlvlno < tcomp->numrlvls;
 		  ++rlvlno, ++rlvl) {
-rlvl->bands = 0;
+			rlvl->bands = 0;
 			rlvl->xstart = JPC_CEILDIVPOW2(tcomp->xstart,
 			  tcomp->numrlvls - 1 - rlvlno);
 			rlvl->ystart = JPC_CEILDIVPOW2(tcomp->ystart,
@@ -795,108 +797,117 @@ rlvl->bands = 0;
 				if (!(band->data = jas_seq2d_create(0, 0, 0, 0))) {
 					return -1;
 				}
-				jas_seq2d_bindsub(band->data, tcomp->data, bnd->locxstart, bnd->locystart, bnd->locxend, bnd->locyend);
+				jas_seq2d_bindsub(band->data, tcomp->data, bnd->locxstart,
+				  bnd->locystart, bnd->locxend, bnd->locyend);
 				jas_seq2d_setshift(band->data, bnd->xstart, bnd->ystart);
 
 				assert(rlvl->numprcs);
 
-				if (!(band->prcs = jas_alloc2(rlvl->numprcs, sizeof(jpc_dec_prc_t)))) {
+				if (!(band->prcs = jas_alloc2(rlvl->numprcs,
+				  sizeof(jpc_dec_prc_t)))) {
 					return -1;
 				}
 
 /************************************************/
-	cbgxstart = tlcbgxstart;
-	cbgystart = tlcbgystart;
-	for (prccnt = rlvl->numprcs, prc = band->prcs;
-	  prccnt > 0; --prccnt, ++prc) {
-		cbgxend = cbgxstart + (1 << rlvl->cbgwidthexpn);
-		cbgyend = cbgystart + (1 << rlvl->cbgheightexpn);
-		prc->xstart = JAS_MAX(cbgxstart, JAS_CAST(uint_fast32_t, jas_seq2d_xstart(band->data)));
-		prc->ystart = JAS_MAX(cbgystart, JAS_CAST(uint_fast32_t, jas_seq2d_ystart(band->data)));
-		prc->xend = JAS_MIN(cbgxend, JAS_CAST(uint_fast32_t, jas_seq2d_xend(band->data)));
-		prc->yend = JAS_MIN(cbgyend, JAS_CAST(uint_fast32_t, jas_seq2d_yend(band->data)));
-		if (prc->xend > prc->xstart && prc->yend > prc->ystart) {
-			tlcblkxstart = JPC_FLOORDIVPOW2(prc->xstart,
-			  rlvl->cblkwidthexpn) << rlvl->cblkwidthexpn;
-			tlcblkystart = JPC_FLOORDIVPOW2(prc->ystart,
-			  rlvl->cblkheightexpn) << rlvl->cblkheightexpn;
-			brcblkxend = JPC_CEILDIVPOW2(prc->xend,
-			  rlvl->cblkwidthexpn) << rlvl->cblkwidthexpn;
-			brcblkyend = JPC_CEILDIVPOW2(prc->yend,
-			  rlvl->cblkheightexpn) << rlvl->cblkheightexpn;
-			prc->numhcblks = (brcblkxend - tlcblkxstart) >>
-			  rlvl->cblkwidthexpn;
-			prc->numvcblks = (brcblkyend - tlcblkystart) >>
-			  rlvl->cblkheightexpn;
-			prc->numcblks = prc->numhcblks * prc->numvcblks;
-			assert(prc->numcblks > 0);
+				cbgxstart = tlcbgxstart;
+				cbgystart = tlcbgystart;
+				for (prccnt = rlvl->numprcs, prc = band->prcs;
+				  prccnt > 0; --prccnt, ++prc) {
+					cbgxend = cbgxstart + (1 << rlvl->cbgwidthexpn);
+					cbgyend = cbgystart + (1 << rlvl->cbgheightexpn);
+					prc->xstart = JAS_MAX(cbgxstart, JAS_CAST(uint_fast32_t,
+					  jas_seq2d_xstart(band->data)));
+					prc->ystart = JAS_MAX(cbgystart, JAS_CAST(uint_fast32_t,
+					  jas_seq2d_ystart(band->data)));
+					prc->xend = JAS_MIN(cbgxend, JAS_CAST(uint_fast32_t,
+					  jas_seq2d_xend(band->data)));
+					prc->yend = JAS_MIN(cbgyend, JAS_CAST(uint_fast32_t,
+					  jas_seq2d_yend(band->data)));
+					if (prc->xend > prc->xstart && prc->yend > prc->ystart) {
+						tlcblkxstart = JPC_FLOORDIVPOW2(prc->xstart,
+						  rlvl->cblkwidthexpn) << rlvl->cblkwidthexpn;
+						tlcblkystart = JPC_FLOORDIVPOW2(prc->ystart,
+						  rlvl->cblkheightexpn) << rlvl->cblkheightexpn;
+						brcblkxend = JPC_CEILDIVPOW2(prc->xend,
+						  rlvl->cblkwidthexpn) << rlvl->cblkwidthexpn;
+						brcblkyend = JPC_CEILDIVPOW2(prc->yend,
+						  rlvl->cblkheightexpn) << rlvl->cblkheightexpn;
+						prc->numhcblks = (brcblkxend - tlcblkxstart) >>
+						  rlvl->cblkwidthexpn;
+						prc->numvcblks = (brcblkyend - tlcblkystart) >>
+						  rlvl->cblkheightexpn;
+						prc->numcblks = prc->numhcblks * prc->numvcblks;
+						assert(prc->numcblks > 0);
 
-			if (!(prc->incltagtree = jpc_tagtree_create(prc->numhcblks, prc->numvcblks))) {
-				return -1;
-			}
-			if (!(prc->numimsbstagtree = jpc_tagtree_create(prc->numhcblks, prc->numvcblks))) {
-				return -1;
-			}
-			if (!(prc->cblks = jas_alloc2(prc->numcblks, sizeof(jpc_dec_cblk_t)))) {
-				return -1;
-			}
+						if (!(prc->incltagtree = jpc_tagtree_create(
+						  prc->numhcblks, prc->numvcblks))) {
+							return -1;
+						}
+						if (!(prc->numimsbstagtree = jpc_tagtree_create(
+						  prc->numhcblks, prc->numvcblks))) {
+							return -1;
+						}
+						if (!(prc->cblks = jas_alloc2(prc->numcblks,
+						  sizeof(jpc_dec_cblk_t)))) {
+							return -1;
+						}
 
-			cblkxstart = cbgxstart;
-			cblkystart = cbgystart;
-			for (cblkcnt = prc->numcblks, cblk = prc->cblks; cblkcnt > 0;) {
-				cblkxend = cblkxstart + (1 << rlvl->cblkwidthexpn);
-				cblkyend = cblkystart + (1 << rlvl->cblkheightexpn);
-				tmpxstart = JAS_MAX(cblkxstart, prc->xstart);
-				tmpystart = JAS_MAX(cblkystart, prc->ystart);
-				tmpxend = JAS_MIN(cblkxend, prc->xend);
-				tmpyend = JAS_MIN(cblkyend, prc->yend);
-				if (tmpxend > tmpxstart && tmpyend > tmpystart) {
-					cblk->firstpassno = -1;
-					cblk->mqdec = 0;
-					cblk->nulldec = 0;
-					cblk->flags = 0;
-					cblk->numpasses = 0;
-					cblk->segs.head = 0;
-					cblk->segs.tail = 0;
-					cblk->curseg = 0;
-					cblk->numimsbs = 0;
-					cblk->numlenbits = 3;
-					cblk->flags = 0;
-					if (!(cblk->data = jas_seq2d_create(0, 0, 0, 0))) {
-						return -1;
+						cblkxstart = cbgxstart;
+						cblkystart = cbgystart;
+						for (cblkcnt = prc->numcblks, cblk = prc->cblks; cblkcnt > 0;) {
+							cblkxend = cblkxstart + (1 << rlvl->cblkwidthexpn);
+							cblkyend = cblkystart + (1 << rlvl->cblkheightexpn);
+							tmpxstart = JAS_MAX(cblkxstart, prc->xstart);
+							tmpystart = JAS_MAX(cblkystart, prc->ystart);
+							tmpxend = JAS_MIN(cblkxend, prc->xend);
+							tmpyend = JAS_MIN(cblkyend, prc->yend);
+							if (tmpxend > tmpxstart && tmpyend > tmpystart) {
+								cblk->firstpassno = -1;
+								cblk->mqdec = 0;
+								cblk->nulldec = 0;
+								cblk->flags = 0;
+								cblk->numpasses = 0;
+								cblk->segs.head = 0;
+								cblk->segs.tail = 0;
+								cblk->curseg = 0;
+								cblk->numimsbs = 0;
+								cblk->numlenbits = 3;
+								cblk->flags = 0;
+								if (!(cblk->data = jas_seq2d_create(0, 0, 0, 0))) {
+									return -1;
+								}
+								jas_seq2d_bindsub(cblk->data, band->data,
+								  tmpxstart, tmpystart, tmpxend, tmpyend);
+								++cblk;
+								--cblkcnt;
+							}
+							cblkxstart += 1 << rlvl->cblkwidthexpn;
+							if (cblkxstart >= cbgxend) {
+								cblkxstart = cbgxstart;
+								cblkystart += 1 << rlvl->cblkheightexpn;
+							}
+						}
+
+					} else {
+						prc->cblks = 0;
+						prc->incltagtree = 0;
+						prc->numimsbstagtree = 0;
 					}
-					jas_seq2d_bindsub(cblk->data, band->data, tmpxstart, tmpystart, tmpxend, tmpyend);
-					++cblk;
-					--cblkcnt;
-				}
-				cblkxstart += 1 << rlvl->cblkwidthexpn;
-				if (cblkxstart >= cbgxend) {
-					cblkxstart = cbgxstart;
-					cblkystart += 1 << rlvl->cblkheightexpn;
-				}
-			}
+					cbgxstart += 1 << rlvl->cbgwidthexpn;
+					if (cbgxstart >= brcbgxend) {
+						cbgxstart = tlcbgxstart;
+						cbgystart += 1 << rlvl->cbgheightexpn;
+					}
 
-		} else {
-			prc->cblks = 0;
-			prc->incltagtree = 0;
-			prc->numimsbstagtree = 0;
-		}
-		cbgxstart += 1 << rlvl->cbgwidthexpn;
-		if (cbgxstart >= brcbgxend) {
-			cbgxstart = tlcbgxstart;
-			cbgystart += 1 << rlvl->cbgheightexpn;
-		}
-
-	}
+				}
 /********************************************/
 			}
 		}
 	}
 
-if (!(tile->pi = jpc_dec_pi_create(dec, tile)))
-{
-	return -1;
-}
+	if (!(tile->pi = jpc_dec_pi_create(dec, tile))) {
+		return -1;
+	}
 
 	for (pchgno = 0; pchgno < jpc_pchglist_numpchgs(tile->cp->pchglist);
 	  ++pchgno) {
@@ -923,73 +934,76 @@ static int jpc_dec_tilefini(jpc_dec_t *dec, jpc_dec_tile_t *tile)
 	jpc_dec_cblk_t *cblk;
 	int cblkno;
 
-if (tile->tcomps) {
+	if (tile->tcomps) {
 
-	for (compno = 0, tcomp = tile->tcomps; compno < dec->numcomps;
-	  ++compno, ++tcomp) {
-		for (rlvlno = 0, rlvl = tcomp->rlvls; rlvlno < tcomp->numrlvls;
-		  ++rlvlno, ++rlvl) {
-if (!rlvl->bands) {
-	continue;
-}
-			for (bandno = 0, band = rlvl->bands; bandno < rlvl->numbands; ++bandno, ++band) {
-if (band->prcs) {
-				for (prcno = 0, prc = band->prcs; prcno <
-				  rlvl->numprcs; ++prcno, ++prc) {
-if (!prc->cblks) {
-	continue;
-}
-					for (cblkno = 0, cblk = prc->cblks; cblkno < prc->numcblks; ++cblkno, ++cblk) {
+		for (compno = 0, tcomp = tile->tcomps; compno < dec->numcomps;
+		  ++compno, ++tcomp) {
+			for (rlvlno = 0, rlvl = tcomp->rlvls; rlvlno < tcomp->numrlvls;
+			  ++rlvlno, ++rlvl) {
+				if (!rlvl->bands) {
+					continue;
+				}
+				for (bandno = 0, band = rlvl->bands; bandno < rlvl->numbands;
+				  ++bandno, ++band) {
+					if (band->prcs) {
+						for (prcno = 0, prc = band->prcs; prcno <
+						  rlvl->numprcs; ++prcno, ++prc) {
+							if (!prc->cblks) {
+								continue;
+							}
+							for (cblkno = 0, cblk = prc->cblks; cblkno <
+							  prc->numcblks; ++cblkno, ++cblk) {
 
-	while (cblk->segs.head) {
-		seg = cblk->segs.head;
-		jpc_seglist_remove(&cblk->segs, seg);
-		jpc_seg_destroy(seg);
-	}
-	jas_matrix_destroy(cblk->data);
-	if (cblk->mqdec) {
-		jpc_mqdec_destroy(cblk->mqdec);
-	}
-	if (cblk->nulldec) {
-		jpc_bitstream_close(cblk->nulldec);
-	}
-	if (cblk->flags) {
-		jas_matrix_destroy(cblk->flags);
-	}
+								while (cblk->segs.head) {
+									seg = cblk->segs.head;
+									jpc_seglist_remove(&cblk->segs, seg);
+									jpc_seg_destroy(seg);
+								}
+								jas_matrix_destroy(cblk->data);
+								if (cblk->mqdec) {
+									jpc_mqdec_destroy(cblk->mqdec);
+								}
+								if (cblk->nulldec) {
+									jpc_bitstream_close(cblk->nulldec);
+								}
+								if (cblk->flags) {
+									jas_matrix_destroy(cblk->flags);
+								}
+							}
+							if (prc->incltagtree) {
+								jpc_tagtree_destroy(prc->incltagtree);
+							}
+							if (prc->numimsbstagtree) {
+								jpc_tagtree_destroy(prc->numimsbstagtree);
+							}
+							if (prc->cblks) {
+								jas_free(prc->cblks);
+							}
+						}
 					}
-					if (prc->incltagtree) {
-						jpc_tagtree_destroy(prc->incltagtree);
+					if (band->data) {
+						jas_matrix_destroy(band->data);
 					}
-					if (prc->numimsbstagtree) {
-						jpc_tagtree_destroy(prc->numimsbstagtree);
-					}
-					if (prc->cblks) {
-						jas_free(prc->cblks);
+					if (band->prcs) {
+						jas_free(band->prcs);
 					}
 				}
-}
-				if (band->data) {
-					jas_matrix_destroy(band->data);
-				}
-				if (band->prcs) {
-					jas_free(band->prcs);
+				if (rlvl->bands) {
+					jas_free(rlvl->bands);
 				}
 			}
-			if (rlvl->bands) {
-				jas_free(rlvl->bands);
+			if (tcomp->rlvls) {
+				jas_free(tcomp->rlvls);
+			}
+			if (tcomp->data) {
+				jas_matrix_destroy(tcomp->data);
+			}
+			if (tcomp->tsfb) {
+				jpc_tsfb_destroy(tcomp->tsfb);
 			}
 		}
-		if (tcomp->rlvls) {
-			jas_free(tcomp->rlvls);
-		}
-		if (tcomp->data) {
-			jas_matrix_destroy(tcomp->data);
-		}
-		if (tcomp->tsfb) {
-			jpc_tsfb_destroy(tcomp->tsfb);
-		}
 	}
-}
+
 	if (tile->cp) {
 		jpc_dec_cp_destroy(tile->cp);
 		tile->cp = 0;
