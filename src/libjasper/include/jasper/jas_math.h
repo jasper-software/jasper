@@ -76,9 +76,11 @@
 
 #include <jasper/jas_config.h>
 
-#include	<assert.h>
-#include	<stdio.h>
-#include	<string.h>
+#include <assert.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdbool.h>
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -109,6 +111,33 @@ extern "C" {
   set to one. */
 #define	JAS_ONES(n) \
   ((1 << (n)) - 1)
+
+/******************************************************************************\
+* Safe integer arithmetic (i.e., with overflow checking).
+\******************************************************************************/
+
+/* Compute the product of two size_t integers with overflow checking. */
+inline static bool jas_safe_size_mul(size_t x, size_t y, size_t *result)
+{
+	/* Check if overflow would occur */
+	if (x && y > SIZE_MAX / x) {
+		/* Overflow would occur. */
+		*result = 0;
+		return false;
+	}
+	*result = x * y;
+	return true;
+}
+
+inline static bool jas_safe_size_add(size_t x, size_t y, size_t *result)
+{
+	if (y > SIZE_MAX - x) {
+		*result = 0;
+		return false;
+	}
+	*result = x + y;
+	return true;
+}
 
 #ifdef __cplusplus
 }

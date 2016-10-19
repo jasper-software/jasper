@@ -82,6 +82,7 @@
 
 #include "jasper/jas_malloc.h"
 #include "jasper/jas_debug.h"
+#include "jasper/jas_math.h"
 
 /******************************************************************************\
 * Code.
@@ -92,23 +93,6 @@
 #endif
 
 #if !defined(DEBUG_MEMALLOC)
-
-/******************************************************************************\
-* Safe integer arithmetic (i.e., with overflow checking).
-\******************************************************************************/
-
-/* Compute the product of two size_t integers with overflow checking. */
-inline static bool jas_safe_size_mul(size_t x, size_t y, size_t* result)
-{
-	/* Check if overflow would occur */
-	if (x && y > SIZE_MAX / x) {
-		/* Overflow would occur. */
-		*result = 0;
-		return false;
-	}
-	*result = x * y;
-	return true;
-}
 
 /******************************************************************************\
 * Basic memory allocation and deallocation primitives.
