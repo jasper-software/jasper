@@ -1006,23 +1006,23 @@ static int jpc_dec_tilefini(jpc_dec_t *dec, jpc_dec_tile_t *tile)
 
 	if (tile->cp) {
 		jpc_dec_cp_destroy(tile->cp);
-		tile->cp = 0;
+		//tile->cp = 0;
 	}
 	if (tile->tcomps) {
 		jas_free(tile->tcomps);
-		tile->tcomps = 0;
+		//tile->tcomps = 0;
 	}
 	if (tile->pi) {
 		jpc_pi_destroy(tile->pi);
-		tile->pi = 0;
+		//tile->pi = 0;
 	}
 	if (tile->pkthdrstream) {
 		jas_stream_close(tile->pkthdrstream);
-		tile->pkthdrstream = 0;
+		//tile->pkthdrstream = 0;
 	}
 	if (tile->pptstab) {
 		jpc_ppxstab_destroy(tile->pptstab);
-		tile->pptstab = 0;
+		//tile->pptstab = 0;
 	}
 
 	tile->state = JPC_TILE_DONE;
@@ -1165,7 +1165,11 @@ static int jpc_dec_process_eoc(jpc_dec_t *dec, jpc_ms_t *ms)
 				return -1;
 			}
 		}
-		jpc_dec_tilefini(dec, tile);
+		/* If the tile has not yet been finalized, finalize it. */
+		// OLD CODE: jpc_dec_tilefini(dec, tile);
+		if (tile->state != JPC_TILE_DONE) {
+			jpc_dec_tilefini(dec, tile);
+		}
 	}
 
 	/* We are done processing the code stream. */
@@ -1221,6 +1225,8 @@ static int jpc_dec_process_siz(jpc_dec_t *dec, jpc_ms_t *ms)
 	dec->numhtiles = JPC_CEILDIV(dec->xend - dec->tilexoff, dec->tilewidth);
 	dec->numvtiles = JPC_CEILDIV(dec->yend - dec->tileyoff, dec->tileheight);
 	dec->numtiles = dec->numhtiles * dec->numvtiles;
+	JAS_DBGLOG(10, ("numtiles = %d; numhtiles = %d; numvtiles = %d;\n",
+	  dec->numtiles, dec->numhtiles, dec->numvtiles));
 	if (!(dec->tiles = jas_alloc2(dec->numtiles, sizeof(jpc_dec_tile_t)))) {
 		return -1;
 	}
@@ -1245,6 +1251,7 @@ static int jpc_dec_process_siz(jpc_dec_t *dec, jpc_ms_t *ms)
 		tile->pkthdrstreampos = 0;
 		tile->pptstab = 0;
 		tile->cp = 0;
+		tile->pi = 0;
 		if (!(tile->tcomps = jas_alloc2(dec->numcomps,
 		  sizeof(jpc_dec_tcomp_t)))) {
 			return -1;
