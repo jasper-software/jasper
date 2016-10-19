@@ -434,6 +434,10 @@ static int jpc_sot_getparms(jpc_ms_t *ms, jpc_cstate_t *cstate, jas_stream_t *in
 	  jpc_getuint8(in, &sot->numparts)) {
 		return -1;
 	}
+	if (sot->tileno > 65534 || sot->len < 12 || sot->partno > 254 ||
+	  sot->numparts < 1 || sot->numparts > 255) {
+		return -1;
+	}
 	if (jas_stream_eof(in)) {
 		return -1;
 	}
@@ -499,7 +503,7 @@ static int jpc_siz_getparms(jpc_ms_t *ms, jpc_cstate_t *cstate,
 		return -1;
 	}
 	if (!siz->width || !siz->height || !siz->tilewidth ||
-	  !siz->tileheight || !siz->numcomps) {
+	  !siz->tileheight || !siz->numcomps || siz->numcomps > 16384) {
 		return -1;
 	}
 	if (!(siz->comps = jas_alloc2(siz->numcomps, sizeof(jpc_sizcomp_t)))) {
