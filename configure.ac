@@ -120,7 +120,6 @@ AH_TEMPLATE([JAS_CONFIGURE], [JasPer configure])
 AH_TEMPLATE([JAS_VERSION], [JasPer version])
 AH_TEMPLATE([DEBUG_MEMALLOC], [Debugging memory allocator])
 AH_TEMPLATE([DEBUG], [Extra debugging support])
-dnl AH_TEMPLATE([HAVE_VLA], [Have variable length arrays])
 
 AH_TOP([
 /* Avoid problems due to multiple inclusion. */
@@ -154,7 +153,6 @@ AH_BOTTOM([
 ############################################################
 
 #AC_PROG_CC
-#AC_PROG_CC_C11
 AC_PROG_CC_C99
 AC_PROG_INSTALL
 # AC_PROG_AWK
@@ -165,11 +163,6 @@ AM_DISABLE_SHARED
 AC_PROG_LIBTOOL
 
 AC_PATH_XTRA
-
-dnl AC_MSG_CHECKING(whether variable-length arrays are supported)
-dnl AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[
-dnl 	int n; int foo[n];
-dnl ]])],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_VLA)],[AC_MSG_RESULT(no)])
 
 ############################################################
 # Check for the IJG JPEG library.
@@ -282,7 +275,6 @@ AC_CHECK_HEADERS(fcntl.h limits.h unistd.h stdint.h stdbool.h io.h windows.h sys
 AC_C_CONST
 AC_C_INLINE
 AC_TYPE_SIZE_T
-dnl AC_CHECK_TYPE(bool, int)
 AC_CHECK_TYPE(uchar, unsigned char)
 AC_CHECK_TYPE(ushort, unsigned short)
 AC_CHECK_TYPE(uint, unsigned int)
