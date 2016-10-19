@@ -63,4 +63,4 @@ libmif_la_SOURCES = \
 	mif_cod.h \
 	mif_cod.c
 
-AM_CPPFLAGS = -I$(top_srcdir)/src/libjasper/include
+AM_CPPFLAGS = -I$(top_builddir)/src/libjasper/include -I$(top_srcdir)/src/libjasper/include

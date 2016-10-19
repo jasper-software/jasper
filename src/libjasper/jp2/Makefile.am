@@ -64,4 +64,4 @@ libjp2_la_SOURCES = \
 	jp2_dec.c \
 	jp2_enc.c
 
-AM_CPPFLAGS = -I$(top_srcdir)/src/libjasper/include
+AM_CPPFLAGS = -I$(top_builddir)/src/libjasper/include -I$(top_srcdir)/src/libjasper/include

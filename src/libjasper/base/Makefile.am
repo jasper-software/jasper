@@ -73,4 +73,4 @@ libbase_la_SOURCES = \
 	jas_tvp.c \
 	jas_version.c
 
-AM_CPPFLAGS = -I$(top_srcdir)/src/libjasper/include
+AM_CPPFLAGS = -I$(top_builddir)/src/libjasper/include -I$(top_srcdir)/src/libjasper/include

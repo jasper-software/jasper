@@ -64,4 +64,4 @@ libpgx_la_SOURCES = \
 	pgx_dec.c \
 	pgx_enc.c
 
-AM_CPPFLAGS = -I$(top_srcdir)/src/libjasper/include
+AM_CPPFLAGS = -I$(top_builddir)/src/libjasper/include -I$(top_srcdir)/src/libjasper/include
