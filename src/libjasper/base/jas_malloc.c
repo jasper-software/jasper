@@ -75,11 +75,13 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <assert.h>
 
 /* We need the prototype for memset. */
 #include <string.h>
 
 #include "jasper/jas_malloc.h"
+#include "jasper/jas_debug.h"
 
 /******************************************************************************\
 * Code.
@@ -114,16 +116,22 @@ inline static bool jas_safe_size_mul(size_t x, size_t y, size_t* result)
 
 void *jas_malloc(size_t size)
 {
-	return malloc(size);
+	void *result;
+	result = malloc(size);
+	JAS_DBGLOG(100, ("jas_malloc(%zu) -> %p\n", size, result));
+	return result;
 }
 
 void *jas_realloc(void *ptr, size_t size)
 {
-	return realloc(ptr, size);
+	void *result = realloc(ptr, size);
+	JAS_DBGLOG(100, ("jas_realloc(%p, %zu) -> %p\n", ptr, size, result));
+	return result;
 }
 
 void jas_free(void *ptr)
 {
+	JAS_DBGLOG(100, ("jas_free(%p)\n", ptr));
 	free(ptr);
 }
 
@@ -157,7 +165,7 @@ void *jas_realloc2(void *ptr, size_t num_elements, size_t element_size)
 	if (!jas_safe_size_mul(num_elements, element_size, &size)) {
 		return 0;
 	}
-	return realloc(ptr, size);
+	return jas_realloc(ptr, size);
 }
 
 void *jas_calloc(size_t num_elements, size_t element_size)
