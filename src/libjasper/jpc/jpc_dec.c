@@ -1086,12 +1086,18 @@ static int jpc_dec_tiledecode(jpc_dec_t *dec, jpc_dec_tile_t *tile)
 	/* Apply an inverse intercomponent transform if necessary. */
 	switch (tile->cp->mctid) {
 	case JPC_MCT_RCT:
-		assert(dec->numcomps >= 3);
+		if (dec->numcomps < 3) {
+			jas_eprintf("RCT requires at least three components\n");
+			return -1;
+		}
 		jpc_irct(tile->tcomps[0].data, tile->tcomps[1].data,
 		  tile->tcomps[2].data);
 		break;
 	case JPC_MCT_ICT:
-		assert(dec->numcomps >= 3);
+		if (dec->numcomps < 3) {
+			jas_eprintf("ICT requires at least three components\n");
+			return -1;
+		}
 		jpc_iict(tile->tcomps[0].data, tile->tcomps[1].data,
 		  tile->tcomps[2].data);
 		break;
@@ -1143,7 +1149,7 @@ static int jpc_dec_tiledecode(jpc_dec_t *dec, jpc_dec_tile_t *tile)
 		  JPC_CEILDIV(dec->ystart, cmpt->vstep), jas_matrix_numcols(
 		  tcomp->data), jas_matrix_numrows(tcomp->data), tcomp->data)) {
 			jas_eprintf("write component failed\n");
-			return -4;
+			return -1;
 		}
 	}
 
