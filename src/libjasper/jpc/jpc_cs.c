@@ -609,6 +609,9 @@ static int jpc_cod_getparms(jpc_ms_t *ms, jpc_cstate_t *cstate, jas_stream_t *in
 	  jpc_getuint8(in, &cod->mctrans)) {
 		return -1;
 	}
+	if (cod->numlyrs < 1 || cod->numlyrs > 65535) {
+		return -1;
+	}
 	if (jpc_cox_getcompparms(ms, cstate, in,
 	  (cod->csty & JPC_COX_PRT) != 0, &cod->compparms)) {
 		return -1;
@@ -756,6 +759,9 @@ static int jpc_cox_getcompparms(jpc_ms_t *ms, jpc_cstate_t *cstate,
 	  jpc_getuint8(in, &compparms->cblksty) ||
 	  jpc_getuint8(in, &compparms->qmfbid)) {
 		return -1;
+	}
+	if (compparms->numdlvls > 32) {
+		goto error;
 	}
 	compparms->numrlvls = compparms->numdlvls + 1;
 	if (compparms->numrlvls > JPC_MAXRLVLS) {
