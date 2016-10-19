@@ -579,6 +579,7 @@ static int jpc_siz_dumpparms(jpc_ms_t *ms, FILE *out)
 	fprintf(out, "tilewidth = %d; tileheight = %d; tilexoff = %d; "
 	  "tileyoff = %d;\n", siz->tilewidth, siz->tileheight, siz->tilexoff,
 	  siz->tileyoff);
+	fprintf(out, "numcomps = %d;\n", siz->numcomps);
 	for (i = 0; i < siz->numcomps; ++i) {
 		fprintf(out, "prec[%d] = %d; sgnd[%d] = %d; hsamp[%d] = %d; "
 		  "vsamp[%d] = %d\n", i, siz->comps[i].prec, i,
