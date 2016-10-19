@@ -73,6 +73,7 @@
 
 #include <assert.h>
 #include <stdlib.h>
+#include <inttypes.h>
 
 #include "jasper/jas_stream.h"
 #include "jasper/jas_malloc.h"
@@ -319,7 +320,7 @@ void jp2_box_dump(jp2_box_t *box, FILE *out)
 	assert(boxinfo);
 
 	fprintf(out, "JP2 box: ");
-	fprintf(out, "type=%c%s%c (0x%08x); length=%d\n", '"', boxinfo->name,
+	fprintf(out, "type=%c%s%c (0x%08" PRIuFAST32 "); length=%" PRIuFAST32 "\n", '"', boxinfo->name,
 	  '"', box->type, box->len);
 	if (box->ops->dumpdata) {
 		(*box->ops->dumpdata)(box, out);
@@ -431,7 +432,7 @@ static void jp2_cdef_dumpdata(jp2_box_t *box, FILE *out)
 	jp2_cdef_t *cdef = &box->data.cdef;
 	unsigned int i;
 	for (i = 0; i < cdef->numchans; ++i) {
-		fprintf(out, "channo=%d; type=%d; assoc=%d\n",
+		fprintf(out, "channo=%" PRIuFAST16 "; type=%" PRIuFAST16 "; assoc=%" PRIuFAST16 "\n",
 		  cdef->ents[i].channo, cdef->ents[i].type, cdef->ents[i].assoc);
 	}
 }
@@ -871,7 +872,7 @@ static void jp2_pclr_dumpdata(jp2_box_t *box, FILE *out)
 	  (int) pclr->numchans);
 	for (i = 0; i < pclr->numlutents; ++i) {
 		for (j = 0; j < pclr->numchans; ++j) {
-			fprintf(out, "LUT[%d][%d]=%d\n", i, j, pclr->lutdata[i * pclr->numchans + j]);
+			fprintf(out, "LUT[%d][%d]=%" PRIiFAST32 "\n", i, j, pclr->lutdata[i * pclr->numchans + j]);
 		}
 	}
 }

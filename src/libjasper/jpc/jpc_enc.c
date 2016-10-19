@@ -148,8 +148,10 @@ void jpc_enc_dump(jpc_enc_t *enc);
 int dump_passes(jpc_enc_pass_t *passes, int numpasses, jpc_enc_cblk_t *cblk);
 void calcrdslopes(jpc_enc_cblk_t *cblk);
 void dump_layeringinfo(jpc_enc_t *enc);
+/*
 static int jpc_calcssexp(jpc_fix_t stepsize);
 static int jpc_calcssmant(jpc_fix_t stepsize);
+*/
 void jpc_quantize(jas_matrix_t *data, jpc_fix_t stepsize);
 static int jpc_enc_encodemainhdr(jpc_enc_t *enc);
 static int jpc_enc_encodemainbody(jpc_enc_t *enc);
@@ -863,6 +865,7 @@ void jpc_enc_destroy(jpc_enc_t *enc)
 * Code.
 \******************************************************************************/
 
+/*
 static int jpc_calcssmant(jpc_fix_t stepsize)
 {
 	int n;
@@ -883,6 +886,7 @@ static int jpc_calcssexp(jpc_fix_t stepsize)
 {
 	return jpc_firstone(stepsize) - JPC_FIX_FRACBITS;
 }
+*/
 
 static int jpc_enc_encodemainhdr(jpc_enc_t *enc)
 {
@@ -897,7 +901,7 @@ long mainhdrlen;
 	jpc_enc_tccp_t *tccp;
 	uint_fast16_t cmptno;
 	jpc_tsfb_band_t bandinfos[JPC_MAXBANDS];
-	jpc_fix_t mctsynweight;
+	// jpc_fix_t mctsynweight;
 	jpc_enc_tcp_t *tcp;
 	jpc_tsfb_t *tsfb;
 	jpc_tsfb_band_t *bandinfo;
@@ -992,7 +996,7 @@ startoff = jas_stream_getrwcount(enc->out);
 		jpc_tsfb_getbands(tsfb, 0, 0, 1 << tccp->maxrlvls, 1 << tccp->maxrlvls,
 		  bandinfos);
 		jpc_tsfb_destroy(tsfb);
-		mctsynweight = jpc_mct_getsynweight(tcp->mctid, cmptno);
+		// mctsynweight = jpc_mct_getsynweight(tcp->mctid, cmptno);
 		numbands = 3 * tccp->maxrlvls - 2;
 		for (bandno = 0, bandinfo = bandinfos; bandno < numbands;
 		  ++bandno, ++bandinfo) {
@@ -1096,8 +1100,8 @@ startoff = jas_stream_getrwcount(enc->out);
 static int jpc_enc_encodemainbody(jpc_enc_t *enc)
 {
 	int tileno;
-	int tilex;
-	int tiley;
+	// int tilex;
+	// int tiley;
 	int i;
 	jpc_sot_t *sot;
 	jpc_enc_tcmpt_t *comp;
@@ -1111,7 +1115,7 @@ static int jpc_enc_encodemainbody(jpc_enc_t *enc)
 	int adjust;
 	int j;
 	int absbandno;
-	long numbytes;
+	// long numbytes;
 	long tilehdrlen;
 	long tilelen;
 	jpc_enc_tile_t *tile;
@@ -1134,11 +1138,11 @@ int numgbits;
 	cp = enc->cp;
 
 	/* Avoid compile warnings. */
-	numbytes = 0;
+	// numbytes = 0;
 
 	for (tileno = 0; tileno < JAS_CAST(int, cp->numtiles); ++tileno) {
-		tilex = tileno % cp->numhtiles;
-		tiley = tileno / cp->numhtiles;
+		// tilex = tileno % cp->numhtiles;
+		// tiley = tileno / cp->numhtiles;
 
 		if (!(enc->curtile = jpc_enc_tile_create(enc->cp, enc->image, tileno))) {
 			abort();

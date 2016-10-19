@@ -70,6 +70,7 @@
 #include "jasper/jas_image.h"
 #include "jasper/jas_string.h"
 #include "jasper/jas_malloc.h"
+#include "jasper/jas_debug.h"
 
 #include "mif_cod.h"
 
