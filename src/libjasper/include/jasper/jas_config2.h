@@ -86,4 +86,9 @@
 #define	HAVE_STDLIB_H		1
 #define	HAVE_STDDEF_H		1
 
+#ifndef __cplusplus
+#undef inline
+#define inline __inline
+#endif
+
 #endif
