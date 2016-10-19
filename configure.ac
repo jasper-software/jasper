@@ -311,6 +311,44 @@ esac
 ], )
 
 ############################################################
+# Enable/disable sanitizers.
+############################################################
+
+AC_ARG_ENABLE(asan,
+[  --enable-asan    Enable Address Sanitizer.],
+[
+case "${enableval}" in
+yes)
+	CFLAGS="$CFLAGS -fsanitize=address"
+	LDFLAGS="$LDFLAGS -fsanitize=address"
+	;;
+esac
+],
+[])
+
+AC_ARG_ENABLE(usan,
+[  --enable-usan    Enable Undefined-Behavior Sanitizer.],
+[
+case "${enableval}" in
+yes)
+	CFLAGS="$CFLAGS -fsanitize=undefined"
+	LDFLAGS="$LDFLAGS -fsanitize=undefined"
+esac
+],
+[])
+
+AC_ARG_ENABLE(leak,
+[  --enable-leak    Enable Leak Sanitizer.],
+[
+case "${enableval}" in
+yes)
+	CFLAGS="$CFLAGS -fsanitize=leak"
+	LDFLAGS="$LDFLAGS -fsanitize=leak"
+esac
+],
+[])
+
+############################################################
 # Enable/disable extra code for debugging.
 ############################################################
 
@@ -323,11 +361,8 @@ yes)
 	AC_DEFINE(DEBUG)
 	AC_DEFINE(DEBUG_OVERFLOW)
 	if test "$GCC" = yes; then
-		CFLAGS=""
+		#CFLAGS=""
 		CFLAGS="$CFLAGS -g -O0"
-		CFLAGS="$CFLAGS -fsanitize=address"
-		CFLAGS="$CFLAGS -fsanitize=leak"
-		CFLAGS="$CFLAGS -fsanitize=undefined"
 	fi
 	;;
 no)
