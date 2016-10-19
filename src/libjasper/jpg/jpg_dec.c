@@ -149,9 +149,11 @@ jas_image_t *jpg_decode(jas_stream_t *in, char *optstr)
 	image = 0;
 	input_file = 0;
 	if (!(input_file = tmpfile())) {
+		jas_eprintf("cannot make temporary file\n");
 		goto error;
 	}
 	if (jpg_copystreamtofile(input_file, in)) {
+		jas_eprintf("cannot copy stream\n");
 		goto error;
 	}
 	rewind(input_file);
@@ -179,12 +181,14 @@ jas_image_t *jpg_decode(jas_stream_t *in, char *optstr)
 
 	/* Create an image object to hold the decoded data. */
 	if (!(image = jpg_mkimage(&cinfo))) {
+		jas_eprintf("jpg_mkimage failed\n");
 		goto error;
 	}
 
 	/* Initialize the data sink object. */
 	dest_mgr->image = image;
 	if (!(dest_mgr->data = jas_matrix_create(1, cinfo.output_width))) {
+		jas_eprintf("jas_matrix_create failed\n");
 		goto error;
 	}
 	dest_mgr->start_output = jpg_start_output;
@@ -217,6 +221,7 @@ jas_image_t *jpg_decode(jas_stream_t *in, char *optstr)
 	input_file = 0;
 
 	if (dest_mgr->error) {
+		jas_eprintf("error during decoding\n");
 		goto error;
 	}
 
