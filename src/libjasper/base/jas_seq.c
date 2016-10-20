@@ -102,6 +102,10 @@ jas_matrix_t *jas_matrix_create(int numrows, int numcols)
 	jas_matrix_t *matrix;
 	int i;
 
+	if (numrows < 0 || numcols < 0) {
+		return 0;
+	}
+
 	if (!(matrix = jas_malloc(sizeof(jas_matrix_t)))) {
 		return 0;
 	}
