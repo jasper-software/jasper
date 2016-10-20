@@ -154,6 +154,9 @@ typedef jas_matrix_t jas_seq_t;
 #define jas_matrix_numcols(matrix) \
 	((matrix)->numcols_)
 
+#define jas_matrix_size(matrix) \
+	(jas_matrix_width(matrix) * jas_matrix_height(matrix))
+
 /* Get a matrix element. */
 #define jas_matrix_get(matrix, i, j) \
 	((matrix)->rows_[i][j])
@@ -269,6 +272,8 @@ jas_matrix_t *jas_seq2d_create(int xstart, int ystart, int xend, int yend);
 	((s)->xstart_ = (x), (s)->ystart_ = (y), \
 	  (s)->xend_ = (s)->xstart_ + (s)->numcols_, \
 	  (s)->yend_ = (s)->ystart_ + (s)->numrows_)
+#define jas_seq2d_size(s) \
+	(jas_seq2d_width(s) * jas_seq2d_height(s))
 
 void jas_seq2d_bindsub(jas_matrix_t *s, jas_matrix_t *s1, int xstart,
   int ystart, int xend, int yend);

@@ -1838,6 +1838,13 @@ static void jpc_undo_roi(jas_matrix_t *x, int roishift, int bgshift, int numbps)
 	bool warn;
 	uint_fast32_t mask;
 
+	if (roishift < 0) {
+		/* We could instead return an error here. */
+		/* I do not think it matters much. */
+		jas_eprintf("warning: forcing negative ROI shift to zero "
+		  "(bitstream is probably corrupt)\n");
+		roishift = 0;
+	}
 	if (roishift == 0 && bgshift == 0) {
 		return;
 	}
@@ -1856,7 +1863,7 @@ static void jpc_undo_roi(jas_matrix_t *x, int roishift, int bgshift, int numbps)
 			} else {
 				/* We are dealing with non-ROI (i.e., background) data. */
 				mag <<= bgshift;
-				mask = (1 << numbps) - 1;
+				mask = (JAS_CAST(uint_fast32_t, 1) << numbps) - 1;
 				/* Perform a basic sanity check on the sample value. */
 				/* Some implementations write garbage in the unused
 				  most-significant bit planes introduced by ROI shifting.

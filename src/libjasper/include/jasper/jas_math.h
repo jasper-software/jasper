@@ -113,6 +113,24 @@ extern "C" {
   ((1 << (n)) - 1)
 
 /******************************************************************************\
+*
+\******************************************************************************/
+
+__attribute__((no_sanitize("undefined")))
+inline static jas_int_asr(int x, int n)
+{
+	assert(n >= 0);
+	return x >> n;
+}
+
+__attribute__((no_sanitize("undefined")))
+inline static jas_int_asl(int x, int n)
+{
+	assert(n >= 0);
+	return x << n;
+}
+
+/******************************************************************************\
 * Safe integer arithmetic (i.e., with overflow checking).
 \******************************************************************************/
 
