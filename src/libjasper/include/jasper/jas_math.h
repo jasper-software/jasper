@@ -116,17 +116,43 @@ extern "C" {
 *
 \******************************************************************************/
 
-__attribute__((no_sanitize("undefined")))
-inline static jas_int_asr(int x, int n)
+__attribute__ ((no_sanitize_undefined))
+inline static int jas_int_asr(int x, int n)
 {
 	assert(n >= 0);
+	// The behavior is undefined when x is negative. */
+	// We tacitly assume the behavior is equivalent to a signed
+	// arithmetic right shift.
 	return x >> n;
 }
 
-__attribute__((no_sanitize("undefined")))
-inline static jas_int_asl(int x, int n)
+__attribute__ ((no_sanitize_undefined))
+inline static int jas_int_asl(int x, int n)
 {
 	assert(n >= 0);
+	// The behavior is undefined when x is negative. */
+	// We tacitly assume the behavior is equivalent to a signed
+	// arithmetic left shift.
+	return x << n;
+}
+
+__attribute__ ((no_sanitize_undefined))
+inline static int jas_fast32_asr(int_fast32_t x, int n)
+{
+	assert(n >= 0);
+	// The behavior is undefined when x is negative. */
+	// We tacitly assume the behavior is equivalent to a signed
+	// arithmetic right shift.
+	return x >> n;
+}
+
+__attribute__ ((no_sanitize_undefined))
+inline static int jas_fast32_asl(int_fast32_t x, int n)
+{
+	assert(n >= 0);
+	// The behavior is undefined when x is negative. */
+	// We tacitly assume the behavior is equivalent to a signed
+	// arithmetic left shift.
 	return x << n;
 }
 

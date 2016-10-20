@@ -79,6 +79,8 @@
 #include <jasper/jas_stream.h>
 #include <jasper/jas_types.h>
 
+#include <jasper/jas_math.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -238,6 +240,9 @@ int jas_matrix_cmp(jas_matrix_t *mat0, jas_matrix_t *mat1);
 jas_matrix_t *jas_matrix_copy(jas_matrix_t *x);
 
 jas_matrix_t *jas_matrix_input(FILE *);
+
+#define jas_seqent_asl jas_fast32_asl
+#define jas_seqent_asr jas_fast32_asr
 
 /******************************************************************************\
 * Functions/macros for 2-D sequence class.

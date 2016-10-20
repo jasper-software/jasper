@@ -330,7 +330,8 @@ void jas_matrix_asr(jas_matrix_t *matrix, int n)
 		  rowstart += rowstep) {
 			for (j = matrix->numcols_, data = rowstart; j > 0; --j,
 			  ++data) {
-				*data >>= n;
+				//*data >>= n;
+				*data = jas_seqent_asr(*data, n);
 			}
 		}
 	}
@@ -351,7 +352,8 @@ void jas_matrix_asl(jas_matrix_t *matrix, int n)
 		  rowstart += rowstep) {
 			for (j = matrix->numcols_, data = rowstart; j > 0; --j,
 			  ++data) {
-				*data <<= n;
+				//*data <<= n;
+				*data = jas_seqent_asl(*data, n);
 			}
 		}
 	}
