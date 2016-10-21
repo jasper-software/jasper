@@ -155,7 +155,7 @@ jas_image_t *jp2_decode(jas_stream_t *in, char *optstr)
 	found = 0;
 	while ((box = jp2_box_get(in))) {
 		if (jas_getdbglevel() >= 1) {
-			jas_eprintf("box type %s\n", box->info->name);
+			jas_eprintf("got box type %s\n", box->info->name);
 		}
 		switch (box->type) {
 		case JP2_BOX_JP2C:

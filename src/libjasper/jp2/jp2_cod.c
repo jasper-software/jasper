@@ -258,6 +258,10 @@ jp2_box_t *jp2_box_get(jas_stream_t *in)
 	box->info = boxinfo;
 	box->ops = &boxinfo->ops;
 	box->len = len;
+	JAS_DBGLOG(10, (
+	  "preliminary processing of JP2 box: type=%c%s%c (0x%08x); length=%d\n",
+	  '"', boxinfo->name, '"', box->type, box->len
+	  ));
 	if (box->len == 1) {
 		if (jp2_getuint64(in, &extlen)) {
 			goto error;
@@ -282,6 +286,9 @@ jp2_box_t *jp2_box_get(jas_stream_t *in)
 			goto error;
 		}
 		if (jas_stream_copy(tmpstream, in, box->datalen)) {
+			// Mark the box data as never having been constructed
+			// so that we will not errantly attempt to destroy it later.
+			box->ops = &jp2_boxinfo_unk.ops;
 			jas_eprintf("cannot copy box data\n");
 			goto error;
 		}
