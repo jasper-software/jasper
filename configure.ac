@@ -375,10 +375,11 @@ esac
 ], [debug=no])
 
 if test "$GCC" = yes; then
-	CFLAGS="$CFLAGS"
-	#CFLAGS="$CFLAGS -std=c99"
-	#CFLAGS="$CFLAGS -pedantic"
-	#CFLAGS="$CFLAGS -pedantic-errors"
+	#CFLAGS="$CFLAGS"
+	CFLAGS="$CFLAGS -std=c99"
+	CFLAGS="$CFLAGS -pedantic"
+	CFLAGS="$CFLAGS -pedantic-errors"
+	CFLAGS="$CFLAGS -Wall"
 	#CFLAGS="$CFLAGS -W -Wall -Wno-long-long -Wformat -Wmissing-prototypes -Wstrict-prototypes"
 fi
 

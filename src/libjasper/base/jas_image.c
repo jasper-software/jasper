@@ -81,6 +81,7 @@
 #include "jasper/jas_image.h"
 #include "jasper/jas_malloc.h"
 #include "jasper/jas_string.h"
+#include "jasper/jas_debug.h"
 
 /******************************************************************************\
 * Types.
@@ -1227,13 +1228,38 @@ static void jas_image_calcbbox2(jas_image_t *image, jas_image_coord_t *tlx,
 	*bry = tmpbry;
 }
 
+static inline long decode_twos_comp(ulong c, int prec)
+{
+	long result;
+	assert(prec >= 2);
+	jas_eprintf("warning: support for signed data is untested\n");
+	// NOTE: Is this correct?
+	result = (c & ((1 << (prec - 1)) - 1)) - (c & (1 << (prec - 1)));
+	return result;
+}
 
+static inline ulong encode_twos_comp(long n, int prec)
+{
+	ulong result;
+	assert(prec >= 2);
+	jas_eprintf("warning: support for signed data is untested\n");
+	// NOTE: Is this correct?
+	if (n < 0) {
+		result = -n;
+		result = (result ^ 0xffffffffUL) + 1;
+		result &= (1 << prec) - 1;
+	} else {
+		result = n;
+	}
+	return result;
+}
 
 static int getint(jas_stream_t *in, int sgnd, int prec, long *val)
 {
 	long v;
 	int n;
 	int c;
+	assert((!sgnd && prec >= 1) || (sgnd && prec >= 2));
 	n = (prec + 7) / 8;
 	v = 0;
 	while (--n >= 0) {
@@ -1243,8 +1269,7 @@ static int getint(jas_stream_t *in, int sgnd, int prec, long *val)
 	}
 	v &= ((1 << prec) - 1);
 	if (sgnd) {
-		/* XXX - Do something here. */
-		abort();
+		*val = decode_twos_comp(v, prec);
 	} else {
 		*val = v;
 	}
@@ -1255,10 +1280,13 @@ static int putint(jas_stream_t *out, int sgnd, int prec, long val)
 {
 	int n;
 	int c;
+	bool s;
+	ulong tmp;
+	assert((!sgnd && prec >= 1) || (sgnd && prec >= 2));
 	if (sgnd) {
-		/* XXX - Do something here. */
-		abort();
+		val = encode_twos_comp(val, prec);
 	}
+	assert(val >= 0);
 	val &= (1 << prec) - 1;
 	n = (prec + 7) / 8;
 	while (--n >= 0) {
@@ -1342,16 +1370,20 @@ jas_image_dump(image, stderr);
 		for (i = 1; i < jas_image_numcmpts(inimage); ++i) {
 			hstep = jas_image_cmpthstep(inimage, i);
 			vstep = jas_image_cmptvstep(inimage, i);
-			if (hstep < minhstep)
+			if (hstep < minhstep) {
 				minhstep = hstep;
-			if (vstep < minvstep)
+			}
+			if (vstep < minvstep) {
 				minvstep = vstep;
+			}
 		}
 		n = jas_image_numcmpts(inimage);
 		for (i = 0; i < n; ++i) {
 			cmpttype = jas_image_cmpttype(inimage, i);
-			if (jas_image_sampcmpt(inimage, i, i + 1, 0, 0, minhstep, minvstep, jas_image_cmptsgnd(inimage, i), jas_image_cmptprec(inimage, i)))
+			if (jas_image_sampcmpt(inimage, i, i + 1, 0, 0, minhstep, minvstep,
+			  jas_image_cmptsgnd(inimage, i), jas_image_cmptprec(inimage, i))) {
 				goto error;
+			}
 			jas_image_setcmpttype(inimage, i + 1, cmpttype);
 			jas_image_delcmpt(inimage, i);
 		}
@@ -1362,8 +1394,9 @@ jas_image_dump(image, stderr);
 	hstep = jas_image_cmpthstep(inimage, 0);
 	vstep = jas_image_cmptvstep(inimage, 0);
 
-	inprof = jas_image_cmprof(inimage);
-	assert(inprof);
+	if (!(inprof = jas_image_cmprof(inimage))) {
+		abort();
+	}
 	numinclrchans = jas_clrspc_numchans(jas_cmprof_clrspc(inprof));
 	numinauxchans = jas_image_numcmpts(inimage) - numinclrchans;
 	numoutclrchans = jas_clrspc_numchans(jas_cmprof_clrspc(outprof));
@@ -1371,8 +1404,9 @@ jas_image_dump(image, stderr);
 	numoutchans = numoutclrchans + numoutauxchans;
 	prec = 8;
 
-	if (!(outimage = jas_image_create0()))
+	if (!(outimage = jas_image_create0())) {
 		goto error;
+	}
 
 	/* Create a component for each of the colorants. */
 	for (i = 0; i < numoutclrchans; ++i) {
@@ -1456,11 +1490,13 @@ jas_image_dump(image, stderr);
 		}
 	}
 
-	for (i = 0; i < numoutclrchans; ++i)
+	for (i = 0; i < numoutclrchans; ++i) {
 		jas_free(outcmptfmts[i].buf);
+	}
 	jas_free(outcmptfmts);
-	for (i = 0; i < numinclrchans; ++i)
+	for (i = 0; i < numinclrchans; ++i) {
 		jas_free(incmptfmts[i].buf);
+	}
 	jas_free(incmptfmts);
 	jas_cmxform_destroy(xform);
 	jas_image_destroy(inimage);

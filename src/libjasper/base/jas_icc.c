@@ -60,14 +60,15 @@
  */
 
 #include <assert.h>
-#include <jasper/jas_config.h>
-#include <jasper/jas_types.h>
-#include <jasper/jas_malloc.h>
-#include <jasper/jas_debug.h>
-#include <jasper/jas_icc.h>
-#include <jasper/jas_cm.h>
-#include <jasper/jas_stream.h>
-#include <jasper/jas_string.h>
+
+#include "jasper/jas_config.h"
+#include "jasper/jas_types.h"
+#include "jasper/jas_malloc.h"
+#include "jasper/jas_debug.h"
+#include "jasper/jas_icc.h"
+#include "jasper/jas_cm.h"
+#include "jasper/jas_stream.h"
+#include "jasper/jas_string.h"
 
 #include <stdlib.h>
 #include <ctype.h>

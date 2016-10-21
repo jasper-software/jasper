@@ -81,6 +81,7 @@
 #include "jpc_cs.h"
 #include "jpc_util.h"
 #include "jpc_math.h"
+#include "jpc_fix.h"
 
 void jpc_tsfb_getbands2(jpc_tsfb_t *tsfb, int locxstart, int locystart,
   int xstart, int ystart, int xend, int yend, jpc_tsfb_band_t **bands,
@@ -127,7 +128,7 @@ int jpc_tsfb_analyze(jpc_tsfb_t *tsfb, jas_seq2d_t *a)
 	  jas_seq2d_height(a), jas_seq2d_rowstep(a), tsfb->numlvls - 1) : 0;
 }
 
-int jpc_tsfb_analyze2(jpc_tsfb_t *tsfb, int *a, int xstart, int ystart,
+int jpc_tsfb_analyze2(jpc_tsfb_t *tsfb, jpc_fix_t *a, int xstart, int ystart,
   int width, int height, int stride, int numlvls)
 {
 	if (width > 0 && height > 0) {
@@ -155,7 +156,7 @@ int jpc_tsfb_synthesize(jpc_tsfb_t *tsfb, jas_seq2d_t *a)
 	  jas_seq2d_height(a), jas_seq2d_rowstep(a), tsfb->numlvls - 1) : 0;
 }
 
-int jpc_tsfb_synthesize2(jpc_tsfb_t *tsfb, int *a, int xstart, int ystart,
+int jpc_tsfb_synthesize2(jpc_tsfb_t *tsfb, jpc_fix_t *a, int xstart, int ystart,
   int width, int height, int stride, int numlvls)
 {
 	if (numlvls > 0) {

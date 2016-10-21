@@ -283,6 +283,9 @@ jas_stream_t *jas_stream_fopen(const char *filename, const char *mode)
 
 	/* Open the underlying file. */
 	if ((obj->fd = open(filename, openflags, JAS_STREAM_PERMS)) < 0) {
+		// Free the underlying file object, since it will not otherwise
+		// be freed.
+		jas_free(obj);
 		jas_stream_destroy(stream);
 		return 0;
 	}

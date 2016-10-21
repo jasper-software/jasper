@@ -77,6 +77,7 @@
 #include <time.h>
 
 #include <jasper/jasper.h>
+#include <jasper/jas_debug.h>
 
 /******************************************************************************\
 *

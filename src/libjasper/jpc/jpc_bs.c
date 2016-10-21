@@ -97,8 +97,7 @@ jpc_bitstream_t *jpc_bitstream_sopen(jas_stream_t *stream, char *mode)
 	jpc_bitstream_t *bitstream;
 
 	/* Ensure that the open mode is valid. */
-#if 1
-/* This causes a string literal too long error (with c99 pedantic mode). */
+#if 0 /* This causes a string literal too long error (with c99 pedantic mode).  Why is this so? */
 	assert(!strcmp(mode, "r") || !strcmp(mode, "w") || !strcmp(mode, "r+")
 	  || !strcmp(mode, "w+"));
 #endif

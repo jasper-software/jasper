@@ -70,6 +70,7 @@
 #include "jasper/jas_image.h"
 #include "jasper/jas_string.h"
 #include "jasper/jas_malloc.h"
+#include "jasper/jas_debug.h"
 
 #include "mif_cod.h"
 
@@ -175,6 +176,7 @@ jas_image_t *mif_decode(jas_stream_t *in, char *optstr)
 		cmpt = hdr->cmpts[cmptno];
 		tmpstream = cmpt->data ? jas_stream_fopen(cmpt->data, "rb") : in;
 		if (!tmpstream) {
+			jas_eprintf("cannot open component file %s\n", cmpt->data);
 			goto error;
 		}
 		if (!(tmpimage = jas_image_decode(tmpstream, -1, 0))) {
@@ -482,25 +484,37 @@ static mif_hdr_t *mif_hdr_get(jas_stream_t *in)
 	done = false;
 	do {
 		if (!mif_getline(in, buf, sizeof(buf))) {
+			jas_eprintf("mif_getline failed\n");
 			goto error;
 		}
 		if (buf[0] == '\0') {
 			continue;
 		}
+		JAS_DBGLOG(10, ("header line: len=%d; %s\n", strlen(buf), buf));
 		if (!(tvp = jas_tvparser_create(buf))) {
+			jas_eprintf("jas_tvparser_create failed\n");
 			goto error;
 		}
 		if (jas_tvparser_next(tvp)) {
+			jas_eprintf("jas_tvparser_next failed\n");
 			abort();
 		}
-		id = jas_taginfo_nonull(jas_taginfos_lookup(mif_tags2, jas_tvparser_gettag(tvp)))->id;
+		id = jas_taginfo_nonull(jas_taginfos_lookup(mif_tags2,
+		  jas_tvparser_gettag(tvp)))->id;
 		jas_tvparser_destroy(tvp);
 		switch (id) {
 		case MIF_CMPT:
-			mif_process_cmpt(hdr, buf);
+			if (mif_process_cmpt(hdr, buf)) {
+				jas_eprintf("cannot get component information\n");
+				goto error;
+			}
 			break;
 		case MIF_END:
 			done = 1;
+			break;
+		default:
+			jas_eprintf("invalid header information: %s\n", buf);
+			goto error;
 			break;
 		}
 	} while (!done);
@@ -524,6 +538,7 @@ static int mif_process_cmpt(mif_hdr_t *hdr, char *buf)
 	tvp = 0;
 
 	if (!(cmpt = mif_cmpt_create())) {
+		jas_eprintf("cannot create component\n");
 		goto error;
 	}
 	cmpt->tlx = 0;
@@ -537,8 +552,16 @@ static int mif_process_cmpt(mif_hdr_t *hdr, char *buf)
 	cmpt->data = 0;
 
 	if (!(tvp = jas_tvparser_create(buf))) {
+		jas_eprintf("cannot create parser\n");
 		goto error;
 	}
+
+	// Skip the component keyword
+	if ((id = jas_tvparser_next(tvp))) {
+		abort();
+	}
+
+	// Process the tag-value pairs.
 	while (!(id = jas_tvparser_next(tvp))) {
 		switch (jas_taginfo_nonull(jas_taginfos_lookup(mif_tags,
 		  jas_tvparser_gettag(tvp)))->id) {
@@ -571,12 +594,20 @@ static int mif_process_cmpt(mif_hdr_t *hdr, char *buf)
 				goto error;
 			}
 			break;
+		default:
+			jas_eprintf("invalid component information: %s\n", buf);
+			goto error;
+			break;
 		}
 	}
 	if (!cmpt->sampperx || !cmpt->samppery) {
 		goto error;
 	}
+	if (!cmpt->width || !cmpt->height || !cmpt->prec || cmpt->sgnd < 0) {
+		goto error;
+	}
 	if (mif_hdr_addcmpt(hdr, hdr->numcmpts, cmpt)) {
+		jas_eprintf("cannot add component\n");
 		goto error;
 	}
 	jas_tvparser_destroy(tvp);
@@ -695,15 +726,16 @@ static int mif_getc(jas_stream_t *in)
 	do {
 		switch (c = jas_stream_getc(in)) {
 		case EOF:
-			done = 1;
+			done = true;
 			break;
 		case '#':
 			for (;;) {
 				if ((c = jas_stream_getc(in)) == EOF) {
-					done = 1;
+					done = true;
 					break;
 				}	
 				if (c == '\n') {
+					done = true;
 					break;
 				}
 			}
@@ -714,7 +746,7 @@ static int mif_getc(jas_stream_t *in)
 			}
 			break;
 		default:
-			done = 1;
+			done = true;
 			break;
 		}
 	} while (!done);

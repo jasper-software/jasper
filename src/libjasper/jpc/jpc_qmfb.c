@@ -96,7 +96,7 @@
 
 int jpc_ft_analyze(jpc_fix_t *a, int xstart, int ystart, int width, int height,
   int stride);
-int jpc_ft_synthesize(int *a, int xstart, int ystart, int width, int height,
+int jpc_ft_synthesize(jpc_fix_t *a, int xstart, int ystart, int width, int height,
   int stride);
 
 int jpc_ns_analyze(jpc_fix_t *a, int xstart, int ystart, int width, int height,
@@ -1528,7 +1528,7 @@ int jpc_ft_analyze(jpc_fix_t *a, int xstart, int ystart, int width, int height,
 
 }
 
-int jpc_ft_synthesize(int *a, int xstart, int ystart, int width, int height,
+int jpc_ft_synthesize(jpc_fix_t *a, int xstart, int ystart, int width, int height,
   int stride)
 {
 	int numrows = height;
