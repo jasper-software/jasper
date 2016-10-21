@@ -76,6 +76,7 @@
 #include <string.h>
 #include <assert.h>
 #include <ctype.h>
+#include <inttypes.h>
 
 #include "jasper/jas_math.h"
 #include "jasper/jas_image.h"
@@ -851,7 +852,7 @@ void jas_image_dump(jas_image_t *image, FILE *out)
 	jas_image_cmpt_t *cmpt;
 	for (cmptno = 0; cmptno < image->numcmpts_; ++cmptno) {
 		cmpt = image->cmpts_[cmptno];
-		fprintf(out, "prec=%d, sgnd=%d, cmpttype=%d\n", cmpt->prec_,
+		fprintf(out, "prec=%d, sgnd=%d, cmpttype=%" PRIiFAST32 "\n", cmpt->prec_,
 		  cmpt->sgnd_, cmpt->type_);
 		width = jas_image_cmptwidth(image, cmptno);
 		height = jas_image_cmptheight(image, cmptno);
@@ -1336,14 +1337,14 @@ jas_image_t *jas_image_chclrspc(jas_image_t *image, jas_cmprof_t *outprof,
 	int n;
 	int hstep;
 	int vstep;
-	int numinauxchans;
-	int numoutauxchans;
+	// int numinauxchans;
+	// int numoutauxchans;
 	int numinclrchans;
 	int numoutclrchans;
 	int prec;
 	jas_image_t *outimage;
 	int cmpttype;
-	int numoutchans;
+	// int numoutchans;
 	jas_cmprof_t *inprof;
 	jas_cmprof_t *tmpprof;
 	jas_image_cmptparm_t cmptparm;
@@ -1398,10 +1399,10 @@ jas_image_dump(image, stderr);
 		abort();
 	}
 	numinclrchans = jas_clrspc_numchans(jas_cmprof_clrspc(inprof));
-	numinauxchans = jas_image_numcmpts(inimage) - numinclrchans;
+	// numinauxchans = jas_image_numcmpts(inimage) - numinclrchans;
 	numoutclrchans = jas_clrspc_numchans(jas_cmprof_clrspc(outprof));
-	numoutauxchans = 0;
-	numoutchans = numoutclrchans + numoutauxchans;
+	// numoutauxchans = 0;
+	// numoutchans = numoutclrchans + numoutauxchans;
 	prec = 8;
 
 	if (!(outimage = jas_image_create0())) {

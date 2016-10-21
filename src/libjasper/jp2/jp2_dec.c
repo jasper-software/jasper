@@ -104,7 +104,7 @@ jas_image_t *jp2_decode(jas_stream_t *in, char *optstr)
 	unsigned int i;
 	jp2_cmap_t *cmapd;
 	jp2_pclr_t *pclrd;
-	jp2_cdef_t *cdefd;
+	// jp2_cdef_t *cdefd;
 	unsigned int channo;
 	int newcmptno;
 	int_fast32_t *lutents;
@@ -358,7 +358,7 @@ jas_image_t *jp2_decode(jas_stream_t *in, char *optstr)
 	} else {
 		cmapd = &dec->cmap->data.cmap;
 		pclrd = &dec->pclr->data.pclr;
-		cdefd = &dec->cdef->data.cdef;
+		// cdefd = &dec->cdef->data.cdef;
 		for (channo = 0; channo < cmapd->numchans; ++channo) {
 			cmapent = &cmapd->ents[channo];
 			if (cmapent->map == JP2_CMAP_DIRECT) {

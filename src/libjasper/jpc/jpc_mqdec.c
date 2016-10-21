@@ -74,6 +74,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include <inttypes.h>
 
 #include "jasper/jas_types.h"
 #include "jasper/jas_malloc.h"
@@ -300,7 +301,7 @@ void jpc_mqdec_dump(jpc_mqdec_t *mqdec, FILE *out)
 	fprintf(out, "MQDEC A = %08lx, C = %08lx, CT=%08lx, ",
 	  (unsigned long) mqdec->areg, (unsigned long) mqdec->creg,
 	  (unsigned long) mqdec->ctreg);
-	fprintf(out, "CTX = %d, ", mqdec->curctx - mqdec->ctxs);
-	fprintf(out, "IND %d, MPS %d, QEVAL %x\n", *mqdec->curctx -
+	fprintf(out, "CTX = %" PRIdPTR ", ", mqdec->curctx - mqdec->ctxs);
+	fprintf(out, "IND %" PRIdPTR ", MPS %d, QEVAL %" PRIuFAST16 "\n", *mqdec->curctx -
 	  jpc_mqstates, (*mqdec->curctx)->mps, (*mqdec->curctx)->qeval);
 }
