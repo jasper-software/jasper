@@ -225,7 +225,8 @@ jas_image_t *jp2_decode(jas_stream_t *in, char *optstr)
 
 	/* Does the number of components indicated in the IHDR box match
 	  the value specified in the code stream? */
-	if (dec->ihdr->data.ihdr.numcmpts != JAS_CAST(uint, jas_image_numcmpts(dec->image))) {
+	if (dec->ihdr->data.ihdr.numcmpts != JAS_CAST(uint,
+	  jas_image_numcmpts(dec->image))) {
 		jas_eprintf("warning: number of components mismatch\n");
 	}
 
@@ -268,8 +269,10 @@ jas_image_t *jp2_decode(jas_stream_t *in, char *optstr)
 		/* Is the component data type information indicated in the BPCC
 		  box consistent with the code stream data? */
 		if (!samedtype) {
-			for (i = 0; i < JAS_CAST(uint, jas_image_numcmpts(dec->image)); ++i) {
-				if (jas_image_cmptdtype(dec->image, i) != JP2_BPCTODTYPE(dec->bpcc->data.bpcc.bpcs[i])) {
+			for (i = 0; i < JAS_CAST(uint, jas_image_numcmpts(dec->image));
+			  ++i) {
+				if (jas_image_cmptdtype(dec->image, i) !=
+				  JP2_BPCTODTYPE(dec->bpcc->data.bpcc.bpcs[i])) {
 					jas_eprintf("warning: component data type mismatch\n");
 				}
 			}
@@ -320,18 +323,21 @@ jas_image_t *jp2_decode(jas_stream_t *in, char *optstr)
 
 	/* Determine the number of channels (which is essentially the number
 	  of components after any palette mappings have been applied). */
-	dec->numchans = dec->cmap ? dec->cmap->data.cmap.numchans : JAS_CAST(uint, jas_image_numcmpts(dec->image));
+	dec->numchans = dec->cmap ? dec->cmap->data.cmap.numchans :
+	  JAS_CAST(uint, jas_image_numcmpts(dec->image));
 
 	/* Perform a basic sanity check on the CMAP box if present. */
 	if (dec->cmap) {
 		for (i = 0; i < dec->numchans; ++i) {
 			/* Is the component number reasonable? */
-			if (dec->cmap->data.cmap.ents[i].cmptno >= JAS_CAST(uint, jas_image_numcmpts(dec->image))) {
+			if (dec->cmap->data.cmap.ents[i].cmptno >= JAS_CAST(uint,
+			  jas_image_numcmpts(dec->image))) {
 				jas_eprintf("error: invalid component number in CMAP box\n");
 				goto error;
 			}
 			/* Is the LUT index reasonable? */
-			if (dec->cmap->data.cmap.ents[i].pcol >= dec->pclr->data.pclr.numchans) {
+			if (dec->cmap->data.cmap.ents[i].pcol >=
+			  dec->pclr->data.pclr.numchans) {
 				jas_eprintf("error: invalid CMAP LUT index\n");
 				goto error;
 			}
@@ -339,7 +345,8 @@ jas_image_t *jp2_decode(jas_stream_t *in, char *optstr)
 	}
 
 	/* Allocate space for the channel-number to component-number LUT. */
-	if (!(dec->chantocmptlut = jas_alloc2(dec->numchans, sizeof(uint_fast16_t)))) {
+	if (!(dec->chantocmptlut = jas_alloc2(dec->numchans,
+	  sizeof(uint_fast16_t)))) {
 		jas_eprintf("error: no memory\n");
 		goto error;
 	}
@@ -362,7 +369,9 @@ jas_image_t *jp2_decode(jas_stream_t *in, char *optstr)
 					lutents[i] = pclrd->lutdata[cmapent->pcol + i * pclrd->numchans];
 				}
 				newcmptno = jas_image_numcmpts(dec->image);
-				jas_image_depalettize(dec->image, cmapent->cmptno, pclrd->numlutents, lutents, JP2_BPCTODTYPE(pclrd->bpc[cmapent->pcol]), newcmptno);
+				jas_image_depalettize(dec->image, cmapent->cmptno,
+				  pclrd->numlutents, lutents,
+				  JP2_BPCTODTYPE(pclrd->bpc[cmapent->pcol]), newcmptno);
 				dec->chantocmptlut[channo] = newcmptno;
 				jas_free(lutents);
 #if 0
@@ -397,7 +406,8 @@ jas_image_t *jp2_decode(jas_stream_t *in, char *optstr)
 			jas_image_setcmpttype(dec->image,
 			  dec->chantocmptlut[dec->cdef->data.cdef.ents[i].channo],
 			  jp2_getct(jas_image_clrspc(dec->image),
-			  dec->cdef->data.cdef.ents[i].type, dec->cdef->data.cdef.ents[i].assoc));
+			  dec->cdef->data.cdef.ents[i].type,
+			  dec->cdef->data.cdef.ents[i].assoc));
 		}
 	} else {
 		for (i = 0; i < dec->numchans; ++i) {
