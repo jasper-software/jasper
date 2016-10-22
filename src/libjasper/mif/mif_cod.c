@@ -466,6 +466,7 @@ static mif_hdr_t *mif_hdr_get(jas_stream_t *in)
 	int id;
 
 	hdr = 0;
+	tvp = 0;
 
 	if (jas_stream_read(in, magicbuf, MIF_MAGICLEN) != MIF_MAGICLEN) {
 		goto error;
@@ -496,12 +497,13 @@ static mif_hdr_t *mif_hdr_get(jas_stream_t *in)
 			goto error;
 		}
 		if (jas_tvparser_next(tvp)) {
-			jas_eprintf("jas_tvparser_next failed\n");
-			abort();
+			jas_eprintf("cannot get record type\n");
+			goto error;
 		}
 		id = jas_taginfo_nonull(jas_taginfos_lookup(mif_tags2,
 		  jas_tvparser_gettag(tvp)))->id;
 		jas_tvparser_destroy(tvp);
+		tvp = 0;
 		switch (id) {
 		case MIF_CMPT:
 			if (mif_process_cmpt(hdr, buf)) {
@@ -524,6 +526,9 @@ static mif_hdr_t *mif_hdr_get(jas_stream_t *in)
 error:
 	if (hdr) {
 		mif_hdr_destroy(hdr);
+	}
+	if (tvp) {
+		jas_tvparser_destroy(tvp);
 	}
 	return 0;
 }
@@ -558,6 +563,7 @@ static int mif_process_cmpt(mif_hdr_t *hdr, char *buf)
 
 	// Skip the component keyword
 	if ((id = jas_tvparser_next(tvp))) {
+		// This should never happen.
 		abort();
 	}
 
