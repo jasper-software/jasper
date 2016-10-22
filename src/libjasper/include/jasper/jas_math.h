@@ -166,20 +166,29 @@ inline static bool jas_safe_size_mul(size_t x, size_t y, size_t *result)
 	/* Check if overflow would occur */
 	if (x && y > SIZE_MAX / x) {
 		/* Overflow would occur. */
-		*result = 0;
 		return false;
 	}
 	*result = x * y;
 	return true;
 }
 
+/* Compute the sum of two size_t integer with overflow checking. */
 inline static bool jas_safe_size_add(size_t x, size_t y, size_t *result)
 {
 	if (y > SIZE_MAX - x) {
-		*result = 0;
 		return false;
 	}
 	*result = x + y;
+	return true;
+}
+
+/* Compute the difference of two size_t integer with overflow checking. */
+inline static bool jas_safe_size_sub(size_t x, size_t y, size_t *result)
+{
+	if (y > x) {
+		return false;
+	}
+	*result = x - y;
 	return true;
 }
 

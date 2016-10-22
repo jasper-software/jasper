@@ -74,6 +74,7 @@
 #include <math.h>
 #include <float.h>
 #include <assert.h>
+#include <stdint.h>
 
 #include <jasper/jasper.h>
 
@@ -86,7 +87,8 @@ typedef enum {
 	OPT_VERSION,
 	OPT_VERBOSE,
 	OPT_INFILE,
-	OPT_DEBUG
+	OPT_DEBUG,
+	OPT_MAXMEM
 } optid_t;
 
 /******************************************************************************\
@@ -106,6 +108,9 @@ static jas_opt_t opts[] = {
 	{OPT_VERBOSE, "verbose", 0},
 	{OPT_INFILE, "f", JAS_OPT_HASARG},
 	{OPT_DEBUG, "debug-level", JAS_OPT_HASARG},
+#if defined(JAS_DEFAULT_MAX_MEM_USAGE)
+	{OPT_MAXMEM, "memory-limit", JAS_OPT_HASARG},
+#endif
 	{-1, 0, 0}
 };
 
@@ -129,6 +134,7 @@ int main(int argc, char **argv)
 	int verbose;
 	char *fmtname;
 	int debug;
+	size_t max_mem;
 
 	if (jas_init()) {
 		abort();
@@ -139,6 +145,9 @@ int main(int argc, char **argv)
 	infile = 0;
 	verbose = 0;
 	debug = 0;
+#if defined(JAS_DEFAULT_MAX_MEM_USAGE)
+	max_mem = JAS_DEFAULT_MAX_MEM_USAGE;
+#endif
 
 	/* Parse the command line options. */
 	while ((id = jas_getopt(argc, argv, opts)) >= 0) {
@@ -156,6 +165,9 @@ int main(int argc, char **argv)
 		case OPT_INFILE:
 			infile = jas_optarg;
 			break;
+		case OPT_MAXMEM:
+			max_mem = strtoull(jas_optarg, 0, 10);
+			break;
 		case OPT_HELP:
 		default:
 			usage();
@@ -164,6 +176,9 @@ int main(int argc, char **argv)
 	}
 
 	jas_setdbglevel(debug);
+#if defined(JAS_DEFAULT_MAX_MEM_USAGE)
+	jas_set_max_mem_usage(max_mem);
+#endif
 
 	/* Open the image file. */
 	if (infile) {

@@ -21,9 +21,6 @@
 /* Extra debugging support */
 #undef DEBUG
 
-/* Debugging memory allocator */
-#undef DEBUG_MEMALLOC
-
 /* Debugging overflow detection */
 #undef DEBUG_OVERFLOW
 

@@ -90,7 +90,8 @@ typedef enum {
 	OPT_METRIC,
 	OPT_MAXONLY,
 	OPT_MINONLY,
-	OPT_DIFFIMAGE
+	OPT_DIFFIMAGE,
+	OPT_MAXMEM
 } optid_t;
 
 typedef enum {
@@ -139,6 +140,9 @@ static jas_opt_t opts[] = {
 	{OPT_MAXONLY, "max", 0},
 	{OPT_MINONLY, "min", 0},
 	{OPT_DIFFIMAGE, "d", JAS_OPT_HASARG},
+#if defined(JAS_DEFAULT_MAX_MEM_USAGE)
+	{OPT_MAXMEM, "memory-limit", JAS_OPT_HASARG},
+#endif
 	{-1, 0, 0}
 };
 
@@ -177,6 +181,7 @@ int main(int argc, char **argv)
 	int maxonly;
 	int minonly;
 	int fmtid;
+	size_t max_mem;
 
 	verbose = 0;
 	origpath = 0;
@@ -186,6 +191,9 @@ int main(int argc, char **argv)
 	diffpath = 0;
 	maxonly = 0;
 	minonly = 0;
+#if defined(JAS_DEFAULT_MAX_MEM_USAGE)
+	max_mem = JAS_DEFAULT_MAX_MEM_USAGE;
+#endif
 
 	if (jas_init()) {
 		abort();
@@ -221,6 +229,9 @@ int main(int argc, char **argv)
 			printf("%s\n", JAS_VERSION);
 			exit(EXIT_SUCCESS);
 			break;
+		case OPT_MAXMEM:
+			max_mem = strtoull(jas_optarg, 0, 10);
+			break;
 		case OPT_HELP:
 		default:
 			usage();
@@ -245,6 +256,10 @@ int main(int argc, char **argv)
 			usage();
 		}
 	}
+
+#if defined(JAS_DEFAULT_MAX_MEM_USAGE)
+	jas_set_max_mem_usage(max_mem);
+#endif
 
 	/* Open the original image file. */
 	if (!(origstream = jas_stream_fopen(origpath, "rb"))) {

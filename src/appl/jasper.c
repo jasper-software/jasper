@@ -75,6 +75,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <time.h>
+#include <stdint.h>
 
 #include <jasper/jasper.h>
 #include <jasper/jas_debug.h>
@@ -120,6 +121,8 @@ typedef struct {
 	int_fast32_t cmptno;
 
 	int srgb;
+
+	size_t max_mem;
 
 } cmdopts_t;
 
@@ -181,6 +184,9 @@ int main(int argc, char **argv)
 	}
 
 	jas_setdbglevel(cmdopts->debug);
+#if defined(JAS_DEFAULT_MAX_MEM_USAGE)
+	jas_set_max_mem_usage(cmdopts->max_mem);
+#endif
 
 	if (cmdopts->verbose) {
 		cmdinfo();
@@ -313,7 +319,8 @@ cmdopts_t *cmdopts_parse(int argc, char **argv)
 		CMDOPT_VERSION,
 		CMDOPT_DEBUG,
 		CMDOPT_CMPTNO,
-		CMDOPT_SRGB
+		CMDOPT_SRGB,
+		CMDOPT_MAXMEM
 	} cmdoptid_t;
 
 	static jas_opt_t cmdoptions[] = {
@@ -336,6 +343,9 @@ cmdopts_t *cmdopts_parse(int argc, char **argv)
 		{CMDOPT_CMPTNO, "cmptno", JAS_OPT_HASARG},
 		{CMDOPT_SRGB, "force-srgb", 0},
 		{CMDOPT_SRGB, "S", 0},
+#if defined(JAS_DEFAULT_MAX_MEM_USAGE)
+		{CMDOPT_MAXMEM, "memory-limit", JAS_OPT_HASARG},
+#endif
 		{-1, 0, 0}
 	};
 
@@ -360,6 +370,9 @@ cmdopts_t *cmdopts_parse(int argc, char **argv)
 	cmdopts->cmptno = -1;
 	cmdopts->debug = 0;
 	cmdopts->srgb = 0;
+#if defined(JAS_DEFAULT_MAX_MEM_USAGE)
+	cmdopts->max_mem = JAS_DEFAULT_MAX_MEM_USAGE;
+#endif
 
 	while ((c = jas_getopt(argc, argv, cmdoptions)) != EOF) {
 		switch (c) {
@@ -407,6 +420,9 @@ cmdopts_t *cmdopts_parse(int argc, char **argv)
 			break;
 		case CMDOPT_SRGB:
 			cmdopts->srgb = 1;
+			break;
+		case CMDOPT_MAXMEM:
+			cmdopts->max_mem = strtoull(jas_optarg, 0, 10);
 			break;
 		default:
 			badusage();

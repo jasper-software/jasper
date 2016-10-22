@@ -75,6 +75,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include <assert.h>
 
 /* We need the prototype for memset. */
@@ -88,15 +89,151 @@
 * Code.
 \******************************************************************************/
 
-#if defined(DEBUG_MEMALLOC)
-#include "../../../local/src/memalloc.c"
-#endif
+#if defined(JAS_DEFAULT_MAX_MEM_USAGE)
 
-#if !defined(DEBUG_MEMALLOC)
+static size_t jas_mem = 0;
+static size_t jas_max_mem = JAS_DEFAULT_MAX_MEM_USAGE;
+
+typedef struct {
+	size_t size;
+} jas_mb_t;
+
+#define JAS_MB_ADJUST \
+  ((sizeof(jas_mb_t) + sizeof(max_align_t) - 1) / sizeof(max_align_t))
+#define JAS_MB_SIZE (JAS_MB_ADJUST * sizeof(max_align_t))
+
+jas_mb_t *jas_get_mb(void *ptr)
+{
+	return JAS_CAST(jas_mb_t *, JAS_CAST(max_align_t *, ptr) - JAS_MB_ADJUST);
+}
+
+void *jas_mb_get_data(jas_mb_t *mb)
+{
+	return JAS_CAST(void *, JAS_CAST(max_align_t *, mb) + JAS_MB_ADJUST);
+}
+
+void jas_set_max_mem_usage(size_t max_mem)
+{
+	jas_max_mem = max_mem;
+}
+
+size_t jas_get_mem_usage()
+{
+	return jas_mem;
+}
+
+void *jas_malloc(size_t size)
+{
+	void *result;
+	jas_mb_t *mb;
+	size_t ext_size;
+	size_t mem;
+
+	JAS_DBGLOG(100, ("jas_malloc(%zu)\n", size));
+#if defined(JAS_MALLOC_RETURN_NULL_PTR_FOR_ZERO_SIZE)
+	if (!size) {
+		return 0;
+	}
+#endif
+	if (!jas_safe_size_add(size, JAS_MB_SIZE, &ext_size)) {
+		jas_eprintf("requested memory size is too large\n");
+		result = 0;
+		mb = 0;
+	} else if (!jas_safe_size_add(jas_mem, size, &mem) || mem > jas_max_mem) {
+		jas_eprintf("maximum memory limit would be exceeded\n");
+		result = 0;
+		mb = 0;
+	} else {
+		JAS_DBGLOG(100, ("jas_malloc: ext_size=%zu\n", ext_size));
+		if ((mb = malloc(ext_size))) {
+			result = jas_mb_get_data(mb);
+			mb->size = size;
+			jas_mem = mem;
+		} else {
+			result = 0;
+		}
+	}
+	JAS_DBGLOG(99, ("jas_malloc(%zu) -> %p (mb=%p)\n", size, result, mb));
+	JAS_DBGLOG(102, ("max_mem=%zu; mem=%zu\n", jas_max_mem, jas_mem));
+	return result;
+}
+
+void *jas_realloc(void *ptr, size_t size)
+{
+	void *result;
+	jas_mb_t *mb;
+	jas_mb_t *old_mb;
+	size_t old_size;
+	size_t ext_size;
+	size_t mem;
+
+	JAS_DBGLOG(100, ("jas_realloc(%x, %zu)\n", ptr, size));
+	if (!ptr) {
+		return jas_malloc(size);
+	}
+	if (ptr && !size) {
+		jas_free(ptr);
+	}
+	if (!jas_safe_size_add(size, JAS_MB_SIZE, &ext_size)) {
+		jas_eprintf("requested memory size is too large\n");
+		return 0;
+	}
+	old_mb = jas_get_mb(ptr);
+	old_size = old_mb->size;
+	JAS_DBGLOG(101, ("jas_realloc: old_mb=%x; old_size=%zu\n", old_mb,
+	  old_size));
+	if (size > old_size) {
+		if (!jas_safe_size_add(jas_mem, ext_size, &mem) || mem > jas_max_mem) {
+			jas_eprintf("maximum memory limit would be exceeded\n");
+			return 0;
+		}
+	} else {
+		if (!jas_safe_size_sub(jas_mem, old_size - size, &jas_mem)) {
+			jas_eprintf("heap corruption detected\n");
+			abort();
+		}
+	}
+	JAS_DBGLOG(100, ("jas_realloc: realloc(%p, %zu)\n", old_mb, ext_size));
+	if (!(mb = realloc(old_mb, ext_size))) {
+		result = 0;
+	} else {
+		result = jas_mb_get_data(mb);
+		mb->size = size;
+		jas_mem = mem;
+	}
+	JAS_DBGLOG(100, ("jas_realloc(%p, %zu) -> %p (%p)\n", ptr, size, result,
+	  mb));
+	JAS_DBGLOG(102, ("max_mem=%zu; mem=%zu\n", jas_max_mem, jas_mem));
+	return result;
+}
+
+void jas_free(void *ptr)
+{
+	jas_mb_t *mb;
+	size_t mem;
+	size_t size;
+	JAS_DBGLOG(100, ("jas_free(%p)\n", ptr));
+	if (ptr) {
+		mb = jas_get_mb(ptr);
+		size = mb->size;
+		JAS_DBGLOG(101, ("jas_free(%p) (mb=%p; size=%zu)\n", ptr, mb, size));
+		if (!jas_safe_size_sub(jas_mem, size, &jas_mem)) {
+			jas_eprintf("heap corruption detected\n");
+			abort();
+		}
+		JAS_DBGLOG(100, ("jas_free: free(%p)\n", mb));
+		free(mb);
+	}
+	JAS_DBGLOG(102, ("max_mem=%zu; mem=%zu\n", jas_max_mem, jas_mem));
+}
+
+#endif
 
 /******************************************************************************\
 * Basic memory allocation and deallocation primitives.
 \******************************************************************************/
+
+#if !defined(JAS_DEFAULT_MAX_MEM_USAGE)
 
 void *jas_malloc(size_t size)
 {
@@ -121,6 +258,8 @@ void jas_free(void *ptr)
 	JAS_DBGLOG(100, ("jas_free(%p)\n", ptr));
 	free(ptr);
 }
+
+#endif
 
 /******************************************************************************\
 * Additional memory allocation and deallocation primitives
@@ -168,5 +307,3 @@ void *jas_calloc(size_t num_elements, size_t element_size)
 	memset(ptr, 0, size);
 	return ptr;
 }
-
-#endif

@@ -328,6 +328,8 @@ static jas_image_cmpt_t *jas_image_cmpt_create(uint_fast32_t tlx,
 	cmpt->stream_ = 0;
 	cmpt->cps_ = (depth + 7) / 8;
 
+	// Compute the number of samples in the image component, while protecting
+	// against overflow.
 	// size = cmpt->width_ * cmpt->height_ * cmpt->cps_;
 	if (!jas_safe_size_mul(cmpt->width_, cmpt->height_, &size) ||
 	  !jas_safe_size_mul(size, cmpt->cps_, &size)) {

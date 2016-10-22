@@ -118,7 +118,6 @@ AC_DEFINE(JAS_CONFIGURE)
 AH_TEMPLATE([DEBUG_OVERFLOW], [Debugging overflow detection])
 AH_TEMPLATE([JAS_CONFIGURE], [JasPer configure])
 AH_TEMPLATE([JAS_VERSION], [JasPer version])
-AH_TEMPLATE([DEBUG_MEMALLOC], [Debugging memory allocator])
 AH_TEMPLATE([DEBUG], [Extra debugging support])
 
 AH_TOP([
@@ -152,8 +151,8 @@ AH_BOTTOM([
 # Checks for programs.
 ############################################################
 
-#AC_PROG_CC
-AC_PROG_CC_C99
+AC_PROG_CC
+#AC_PROG_CC_C11
 AC_PROG_INSTALL
 # AC_PROG_AWK
 # AC_PROG_CPP
@@ -292,25 +291,6 @@ AC_CHECK_FUNCS(getrusage)
 AC_FUNC_VPRINTF
 
 ############################################################
-# Enable/disable special memory allocator for debugging.
-############################################################
-
-AC_ARG_ENABLE(dmalloc,
-[  --enable-dmalloc    use special memory allocator for debugging],
-[
-case "${enableval}" in
-yes)
-	AC_DEFINE(DEBUG_MEMALLOC)
-	;;
-no)
-	;;
-*)
-	AC_MSG_ERROR(bad value ${enableval} for --enable-dmalloc)
-	;;
-esac
-], )
-
-############################################################
 # Enable/disable sanitizers.
 ############################################################
 
@@ -376,7 +356,8 @@ esac
 
 if test "$GCC" = yes; then
 	#CFLAGS="$CFLAGS"
-	CFLAGS="$CFLAGS -std=c99"
+#	CFLAGS="$CFLAGS -std=c99"
+#	CFLAGS="$CFLAGS -std=c11"
 	CFLAGS="$CFLAGS -pedantic"
 	CFLAGS="$CFLAGS -pedantic-errors"
 	CFLAGS="$CFLAGS -Wall"
@@ -404,8 +385,8 @@ no)
 esac
 ], [])
 
-if test -n "$EXTRACFLAGS"; then
-	CFLAGS="$CFLAGS $EXTRACFLAGS"
+if test -n "$EXTRA_CFLAGS"; then
+	CFLAGS="$CFLAGS $EXTRA_CFLAGS"
 fi
 
 ############################################################
