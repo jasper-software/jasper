@@ -1,2 +1,3 @@
 # Consider all PNM files to be binary.
 *.pnm binary
+#* merge=verify
