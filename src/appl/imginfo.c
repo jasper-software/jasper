@@ -209,10 +209,18 @@ int main(int argc, char **argv)
 	/* Close the image file. */
 	jas_stream_close(instream);
 
-	numcmpts = jas_image_numcmpts(image);
-	width = jas_image_cmptwidth(image, 0);
-	height = jas_image_cmptheight(image, 0);
-	depth = jas_image_cmptprec(image, 0);
+	if (!(numcmpts = jas_image_numcmpts(image))) {
+		fprintf(stderr, "warning: image has no components\n");
+	}
+	if (numcmpts) {
+		width = jas_image_cmptwidth(image, 0);
+		height = jas_image_cmptheight(image, 0);
+		depth = jas_image_cmptprec(image, 0);
+	} else {
+		width = 0;
+		height = 0;
+		depth = 0;
+	}
 	if (!(fmtname = jas_image_fmttostr(fmtid))) {
 		abort();
 	}
