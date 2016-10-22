@@ -238,7 +238,7 @@ void jas_free(void *ptr)
 void *jas_malloc(size_t size)
 {
 	void *result;
-	JAS_DBGLOG(101, ("jas_malloc called with %zu\n", size));
+	JAS_DBGLOG(101, ("jas_malloc(%zu)\n", size));
 	result = malloc(size);
 	JAS_DBGLOG(100, ("jas_malloc(%zu) -> %p\n", size, result));
 	return result;
@@ -247,7 +247,7 @@ void *jas_malloc(size_t size)
 void *jas_realloc(void *ptr, size_t size)
 {
 	void *result;
-	JAS_DBGLOG(101, ("jas_realloc called with %x,%zu\n", ptr, size));
+	JAS_DBGLOG(101, ("jas_realloc(%x, %zu)\n", ptr, size));
 	result = realloc(ptr, size);
 	JAS_DBGLOG(100, ("jas_realloc(%p, %zu) -> %p\n", ptr, size, result));
 	return result;

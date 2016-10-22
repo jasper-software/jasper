@@ -101,13 +101,16 @@ jas_matrix_t *jas_matrix_create(int numrows, int numcols)
 {
 	jas_matrix_t *matrix;
 	int i;
+	size_t size;
+
+	matrix = 0;
 
 	if (numrows < 0 || numcols < 0) {
-		return 0;
+		goto error;
 	}
 
 	if (!(matrix = jas_malloc(sizeof(jas_matrix_t)))) {
-		return 0;
+		goto error;
 	}
 	matrix->flags_ = 0;
 	matrix->numrows_ = numrows;
@@ -115,21 +118,25 @@ jas_matrix_t *jas_matrix_create(int numrows, int numcols)
 	matrix->rows_ = 0;
 	matrix->maxrows_ = numrows;
 	matrix->data_ = 0;
-	matrix->datasize_ = numrows * numcols;
+	matrix->datasize_ = 0;
+
+	// matrix->datasize_ = numrows * numcols;
+	if (!jas_safe_size_mul(numrows, numcols, &size)) {
+		goto error;
+	}
+	matrix->datasize_ = size;
 
 	if (matrix->maxrows_ > 0) {
 		if (!(matrix->rows_ = jas_alloc2(matrix->maxrows_,
 		  sizeof(jas_seqent_t *)))) {
-			jas_matrix_destroy(matrix);
-			return 0;
+			goto error;
 		}
 	}
 
 	if (matrix->datasize_ > 0) {
 		if (!(matrix->data_ = jas_alloc2(matrix->datasize_,
 		  sizeof(jas_seqent_t)))) {
-			jas_matrix_destroy(matrix);
-			return 0;
+			goto error;
 		}
 	}
 
@@ -147,6 +154,12 @@ jas_matrix_t *jas_matrix_create(int numrows, int numcols)
 	matrix->yend_ = matrix->numrows_;
 
 	return matrix;
+
+error:
+	if (matrix) {
+		jas_matrix_destroy(matrix);
+	}
+	return 0;
 }
 
 void jas_matrix_destroy(jas_matrix_t *matrix)
