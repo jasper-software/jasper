@@ -885,7 +885,8 @@ void jpc_ft_fwdlift_row(jpc_fix_t *a, int numcols, int parity)
 		}
 		n = numcols - llen - parity - (parity == (numcols & 1));
 		while (n-- > 0) {
-			hptr[0] -= (lptr[0] + lptr[1]) >> 1;
+			//hptr[0] -= (lptr[0] + lptr[1]) >> 1;
+			hptr[0] -= jpc_fix_asr(lptr[0] + lptr[1], 1);
 			++hptr;
 			++lptr;
 		}
@@ -897,24 +898,28 @@ void jpc_ft_fwdlift_row(jpc_fix_t *a, int numcols, int parity)
 		lptr = &a[0];
 		hptr = &a[llen];
 		if (!parity) {
-			lptr[0] += (hptr[0] + 1) >> 1;
+			//lptr[0] += (hptr[0] + 1) >> 1;
+			lptr[0] += jpc_fix_asr(hptr[0] + 1, 1);
 			++lptr;
 		}
 		n = llen - (!parity) - (parity != (numcols & 1));
 		while (n-- > 0) {
-			lptr[0] += (hptr[0] + hptr[1] + 2) >> 2;
+			//lptr[0] += (hptr[0] + hptr[1] + 2) >> 2;
+			lptr[0] += jpc_fix_asr(hptr[0] + hptr[1] + 2, 2);
 			++lptr;
 			++hptr;
 		}
 		if (parity != (numcols & 1)) {
-			lptr[0] += (hptr[0] + 1) >> 1;
+			//lptr[0] += (hptr[0] + 1) >> 1;
+			lptr[0] += jpc_fix_asr(hptr[0] + 1, 1);
 		}
 
 	} else {
 
 		if (parity) {
 			lptr = &a[0];
-			lptr[0] <<= 1;
+			//lptr[0] <<= 1;
+			lptr[0] = jpc_fix_asl(lptr[0], 1);
 		}
 
 	}
@@ -947,7 +952,8 @@ void jpc_ft_fwdlift_col(jpc_fix_t *a, int numrows, int stride, int parity)
 		}
 		n = numrows - llen - parity - (parity == (numrows & 1));
 		while (n-- > 0) {
-			hptr[0] -= (lptr[0] + lptr[stride]) >> 1;
+			//hptr[0] -= (lptr[0] + lptr[stride]) >> 1;
+			hptr[0] -= jpc_fix_asr(lptr[0] + lptr[stride], 1);
 			hptr += stride;
 			lptr += stride;
 		}
@@ -959,24 +965,28 @@ void jpc_ft_fwdlift_col(jpc_fix_t *a, int numrows, int stride, int parity)
 		lptr = &a[0];
 		hptr = &a[llen * stride];
 		if (!parity) {
-			lptr[0] += (hptr[0] + 1) >> 1;
+			//lptr[0] += (hptr[0] + 1) >> 1;
+			lptr[0] += jpc_fix_asr(hptr[0] + 1, 1);
 			lptr += stride;
 		}
 		n = llen - (!parity) - (parity != (numrows & 1));
 		while (n-- > 0) {
-			lptr[0] += (hptr[0] + hptr[stride] + 2) >> 2;
+			//lptr[0] += (hptr[0] + hptr[stride] + 2) >> 2;
+			lptr[0] += jpc_fix_asr(hptr[0] + hptr[stride] + 2, 2);
 			lptr += stride;
 			hptr += stride;
 		}
 		if (parity != (numrows & 1)) {
-			lptr[0] += (hptr[0] + 1) >> 1;
+			//lptr[0] += (hptr[0] + 1) >> 1;
+			lptr[0] += jpc_fix_asr(hptr[0] + 1, 1);
 		}
 
 	} else {
 
 		if (parity) {
 			lptr = &a[0];
-			lptr[0] <<= 1;
+			//lptr[0] <<= 1;
+			lptr[0] = jpc_fix_asl(lptr[0], 1);
 		}
 
 	}
@@ -1016,7 +1026,8 @@ void jpc_ft_fwdlift_colgrp(jpc_fix_t *a, int numrows, int stride, int parity)
 			lptr2 = lptr;
 			hptr2 = hptr;
 			for (i = 0; i < JPC_QMFB_COLGRPSIZE; ++i) {
-				hptr2[0] -= (lptr2[0] + lptr2[stride]) >> 1;
+				//hptr2[0] -= (lptr2[0] + lptr2[stride]) >> 1;
+				hptr2[0] -= jpc_fix_asr(lptr2[0] + lptr2[stride], 1);
 				++lptr2;
 				++hptr2;
 			}
@@ -1040,7 +1051,8 @@ void jpc_ft_fwdlift_colgrp(jpc_fix_t *a, int numrows, int stride, int parity)
 			lptr2 = lptr;
 			hptr2 = hptr;
 			for (i = 0; i < JPC_QMFB_COLGRPSIZE; ++i) {
-				lptr2[0] += (hptr2[0] + 1) >> 1;
+				//lptr2[0] += (hptr2[0] + 1) >> 1;
+				lptr2[0] += jpc_fix_asr(hptr2[0] + 1, 1);
 				++lptr2;
 				++hptr2;
 			}
@@ -1051,7 +1063,8 @@ void jpc_ft_fwdlift_colgrp(jpc_fix_t *a, int numrows, int stride, int parity)
 			lptr2 = lptr;
 			hptr2 = hptr;
 			for (i = 0; i < JPC_QMFB_COLGRPSIZE; ++i) {
-				lptr2[0] += (hptr2[0] + hptr2[stride] + 2) >> 2;
+				//lptr2[0] += (hptr2[0] + hptr2[stride] + 2) >> 2;
+				lptr2[0] += jpc_fix_asr(hptr2[0] + hptr2[stride] + 2, 2);
 				++lptr2;
 				++hptr2;
 			}
@@ -1062,7 +1075,8 @@ void jpc_ft_fwdlift_colgrp(jpc_fix_t *a, int numrows, int stride, int parity)
 			lptr2 = lptr;
 			hptr2 = hptr;
 			for (i = 0; i < JPC_QMFB_COLGRPSIZE; ++i) {
-				lptr2[0] += (hptr2[0] + 1) >> 1;
+				//lptr2[0] += (hptr2[0] + 1) >> 1;
+				lptr2[0] += jpc_fix_asr(hptr2[0] + 1, 1);
 				++lptr2;
 				++hptr2;
 			}
@@ -1073,7 +1087,8 @@ void jpc_ft_fwdlift_colgrp(jpc_fix_t *a, int numrows, int stride, int parity)
 		if (parity) {
 			lptr2 = &a[0];
 			for (i = 0; i < JPC_QMFB_COLGRPSIZE; ++i) {
-				lptr2[0] <<= 1;
+				//lptr2[0] <<= 1;
+				lptr2[0] = jpc_fix_asl(lptr2[0], 1);
 				++lptr2;
 			}
 		}
@@ -1116,7 +1131,8 @@ void jpc_ft_fwdlift_colres(jpc_fix_t *a, int numrows, int numcols, int stride,
 			lptr2 = lptr;
 			hptr2 = hptr;
 			for (i = 0; i < numcols; ++i) {
-				hptr2[0] -= (lptr2[0] + lptr2[stride]) >> 1;
+				//hptr2[0] -= (lptr2[0] + lptr2[stride]) >> 1;
+				hptr2[0] -= jpc_fix_asr(lptr2[0] + lptr2[stride], 1);
 				++lptr2;
 				++hptr2;
 			}
@@ -1140,7 +1156,8 @@ void jpc_ft_fwdlift_colres(jpc_fix_t *a, int numrows, int numcols, int stride,
 			lptr2 = lptr;
 			hptr2 = hptr;
 			for (i = 0; i < numcols; ++i) {
-				lptr2[0] += (hptr2[0] + 1) >> 1;
+				//lptr2[0] += (hptr2[0] + 1) >> 1;
+				lptr2[0] += jpc_fix_asr(hptr2[0] + 1, 1);
 				++lptr2;
 				++hptr2;
 			}
@@ -1151,7 +1168,8 @@ void jpc_ft_fwdlift_colres(jpc_fix_t *a, int numrows, int numcols, int stride,
 			lptr2 = lptr;
 			hptr2 = hptr;
 			for (i = 0; i < numcols; ++i) {
-				lptr2[0] += (hptr2[0] + hptr2[stride] + 2) >> 2;
+				//lptr2[0] += (hptr2[0] + hptr2[stride] + 2) >> 2;
+				lptr2[0] += jpc_fix_asr(hptr2[0] + hptr2[stride] + 2, 2);
 				++lptr2;
 				++hptr2;
 			}
@@ -1162,7 +1180,8 @@ void jpc_ft_fwdlift_colres(jpc_fix_t *a, int numrows, int numcols, int stride,
 			lptr2 = lptr;
 			hptr2 = hptr;
 			for (i = 0; i < numcols; ++i) {
-				lptr2[0] += (hptr2[0] + 1) >> 1;
+				//lptr2[0] += (hptr2[0] + 1) >> 1;
+				lptr2[0] += jpc_fix_asr(hptr2[0] + 1, 1);
 				++lptr2;
 				++hptr2;
 			}
@@ -1173,7 +1192,8 @@ void jpc_ft_fwdlift_colres(jpc_fix_t *a, int numrows, int numcols, int stride,
 		if (parity) {
 			lptr2 = &a[0];
 			for (i = 0; i < numcols; ++i) {
-				lptr2[0] <<= 1;
+				//lptr2[0] <<= 1;
+				lptr2[0] = jpc_fix_asl(lptr2[0], 1);
 				++lptr2;
 			}
 		}
@@ -1198,17 +1218,20 @@ void jpc_ft_invlift_row(jpc_fix_t *a, int numcols, int parity)
 		lptr = &a[0];
 		hptr = &a[llen];
 		if (!parity) {
-			lptr[0] -= (hptr[0] + 1) >> 1;
+			//lptr[0] -= (hptr[0] + 1) >> 1;
+			lptr[0] -= jpc_fix_asr(hptr[0] + 1, 1);
 			++lptr;
 		}
 		n = llen - (!parity) - (parity != (numcols & 1));
 		while (n-- > 0) {
-			lptr[0] -= (hptr[0] + hptr[1] + 2) >> 2;
+			//lptr[0] -= (hptr[0] + hptr[1] + 2) >> 2;
+			lptr[0] -= jpc_fix_asr(hptr[0] + hptr[1] + 2, 2);
 			++lptr;
 			++hptr;
 		}
 		if (parity != (numcols & 1)) {
-			lptr[0] -= (hptr[0] + 1) >> 1;
+			//lptr[0] -= (hptr[0] + 1) >> 1;
+			lptr[0] -= jpc_fix_asr(hptr[0] + 1, 1);
 		}
 
 		/* Apply the second lifting step. */
@@ -1220,7 +1243,8 @@ void jpc_ft_invlift_row(jpc_fix_t *a, int numcols, int parity)
 		}
 		n = numcols - llen - parity - (parity == (numcols & 1));
 		while (n-- > 0) {
-			hptr[0] += (lptr[0] + lptr[1]) >> 1;
+			//hptr[0] += (lptr[0] + lptr[1]) >> 1;
+			hptr[0] += jpc_fix_asr(lptr[0] + lptr[1], 1);
 			++hptr;
 			++lptr;
 		}
@@ -1232,7 +1256,8 @@ void jpc_ft_invlift_row(jpc_fix_t *a, int numcols, int parity)
 
 		if (parity) {
 			lptr = &a[0];
-			lptr[0] >>= 1;
+			//lptr[0] >>= 1;
+			lptr[0] = jpc_fix_asr(lptr[0], 1);
 		}
 
 	}
@@ -1260,17 +1285,20 @@ void jpc_ft_invlift_col(jpc_fix_t *a, int numrows, int stride, int parity)
 		lptr = &a[0];
 		hptr = &a[llen * stride];
 		if (!parity) {
-			lptr[0] -= (hptr[0] + 1) >> 1;
+			//lptr[0] -= (hptr[0] + 1) >> 1;
+			lptr[0] -= jpc_fix_asr(hptr[0] + 1, 1);
 			lptr += stride;
 		}
 		n = llen - (!parity) - (parity != (numrows & 1));
 		while (n-- > 0) {
-			lptr[0] -= (hptr[0] + hptr[stride] + 2) >> 2;
+			//lptr[0] -= (hptr[0] + hptr[stride] + 2) >> 2;
+			lptr[0] -= jpc_fix_asr(hptr[0] + hptr[stride] + 2, 2);
 			lptr += stride;
 			hptr += stride;
 		}
 		if (parity != (numrows & 1)) {
-			lptr[0] -= (hptr[0] + 1) >> 1;
+			//lptr[0] -= (hptr[0] + 1) >> 1;
+			lptr[0] -= jpc_fix_asr(hptr[0] + 1, 1);
 		}
 
 		/* Apply the second lifting step. */
@@ -1282,7 +1310,8 @@ void jpc_ft_invlift_col(jpc_fix_t *a, int numrows, int stride, int parity)
 		}
 		n = numrows - llen - parity - (parity == (numrows & 1));
 		while (n-- > 0) {
-			hptr[0] += (lptr[0] + lptr[stride]) >> 1;
+			//hptr[0] += (lptr[0] + lptr[stride]) >> 1;
+			hptr[0] += jpc_fix_asr(lptr[0] + lptr[stride], 1);
 			hptr += stride;
 			lptr += stride;
 		}
@@ -1294,7 +1323,8 @@ void jpc_ft_invlift_col(jpc_fix_t *a, int numrows, int stride, int parity)
 
 		if (parity) {
 			lptr = &a[0];
-			lptr[0] >>= 1;
+			//lptr[0] >>= 1;
+			lptr[0] = jpc_fix_asr(lptr[0], 1);
 		}
 
 	}
@@ -1323,7 +1353,8 @@ void jpc_ft_invlift_colgrp(jpc_fix_t *a, int numrows, int stride, int parity)
 			lptr2 = lptr;
 			hptr2 = hptr;
 			for (i = 0; i < JPC_QMFB_COLGRPSIZE; ++i) {
-				lptr2[0] -= (hptr2[0] + 1) >> 1;
+				//lptr2[0] -= (hptr2[0] + 1) >> 1;
+				lptr2[0] -= jpc_fix_asr(hptr2[0] + 1, 1);
 				++lptr2;
 				++hptr2;
 			}
@@ -1334,7 +1365,8 @@ void jpc_ft_invlift_colgrp(jpc_fix_t *a, int numrows, int stride, int parity)
 			lptr2 = lptr;
 			hptr2 = hptr;
 			for (i = 0; i < JPC_QMFB_COLGRPSIZE; ++i) {
-				lptr2[0] -= (hptr2[0] + hptr2[stride] + 2) >> 2;
+				//lptr2[0] -= (hptr2[0] + hptr2[stride] + 2) >> 2;
+				lptr2[0] -= jpc_fix_asr(hptr2[0] + hptr2[stride] + 2, 2);
 				++lptr2;
 				++hptr2;
 			}
@@ -1345,7 +1377,8 @@ void jpc_ft_invlift_colgrp(jpc_fix_t *a, int numrows, int stride, int parity)
 			lptr2 = lptr;
 			hptr2 = hptr;
 			for (i = 0; i < JPC_QMFB_COLGRPSIZE; ++i) {
-				lptr2[0] -= (hptr2[0] + 1) >> 1;
+				//lptr2[0] -= (hptr2[0] + 1) >> 1;
+				lptr2[0] -= jpc_fix_asr(hptr2[0] + 1, 1);
 				++lptr2;
 				++hptr2;
 			}
@@ -1369,7 +1402,8 @@ void jpc_ft_invlift_colgrp(jpc_fix_t *a, int numrows, int stride, int parity)
 			lptr2 = lptr;
 			hptr2 = hptr;
 			for (i = 0; i < JPC_QMFB_COLGRPSIZE; ++i) {
-				hptr2[0] += (lptr2[0] + lptr2[stride]) >> 1;
+				//hptr2[0] += (lptr2[0] + lptr2[stride]) >> 1;
+				hptr2[0] += jpc_fix_asr(lptr2[0] + lptr2[stride], 1);
 				++lptr2;
 				++hptr2;
 			}
@@ -1391,7 +1425,8 @@ void jpc_ft_invlift_colgrp(jpc_fix_t *a, int numrows, int stride, int parity)
 		if (parity) {
 			lptr2 = &a[0];
 			for (i = 0; i < JPC_QMFB_COLGRPSIZE; ++i) {
-				lptr2[0] >>= 1;
+				//lptr2[0] >>= 1;
+				lptr2[0] = jpc_fix_asr(lptr2[0], 1);
 				++lptr2;
 			}
 		}
@@ -1423,7 +1458,8 @@ void jpc_ft_invlift_colres(jpc_fix_t *a, int numrows, int numcols, int stride,
 			lptr2 = lptr;
 			hptr2 = hptr;
 			for (i = 0; i < numcols; ++i) {
-				lptr2[0] -= (hptr2[0] + 1) >> 1;
+				//lptr2[0] -= (hptr2[0] + 1) >> 1;
+				lptr2[0] -= jpc_fix_asr(hptr2[0] + 1, 1);
 				++lptr2;
 				++hptr2;
 			}
@@ -1434,7 +1470,8 @@ void jpc_ft_invlift_colres(jpc_fix_t *a, int numrows, int numcols, int stride,
 			lptr2 = lptr;
 			hptr2 = hptr;
 			for (i = 0; i < numcols; ++i) {
-				lptr2[0] -= (hptr2[0] + hptr2[stride] + 2) >> 2;
+				//lptr2[0] -= (hptr2[0] + hptr2[stride] + 2) >> 2;
+				lptr2[0] -= jpc_fix_asr(hptr2[0] + hptr2[stride] + 2, 2);
 				++lptr2;
 				++hptr2;
 			}
@@ -1445,7 +1482,8 @@ void jpc_ft_invlift_colres(jpc_fix_t *a, int numrows, int numcols, int stride,
 			lptr2 = lptr;
 			hptr2 = hptr;
 			for (i = 0; i < numcols; ++i) {
-				lptr2[0] -= (hptr2[0] + 1) >> 1;
+				//lptr2[0] -= (hptr2[0] + 1) >> 1;
+				lptr2[0] -= jpc_fix_asr(hptr2[0] + 1, 1);
 				++lptr2;
 				++hptr2;
 			}
@@ -1469,7 +1507,8 @@ void jpc_ft_invlift_colres(jpc_fix_t *a, int numrows, int numcols, int stride,
 			lptr2 = lptr;
 			hptr2 = hptr;
 			for (i = 0; i < numcols; ++i) {
-				hptr2[0] += (lptr2[0] + lptr2[stride]) >> 1;
+				//hptr2[0] += (lptr2[0] + lptr2[stride]) >> 1;
+				hptr2[0] += jpc_fix_asr(lptr2[0] + lptr2[stride], 1);
 				++lptr2;
 				++hptr2;
 			}
@@ -1491,7 +1530,8 @@ void jpc_ft_invlift_colres(jpc_fix_t *a, int numrows, int numcols, int stride,
 		if (parity) {
 			lptr2 = &a[0];
 			for (i = 0; i < numcols; ++i) {
-				lptr2[0] >>= 1;
+				//lptr2[0] >>= 1;
+				lptr2[0] = jpc_fix_asr(lptr2[0], 1);
 				++lptr2;
 			}
 		}
@@ -1697,7 +1737,8 @@ void jpc_ns_fwdlift_row(jpc_fix_t *a, int numcols, int parity)
 #if defined(WT_LENONE)
 		if (parity) {
 			lptr = &a[0];
-			lptr[0] <<= 1;
+			//lptr[0] <<= 1;
+			lptr[0] = jpc_fix_asl(lptr[0], 1);
 		}
 #endif
 
@@ -1903,7 +1944,8 @@ void jpc_ns_fwdlift_colgrp(jpc_fix_t *a, int numrows, int stride,
 		if (parity) {
 			lptr2 = &a[0];
 			for (i = 0; i < JPC_QMFB_COLGRPSIZE; ++i) {
-				lptr2[0] <<= 1;
+				//lptr2[0] <<= 1;
+				lptr2[0] = jpc_fix_asl(lptr2[0], 1);
 				++lptr2;
 			}
 		}
@@ -2111,7 +2153,8 @@ void jpc_ns_fwdlift_colres(jpc_fix_t *a, int numrows, int numcols,
 		if (parity) {
 			lptr2 = &a[0];
 			for (i = 0; i < numcols; ++i) {
-				lptr2[0] <<= 1;
+				//lptr2[0] <<= 1;
+				lptr2[0] = jpc_fix_asl(lptr2[0], 1);
 				++lptr2;
 			}
 		}
@@ -2289,7 +2332,8 @@ void jpc_ns_fwdlift_col(jpc_fix_t *a, int numrows, int stride,
 #if defined(WT_LENONE)
 		if (parity) {
 			lptr2 = &a[0];
-			lptr2[0] <<= 1;
+			//lptr2[0] <<= 1;
+			lptr2[0] = jpc_fix_asl(lptr2[0], 1);
 			++lptr2;
 		}
 #endif
@@ -2411,7 +2455,8 @@ void jpc_ns_invlift_row(jpc_fix_t *a, int numcols, int parity)
 #if defined(WT_LENONE)
 		if (parity) {
 			lptr = &a[0];
-			lptr[0] >>= 1;
+			//lptr[0] >>= 1;
+			lptr[0] = jpc_fix_asr(lptr[0], 1);
 		}
 #endif
 
@@ -2617,7 +2662,8 @@ void jpc_ns_invlift_colgrp(jpc_fix_t *a, int numrows, int stride,
 		if (parity) {
 			lptr2 = &a[0];
 			for (i = 0; i < JPC_QMFB_COLGRPSIZE; ++i) {
-				lptr2[0] >>= 1;
+				//lptr2[0] >>= 1;
+				lptr2[0] = jpc_fix_asr(lptr2[0], 1);
 				++lptr2;
 			}
 		}
@@ -2825,7 +2871,8 @@ void jpc_ns_invlift_colres(jpc_fix_t *a, int numrows, int numcols,
 		if (parity) {
 			lptr2 = &a[0];
 			for (i = 0; i < numcols; ++i) {
-				lptr2[0] >>= 1;
+				//lptr2[0] >>= 1;
+				lptr2[0] = jpc_fix_asr(lptr2[0], 1);
 				++lptr2;
 			}
 		}
@@ -3003,7 +3050,8 @@ void jpc_ns_invlift_col(jpc_fix_t *a, int numrows, int stride,
 #if defined(WT_LENONE)
 		if (parity) {
 			lptr2 = &a[0];
-			lptr2[0] >>= 1;
+			//lptr2[0] >>= 1;
+			lptr2[0] = jpc_fix_asr(lptr2[0], 1);
 			++lptr2;
 		}
 #endif
