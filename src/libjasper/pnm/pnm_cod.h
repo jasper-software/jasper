@@ -90,9 +90,10 @@
 #define	PNM_MAGIC_PAM		0x5037 /* PAM (P7) */
 
 /* Type of image data. */
-#define PNM_TYPE_PPM	0 /* PixMap */
-#define PNM_TYPE_PGM	1 /* GrayMap */
-#define PNM_TYPE_PBM	2 /* BitMap */
+#define PNM_TYPE_INVALID	0
+#define PNM_TYPE_PBM	1 /* BitMap */
+#define PNM_TYPE_PGM	2 /* GrayMap */
+#define PNM_TYPE_PPM	3 /* PixMap */
 
 /* Format of image data. */
 #define PNM_FMT_TXT	0 /* Text */

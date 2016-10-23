@@ -103,7 +103,7 @@ int pnm_type(uint_fast16_t magic)
 		break;
 	default:
 		/* This should not happen. */
-		abort();
+		type = PNM_TYPE_INVALID;
 		break;
 	}
 	return type;
