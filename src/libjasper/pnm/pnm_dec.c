@@ -325,6 +325,7 @@ static int pnm_getdata(jas_stream_t *in, pnm_hdr_t *hdr, jas_image_t *image)
 								if (!pnm_allowtrunc) {
 									goto done;
 								}
+								jas_eprintf("bad sample data\n");
 								sv = 0;
 							}
 							v = sv;
@@ -335,6 +336,7 @@ static int pnm_getdata(jas_stream_t *in, pnm_hdr_t *hdr, jas_image_t *image)
 								if (!pnm_allowtrunc) {
 									goto done;
 								}
+								jas_eprintf("bad sample data\n");
 								uv = 0;
 							}
 							v = uv;
@@ -348,6 +350,7 @@ static int pnm_getdata(jas_stream_t *in, pnm_hdr_t *hdr, jas_image_t *image)
 								if (!pnm_allowtrunc) {
 									goto done;
 								}
+								jas_eprintf("bad sample data\n");
 								sv = 0;
 							}
 							v = sv;
@@ -358,6 +361,7 @@ static int pnm_getdata(jas_stream_t *in, pnm_hdr_t *hdr, jas_image_t *image)
 								if (!pnm_allowtrunc) {
 									goto done;
 								}
+								jas_eprintf("bad sample data\n");
 								uv = 0;
 							}
 							v = uv;
@@ -399,8 +403,11 @@ static int pnm_getsint(jas_stream_t *in, int wordsize, int_fast32_t *val)
 	if (pnm_getuint(in, wordsize, &tmpval)) {
 		return -1;
 	}
+	if ((tmpval & (1 << (wordsize - 1))) != 0) {
+		jas_eprintf("PNM decoder does not fully support signed data\n");
+		return -1;
+	}
 	if (val) {
-		assert((tmpval & (1 << (wordsize - 1))) == 0);
 		*val = tmpval;
 	}
 
