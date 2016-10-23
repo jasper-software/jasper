@@ -1195,6 +1195,7 @@ static int jpc_dec_process_siz(jpc_dec_t *dec, jpc_ms_t *ms)
 	int htileno;
 	int vtileno;
 	jpc_dec_cmpt_t *cmpt;
+	size_t size;
 
 	dec->xstart = siz->xoff;
 	dec->ystart = siz->yoff;
@@ -1231,7 +1232,10 @@ static int jpc_dec_process_siz(jpc_dec_t *dec, jpc_ms_t *ms)
 
 	dec->numhtiles = JPC_CEILDIV(dec->xend - dec->tilexoff, dec->tilewidth);
 	dec->numvtiles = JPC_CEILDIV(dec->yend - dec->tileyoff, dec->tileheight);
-	dec->numtiles = dec->numhtiles * dec->numvtiles;
+	if (!jas_safe_size_mul(dec->numhtiles, dec->numvtiles, &size)) {
+		return -1;
+	}
+	dec->numtiles = size;
 	JAS_DBGLOG(10, ("numtiles = %d; numhtiles = %d; numvtiles = %d;\n",
 	  dec->numtiles, dec->numhtiles, dec->numvtiles));
 	if (!(dec->tiles = jas_alloc2(dec->numtiles, sizeof(jpc_dec_tile_t)))) {
