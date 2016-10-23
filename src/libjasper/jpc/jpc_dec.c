@@ -72,6 +72,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <inttypes.h>
 
 #include "jasper/jas_types.h"
 #include "jasper/jas_math.h"
@@ -2043,33 +2044,33 @@ static int jpc_dec_dump(jpc_dec_t *dec, FILE *out)
 		  ++compno, ++tcomp) {
 			for (rlvlno = 0, rlvl = tcomp->rlvls; rlvlno <
 			  tcomp->numrlvls; ++rlvlno, ++rlvl) {
-fprintf(out, "RESOLUTION LEVEL %d\n", rlvlno);
-fprintf(out, "xs =%d, ys = %d, xe = %d, ye = %d, w = %d, h = %d\n",
-  rlvl->xstart, rlvl->ystart, rlvl->xend, rlvl->yend, rlvl->xend -
-  rlvl->xstart, rlvl->yend - rlvl->ystart);
+				fprintf(out, "RESOLUTION LEVEL %d\n", rlvlno);
+				fprintf(out, "xs =%"PRIuFAST32", ys = %"PRIuFAST32", xe = %"PRIuFAST32", ye = %"PRIuFAST32", w = %"PRIuFAST32", h = %"PRIuFAST32"\n",
+				  rlvl->xstart, rlvl->ystart, rlvl->xend, rlvl->yend, rlvl->xend -
+				  rlvl->xstart, rlvl->yend - rlvl->ystart);
 				for (bandno = 0, band = rlvl->bands;
 				  bandno < rlvl->numbands; ++bandno, ++band) {
-fprintf(out, "BAND %d\n", bandno);
-fprintf(out, "xs =%d, ys = %d, xe = %d, ye = %d, w = %d, h = %d\n",
-  jas_seq2d_xstart(band->data), jas_seq2d_ystart(band->data), jas_seq2d_xend(band->data),
-  jas_seq2d_yend(band->data), jas_seq2d_xend(band->data) - jas_seq2d_xstart(band->data),
-  jas_seq2d_yend(band->data) - jas_seq2d_ystart(band->data));
+					fprintf(out, "BAND %d\n", bandno);
+					fprintf(out, "xs =%"PRIiFAST32", ys = %"PRIiFAST32", xe = %"PRIiFAST32", ye = %"PRIiFAST32", w = %"PRIiFAST32", h = %"PRIiFAST32"\n",
+					  jas_seq2d_xstart(band->data), jas_seq2d_ystart(band->data), jas_seq2d_xend(band->data),
+					  jas_seq2d_yend(band->data), jas_seq2d_xend(band->data) - jas_seq2d_xstart(band->data),
+					  jas_seq2d_yend(band->data) - jas_seq2d_ystart(band->data));
 					for (prcno = 0, prc = band->prcs;
 					  prcno < rlvl->numprcs; ++prcno,
 					  ++prc) {
-fprintf(out, "CODE BLOCK GROUP %d\n", prcno);
-fprintf(out, "xs =%d, ys = %d, xe = %d, ye = %d, w = %d, h = %d\n",
-  prc->xstart, prc->ystart, prc->xend, prc->yend, prc->xend -
-  prc->xstart, prc->yend - prc->ystart);
+						fprintf(out, "CODE BLOCK GROUP %d\n", prcno);
+						fprintf(out, "xs =%"PRIuFAST32", ys = %"PRIuFAST32", xe = %"PRIuFAST32", ye = %"PRIuFAST32", w = %"PRIuFAST32", h = %"PRIuFAST32"\n",
+						  prc->xstart, prc->ystart, prc->xend, prc->yend, prc->xend -
+						  prc->xstart, prc->yend - prc->ystart);
 						for (cblkno = 0, cblk =
 						  prc->cblks; cblkno <
 						  prc->numcblks; ++cblkno,
 						  ++cblk) {
-fprintf(out, "CODE BLOCK %d\n", cblkno);
-fprintf(out, "xs =%d, ys = %d, xe = %d, ye = %d, w = %d, h = %d\n",
-  jas_seq2d_xstart(cblk->data), jas_seq2d_ystart(cblk->data), jas_seq2d_xend(cblk->data),
-  jas_seq2d_yend(cblk->data), jas_seq2d_xend(cblk->data) - jas_seq2d_xstart(cblk->data),
-  jas_seq2d_yend(cblk->data) - jas_seq2d_ystart(cblk->data));
+							fprintf(out, "CODE BLOCK %d\n", cblkno);
+							fprintf(out, "xs =%"PRIiFAST32", ys = %"PRIiFAST32", xe = %"PRIiFAST32", ye = %"PRIiFAST32", w = %"PRIiFAST32", h = %"PRIiFAST32"\n",
+							  jas_seq2d_xstart(cblk->data), jas_seq2d_ystart(cblk->data), jas_seq2d_xend(cblk->data),
+							  jas_seq2d_yend(cblk->data), jas_seq2d_xend(cblk->data) - jas_seq2d_xstart(cblk->data),
+							  jas_seq2d_yend(cblk->data) - jas_seq2d_ystart(cblk->data));
 						}
 					}
 				}

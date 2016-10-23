@@ -74,6 +74,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <ctype.h>
+#include <inttypes.h>
 
 #include "jasper/jas_malloc.h"
 #include "jasper/jas_debug.h"
@@ -404,9 +405,9 @@ void jpc_ms_dump(jpc_ms_t *ms, FILE *out)
 {
 	jpc_mstabent_t *mstabent;
 	mstabent = jpc_mstab_lookup(ms->id);
-	fprintf(out, "type = 0x%04x (%s);", ms->id, mstabent->name);
+	fprintf(out, "type = 0x%04"PRIxFAST16" (%s);", ms->id, mstabent->name);
 	if (JPC_MS_HASPARMS(ms->id)) {
-		fprintf(out, " len = %d;", ms->len + 2);
+		fprintf(out, " len = %"PRIuFAST16";", ms->len + 2);
 		if (ms->ops->dumpparms) {
 			(*ms->ops->dumpparms)(ms, out);
 		} else {
@@ -463,7 +464,8 @@ static int jpc_sot_putparms(jpc_ms_t *ms, jpc_cstate_t *cstate, jas_stream_t *ou
 static int jpc_sot_dumpparms(jpc_ms_t *ms, FILE *out)
 {
 	jpc_sot_t *sot = &ms->parms.sot;
-	fprintf(out, "tileno = %d; len = %d; partno = %d; numparts = %d\n",
+	fprintf(out,
+	  "tileno = %"PRIuFAST16"; len = %"PRIuFAST32"; partno = %d; numparts = %d\n",
 	  sot->tileno, sot->len, sot->partno, sot->numparts);
 	return 0;
 }
@@ -573,13 +575,13 @@ static int jpc_siz_dumpparms(jpc_ms_t *ms, FILE *out)
 {
 	jpc_siz_t *siz = &ms->parms.siz;
 	unsigned int i;
-	fprintf(out, "caps = 0x%02x;\n", siz->caps);
-	fprintf(out, "width = %d; height = %d; xoff = %d; yoff = %d;\n",
+	fprintf(out, "caps = 0x%02"PRIxFAST16";\n", siz->caps);
+	fprintf(out, "width = %"PRIuFAST32"; height = %"PRIuFAST32"; xoff = %"PRIuFAST32"; yoff = %" PRIuFAST32 ";\n",
 	  siz->width, siz->height, siz->xoff, siz->yoff);
-	fprintf(out, "tilewidth = %d; tileheight = %d; tilexoff = %d; "
-	  "tileyoff = %d;\n", siz->tilewidth, siz->tileheight, siz->tilexoff,
-	  siz->tileyoff);
-	fprintf(out, "numcomps = %d;\n", siz->numcomps);
+	fprintf(out, "tilewidth = %"PRIuFAST32"; tileheight = %"PRIuFAST32"; "
+	  "tilexoff = %"PRIuFAST32"; tileyoff = %" PRIuFAST32 ";\n",
+	  siz->tilewidth, siz->tileheight, siz->tilexoff, siz->tileyoff);
+	fprintf(out, "numcomps = %"PRIuFAST16";\n", siz->numcomps);
 	for (i = 0; i < siz->numcomps; ++i) {
 		fprintf(out, "prec[%d] = %d; sgnd[%d] = %d; hsamp[%d] = %d; "
 		  "vsamp[%d] = %d\n", i, siz->comps[i].prec, i,
@@ -649,7 +651,7 @@ static int jpc_cod_dumpparms(jpc_ms_t *ms, FILE *out)
 	fprintf(out, "csty = 0x%02x;\n", cod->compparms.csty);
 	fprintf(out, "numdlvls = %d; qmfbid = %d; mctrans = %d\n",
 	  cod->compparms.numdlvls, cod->compparms.qmfbid, cod->mctrans);
-	fprintf(out, "prg = %d; numlyrs = %d;\n",
+	fprintf(out, "prg = %d; numlyrs = %"PRIuFAST16";\n",
 	  cod->prg, cod->numlyrs);
 	fprintf(out, "cblkwidthval = %d; cblkheightval = %d; "
 	  "cblksty = 0x%02x;\n", cod->compparms.cblkwidthval, cod->compparms.cblkheightval,
@@ -727,7 +729,7 @@ static int jpc_coc_putparms(jpc_ms_t *ms, jpc_cstate_t *cstate, jas_stream_t *ou
 static int jpc_coc_dumpparms(jpc_ms_t *ms, FILE *out)
 {
 	jpc_coc_t *coc = &ms->parms.coc;
-	fprintf(out, "compno = %d; csty = 0x%02x; numdlvls = %d;\n",
+	fprintf(out, "compno = %"PRIuFAST16"; csty = 0x%02x; numdlvls = %d;\n",
 	  coc->compno, coc->compparms.csty, coc->compparms.numdlvls);
 	fprintf(out, "cblkwidthval = %d; cblkheightval = %d; "
 	  "cblksty = 0x%02x; qmfbid = %d;\n", coc->compparms.cblkwidthval,
@@ -867,7 +869,7 @@ static int jpc_rgn_putparms(jpc_ms_t *ms, jpc_cstate_t *cstate, jas_stream_t *ou
 static int jpc_rgn_dumpparms(jpc_ms_t *ms, FILE *out)
 {
 	jpc_rgn_t *rgn = &ms->parms.rgn;
-	fprintf(out, "compno = %d; roisty = %d; roishift = %d\n",
+	fprintf(out, "compno = %"PRIuFAST16"; roisty = %d; roishift = %d\n",
 	  rgn->compno, rgn->roisty, rgn->roishift);
 	return 0;
 }
@@ -968,7 +970,7 @@ static int jpc_qcc_dumpparms(jpc_ms_t *ms, FILE *out)
 {
 	jpc_qcc_t *qcc = &ms->parms.qcc;
 	int i;
-	fprintf(out, "compno = %d; qntsty = %d; numguard = %d; "
+	fprintf(out, "compno = %"PRIuFAST16"; qntsty = %d; numguard = %d; "
 	  "numstepsizes = %d\n", qcc->compno, qcc->compparms.qntsty, qcc->compparms.numguard,
 	  qcc->compparms.numstepsizes);
 	for (i = 0; i < qcc->compparms.numstepsizes; ++i) {
@@ -1108,7 +1110,7 @@ static int jpc_sop_putparms(jpc_ms_t *ms, jpc_cstate_t *cstate, jas_stream_t *ou
 static int jpc_sop_dumpparms(jpc_ms_t *ms, FILE *out)
 {
 	jpc_sop_t *sop = &ms->parms.sop;
-	fprintf(out, "seqno = %d;\n", sop->seqno);
+	fprintf(out, "seqno = %"PRIuFAST16";\n", sop->seqno);
 	return 0;
 }
 
@@ -1174,7 +1176,7 @@ static int jpc_ppm_putparms(jpc_ms_t *ms, jpc_cstate_t *cstate, jas_stream_t *ou
 static int jpc_ppm_dumpparms(jpc_ms_t *ms, FILE *out)
 {
 	jpc_ppm_t *ppm = &ms->parms.ppm;
-	fprintf(out, "ind=%d; len = %d;\n", ppm->ind, ppm->len);
+	fprintf(out, "ind=%d; len = %"PRIuFAST16";\n", ppm->ind, ppm->len);
 	if (ppm->len > 0) {
 		fprintf(out, "data =\n");
 		jas_memdump(out, ppm->data, ppm->len);
@@ -1246,7 +1248,7 @@ static int jpc_ppt_putparms(jpc_ms_t *ms, jpc_cstate_t *cstate, jas_stream_t *ou
 static int jpc_ppt_dumpparms(jpc_ms_t *ms, FILE *out)
 {
 	jpc_ppt_t *ppt = &ms->parms.ppt;
-	fprintf(out, "ind=%d; len = %d;\n", ppt->ind, ppt->len);
+	fprintf(out, "ind=%d; len = %"PRIuFAST32";\n", ppt->ind, ppt->len);
 	if (ppt->len > 0) {
 		fprintf(out, "data =\n");
 		jas_memdump(out, ppt->data, ppt->len);
@@ -1352,11 +1354,11 @@ static int jpc_poc_dumpparms(jpc_ms_t *ms, FILE *out)
 	for (pchgno = 0, pchg = poc->pchgs; pchgno < poc->numpchgs;
 	  ++pchgno, ++pchg) {
 		fprintf(out, "po[%d] = %d; ", pchgno, pchg->prgord);
-		fprintf(out, "cs[%d] = %d; ce[%d] = %d; ",
+		fprintf(out, "cs[%d] = %"PRIuFAST16"; ce[%d] = %"PRIuFAST16"; ",
 		  pchgno, pchg->compnostart, pchgno, pchg->compnoend);
 		fprintf(out, "rs[%d] = %d; re[%d] = %d; ",
 		  pchgno, pchg->rlvlnostart, pchgno, pchg->rlvlnoend);
-		fprintf(out, "le[%d] = %d\n", pchgno, pchg->lyrnoend);
+		fprintf(out, "le[%d] = %"PRIuFAST16"\n", pchgno, pchg->lyrnoend);
 	}
 	return 0;
 }
@@ -1419,8 +1421,8 @@ static int jpc_crg_dumpparms(jpc_ms_t *ms, FILE *out)
 	jpc_crgcomp_t *comp;
 	for (compno = 0, comp = crg->comps; compno < crg->numcomps; ++compno,
 	  ++comp) {
-		fprintf(out, "hoff[%d] = %d; voff[%d] = %d\n", compno,
-		  comp->hoff, compno, comp->voff);
+		fprintf(out, "hoff[%d] = %"PRIuFAST16"; voff[%d] = %"PRIuFAST16"\n",
+		  compno, comp->hoff, compno, comp->voff);
 	}
 	return 0;
 }
@@ -1482,7 +1484,7 @@ static int jpc_com_dumpparms(jpc_ms_t *ms, FILE *out)
 	jpc_com_t *com = &ms->parms.com;
 	unsigned int i;
 	int printable;
-	fprintf(out, "regid = %d;\n", com->regid);
+	fprintf(out, "regid = %"PRIuFAST16";\n", com->regid);
 	printable = 1;
 	for (i = 0; i < com->len; ++i) {
 		if (!isprint(com->data[i])) {

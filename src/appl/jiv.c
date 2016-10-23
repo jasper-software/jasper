@@ -67,6 +67,7 @@
 #include <GL/glut.h>
 #include <stdlib.h>
 #include <math.h>
+#include <inttypes.h>
 
 /******************************************************************************\
 *
@@ -778,7 +779,8 @@ static int loadimage()
 
 	if (cmdopts.verbose) {
 		fprintf(stderr, "num of components %d\n", jas_image_numcmpts(gs.image));
-		fprintf(stderr, "dimensions %d %d\n", jas_image_width(gs.image), jas_image_height(gs.image));
+		fprintf(stderr, "dimensions %"PRIiFAST32" %"PRIiFAST32"\n",
+		  jas_image_width(gs.image), jas_image_height(gs.image));
 	}
 
 	gs.viewportwidth = vw;

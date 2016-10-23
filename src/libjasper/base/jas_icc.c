@@ -72,6 +72,7 @@
 
 #include <stdlib.h>
 #include <ctype.h>
+#include <inttypes.h>
 
 #define	jas_iccputuint8(out, val)	jas_iccputuint(out, 1, val)
 #define	jas_iccputuint16(out, val)	jas_iccputuint(out, 2, val)
@@ -728,7 +729,7 @@ void jas_iccattrtab_dump(jas_iccattrtab_t *attrtab, FILE *out)
 		attrval = attr->val;
 		info = jas_iccattrvalinfo_lookup(attrval->type);
 		if (!info) abort();
-		fprintf(out, "attrno=%d; attrname=\"%s\"(0x%08x); attrtype=\"%s\"(0x%08x)\n",
+		fprintf(out, "attrno=%d; attrname=\"%s\"(0x%08"PRIxFAST32"); attrtype=\"%s\"(0x%08"PRIxFAST32")\n",
 		  i,
 		  jas_iccsigtostr(attr->name, &buf[0]),
 		  attr->name,
@@ -885,7 +886,7 @@ void jas_iccattrval_dump(jas_iccattrval_t *attrval, FILE *out)
 {
 	char buf[8];
 	jas_iccsigtostr(attrval->type, buf);
-	fprintf(out, "refcnt = %d; type = 0x%08x %s\n", attrval->refcnt,
+	fprintf(out, "refcnt = %d; type = 0x%08"PRIxFAST32" %s\n", attrval->refcnt,
 	  attrval->type, jas_iccsigtostr(attrval->type, &buf[0]));
 	if (attrval->ops->dump) {
 		(*attrval->ops->dump)(attrval, out);
@@ -1045,7 +1046,7 @@ static void jas_icccurv_dump(jas_iccattrval_t *attrval, FILE *out)
 {
 	int i;
 	jas_icccurv_t *curv = &attrval->data.curv;
-	fprintf(out, "number of entires = %d\n", curv->numents);
+	fprintf(out, "number of entries = %"PRIuFAST32"\n", curv->numents);
 	if (curv->numents == 1) {
 		fprintf(out, "gamma = %f\n", curv->ents[0] / 256.0);
 	} else {
@@ -1175,9 +1176,9 @@ static void jas_icctxtdesc_dump(jas_iccattrval_t *attrval, FILE *out)
 {
 	jas_icctxtdesc_t *txtdesc = &attrval->data.txtdesc;
 	fprintf(out, "ascii = \"%s\"\n", txtdesc->ascdata);
-	fprintf(out, "uclangcode = %d; uclen = %d\n", txtdesc->uclangcode,
-	  txtdesc->uclen);
-	fprintf(out, "sccode = %d\n", txtdesc->sccode);
+	fprintf(out, "uclangcode = %"PRIuFAST32"; uclen = %"PRIuFAST32"\n",
+	  txtdesc->uclangcode, txtdesc->uclen);
+	fprintf(out, "sccode = %"PRIuFAST16"\n", txtdesc->sccode);
 	fprintf(out, "maclen = %d\n", txtdesc->maclen);
 }
 
@@ -1419,7 +1420,7 @@ static void jas_icclut8_dump(jas_iccattrval_t *attrval, FILE *out)
 		}
 		fprintf(out, "\n");
 	}
-	fprintf(out, "numintabents=%d, numouttabents=%d\n",
+	fprintf(out, "numintabents=%"PRIuFAST16", numouttabents=%"PRIuFAST16"\n",
 	  lut8->numintabents, lut8->numouttabents);
 }
 
@@ -1593,7 +1594,7 @@ static void jas_icclut16_dump(jas_iccattrval_t *attrval, FILE *out)
 		}
 		fprintf(out, "\n");
 	}
-	fprintf(out, "numintabents=%d, numouttabents=%d\n",
+	fprintf(out, "numintabents=%"PRIuFAST16", numouttabents=%"PRIuFAST16"\n",
 	  lut16->numintabents, lut16->numouttabents);
 }
 

@@ -63,6 +63,8 @@
 * Includes.
 \******************************************************************************/
 
+#include <inttypes.h>
+
 #include "pgx_cod.h"
 
 /******************************************************************************\
@@ -71,7 +73,7 @@
 
 void pgx_dumphdr(FILE *out, pgx_hdr_t *hdr)
 {
-	fprintf(out, "byteorder=%s sgnd=%s prec=%d width=%d height=%d\n",
+	fprintf(out, "byteorder=%s sgnd=%s prec=%"PRIuFAST32" width=%"PRIuFAST32" height=%"PRIuFAST32"\n",
 	  hdr->bigendian ? "bigendian" : "littleendian",
 	  hdr->sgnd ? "signed" : "unsigned",
 	  hdr->prec, hdr->width, hdr->height);

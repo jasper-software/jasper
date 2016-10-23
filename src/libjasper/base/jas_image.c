@@ -76,6 +76,7 @@
 #include <string.h>
 #include <assert.h>
 #include <ctype.h>
+#include <inttypes.h>
 
 #include "jasper/jas_math.h"
 #include "jasper/jas_image.h"
@@ -853,7 +854,7 @@ void jas_image_dump(jas_image_t *image, FILE *out)
 	jas_image_cmpt_t *cmpt;
 	for (cmptno = 0; cmptno < image->numcmpts_; ++cmptno) {
 		cmpt = image->cmpts_[cmptno];
-		fprintf(out, "prec=%d, sgnd=%d, cmpttype=%d\n", cmpt->prec_,
+		fprintf(out, "prec=%d, sgnd=%d, cmpttype=%"PRIiFAST32"\n", cmpt->prec_,
 		  cmpt->sgnd_, cmpt->type_);
 		width = jas_image_cmptwidth(image, cmptno);
 		height = jas_image_cmptheight(image, cmptno);
@@ -1362,6 +1363,8 @@ jas_eprintf("IMAGE\n");
 jas_image_dump(image, stderr);
 #endif
 
+	outimage = 0;
+	xform = 0;
 	if (!(inimage = jas_image_copy(image)))
 		goto error;
 	image = 0;
@@ -1441,8 +1444,10 @@ jas_image_dump(image, stderr);
 	tmpprof = 0;
 	jas_image_setclrspc(outimage, jas_cmprof_clrspc(outprof));
 
-	if (!(xform = jas_cmxform_create(inprof, outprof, 0, JAS_CMXFORM_OP_FWD, intent, 0)))
+	if (!(xform = jas_cmxform_create(inprof, outprof, 0, JAS_CMXFORM_OP_FWD,
+	  intent, 0))) {
 		goto error;
+	}
 
 	inpixmap.numcmpts = numinclrchans;
 	if (!(incmptfmts = jas_alloc2(numinclrchans, sizeof(jas_cmcmptfmt_t)))) {
@@ -1481,13 +1486,15 @@ jas_image_dump(image, stderr);
 	for (i = 0; i < height; ++i) {
 		for (j = 0; j < numinclrchans; ++j) {
 			k = jas_image_getcmptbytype(inimage, JAS_IMAGE_CT_COLOR(j));
-			if (jas_image_readcmpt2(inimage, k, 0, i, width, 1, incmptfmts[j].buf))
+			if (jas_image_readcmpt2(inimage, k, 0, i, width, 1,
+			  incmptfmts[j].buf))
 				goto error;
 		}
 		jas_cmxform_apply(xform, &inpixmap, &outpixmap);
 		for (j = 0; j < numoutclrchans; ++j) {
 			k = jas_image_getcmptbytype(outimage, JAS_IMAGE_CT_COLOR(j));
-			if (jas_image_writecmpt2(outimage, k, 0, i, width, 1, outcmptfmts[j].buf))
+			if (jas_image_writecmpt2(outimage, k, 0, i, width, 1,
+			  outcmptfmts[j].buf))
 				goto error;
 		}
 	}

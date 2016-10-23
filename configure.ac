@@ -356,12 +356,12 @@ esac
 
 if test "$GCC" = yes; then
 	#CFLAGS="$CFLAGS"
-#	CFLAGS="$CFLAGS -std=c99"
-#	CFLAGS="$CFLAGS -std=c11"
+	#CFLAGS="$CFLAGS -std=c99"
+	#CFLAGS="$CFLAGS -std=c11"
 	CFLAGS="$CFLAGS -pedantic"
 	CFLAGS="$CFLAGS -pedantic-errors"
-	CFLAGS="$CFLAGS -Wall"
-	#CFLAGS="$CFLAGS -W -Wall -Wno-long-long -Wformat -Wmissing-prototypes -Wstrict-prototypes"
+	CFLAGS="$CFLAGS -Wall -Wno-unused"
+	#CFLAGS="$CFLAGS -W -Wformat -Wmissing-prototypes -Wstrict-prototypes"
 fi
 
 ############################################################
