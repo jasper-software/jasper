@@ -251,13 +251,16 @@ jp2_box_t *jp2_box_get(jas_stream_t *in)
 	if (!(box = jas_malloc(sizeof(jp2_box_t)))) {
 		goto error;
 	}
+
+	// Mark the box data as never having been constructed
+	// so that we will not errantly attempt to destroy it later.
 	box->ops = &jp2_boxinfo_unk.ops;
+
 	if (jp2_getuint32(in, &len) || jp2_getuint32(in, &box->type)) {
 		goto error;
 	}
 	boxinfo = jp2_boxinfolookup(box->type);
 	box->info = boxinfo;
-	box->ops = &boxinfo->ops;
 	box->len = len;
 	JAS_DBGLOG(10, (
 	  "preliminary processing of JP2 box: type=%c%s%c (0x%08x); length=%d\n",
@@ -287,13 +290,14 @@ jp2_box_t *jp2_box_get(jas_stream_t *in)
 			goto error;
 		}
 		if (jas_stream_copy(tmpstream, in, box->datalen)) {
-			// Mark the box data as never having been constructed
-			// so that we will not errantly attempt to destroy it later.
-			box->ops = &jp2_boxinfo_unk.ops;
 			jas_eprintf("cannot copy box data\n");
 			goto error;
 		}
 		jas_stream_rewind(tmpstream);
+
+		// From here onwards, the box data will need to be destroyed.
+		// So, initialize the box operations.
+		box->ops = &boxinfo->ops;
 
 		if (box->ops->getdata) {
 			if ((*box->ops->getdata)(box, tmpstream)) {
@@ -327,8 +331,8 @@ void jp2_box_dump(jp2_box_t *box, FILE *out)
 	assert(boxinfo);
 
 	fprintf(out, "JP2 box: ");
-	fprintf(out, "type=%c%s%c (0x%08"PRIxFAST32"); length=%"PRIuFAST32"\n", '"', boxinfo->name,
-	  '"', box->type, box->len);
+	fprintf(out, "type=%c%s%c (0x%08"PRIxFAST32"); length=%"PRIuFAST32"\n", '"',
+	  boxinfo->name, '"', box->type, box->len);
 	if (box->ops->dumpdata) {
 		(*box->ops->dumpdata)(box, out);
 	}
