@@ -324,7 +324,9 @@ void jpc_qmfb_split_row(jpc_fix_t *a, int numcols, int parity)
 
 	if (numcols >= 2) {
 		hstartcol = (numcols + 1 - parity) >> 1;
-		m = (parity) ? hstartcol : (numcols - hstartcol);
+		// ORIGINAL (WRONG): m = (parity) ? hstartcol : (numcols - hstartcol);
+		m = numcols - hstartcol;
+
 		/* Save the samples destined for the highpass channel. */
 		n = m;
 		dstptr = buf;
@@ -384,7 +386,9 @@ void jpc_qmfb_split_col(jpc_fix_t *a, int numrows, int stride,
 
 	if (numrows >= 2) {
 		hstartcol = (numrows + 1 - parity) >> 1;
-		m = (parity) ? hstartcol : (numrows - hstartcol);
+		// ORIGINAL (WRONG): m = (parity) ? hstartcol : (numrows - hstartcol);
+		m = numrows - hstartcol;
+
 		/* Save the samples destined for the highpass channel. */
 		n = m;
 		dstptr = buf;
@@ -447,7 +451,9 @@ void jpc_qmfb_split_colgrp(jpc_fix_t *a, int numrows, int stride,
 
 	if (numrows >= 2) {
 		hstartcol = (numrows + 1 - parity) >> 1;
-		m = (parity) ? hstartcol : (numrows - hstartcol);
+		// ORIGINAL (WRONG): m = (parity) ? hstartcol : (numrows - hstartcol);
+		m = numrows - hstartcol;
+
 		/* Save the samples destined for the highpass channel. */
 		n = m;
 		dstptr = buf;
@@ -528,7 +534,9 @@ void jpc_qmfb_split_colres(jpc_fix_t *a, int numrows, int numcols,
 
 	if (numrows >= 2) {
 		hstartcol = (numrows + 1 - parity) >> 1;
-		m = (parity) ? hstartcol : (numrows - hstartcol);
+		// ORIGINAL (WRONG): m = (parity) ? hstartcol : (numrows - hstartcol);
+		m = numrows - hstartcol;
+
 		/* Save the samples destined for the highpass channel. */
 		n = m;
 		dstptr = buf;
