@@ -260,9 +260,16 @@ static int ras_getdatastd(jas_stream_t *in, ras_hdr_t *hdr, ras_cmap_t *cmap,
 	/* Avoid compiler warnings about unused parameters. */
 	cmap = 0;
 
+	assert(jas_image_numcmpts(image) <= 3);
+
+	for (i = 0; i < 3; ++i) {
+		data[i] = 0;
+	}
+
 	for (i = 0; i < jas_image_numcmpts(image); ++i) {
-		data[i] = jas_matrix_create(1, jas_image_width(image));
-		assert(data[i]);
+		if (!(data[i] = jas_matrix_create(1, jas_image_width(image)))) {
+			goto error;
+		}
 	}
 
 	pad = RAS_ROWSIZE(hdr) - (hdr->width * hdr->depth + 7) / 8;
@@ -273,7 +280,7 @@ static int ras_getdatastd(jas_stream_t *in, ras_hdr_t *hdr, ras_cmap_t *cmap,
 		for (x = 0; x < hdr->width; x++) {
 			while (nz < hdr->depth) {
 				if ((c = jas_stream_getc(in)) == EOF) {
-					return -1;
+					goto error;
 				}
 				z = (z << 8) | c;
 				nz += 8;
@@ -293,22 +300,31 @@ static int ras_getdatastd(jas_stream_t *in, ras_hdr_t *hdr, ras_cmap_t *cmap,
 		}
 		if (pad) {
 			if ((c = jas_stream_getc(in)) == EOF) {
-				return -1;
+				goto error;
 			}
 		}
 		for (i = 0; i < jas_image_numcmpts(image); ++i) {
 			if (jas_image_writecmpt(image, i, 0, y, hdr->width, 1,
 			  data[i])) {
-				return -1;
+				goto error;
 			}
 		}
 	}
 
 	for (i = 0; i < jas_image_numcmpts(image); ++i) {
 		jas_matrix_destroy(data[i]);
+		data[i] = 0;
 	}
 
 	return 0;
+
+error:
+	for (i = 0; i < 3; ++i) {
+		if (data[i]) {
+			jas_matrix_destroy(data[i]);
+		}
+	}
+	return -1;
 }
 
 static int ras_getcmap(jas_stream_t *in, ras_hdr_t *hdr, ras_cmap_t *cmap)
@@ -327,7 +343,9 @@ static int ras_getcmap(jas_stream_t *in, ras_hdr_t *hdr, ras_cmap_t *cmap)
 		{
 		jas_eprintf("warning: palettized images not fully supported\n");
 		numcolors = 1 << hdr->depth;
-		assert(numcolors <= RAS_CMAP_MAXSIZ);
+		if (numcolors > RAS_CMAP_MAXSIZ) {
+			return -1;
+		}
 		actualnumcolors = hdr->maplength / 3;
 		for (i = 0; i < numcolors; i++) {
 			cmap->data[i] = 0;
