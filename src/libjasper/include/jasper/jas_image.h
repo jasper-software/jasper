@@ -79,6 +79,7 @@
 #include <jasper/jas_seq.h>
 #include <jasper/jas_cm.h>
 #include <stdio.h>
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -398,6 +399,9 @@ void jas_image_destroy(jas_image_t *image);
 #define	jas_image_cmptbry(image, cmptno) \
 	((image)->cmpts_[cmptno]->tly_ + (image)->cmpts_[cmptno]->height_ * \
 	  (image)->cmpts_[cmptno]->vstep_)
+
+// Test if all components are specified at the same positions in space. */
+bool jas_image_cmpt_domains_same(jas_image_t *image);
 
 /* Get the raw size of an image (i.e., the nominal size of the image without
   any compression. */

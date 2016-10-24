@@ -1091,12 +1091,20 @@ static int jpc_dec_tiledecode(jpc_dec_t *dec, jpc_dec_tile_t *tile)
 			jas_eprintf("RCT requires at least three components\n");
 			return -1;
 		}
+		if (!jas_image_cmpt_domains_same(dec->image)) {
+			jas_eprintf("RCT requires all components have the same domain\n");
+			return -1;
+		}
 		jpc_irct(tile->tcomps[0].data, tile->tcomps[1].data,
 		  tile->tcomps[2].data);
 		break;
 	case JPC_MCT_ICT:
 		if (dec->numcomps < 3) {
 			jas_eprintf("ICT requires at least three components\n");
+			return -1;
+		}
+		if (!jas_image_cmpt_domains_same(dec->image)) {
+			jas_eprintf("RCT requires all components have the same domain\n");
 			return -1;
 		}
 		jpc_iict(tile->tcomps[0].data, tile->tcomps[1].data,
