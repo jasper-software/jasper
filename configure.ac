@@ -291,6 +291,23 @@ AC_CHECK_FUNCS(getrusage)
 AC_FUNC_VPRINTF
 
 ############################################################
+# Enable memory limit feature.
+############################################################
+
+AC_ARG_ENABLE(memory-limit,
+[  --enable-memory-limit=[ARG]    Set memory limit to ARG.],
+[
+case "${enableval}" in
+*)
+	AC_DEFINE_UNQUOTED([JAS_DEFAULT_MAX_MEM_USAGE],
+	[${enableval}],
+	[Maximum memory usage limit])
+	;;
+esac
+],
+[])
+
+############################################################
 # Enable/disable sanitizers.
 ############################################################
 
