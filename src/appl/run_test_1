@@ -1,5 +1,7 @@
 #! /bin/bash
 
+# Reference: https://github.com/google/sanitizers/wiki/SanitizerCommonFlags
+
 cmd_dir=$(dirname "$0") || exit 1
 
 data_dir="$cmd_dir/../../data/test"
