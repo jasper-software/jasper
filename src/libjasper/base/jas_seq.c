@@ -479,8 +479,8 @@ int jas_seq2d_output(jas_matrix_t *matrix, FILE *out)
 			x = jas_matrix_get(matrix, i, j);
 			sprintf(sbuf, "%s%4ld", (strlen(buf) > 0) ? " " : "",
 			  JAS_CAST(long, x));
-			n = strlen(buf);
-			if (n + strlen(sbuf) > MAXLINELEN) {
+			n = JAS_CAST(int, strlen(buf));
+			if (n + JAS_CAST(int, strlen(sbuf)) > MAXLINELEN) {
 				fputs(buf, out);
 				fputs("\n", out);
 				buf[0] = '\0';

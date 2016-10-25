@@ -959,7 +959,7 @@ startoff = jas_stream_getrwcount(enc->out);
 	}
 	sprintf(buf, "Creator: JasPer Version %s", jas_getversion());
 	com = &enc->mrk->parms.com;
-	com->len = strlen(buf);
+	com->len = JAS_CAST(uint_fast16_t, strlen(buf));
 	com->regid = JPC_COM_LATIN;
 	if (!(com->data = JAS_CAST(uchar *, jas_strdup(buf)))) {
 		abort();

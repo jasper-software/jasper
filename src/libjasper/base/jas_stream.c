@@ -1133,15 +1133,24 @@ static int file_close(jas_stream_obj_t *obj)
 static int sfile_read(jas_stream_obj_t *obj, char *buf, int cnt)
 {
 	FILE *fp;
+	size_t n;
+	int result;
 	fp = JAS_CAST(FILE *, obj);
-	return fread(buf, 1, cnt, fp);
+	n = fread(buf, 1, cnt, fp);
+	if (n != cnt) {
+		result = (!ferror(fp) && feof(fp)) ? 0 : -1;
+	}
+	result = JAS_CAST(int, n);
+	return result;
 }
 
 static int sfile_write(jas_stream_obj_t *obj, char *buf, int cnt)
 {
 	FILE *fp;
+	size_t n;
 	fp = JAS_CAST(FILE *, obj);
-	return fwrite(buf, 1, cnt, fp);
+	n = fwrite(buf, 1, cnt, fp);
+	return (n != JAS_CAST(size_t, cnt)) ? (-1) : cnt;
 }
 
 static long sfile_seek(jas_stream_obj_t *obj, long offset, int origin)

@@ -1121,7 +1121,7 @@ static int jas_icctxtdesc_input(jas_iccattrval_t *attrval, jas_stream_t *in,
 	txtdesc->maclen = c;
 	if (jas_stream_read(in, txtdesc->macdata, 67) != 67)
 		goto error;
-	txtdesc->asclen = strlen(txtdesc->ascdata) + 1;
+	txtdesc->asclen = JAS_CAST(jas_iccuint32_t, strlen(txtdesc->ascdata) + 1);
 #define WORKAROUND_BAD_PROFILES
 #ifdef WORKAROUND_BAD_PROFILES
 	n = txtdesc->asclen + txtdesc->uclen * 2 + 15 + 67;
@@ -1145,7 +1145,8 @@ error:
 static int jas_icctxtdesc_getsize(jas_iccattrval_t *attrval)
 {
 	jas_icctxtdesc_t *txtdesc = &attrval->data.txtdesc;
-	return strlen(txtdesc->ascdata) + 1 + txtdesc->uclen * 2 + 15 + 67;
+	return JAS_CAST(int, strlen(txtdesc->ascdata) + 1 + txtdesc->uclen * 2 +
+	  15 + 67);
 }
 
 static int jas_icctxtdesc_output(jas_iccattrval_t *attrval, jas_stream_t *out)
@@ -1226,7 +1227,7 @@ error:
 static int jas_icctxt_getsize(jas_iccattrval_t *attrval)
 {
 	jas_icctxt_t *txt = &attrval->data.txt;
-	return strlen(txt->string) + 1;
+	return JAS_CAST(int, strlen(txt->string) + 1);
 }
 
 static int jas_icctxt_output(jas_iccattrval_t *attrval, jas_stream_t *out)

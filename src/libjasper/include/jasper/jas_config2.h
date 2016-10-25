@@ -74,7 +74,9 @@
 #define	ushort		unsigned short
 #define	uint		unsigned int
 #define	ulong		unsigned long
+#undef longlong
 #define	longlong	long long
+#undef ulonglong
 #define	ulonglong	unsigned long long
 /*#define	ssize_t		int*/
 
