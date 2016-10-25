@@ -1,0 +1,60 @@
+#! /bin/bash
+
+cmd_dir=$(dirname "$0") || exit 1
+
+data_dir="$cmd_dir/../../data/test"
+
+good_list=($data_dir/good/*.*)
+bad_list=($data_dir/bad/*.*)
+
+imginfo="$cmd_dir/imginfo"
+
+
+function panic()
+{
+	echo "ERROR: $@" 1>&2
+	exit 1
+}
+
+error_count=0
+
+for in_file in "${good_list[@]}"; do
+	echo "############################################################"
+	echo "Input file: $in_file"
+	"$imginfo" < "$in_file"
+	status=$?
+	echo "exit status: $status"
+	if [ "$status" -ne 0 ]; then
+		#panic "Command has unexpected exit status"
+		error_count=$((error_count + 1))
+	fi
+done
+echo "############################################################"
+
+for in_file in "${bad_list[@]}"; do
+	name=$(basename "$in_file")
+	echo "############################################################"
+	case "$name" in
+	2_crashes.bmp)
+		echo "Skipping $in_file"
+		continue
+		;;
+	esac
+
+	echo "Input file: $in_file"
+	ASAN_OPTIONS="exitcode=10 allocator_may_return_null=true detect_leaks=false" "$imginfo" < "$in_file"
+	status=$?
+	echo "exit status: $status"
+	if [ "$status" -ne 1 ]; then
+		#panic "Command has unexpected exit status"
+		error_count=$((error_count + 1))
+	fi
+done
+echo "############################################################"
+
+if [ "$error_count" -gt 0 ]; then
+	echo "error count: $error_count"
+	panic "FAILED"
+fi
+
+echo "OK"

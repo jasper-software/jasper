@@ -8,6 +8,8 @@ core
 .libs
 Makefile
 Makefile.in
+*.trs
+*.log
 
 # Top-level directory
 /autom4te.cache
