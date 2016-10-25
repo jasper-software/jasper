@@ -1216,6 +1216,7 @@ static int jpc_dec_process_siz(jpc_dec_t *dec, jpc_ms_t *ms)
 	dec->tilexoff = siz->tilexoff;
 	dec->tileyoff = siz->tileyoff;
 	dec->numcomps = siz->numcomps;
+
 	if (!(dec->cp = jpc_dec_cp_create(dec->numcomps))) {
 		return -1;
 	}

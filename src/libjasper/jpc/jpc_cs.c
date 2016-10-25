@@ -508,6 +508,10 @@ static int jpc_siz_getparms(jpc_ms_t *ms, jpc_cstate_t *cstate,
 	  !siz->tileheight || !siz->numcomps || siz->numcomps > 16384) {
 		return -1;
 	}
+	if (siz->tilexoff >= siz->width || siz->tileyoff >= siz->height) {
+		jas_eprintf("all tiles are outside the image area\n");
+		return -1;
+	}
 	if (!(siz->comps = jas_alloc2(siz->numcomps, sizeof(jpc_sizcomp_t)))) {
 		return -1;
 	}
