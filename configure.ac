@@ -295,15 +295,16 @@ AC_FUNC_VPRINTF
 ############################################################
 
 AC_ARG_ENABLE(memory-limit,
-[  --enable-memory-limit=[ARG]    Set memory limit to ARG.],
+[  --enable-memory-limit=[ARG]    Set memory limit to ARG (where ARG defaults to SIZE_MAX).],
 [
-case "${enableval}" in
-*)
+if test "${enableval}" != no; then
+	if test "${enableval}" = yes; then
+		enableval="SIZE_MAX"
+	fi
 	AC_DEFINE_UNQUOTED([JAS_DEFAULT_MAX_MEM_USAGE],
 	[${enableval}],
 	[Maximum memory usage limit])
-	;;
-esac
+fi
 ],
 [])
 
