@@ -66,7 +66,7 @@ ACLOCAL_AMFLAGS = -I ac_m4
 # Note: We need to put the derived file "jasper.spec" in the distribution
 # in order to facilitate RPM building.
 
-SUBDIRS = src pkgconfig
+SUBDIRS = src pkgconfig test
 
 rpm: dist
 	for i in BUILD RPMS SRPMS SOURCES SPECS; do \

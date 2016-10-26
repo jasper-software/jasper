@@ -4,13 +4,13 @@
 
 cmd_dir=$(dirname "$0") || exit 1
 
-data_dir="$cmd_dir/../../data/test"
+top_dir="$cmd_dir/../.."
+data_dir="$top_dir/data/test"
 
 good_list=($data_dir/good/*.*)
 bad_list=($data_dir/bad/*.*)
 
-imginfo="$cmd_dir/imginfo"
-
+imginfo="$top_dir/src/appl/imginfo"
 
 function panic()
 {

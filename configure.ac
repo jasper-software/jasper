@@ -433,6 +433,8 @@ src/libjasper/pgx/Makefile
 src/libjasper/pnm/Makefile
 src/libjasper/ras/Makefile
 src/msvc/Makefile
+test/Makefile
+test/bin/Makefile
 pkgconfig/Makefile
 pkgconfig/jasper.pc
 jasper.spec

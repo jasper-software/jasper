@@ -68,10 +68,6 @@ bin_PROGRAMS = jasper $(BIN_JIV) imgcmp imginfo tmrdemo
 #bin_PROGRAMS = jasper $(BIN_JIV) imgcmp imginfo tmrdemo dummy dummy2
 EXTRA_PROGRAMS = $(EXTRA_JIV) dummy dummy2
 
-
-TESTS = \
-	run_test_1
-
 jasper_SOURCES = jasper.c
 imgcmp_SOURCES = imgcmp.c
 imginfo_SOURCES = imginfo.c
@@ -87,8 +83,7 @@ man_MANS = \
 	jiv.1
 
 EXTRA_DIST = \
-	$(man_MANS) \
-	run_test_1
+	$(man_MANS)
 
 AM_CPPFLAGS = -I$(top_builddir)/src/libjasper/include -I$(top_srcdir)/src/libjasper/include
 
