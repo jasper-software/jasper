@@ -74,4 +74,5 @@ AM_TESTS_ENVIRONMENT = \
 #	. $(top_builddir)/test/bin/test_setup
 
 TESTS = \
-	run_test_1
+	run_test_1 \
+	run_test_2

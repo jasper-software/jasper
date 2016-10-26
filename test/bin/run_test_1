@@ -6,6 +6,7 @@
 # Reference: https://github.com/google/sanitizers/wiki/SanitizerCommonFlags
 
 cmd_dir=$(dirname "$0") || exit 1
+source "$cmd_dir"/utilities || exit 1
 
 top_dir="$cmd_dir/../.."
 data_dir="$top_dir/data/test"
@@ -21,7 +22,7 @@ function panic()
 good_list=($data_dir/good/*.*)
 bad_list=($data_dir/bad/*.*)
 
-abs_top_builddir="$JAS_ABS_TOP_BUILDDIR"
+abs_top_builddir=$(get_abs_top_builddir) || panic "cannot get top builddir"
 imginfo="$abs_top_builddir/src/appl/imginfo"
 
 error_count=0

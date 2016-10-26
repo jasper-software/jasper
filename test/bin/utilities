@@ -1,0 +1,118 @@
+#! /bin/bash
+
+################################################################################
+#
+################################################################################
+
+function panic()
+{
+	echo "ERROR: $@" 1>&2
+	exit 1
+}
+
+function get_abs_top_builddir()
+{
+	local dir
+	if [ -n "$JAS_ABS_TOP_BUILDDIR" ]; then
+		dir="$JAS_ABS_TOP_BUILDDIR"
+	else
+		dir=$(realpath ../..) || return 1
+	fi
+	echo "$dir"
+}
+
+function get_tmp_dir()
+{
+	local package="jasper"
+	if [ $# -ne 1 ]; then
+		return 1
+	fi
+	local name="$1"
+	echo "/tmp/$package-$USER@$HOSTNAME/$name-$$"
+}
+
+function make_tmp_dir()
+{
+	local name
+	if [ $# -ge 1 ]; then
+		name="$1"
+	else
+		name=`basename $0`
+	fi
+	local tmp_dir
+	tmp_dir=`get_tmp_dir "$name"` || return 1
+	if [ ! -d "$tmp_dir" ]; then
+		mkdir -p "$tmp_dir" || return 1
+	fi
+	echo "$tmp_dir"
+}
+
+################################################################################
+# Image characteristics.
+################################################################################
+
+function image_which()
+{
+	if [ $# -ne 2 ]; then
+		return 2
+	fi
+	local path="$1"
+	local file="$2"
+	local dirs=$(echo "$path" | tr ':' ' ') || return 1
+	for dir in "${dirs[@]}"; do
+		local buffer="$dir/$file"
+		if [ -f $buffer ]; then
+			echo "$buffer"
+			return 0
+		fi
+	done
+	echo "$image_file"
+}
+
+function image_info()
+{
+	if [ $# -ne 2 ]; then
+		return 2
+	fi
+	local file="$1"
+	local key="$2"
+	local value
+	case "$key" in
+	format)
+		value=$("${IMGINFO_COMMAND:-imginfo}" < "$file" 2> /dev/null | \
+		  awk '{print $1}') || return 1
+		;;
+	num_components)
+		value=$("${IMGINFO_COMMAND:-imginfo}" < "$file" 2> /dev/null | \
+		  awk '{print $2}') || return 1
+		;;
+	width)
+		value=$("${IMGINFO_COMMAND:-imginfo}" < "$file" 2> /dev/null | \
+		  awk '{print $3}') || return 1
+		;;
+	height)
+		value=$("${IMGINFO_COMMAND:-imginfo}" < "$file" 2> /dev/null | \
+		  awk '{print $4}') || return 1
+		;;
+	depth)
+		value=$("${IMGINFO_COMMAND:-imginfo}" < "$file" 2> /dev/null | \
+		  awk '{print $5}') || return 1
+		;;
+	type)
+		local num_components=$("${IMGINFO_COMMAND:-imginfo}" < "$file" \
+		  2> /dev/null | awk '{print $2}') || return 1
+		value=""
+		case "$num_components" in
+		1)
+			value="gray";;
+		3)
+			value="rgb";;
+		esac
+		;;
+	esac
+	if [ -z "$value" ]; then
+		return 1
+	fi
+	echo "$value"
+}
+
