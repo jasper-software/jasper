@@ -10,6 +10,14 @@ function panic()
 	exit 1
 }
 
+function set_source_and_build_dirs()
+{
+	abs_top_builddir=${JAS_ABS_TOP_BUILDDIR:-$(realpath ../..)}
+	top_builddir=${JAS_TOP_BUILDDIR:-$(realpath --relative-to "$abs_top_builddir" ../..)}
+	abs_top_srcdir=${JAS_ABS_TOP_SRCDIR:-$(realpath ../..)}
+	top_srcdir=${JAS_TOP_SRCDIR:-$(realpath --relative-to "$abs_top_srcdir" ../..)}
+}
+
 function get_abs_top_builddir()
 {
 	local dir

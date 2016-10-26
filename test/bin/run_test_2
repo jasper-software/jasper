@@ -7,10 +7,15 @@ source "$cmd_dir/utilities" || exit 1
 tmp_dir=$(make_tmp_dir)
 tmp_file=$tmp_dir/data
 
-abs_top_builddir=$(get_abs_top_builddir) || panic "cannot get top builddir"
+#abs_top_builddir=$(get_abs_top_builddir) || \
+#  panic "cannot get top builddir"
+set_source_and_build_dirs
+
+echo "abs_top_builddir $abs_top_builddir"
+echo "abs_top_srcdir $abs_top_srcdir"
 
 export IMGINFO_COMMAND="$abs_top_builddir/src/appl/imginfo"
-data_dir="$abs_top_builddir/data"
+data_dir="$abs_top_srcdir/data"
 
 jasper="$abs_top_builddir/src/appl/jasper"
 imgcmp="$abs_top_builddir/src/appl/imgcmp"
