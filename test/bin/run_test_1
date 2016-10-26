@@ -5,8 +5,6 @@
 
 # Reference: https://github.com/google/sanitizers/wiki/SanitizerCommonFlags
 
-printenv
-
 cmd_dir=$(dirname "$0") || exit 1
 
 top_dir="$cmd_dir/../.."
@@ -52,7 +50,12 @@ for in_file in "${bad_list[@]}"; do
 	esac
 
 	echo "Input file: $in_file"
-	ASAN_OPTIONS="exitcode=10 allocator_may_return_null=true detect_leaks=false" "$imginfo" < "$in_file"
+	special_asan_options=()
+	special_asan_options+=(exitcode=10)
+	special_asan_options+=(allocator_may_return_null=true)
+	special_asan_options+=(detect_leaks=false)
+	#special_asan_options+=(soft_rss_limit_mb=1024)
+	ASAN_OPTIONS="${special_asan_options[*]}" "$imginfo" < "$in_file"
 	status=$?
 	echo "exit status: $status"
 	if [ "$status" -ne 1 ]; then
