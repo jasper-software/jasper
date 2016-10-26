@@ -65,5 +65,13 @@ EXTRA_DIST = \
 	run_test \
 	tests
 
+AM_TESTS_ENVIRONMENT = \
+	JAS_ABS_TOP_SRCDIR="$(abs_top_srcdir)" \
+	JAS_TOP_SRCDIR="$(top_srcdir)" \
+	JAS_ABS_TOP_BUILDDIR="$(abs_top_builddir)" \
+	JAS_TOP_BUILDDIR="$(top_builddir)"
+
+#	. $(top_builddir)/test/bin/test_setup
+
 TESTS = \
 	run_test_1
