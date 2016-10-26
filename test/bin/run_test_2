@@ -1,18 +1,21 @@
 #! /bin/bash
 # Copyright (c) 2016 Michael David Adams
+################################################################################
 
 cmd_dir=$(dirname $0) || exit 1
 source "$cmd_dir/utilities" || exit 1
 
-tmp_dir=$(make_tmp_dir)
-tmp_file=$tmp_dir/data
+################################################################################
 
-#abs_top_builddir=$(get_abs_top_builddir) || \
-#  panic "cannot get top builddir"
-set_source_and_build_dirs
+set_source_and_build_dirs || panic "cannot set source and build directories"
+tmp_dir=$(make_tmp_dir)
+
+################################################################################
 
 echo "abs_top_builddir $abs_top_builddir"
 echo "abs_top_srcdir $abs_top_srcdir"
+
+tmp_file=$tmp_dir/data
 
 export IMGINFO_COMMAND="$abs_top_builddir/src/appl/imginfo"
 data_dir="$abs_top_srcdir/data"

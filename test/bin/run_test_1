@@ -1,28 +1,27 @@
 #! /bin/bash
 # Copyright (c) 2016 Michael David Adams
-
 ################################################################################
 
-# Reference: https://github.com/google/sanitizers/wiki/SanitizerCommonFlags
+# Reference on sanitizer options:
+# https://github.com/google/sanitizers/wiki/SanitizerCommonFlags
+
+################################################################################
 
 cmd_dir=$(dirname "$0") || exit 1
 source "$cmd_dir"/utilities || exit 1
 
+################################################################################
+
+set_source_and_build_dirs || panic "cannot set source and build directories"
+
 top_dir="$cmd_dir/../.."
 data_dir="$top_dir/data/test"
-
-function panic()
-{
-	echo "ERROR: $@" 1>&2
-	exit 1
-}
 
 ################################################################################
 
 good_list=($data_dir/good/*.*)
 bad_list=($data_dir/bad/*.*)
 
-abs_top_builddir=$(get_abs_top_builddir) || panic "cannot get top builddir"
 imginfo="$abs_top_builddir/src/appl/imginfo"
 
 error_count=0

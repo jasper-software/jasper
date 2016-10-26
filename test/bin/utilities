@@ -1,4 +1,5 @@
 #! /bin/bash
+# Copyright (c) 2016 Michael David Adams
 
 ################################################################################
 #
@@ -10,23 +11,21 @@ function panic()
 	exit 1
 }
 
-function set_source_and_build_dirs()
+function eecho()
 {
-	abs_top_builddir=${JAS_ABS_TOP_BUILDDIR:-$(realpath ../..)}
-	top_builddir=${JAS_TOP_BUILDDIR:-$(realpath --relative-to "$abs_top_builddir" ../..)}
-	abs_top_srcdir=${JAS_ABS_TOP_SRCDIR:-$(realpath ../..)}
-	top_srcdir=${JAS_TOP_SRCDIR:-$(realpath --relative-to "$abs_top_srcdir" ../..)}
+	echo "$@" 1>&2
 }
 
-function get_abs_top_builddir()
+function set_source_and_build_dirs()
 {
-	local dir
-	if [ -n "$JAS_ABS_TOP_BUILDDIR" ]; then
-		dir="$JAS_ABS_TOP_BUILDDIR"
-	else
-		dir=$(realpath ../..) || return 1
-	fi
-	echo "$dir"
+	abs_top_builddir=${JAS_ABS_TOP_BUILDDIR:-$(realpath "$cmd_dir/../..")} || \
+	  return 1
+	top_builddir=${JAS_TOP_BUILDDIR:-$(realpath --relative-to \
+	  "$abs_top_builddir" "$cmd_dir/../..")} || return 1
+	abs_top_srcdir=${JAS_ABS_TOP_SRCDIR:-$(realpath "$cmd_dir/../..")} || \
+	  return 1
+	top_srcdir=${JAS_TOP_SRCDIR:-$(realpath --relative-to "$abs_top_srcdir" \
+	  "$cmd_dir/../..")} || return 1
 }
 
 function get_tmp_dir()
@@ -79,6 +78,7 @@ function image_which()
 
 function image_info()
 {
+	eecho "IMGINFO_COMMAND $IMGINFO_COMMAND"
 	if [ $# -ne 2 ]; then
 		return 2
 	fi
