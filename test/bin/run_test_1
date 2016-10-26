@@ -1,4 +1,5 @@
 #! /bin/bash
+# Copyright (c) 2016 Michael David Adams
 
 # Reference: https://github.com/google/sanitizers/wiki/SanitizerCommonFlags
 

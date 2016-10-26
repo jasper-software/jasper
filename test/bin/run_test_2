@@ -1,0 +1,52 @@
+#! /bin/bash
+# Copyright (c) 2016 Michael David Adams
+
+CMDDIR=`dirname $0`
+. $CMDDIR/jpcod
+init
+
+TMPDIR=/tmp/mdadams
+
+mkdir -p $TMPDIR
+TMPFILE=$TMPDIR/junk.pnm
+
+INFILES=""
+INFILES="$INFILES target.pnm"
+INFILES="$INFILES stawamuschief.pnm"
+INFILES="$INFILES stawamuschief_gray.pnm"
+INFILES="$INFILES goldenears.bmp"
+#INFILES="$INFILES goldenears_gray.bmp"
+INFILES="$INFILES goldenears.ras"
+INFILES="$INFILES goldenears_gray.ras"
+
+#FMTS="mif"
+FMTS="bmp jp2 jpc pgx pnm ras"
+#FMTS="$FMTS jpg"
+
+for INFILE in $INFILES; do
+	INFILE0=$INFILE
+	INFILE=`imgwhich $INFILE`
+	IMGTYPE=`imgtype $INFILE`
+	if [ ! -f $INFILE ]; then
+		echo "WARNING: IMAGE FILE NOT FOUND $INFILE0"
+		continue
+	fi
+	for FMT in $FMTS; do
+		if [ $IMGTYPE == rgb -a $FMT = pgx ]; then
+			continue
+		fi
+#		echo "$INFILE0 $FMT"
+		rm -f $TMPFILE
+		$JASPER -f $INFILE -T $FMT 2> /dev/null | \
+		  $JASPER -T $FMT > $TMPFILE 2> /dev/null
+		PAE=`$IMGCMP -f $INFILE -F $TMPFILE -m pae --max 2> /dev/null`
+		if [ "$PAE" != 0 ]; then
+			echo "ERROR: $FMT $INFILE0 NOT LOSSLESS (PAE=$PAE)"
+			$JIV $TMPFILE $INFILE
+#			exit 1
+		fi
+		echo "STATUS: $FMT $INFILE0 OK"
+		#display $TMPFILE
+	done
+done
+

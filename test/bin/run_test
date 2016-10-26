@@ -1,0 +1,460 @@
+#! /bin/bash
+# Copyright (c) 2016 Michael David Adams
+
+CMDDIR=`dirname $0`
+. $CMDDIR/jpcod
+init
+
+DOSHOWIMG=0
+MKDATA=1
+DATADIR=/tmp/mdadams/jpeg2000
+#VERBOSE=0
+VERBOSE=1
+DEBUG=0
+#DEBUG=1
+# Only warn if an image is missing.
+NOIMGWARN=1
+# Rate contraint violation for JasPer yields fatal error.
+RATEVIOLFATAL=1
+RATEVIOLFATAL=0
+# Distortion constraint violation yields fatal error.
+DISTVIOLFATAL=1
+#DISTVIOLFATAL=0
+
+#TMPDIR=/tmp/mdadams
+TSTSFILE=$CMDDIR/tests
+JPENC=$CMDDIR/jpenc
+JPDEC=$CMDDIR/jpdec
+
+#SHOWIMG="xloadimage -quiet -geometry +0+0"
+SHOWIMG="display -geometry 256x256> -geometry +0+0"
+
+################################################################################
+# Functions for processing the test cases file and its associated data.
+################################################################################
+
+preprocessor()
+{
+	cpp -P
+}
+
+stripblanklines()
+{
+	awk '(NF > 0){print $0}' -
+}
+
+gettest()
+{
+	cat $TSTSFILE | preprocessor 2> /dev/null | stripblanklines | awk '
+	{
+		id="";
+		for (i = 1; i <= NF; ++i) {
+			ind = index($i, "=");
+			if (ind <= 0) {
+				continue;
+			}
+			len = length($i);
+			key = substr($i, 1, ind - 1);
+			val = substr($i, ind + 1, len - ind);
+			if (key == "id") {
+				id=val;
+			}
+		}
+		if (length(id) > 0 && TESTID == id) {
+			print $0;
+		}
+	}
+	' TESTID=$1
+}
+
+gettestids()
+{
+	cat $TSTSFILE | preprocessor | stripblanklines | awk '
+	{
+		id="";
+		for (i = 1; i <= NF; ++i) {
+			ind = index($i, "=");
+			if (ind <= 0) {
+				continue;
+			}
+			len = length($i);
+			key = substr($i, 1, ind - 1);
+			val = substr($i, ind + 1, len - ind);
+			if (key == "id") {
+				id=val;
+			}
+		}
+		if (length(id) > 0) {
+			printf "%s ", id;
+		}
+	}
+	'
+}
+
+################################################################################
+#
+################################################################################
+
+TESTIDS=""
+if [ $# -lt 2 ]; then
+	echo "usage: $0 enc dec [testid]"
+	exit 1
+fi
+ENC=$1
+DEC=$2
+shift 2
+if [ $# -ge 1 ]; then
+	TESTIDS=$@
+fi
+
+################################################################################
+#
+################################################################################
+
+if [ -z "$TESTIDS" ]; then
+	TESTIDS=`gettestids`
+fi
+
+[ -d $TMPDIR ] || mkdir -p $TMPDIR
+[ -d $DATADIR ] || mkdir -p $DATADIR
+
+NUMSKIPS=0
+SKIPLIST=""
+NUMRATEVIOLS=0
+RATEVIOLLIST=""
+NUMDISTVIOLS=0
+DISTVIOLLIST=""
+
+for TESTID in $TESTIDS; do
+	TST=`gettest $TESTID`
+	if [ -z "$TST" ]; then
+		echo "WARNING: INVALID TEST ID $TESTID"
+		continue
+	fi
+
+	INFILE=""
+	ENCOPTS=""
+	DECOPTS=""
+	RATE=0
+	MAXPAE=""
+	MINPSNR=""
+	IMAGE=""
+	ID=""
+	BUG=""
+	ENCFMT=jpc
+	#ENCFMT=jp2
+
+	set -- $TST
+	while [ $# -gt 0 ]; do
+		OPT=$1
+		TAG=`gettag $OPT`
+		VAL=`getval $OPT`
+		case $TAG in
+		imgareatlx|imgareatly|tilegrdtlx|tilegrdtly|tilewidth|tileheight|prcwidth|prcheight|cblkwidth|cblkheight|mode|nomct|numrlvls|numgbits|ilyrrates|prg|pterm|termall|lazy|segsym|resetprob|vcausal|sop|eph|roirect)
+			ENCOPTS="$ENCOPTS $OPT";;
+		rate)
+			ENCOPTS="$ENCOPTS $OPT"
+			RATE=$VAL
+			;;
+		maxlyrs)
+			DECOPTS="$DECOPTS $OPT";;
+		image)
+			INFILE=$VAL;;
+		pae)
+			MAXPAE=$VAL;;
+		psnr)
+			MINPSNR=$VAL;;
+		id)
+			TSTID=$VAL;;
+		fmt)
+			ENCFMT=$VAL;;
+		encfile)
+			ENCFILE=$VAL;;
+		bug)
+			BUG=$VAL;;
+		*)
+			echo "unknown option $TAG"
+			exit 1
+			;;
+		esac
+		shift
+	done
+
+
+	# Check for known bug in encoder and/or decoder.
+	HASENCBUG=0
+	case $ENC in
+	jasper)
+		case "$BUG" in
+		*jasper_enc*|*jasper_cod*)
+			HASENCBUG=1;;
+		esac
+		;;
+	jj2k)
+		case "$BUG" in
+		*jj2000_enc*|*jj2000_cod*)
+			HASENCBUG=1;;
+		esac
+		;;
+	kakadu)
+		case "$BUG" in
+		*kakadu_enc*|*kakadu_cod*)
+			HASENCBUG=1;;
+		esac
+		;;
+	oj)
+		case "$BUG" in
+		*oj_enc*|*oj_cod*)
+			HASENCBUG=1;;
+		esac
+		;;
+	esac
+	HASDECBUG=0
+	case $DEC in
+	jasper)
+		case "$BUG" in
+		*jasper_dec*|*jasper_cod*)
+			HASDECBUG=1;;
+		esac
+		;;
+	jj2k)
+		case "$BUG" in
+		*jj2000_dec*|*jj2000_cod*)
+			HASDECBUG=1;;
+		esac
+		;;
+	kakadu)
+		case "$BUG" in
+		*kakadu_dec*|*kakadu_cod*)
+			HASDECBUG=1;;
+		esac
+		;;
+	oj)
+		case "$BUG" in
+		*oj_dec*|*oj_cod*)
+			HASDECBUG=1;;
+		esac
+		;;
+	esac
+	if [ $HASENCBUG -ne 0 ]; then
+		echo "WARNING: ENCODER HAS KNOWN BUG"
+	fi
+	if [ $HASDECBUG -ne 0 ]; then
+		echo "WARNING: DECODER HAS KNOWN BUG"
+	fi
+
+	if [ $HASENCBUG -ne 0 -o $HASDECBUG -ne 0 ]; then
+		echo "WARNING: skipping $TESTID"
+		NUMSKIPS=`expr $NUMSKIPS + 1`
+		SKIPLIST="$SKIPLIST $TESTID"
+		continue
+	fi
+
+# These variables are the same and should be merged.
+if [ $TSTID != $TESTID ]; then
+	exit 1
+fi
+
+	if [ ! -f $INFILE ]; then
+		INFILE=`imgwhich $INFILE`
+	fi
+	if [ ! -f $INFILE ]; then
+		if [ $NOIMGWARN -ne 0 ]; then
+			echo "WARNING: CANNOT FIND IMAGE $INFILE"
+			echo "WARNING: skipping $TESTID"
+			NUMSKIPS=`expr $NUMSKIPS + 1`
+			SKIPLIST="$SKIPLIST $TESTID"
+			continue
+		else
+			echo "ERROR: CANNOT FIND IMAGE $INFILE"
+			exit 1
+		fi
+	fi
+
+	if [ $VERBOSE -ne 0 ]; then
+		ENCOPTS="$ENCOPTS verbose"
+		DECOPTS="$DECOPTS verbose"
+	fi
+	if [ $DEBUG -ne 0 ]; then
+		ENCOPTS="$ENCOPTS debug=$DEBUG"
+		DECOPTS="$DECOPTS debug=$DEBUG"
+	fi
+
+	IMGDATA=`$IMGINFO -f $INFILE 2> /dev/null`
+	if [ $? -ne 0 ]; then
+		echo "ERROR: cannot get image information for $INFILE"
+		exit 1
+	fi
+	IMGFMT=`echo $IMGDATA | awk '{print $1}'`
+	IMGNUMCMPTS=`echo $IMGDATA | awk '{print $2}'`
+	IMGWIDTH=`echo $IMGDATA | awk '{print $3}'`
+	IMGHEIGHT=`echo $IMGDATA | awk '{print $4}'`
+	IMGPREC=`echo $IMGDATA | awk '{print $5}'`
+	IMGRAWSIZE=`echo $IMGDATA | awk '{print $6}'`
+
+	if [ $IMGFMT = mif -o $IMGFMT = jpc -o $IMGFMT = jp2 -o $IMGFMT = pgx ]; then
+		DECFMT=$IMGFMT
+	else
+		if [ $IMGNUMCMPTS -eq 1 -a $IMGPREC -gt 8 ]; then
+			DECFMT=pgx
+		else
+			DECFMT=pnm
+		fi
+#		if [ $IMGNUMCMPTS -eq 1 ]; then
+#			DECFMT=pgx
+#		else
+#			DECFMT=pnm
+#		fi
+	fi
+
+	if [ $RATE = 0 ]; then
+		ENCSIZE=0
+	else
+		ENCSIZE=`evalexpr "$IMGRAWSIZE * $RATE + 1" | realtoint`
+	fi
+
+	ENCFILE=$TMPDIR/test.$ENCFMT
+	DECFILE=$TMPDIR/recon.$DECFMT
+	#DIFFFILE=$TMPDIR/DIFF.pnm
+	DIFFFILE=""
+	LOGFILE=$TMPDIR/log.txt
+
+	rm -f $TMPDIR/*.pgm $TMPDIR/*.ppm $TMPDIR/*.$DECFMT
+	rm -f $ENCFILE
+	rm -f $DECFILE $DIFFFILE
+
+	if [ \( $IMGFMT != pnm -a $IMGFMT != pgx -a $ENC != jasper \) -o \
+	  \( $IMGFMT != pnm -a $ENC = kakadu \) ]; then
+		echo "WARNING: encoder cannot handle input image format $IMGFMT... skipping"
+		NUMSKIPS=`expr $NUMSKIPS + 1`
+		SKIPLIST="$SKIPLIST $TESTID"
+		continue
+	fi
+	if [ \( $DECFMT != pnm -a $DECFMT != pgx -a $DEC != jasper \) -o \
+	  \( $DECFMT != pnm -a $DEC = kakadu \) ]; then
+		echo "WARNING: decoder cannot handle output image format $DECFMT... skipping"
+		NUMSKIPS=`expr $NUMSKIPS + 1`
+		SKIPLIST="$SKIPLIST $TESTID"
+		continue
+	fi
+
+	echo "------------------------------------------------------------"
+	echo "TESTID=$TESTID ENC=$ENC DEC=$DEC"
+	if [ $VERBOSE -ne 0 ]; then
+		echo "FMT=$IMGFMT WIDTH=$IMGWIDTH HEIGHT=$IMGHEIGHT PREC=$IMGPREC NUMCMPTS=$IMGNUMCMPTS RAWSIZE=$IMGRAWSIZE"
+		echo "$TST"
+	fi
+
+	$JPENC software=$ENC input=$INFILE output=$ENCFILE fmt=$ENCFMT $ENCOPTS
+	ENCSTATUS=$?
+	if [ $ENCSTATUS -eq 2 ]; then
+		echo "WARNING: encoder feature not supported"
+		echo "skipping"
+		NUMSKIPS=`expr $NUMSKIPS + 1`
+		SKIPLIST="$SKIPLIST $TESTID"
+		continue
+	fi
+	if [ $ENCSTATUS -ne 0 ]; then
+		echo "ERROR: ENCODER FAILURE"
+		exit 1
+	fi
+
+	$JPDEC software=$DEC input=$ENCFILE output=$DECFILE $DECOPTS
+	DECSTATUS=$?
+	if [ $DECSTATUS -ne 0 ]; then
+		echo "ERROR: DECODER FAILURE"
+		exit 1
+	fi
+
+	ENCFILESIZE=`wc -c $ENCFILE | awk '{print $1}' -`
+
+	if [ \( -z "$MAXPAE" \) -a \( -z "$MINPSNR" \) ]; then
+		echo "ERROR: NO ERROR CONSTRAINT SPECIFIED"
+		exit 1
+	fi
+
+	if [ $RATE != 0 ]; then
+		if [ $ENCFILESIZE -gt $ENCSIZE ]; then
+			echo "ERROR: RATE CONSTRAINT VIOLATED ($ENCFILESIZE > $ENCSIZE)"
+			if [ \( $ENC = jasper \) -a \( $RATEVIOLFATAL -ne 0 \) ]; then
+				exit 1
+			fi
+			RATEVIOLLIST="$RATEVIOLLIST $TESTID"
+			NUMRATEVIOLS=`expr $NUMRATEVIOLS + 1`
+		fi
+	fi
+
+	FILE0=`pnutod $INFILE`
+	FILE1=`pnutod $DECFILE`
+	PAE=`$IMGCMP -f $FILE0 -F $FILE1 -m pae --max 2> /dev/null`
+	if [ -z "$PAE" ]; then
+		echo "cannot get PAE $FILE0 $FILE1"
+		exit 1
+	fi
+	if [ $PAE -ne 0 ]; then
+		PSNR=`$IMGCMP -f $FILE0 -F $FILE1 -m psnr --min 2> /dev/null`
+		echo "STATUS: LOSSY (ENCFILESIZE=$ENCFILESIZE ENCSIZE=$ENCSIZE PAE=$PAE PSNR=$PSNR)"
+	else
+		echo "STATUS: LOSSLESS (ENCFILESIZE=$ENCFILESIZE)"
+		PSNR=1000.0
+	fi
+	if [ -z "$PSNR" ]; then
+		echo "cannot get PSNR"
+		exit 1
+	fi
+	if [ -n "$MAXPAE" ]; then
+		if [ $PAE -gt $MAXPAE ]; then
+			echo "ERROR: PAE CONSTRAINT NOT SATISFIED ($PAE > $MAXPAE)"
+			if [ $DISTVIOLFATAL -ne 0 ]; then
+				$SHOWIMG $DECFILE 
+				exit 1
+			fi
+			DISTVIOLLIST="$DISTVIOLLIST $TESTID"
+			NUMDISTVIOLS=`expr $NUMDISTVIOLS + 1`
+		fi
+	fi
+	if [ -n "$MINPSNR" ]; then
+		CONSTRAINT=`evalrelexpr "$PSNR > $MINPSNR"`
+		if [ $CONSTRAINT -eq 0 ]; then
+			echo "ERROR: PSNR CONSTRAINT NOT SATISFIED ($PSNR < $MINPSNR)"
+			if [ $DISTVIOLFATAL -ne 0 ]; then
+				$SHOWIMG $DECFILE 
+				exit 1
+			fi
+			DISTVIOLLIST="$DISTVIOLLIST $TESTID"
+			NUMDISTVIOLS=`expr $NUMDISTVIOLS + 1`
+		fi
+	fi
+
+	if [ $DOSHOWIMG -ne 0 ]; then
+		echo "Type Ctrl-Q to exit ImageMagick"
+		$SHOWIMG $DECFILE 
+		#PID=$!
+		#sleep 5
+		#kill $PID
+	fi
+
+	if [ $MKDATA -ne 0 ]; then
+		cp $ENCFILE $DATADIR/$TSTID.$ENCFMT
+	fi
+
+done
+
+if [ $NUMDISTVIOLS -ne 0 ]; then
+	echo "ERROR: number of distortion constraint violations $NUMDISTVIOLS"
+	echo "$DISTVIOLLIST"
+fi
+if [ $NUMRATEVIOLS -ne 0 ]; then
+	echo "ERROR: number of rate constraint violations $NUMRATEVIOLS"
+	echo "$RATEVIOLLIST"
+fi
+if [ $NUMSKIPS -ne 0 ]; then
+	echo "WARNING: skipped $NUMSKIPS tests"
+	echo "$SKIPLIST"
+fi
+if [ \( $DISTVIOLFATAL -ne 0 \) -a \( $NUMDISTVIOLS -gt 0 \) ]; then
+	exit 1
+fi
+if [ \( $RATEVIOLFATAL -ne 0 \) -a \( $NUMRATEVIOLS -gt 0 \) ]; then
+	exit 1
+fi

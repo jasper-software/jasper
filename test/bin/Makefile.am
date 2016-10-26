@@ -57,7 +57,13 @@
 # __END_OF_JASPER_LICENSE__
 
 EXTRA_DIST = \
-	run_test_1
+	run_test_1 \
+	run_test_2 \
+	jpcod \
+	jpdec \
+	jpenc \
+	run_test \
+	tests
 
 TESTS = \
 	run_test_1
