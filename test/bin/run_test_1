@@ -1,6 +1,8 @@
 #! /bin/bash
 # Copyright (c) 2016 Michael David Adams
 
+################################################################################
+
 # Reference: https://github.com/google/sanitizers/wiki/SanitizerCommonFlags
 
 cmd_dir=$(dirname "$0") || exit 1
@@ -8,16 +10,18 @@ cmd_dir=$(dirname "$0") || exit 1
 top_dir="$cmd_dir/../.."
 data_dir="$top_dir/data/test"
 
-good_list=($data_dir/good/*.*)
-bad_list=($data_dir/bad/*.*)
-
-imginfo="$top_dir/src/appl/imginfo"
-
 function panic()
 {
 	echo "ERROR: $@" 1>&2
 	exit 1
 }
+
+################################################################################
+
+good_list=($data_dir/good/*.*)
+bad_list=($data_dir/bad/*.*)
+
+imginfo="$top_dir/src/appl/imginfo"
 
 error_count=0
 
@@ -37,12 +41,12 @@ echo "############################################################"
 for in_file in "${bad_list[@]}"; do
 	name=$(basename "$in_file")
 	echo "############################################################"
-	case "$name" in
-	2_crashes.bmp)
-		echo "Skipping $in_file"
-		continue
-		;;
-	esac
+#	case "$name" in
+#	2_crashes.bmp)
+#		echo "Skipping $in_file"
+#		continue
+#		;;
+#	esac
 
 	echo "Input file: $in_file"
 	ASAN_OPTIONS="exitcode=10 allocator_may_return_null=true detect_leaks=false" "$imginfo" < "$in_file"
