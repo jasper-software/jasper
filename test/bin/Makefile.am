@@ -64,7 +64,8 @@ EXTRA_DIST = \
 	jpdec \
 	jpenc \
 	run_test \
-	tests
+	tests \
+	utilities
 
 AM_TESTS_ENVIRONMENT = \
 	JAS_ABS_TOP_SRCDIR="$(abs_top_srcdir)" \
