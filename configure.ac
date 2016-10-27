@@ -69,6 +69,9 @@ dnl Microsoft Windows will barf if you try to use "aux" as a directory name. :-(
 AC_CONFIG_AUX_DIR([ac_aux])
 AC_CONFIG_MACRO_DIR([ac_m4])
 
+dnl Initialize automake.
+AM_INIT_AUTOMAKE([1.11 foreign dist-xz dist-bzip2])
+
 m4_include([ac_m4/m4_ax_generate_changelog.m4])
 
 AX_GENERATE_CHANGELOG
@@ -80,10 +83,6 @@ LT_INIT([shared static])
 # Note: This precedes automake initialization to avoid warnings.
 AC_CANONICAL_BUILD
 AC_CANONICAL_HOST
-AC_CANONICAL_TARGET
-
-# Initialize automake.
-AM_INIT_AUTOMAKE
 
 # Initialize version information parameters.
 JAS_MAJOR_VERSION=AC_JAS_MAJOR_VERSION
