@@ -18,7 +18,7 @@ init()
 	CMDDIR=$(dirname "$0") || return 1
 	CMDDIR=$(realpath "$CMDDIR") || return 1
 	ABSCMDDIR="$CMDDIR"
-	TMPDIR=/tmp/jaspertest
+	TMPDIR=$(make_tmp_dir jpcod) || return 1
 	HOSTNAME=`hostname`
 
 	JAVA=/usr/java/jre1.5.0_07/bin/java
