@@ -1,26 +1,23 @@
 #! /bin/bash
 # Copyright (c) 2016 Michael David Adams
 
-function panic()
-{
-	echo "PANIC: $@" 1>&2
-	exit 1
-}
-
 ################################################################################
 # Basic initialization.
 ################################################################################
 
 init()
 {
-	CMDDIR=`dirname $0`
-	CMDDIR=`parsepathname $CMDDIR`
-	ABSCMDDIR=`absdirname $0`
-	if [ "$ABSCMDDIR" != "$CMDDIR" ]; then
-		echo "ERROR: MUST USE ABSOULTE PATHNAME"
-		exit 1
-	fi
-	CMDDIR=$ABSCMDDIR
+#	CMDDIR=`dirname $0`
+#	CMDDIR=`parsepathname $CMDDIR`
+#	ABSCMDDIR=`absdirname $0`
+#	if [ "$ABSCMDDIR" != "$CMDDIR" ]; then
+#		echo "ERROR: MUST USE ABSOULTE PATHNAME"
+#		exit 1
+#	fi
+#	CMDDIR=$ABSCMDDIR
+	CMDDIR=$(dirname "$0") || return 1
+	CMDDIR=$(realpath "$CMDDIR") || return 1
+	ABSCMDDIR="$CMDDIR"
 	TMPDIR=/tmp/jaspertest
 	HOSTNAME=`hostname`
 
@@ -31,8 +28,8 @@ init()
 	KAKADUTOPDIR=$ALTTOPDIR/kakadu-5.2.2
 	JJ2KVER=5.1
 	JJ2KTOPDIR=$ALTTOPDIR/jj2000-$JJ2KVER
-	LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$KAKADUTOPDIR
-	export LD_LIBRARY_PATH
+#	LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$KAKADUTOPDIR
+#	export LD_LIBRARY_PATH
 
 	case $HOSTNAME in
 	localhost*)

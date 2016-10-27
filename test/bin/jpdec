@@ -1,8 +1,11 @@
 #! /bin/bash
 # Copyright (c) 2016 Michael David Adams
 
-CMDDIR=`dirname $0`
-. $CMDDIR/jpcod
+CMDDIR=`dirname $0` || exit 1
+. $CMDDIR/utilities || exit 1
+. $CMDDIR/jpcod || exit 1
+
+set_source_and_build_dirs || panic "cannot set source and build directories"
 
 init
 VERBOSE=0

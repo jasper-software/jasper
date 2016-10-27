@@ -1,13 +1,19 @@
 #! /bin/bash
 # Copyright (c) 2016 Michael David Adams
 
-CMDDIR=`dirname $0`
-. $CMDDIR/jpcod
+CMDDIR=`dirname $0` || exit 1
+. $CMDDIR/utilities || exit 1
+. $CMDDIR/jpcod || exit 1
+
+set_source_and_build_dirs || panic "cannot set source and build directories"
+tmp_dir=$(make_tmp_dir)
+
 init
 
 DOSHOWIMG=0
 MKDATA=1
-DATADIR=/tmp/mdadams/jpeg2000
+#DATADIR=/tmp/mdadams/jpeg2000
+DATADIR="$tmp_dir"
 #VERBOSE=0
 VERBOSE=1
 DEBUG=0

@@ -59,6 +59,7 @@
 EXTRA_DIST = \
 	run_test_1 \
 	run_test_2 \
+	run_test_3 \
 	jpcod \
 	jpdec \
 	jpenc \
@@ -71,8 +72,7 @@ AM_TESTS_ENVIRONMENT = \
 	JAS_ABS_TOP_BUILDDIR="$(abs_top_builddir)" \
 	JAS_TOP_BUILDDIR="$(top_builddir)"
 
-#	. $(top_builddir)/test/bin/test_setup
-
 TESTS = \
 	run_test_1 \
-	run_test_2
+	run_test_2 \
+	run_test_3
