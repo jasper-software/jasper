@@ -10,6 +10,9 @@ tmp_dir=$(make_tmp_dir)
 
 init
 
+export IMGINFO_COMMAND="$abs_top_builddir/src/appl/imginfo"
+IMGCMP="$abs_top_builddir/src/appl/imgcmp"
+
 DOSHOWIMG=0
 MKDATA=1
 #DATADIR=/tmp/mdadams/jpeg2000
@@ -96,6 +99,23 @@ gettestids()
 	}
 	'
 }
+
+################################################################################
+#
+################################################################################
+
+IMAGE_PATH="$IMGPATH"
+
+while getopts I: opt; do
+	case $opt in
+	I)
+		IMAGE_PATH="$IMAGE_PATH:$OPTARG";;
+	\?)
+		usage
+		break;;
+	esac
+done
+shift `expr $OPTIND - 1`
 
 ################################################################################
 #
@@ -262,7 +282,8 @@ if [ $TSTID != $TESTID ]; then
 fi
 
 	if [ ! -f $INFILE ]; then
-		INFILE=`imgwhich $INFILE`
+		INFILE=$(image_which "$IMAGE_PATH" "$INFILE") || \
+		  panic "cannot find image"
 	fi
 	if [ ! -f $INFILE ]; then
 		if [ $NOIMGWARN -ne 0 ]; then
@@ -286,17 +307,23 @@ fi
 		DECOPTS="$DECOPTS debug=$DEBUG"
 	fi
 
-	IMGDATA=`$IMGINFO -f $INFILE 2> /dev/null`
-	if [ $? -ne 0 ]; then
-		echo "ERROR: cannot get image information for $INFILE"
-		exit 1
-	fi
-	IMGFMT=`echo $IMGDATA | awk '{print $1}'`
-	IMGNUMCMPTS=`echo $IMGDATA | awk '{print $2}'`
-	IMGWIDTH=`echo $IMGDATA | awk '{print $3}'`
-	IMGHEIGHT=`echo $IMGDATA | awk '{print $4}'`
-	IMGPREC=`echo $IMGDATA | awk '{print $5}'`
-	IMGRAWSIZE=`echo $IMGDATA | awk '{print $6}'`
+#	IMGDATA=$(image_info "$INFILE"  2> /dev/null)
+#	if [ $? -ne 0 ]; then
+#		echo "ERROR: cannot get image information for $INFILE"
+#		exit 1
+#	fi
+	IMGFMT=$(image_info "$INFILE" format) || \
+	  panic "cannot get image format"
+	IMGNUMCMPTS=$(image_info "$INFILE" num_components) || \
+	  panic "cannot get number of image components"
+	IMGWIDTH=$(image_info "$INFILE" width) || \
+	  panic "cannot get image width"
+	IMGHEIGHT=$(image_info "$INFILE" height) || \
+	  panic "cannot get image height"
+	IMGPREC=$(image_info "$INFILE" depth) || \
+	  panic "cannot get image depth"
+	IMGRAWSIZE=$(image_info "$INFILE" size) || \
+	  panic "cannot get image size"
 
 	if [ $IMGFMT = mif -o $IMGFMT = jpc -o $IMGFMT = jp2 -o $IMGFMT = pgx ]; then
 		DECFMT=$IMGFMT

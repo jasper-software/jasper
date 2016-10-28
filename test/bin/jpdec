@@ -10,6 +10,9 @@ set_source_and_build_dirs || panic "cannot set source and build directories"
 init
 VERBOSE=0
 
+export IMGINFO_COMMAND="$abs_top_builddir/src/appl/imginfo"
+JASPER="$abs_top_builddir/src/appl/jasper"
+
 ################################################################################
 #
 ################################################################################
@@ -259,13 +262,8 @@ pnm|pgm|ppm)
 *)
 	;;
 esac
-#IMGFMT=`imgfmt $INFILE`
-#IMGWIDTH=`imgwidth $INFILE`
-#IMGHEIGHT=`imgheight $INFILE`
-#IMGDEPTH=`imgdepth $INFILE`
-#IMGCMPTS=`imgcmpts $INFILE`
 
-IMGTYPE=`imgtype $INFILE`
+IMGTYPE=$(image_info "$INFILE" type) || panic "cannot get image type"
 if [ -z "$IMGTYPE" ]; then
 	IMGTYPE=rgb
 	IMGTYPE=gray

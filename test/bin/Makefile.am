@@ -75,6 +75,5 @@ AM_TESTS_ENVIRONMENT = \
 
 TESTS = \
 	run_test_1 \
-	run_test_2
-
-#	run_test_3
+	run_test_2 \
+	run_test_3

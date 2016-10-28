@@ -65,49 +65,59 @@ function image_which()
 	fi
 	local path="$1"
 	local file="$2"
-	local dirs=$(echo "$path" | tr ':' ' ') || return 1
+	#eecho "PATH=$path FILE=$file"
+	local dirs=($(echo "$path" | tr ':' ' ')) || return 1
 	for dir in "${dirs[@]}"; do
 		local buffer="$dir/$file"
-		if [ -f $buffer ]; then
+		if [ -f "$buffer" ]; then
 			echo "$buffer"
 			return 0
 		fi
 	done
-	echo "$image_file"
+	echo "$file"
 }
 
 function image_info()
 {
-	eecho "IMGINFO_COMMAND $IMGINFO_COMMAND"
+	#eecho "IMGINFO_COMMAND $IMGINFO_COMMAND"
 	if [ $# -ne 2 ]; then
 		return 2
 	fi
 	local file="$1"
 	local key="$2"
 	local value
+	local imginfo="${IMGINFO_COMMAND:-imginfo}"
+	if [ ! -x "$imginfo" ]; then
+		eecho "cannot find command $imginfo"
+		return 1
+	fi
 	case "$key" in
 	format)
-		value=$("${IMGINFO_COMMAND:-imginfo}" < "$file" 2> /dev/null | \
+		value=$("$imginfo" < "$file" 2> /dev/null | \
 		  awk '{print $1}') || return 1
 		;;
 	num_components)
-		value=$("${IMGINFO_COMMAND:-imginfo}" < "$file" 2> /dev/null | \
+		value=$("$imginfo" < "$file" 2> /dev/null | \
 		  awk '{print $2}') || return 1
 		;;
 	width)
-		value=$("${IMGINFO_COMMAND:-imginfo}" < "$file" 2> /dev/null | \
+		value=$("$imginfo" < "$file" 2> /dev/null | \
 		  awk '{print $3}') || return 1
 		;;
 	height)
-		value=$("${IMGINFO_COMMAND:-imginfo}" < "$file" 2> /dev/null | \
+		value=$("$imginfo" < "$file" 2> /dev/null | \
 		  awk '{print $4}') || return 1
 		;;
 	depth)
-		value=$("${IMGINFO_COMMAND:-imginfo}" < "$file" 2> /dev/null | \
+		value=$("$imginfo" < "$file" 2> /dev/null | \
 		  awk '{print $5}') || return 1
 		;;
+	size)
+		value=$("$imginfo" < "$file" 2> /dev/null | \
+		  awk '{print $6}') || return 1
+		;;
 	type)
-		local num_components=$("${IMGINFO_COMMAND:-imginfo}" < "$file" \
+		local num_components=$("$imginfo" < "$file" \
 		  2> /dev/null | awk '{print $2}') || return 1
 		value=""
 		case "$num_components" in

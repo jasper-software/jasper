@@ -7,19 +7,11 @@
 
 init()
 {
-#	CMDDIR=`dirname $0`
-#	CMDDIR=`parsepathname $CMDDIR`
-#	ABSCMDDIR=`absdirname $0`
-#	if [ "$ABSCMDDIR" != "$CMDDIR" ]; then
-#		echo "ERROR: MUST USE ABSOULTE PATHNAME"
-#		exit 1
-#	fi
-#	CMDDIR=$ABSCMDDIR
 	CMDDIR=$(dirname "$0") || return 1
 	CMDDIR=$(realpath "$CMDDIR") || return 1
 	ABSCMDDIR="$CMDDIR"
 	TMPDIR=$(make_tmp_dir jpcod) || return 1
-	HOSTNAME=`hostname`
+#	HOSTNAME=`hostname`
 
 	JAVA=/usr/java/jre1.5.0_07/bin/java
 
@@ -28,47 +20,52 @@ init()
 	KAKADUTOPDIR=$ALTTOPDIR/kakadu-5.2.2
 	JJ2KVER=5.1
 	JJ2KTOPDIR=$ALTTOPDIR/jj2000-$JJ2KVER
-#	LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$KAKADUTOPDIR
-#	export LD_LIBRARY_PATH
+	#LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$KAKADUTOPDIR
+	#export LD_LIBRARY_PATH
 
-	case $HOSTNAME in
-	localhost*)
-		HOSTNAME=ondelette
-		;;
-	esac
+	ALTIMGDIR="$HOME/data/jpeg2000_images/pnm"
+	VMTOPDIR="$HOME/work/vm90/VM9.0"
+	#EXEEXT=".exe"
+	SHOWIMG="display -geometry 256x256> -geometry +0+0"
 
-	case $HOSTNAME in
-	aurora)
-		ALTIMGDIR=$HOME/data/jpeg2000_images/pnm
-		;;
-	ondelette*)
-		ALTIMGDIR=$HOME/data/jpeg2000_images
-		;;
-	vortex*)
-		ALTIMGDIR=d:/users/mdadams/images
-		;;
-	*)
-		echo "ERROR: UNKNOWN HOST $HOSTNAME"
-		exit 1
-		;;
-	esac
+#	case $HOSTNAME in
+#	localhost*)
+#		HOSTNAME=ondelette
+#		;;
+#	esac
 
-	case $HOSTNAME in
-	aurora)
-		VMTOPDIR=$HOME/work/vm90/VM9.0
-		;;
-	ondelette*)
-		VMTOPDIR=$HOME/work/vm90/VM9.0
-		;;
-	vortex*)
-		VMTOPDIR=/
-		EXEEXT=".exe"
-		;;
-	*)
-		echo "ERROR: UNKNOWN HOST $HOSTNAME"
-		exit 1
-		;;
-	esac
+#	case $HOSTNAME in
+#	aurora)
+#		ALTIMGDIR=$HOME/data/jpeg2000_images/pnm
+#		;;
+#	ondelette*)
+#		ALTIMGDIR=$HOME/data/jpeg2000_images
+#		;;
+#	vortex*)
+#		ALTIMGDIR=d:/users/mdadams/images
+#		;;
+#	*)
+#		echo "ERROR: UNKNOWN HOST $HOSTNAME"
+#		exit 1
+#		;;
+#	esac
+
+#	case $HOSTNAME in
+#	aurora)
+#		VMTOPDIR=$HOME/work/vm90/VM9.0
+#		;;
+#	ondelette*)
+#		VMTOPDIR=$HOME/work/vm90/VM9.0
+#		;;
+#	vortex*)
+#		VMTOPDIR=/
+#		EXEEXT=".exe"
+#		;;
+#	*)
+#		echo "ERROR: UNKNOWN HOST $HOSTNAME"
+#		exit 1
+#		;;
+#	esac
 
 	#IMGDIR=$JASPERTOPDIR/data/images
 	#JASPER=$JASPERTOPDIR/src/appl/jasper$EXEEXT
@@ -85,21 +82,25 @@ init()
 	VMENC=$VMTOPDIR/bin/vm9_compress_32$EXEEXT
 	VMDEC=$VMTOPDIR/bin/vm9_expand_32$EXEEXT
 	JJCOD=$CMDDIR/jj2k
-	IMGPATH="$IMGDIR ${IMGDIR}2 $ALTIMGDIR"
+	IMGPATH="$IMGDIR:${IMGDIR}2:$ALTIMGDIR"
 
-	case $HOSTNAME in
-	aurora)
-		SHOWIMG="display -geometry 256x256> -geometry +0+0"
-		;;
-	ondelette*)
-		SHOWIMG="display -geometry 256x256> -geometry +0+0"
-		;;
-	sisley*)
-		SHOWIMG=xv
-		;;
-	esac
+#	case $HOSTNAME in
+#	aurora)
+#		SHOWIMG="display -geometry 256x256> -geometry +0+0"
+#		;;
+#	ondelette*)
+#		SHOWIMG="display -geometry 256x256> -geometry +0+0"
+#		;;
+#	sisley*)
+#		SHOWIMG=xv
+#		;;
+#	esac
 
 }
+
+################################################################################
+#
+################################################################################
 
 parsepathname()
 {
@@ -402,64 +403,9 @@ filename()
 	' -
 }
 
-################################################################################
-# Image characteristics.
-################################################################################
-
-imgwhich()
+to_upper()
 {
-(
-#	DIRS=`echo "$IMGPATH" | tr ':' ' '`
-	for DIR in $IMGPATH; do
-		BUF=$DIR/$1
-		if [ -f $BUF ]; then
-			echo $BUF
-			exit 0
-		fi
-	done
-	echo $1
-)
-}
-
-imgfmt()
-{
-	$IMGINFO < $1 2> /dev/null | awk '{print $1}'
-}
-
-imgcmpts()
-{
-	$IMGINFO < $1 2> /dev/null | awk '{print $2}'
-}
-
-imgwidth()
-{
-	$IMGINFO < $1 2> /dev/null | awk '{print $3}'
-}
-
-imgheight()
-{
-	$IMGINFO < $1 2> /dev/null | awk '{print $4}'
-}
-
-imgdepth()
-{
-	$IMGINFO < $1 2> /dev/null | awk '{print $5}'
-}
-
-imgtype()
-{
-(
-	[ $# -eq 1 ] || exit 1
-	NUMCMPTS=`imgcmpts $1`
-	if [ -z "$NUMCMPTS" ]; then
-		exit 1
-	fi
-	if [ $NUMCMPTS -eq 3 ]; then
-		echo "rgb"
-	else
-		echo "gray"
-	fi
-)
+	tr '[:lower:]' '[:upper:]'
 }
 
 ################################################################################
@@ -482,9 +428,4 @@ ppmtorgb()
 	mv $TMPDIR/ppmtorgb_tmp.grn $GRNOUTFILE
 	mv $TMPDIR/ppmtorgb_tmp.blu $BLUOUTFILE
 )
-}
-
-to_upper()
-{
-	tr '[:lower:]' '[:upper:]'
 }

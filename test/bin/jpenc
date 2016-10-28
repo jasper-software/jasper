@@ -10,6 +10,9 @@ set_source_and_build_dirs || panic "cannot set source and build directories"
 init
 VERBOSE=0
 
+export IMGINFO_COMMAND="$abs_top_builddir/src/appl/imginfo"
+JASPER="$abs_top_builddir/src/appl/jasper"
+
 ################################################################################
 #
 ################################################################################
@@ -170,7 +173,8 @@ jasper_enc()
 jj2k_enc()
 {
 	(
-		IMGFMT=`imgfmt $INFILE`
+		IMGFMT=$(image_info "$INFILE" format) || \
+		  panic "cannot get image format"
 		INFILESUFFIX=`getsuffix $INFILE`
 		INFILEBASE=`stripsuffix $INFILE`
 
@@ -339,7 +343,8 @@ vm_enc()
 			echo "VM encoder cannot handle JP2 format"
 			exit 1
 		fi
-		IMGFMT=`imgfmt $INFILE`
+		IMGFMT=$(image_info "$INFILE" format) || \
+		  panic "cannot get image format"
 		if [ $IMGFMT != pnm -a $IMGFMT != pgx ]; then
 			exit 2
 		fi
@@ -805,15 +810,15 @@ fi
 
 NUMDLVLS=`expr $NUMRLVLS - 1`
 
-IMGFMT=`imgfmt $INFILE`
-IMGTYPE=`imgtype $INFILE`
+IMGFMT=$(image_info "$INFILE" format) || panic "cannot get image format"
+IMGTYPE=$(image_info "$INFILE" type) || panic "cannot get image type"
 if [ -z "$IMGTYPE" ]; then
 	echo "ERROR: CANNOT DETERMINE IMAGE TYPE"
 	exit 1
 fi
-IMGWIDTH=`imgwidth $INFILE`
-IMGHEIGHT=`imgheight $INFILE`
-IMGPREC=`imgdepth $INFILE`
+IMGWIDTH=$(image_info "$INFILE" width) || panic "cannot get image width"
+IMGHEIGHT=$(image_info "$INFILE" height) || panic "cannot get image height"
+IMGPREC=$(image_info "$INFILE" depth) || panic "cannot get image depth"
 
 rm -f $OUTFILE
 
