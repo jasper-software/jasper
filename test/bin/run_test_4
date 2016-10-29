@@ -67,7 +67,13 @@ for testcase in "${testcases[@]}"; do
 	  panic "cannot get test case"
 
 	enc_file="$JAS_JP2K_TEST_TOP_DIR/${record[encoded_file]}"
-	"$imginfo" < "$enc_file"
+	if [ "$debug_level" -ne 0 ]; then
+		imginfo_opts+=(--debug-level "$debug_level")
+	fi
+	if [ "$verbose" -ge 1 ]; then
+		echo "Running $imginfo ${imginfo_opts[@]} < $enc_file"
+	fi
+	"$imginfo" "${imginfo_opts[@]}" < "$enc_file"
 	status=$?
 	if [ "$status" -ne 0 ]; then
 		echo "error: cannot decode $enc_file"
