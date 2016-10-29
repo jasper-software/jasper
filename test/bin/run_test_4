@@ -20,7 +20,6 @@ tmp_dir=$(make_tmp_dir "$cmd_name") || panic "cannot make temporary directory"
 debug_level=0
 verbose=0
 jas_jp2k_test_top_dir="$JAS_JP2K_TEST_TOP_DIR"
-#jas_jp2k_test_top_dir="$HOME/data/git/J2KP4files"
 
 while getopts T:D:v opt; do
 	case $opt in
@@ -38,6 +37,7 @@ done
 shift `expr $OPTIND - 1`
 
 if [ ! -d "$jas_jp2k_test_top_dir" ]; then
+	echo "The directory named by JAS_JP2K_TEST_TOP_DIR does not exist."
 	echo "The data for this test is not available."
 	echo "Skipping test."
 	exit 0
