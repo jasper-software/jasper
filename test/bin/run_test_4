@@ -56,6 +56,33 @@ tcf_gettestids "$testcase_file" testcases || \
   panic "cannot get test cases"
 echo "Number of test cases: ${#testcases[@]}"
 
+error_count=0
+
+for testcase in "${testcases[@]}"; do
+
+	echo "############################################################"
+	echo "Test case: $testcase"
+
+	tcf_gettest "$testcase_file" "$testcase" record || \
+	  panic "cannot get test case"
+
+	enc_file="$JAS_JP2K_TEST_TOP_DIR/${record[encoded_file]}"
+	"$imginfo" < "$enc_file"
+	status=$?
+	if [ "$status" -ne 0 ]; then
+		echo "error: cannot decode $enc_file"
+		error_count=$((error_count + 1))
+	fi
+
+done
+
+if [ "$error_count" -ne 0 ]; then
+	echo "error count: $error_count"
+	exit 1
+fi
+
+exit 0
+
 for testcase in "${testcases[@]}"; do
 
 	echo "############################################################"
