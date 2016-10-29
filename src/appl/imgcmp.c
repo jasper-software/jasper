@@ -294,7 +294,8 @@ int main(int argc, char **argv)
 	/* Ensure that both images have the same number of components. */
 	numcomps = jas_image_numcmpts(origimage);
 	if (jas_image_numcmpts(reconimage) != numcomps) {
-		fprintf(stderr, "number of components differ\n");
+		fprintf(stderr, "number of components differ (%d != %d)\n",
+		  numcomps, jas_image_numcmpts(reconimage));
 		return EXIT_FAILURE;
 	}
 

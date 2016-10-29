@@ -1,9 +1,9 @@
 #! /bin/bash
 # Copyright (c) 2016 Michael David Adams
 
-CMDDIR=`dirname $0` || exit 1
-. $CMDDIR/utilities || exit 1
-. $CMDDIR/jpcod || exit 1
+cmd_dir=$(dirname "$0") || exit 1
+source "$cmd_dir/utilities" || exit 1
+source "$cmd_dir/jpcod" || exit 1
 
 set_source_and_build_dirs || panic "cannot set source and build directories"
 tmp_dir=$(make_tmp_dir)
@@ -31,9 +31,9 @@ DISTVIOLFATAL=1
 #DISTVIOLFATAL=0
 
 #TMPDIR=/tmp/mdadams
-TSTSFILE=$CMDDIR/tests
-JPENC=$CMDDIR/jpenc
-JPDEC=$CMDDIR/jpdec
+TSTSFILE=$cmd_dir/codec_tests
+JPENC=$cmd_dir/jpenc
+JPDEC=$cmd_dir/jpdec
 
 #SHOWIMG="xloadimage -quiet -geometry +0+0"
 SHOWIMG="display -geometry 256x256> -geometry +0+0"

@@ -622,10 +622,13 @@ int jas_image_getfmt(jas_stream_t *in)
 	  ++fmtinfo) {
 		if (fmtinfo->ops.validate) {
 			/* Is the input data valid for this format? */
+			JAS_DBGLOG(20, ("testing for format %s ... ", fmtinfo->name));
 			if (!(*fmtinfo->ops.validate)(in)) {
+				JAS_DBGLOG(20, ("test succeeded\n"));
 				found = 1;
 				break;
 			}
+			JAS_DBGLOG(20, ("test failed\n"));
 		}
 	}
 	return found ? fmtinfo->id : (-1);

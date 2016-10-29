@@ -70,6 +70,7 @@
 #include "jasper/jas_stream.h"
 #include "jasper/jas_image.h"
 #include "jasper/jas_string.h"
+#include "jasper/jas_debug.h"
 
 #include "pgx_cod.h"
 
@@ -104,12 +105,13 @@ jas_image_t *pgx_decode(jas_stream_t *in, char *optstr)
 	image = 0;
 
 	if (pgx_gethdr(in, &hdr)) {
+		jas_eprintf("cannot get header\n");
 		goto error;
 	}
 
-#ifdef PGX_DEBUG
-	pgx_dumphdr(stderr, &hdr);
-#endif
+	if (jas_getdbglevel() >= 10) {
+		pgx_dumphdr(stderr, &hdr);
+	}
 
 	if (!(image = jas_image_create0())) {
 		goto error;
@@ -126,6 +128,7 @@ jas_image_t *pgx_decode(jas_stream_t *in, char *optstr)
 		goto error;
 	}
 	if (pgx_getdata(in, &hdr, image)) {
+		jas_eprintf("cannot get data\n");
 		goto error;
 	}
 
@@ -204,24 +207,30 @@ static int pgx_gethdr(jas_stream_t *in, pgx_hdr_t *hdr)
 	buf[1] = c;
 	hdr->magic = buf[0] << 8 | buf[1];
 	if (hdr->magic != PGX_MAGIC) {
+		jas_eprintf("invalid PGX signature\n");
 		goto error;
 	}
 	if ((c = pgx_getc(in)) == EOF || !isspace(c)) {
 		goto error;
 	}
 	if (pgx_getbyteorder(in, &hdr->bigendian)) {
+		jas_eprintf("cannot get byte order\n");
 		goto error;
 	}
 	if (pgx_getsgnd(in, &hdr->sgnd)) {
+		jas_eprintf("cannot get signedness\n");
 		goto error;
 	}
 	if (pgx_getuint32(in, &hdr->prec)) {
+		jas_eprintf("cannot get precision\n");
 		goto error;
 	}
 	if (pgx_getuint32(in, &hdr->width)) {
+		jas_eprintf("cannot get width\n");
 		goto error;
 	}
 	if (pgx_getuint32(in, &hdr->height)) {
+		jas_eprintf("cannot get height\n");
 		goto error;
 	}
 	return 0;
@@ -360,19 +369,42 @@ static int pgx_getsgnd(jas_stream_t *in, bool *sgnd)
 		}
 	} while (isspace(c));
 
+#if 0
 	if (c == '+') {
 		*sgnd = false;
 	} else if (c == '-') {
 		*sgnd = true;
 	} else {
-		goto error;
+		*sgnd = false;
+		if (jas_stream_ungetc(in, c)) {
+			goto error;
+		}
+		return 0;
 	}
+
 	while ((c = pgx_getc(in)) != EOF && !isspace(c)) {
 		;
 	}
 	if (c == EOF) {
 		goto error;
 	}
+#else
+	if (c == '+' || c == '-') {
+		*sgnd = (c == '-');
+		while ((c = pgx_getc(in)) != EOF && !isspace(c)) {
+			;
+		}
+		if (c == EOF) {
+			goto error;
+		}
+	} else {
+		*sgnd = false;
+		if (jas_stream_ungetc(in, c)) {
+			goto error;
+		}
+	}
+#endif
+
 	return 0;
 
 error:

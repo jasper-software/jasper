@@ -1,9 +1,9 @@
 #! /bin/bash
 # Copyright (c) 2016 Michael David Adams
 
-CMDDIR=`dirname $0` || exit 1
-. $CMDDIR/utilities || exit 1
-. $CMDDIR/jpcod || exit 1
+cmd_dir=$(dirname "$0") || exit 1
+source "$cmd_dir/utilities" || exit 1
+source "$cmd_dir/jpcod" || exit 1
 
 set_source_and_build_dirs || panic "cannot set source and build directories"
 

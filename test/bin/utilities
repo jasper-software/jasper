@@ -26,6 +26,10 @@ function set_source_and_build_dirs()
 	  return 1
 	top_srcdir=${JAS_TOP_SRCDIR:-$(realpath --relative-to "$abs_top_srcdir" \
 	  "$cmd_dir/../..")} || return 1
+	#eecho "abs_top_builddir=$abs_top_builddir"
+	#eecho "top_builddir=$top_builddir"
+	#eecho "abs_top_srcdir=$abs_top_srcdir"
+	#eecho "top_srcdir=$top_srcdir"
 }
 
 function get_tmp_dir()
@@ -132,5 +136,88 @@ function image_info()
 		return 1
 	fi
 	echo "$value"
+}
+
+################################################################################
+# Functions for processing the test cases file and its associated data.
+################################################################################
+
+stripblanklines()
+{
+	awk '(NF > 0){print $0}' -
+}
+
+tcf_preprocessor()
+{
+	cpp -P 2> /dev/null | stripblanklines
+	#cpp -P | stripblanklines
+}
+
+tcf_gettest()
+{
+	if [ $# -ne 3 ]; then
+		return 3
+	fi
+	local file="$1"
+	local id="$2"
+	local name="$3"
+	#eecho "$file $id $name"
+	local buffer=$(cat "$file" | tcf_preprocessor | awk -v TESTID="$id" '
+	{
+		id="";
+		buf="";
+		for (i = 1; i <= NF; ++i) {
+			ind = index($i, "=");
+			if (ind <= 0) {
+				continue;
+			}
+			len = length($i);
+			key = substr($i, 1, ind - 1);
+			val = substr($i, ind + 1, len - ind);
+			if (key == "id") {
+				id=val;
+			}
+			buf = buf "[" key "]=" val " ";
+		}
+		if (length(id) > 0 && TESTID == id) {
+#			print $0;
+			print buf;
+		}
+	}
+	')
+	#eecho "BUFFER $buffer"
+	eval declare -g -A "$name"=\("$buffer"\)
+}
+
+tcf_gettestids()
+{
+	if [ $# -ne 2 ]; then
+		return 2
+	fi
+	local file="$1"
+	local name="$2"
+	#eecho "$file $name"
+	local buffer=$(cat "$file" | tcf_preprocessor | awk '
+	{
+		id="";
+		for (i = 1; i <= NF; ++i) {
+			ind = index($i, "=");
+			if (ind <= 0) {
+				continue;
+			}
+			len = length($i);
+			key = substr($i, 1, ind - 1);
+			val = substr($i, ind + 1, len - ind);
+			if (key == "id") {
+				id=val;
+			}
+		}
+		if (length(id) > 0) {
+			printf "%s ", id;
+		}
+	}
+	')
+	#eecho "BUFFER $buffer"
+	eval declare -g -a "$name"=\("$buffer"\)
 }
 

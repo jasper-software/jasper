@@ -28,45 +28,6 @@ init()
 	#EXEEXT=".exe"
 	SHOWIMG="display -geometry 256x256> -geometry +0+0"
 
-#	case $HOSTNAME in
-#	localhost*)
-#		HOSTNAME=ondelette
-#		;;
-#	esac
-
-#	case $HOSTNAME in
-#	aurora)
-#		ALTIMGDIR=$HOME/data/jpeg2000_images/pnm
-#		;;
-#	ondelette*)
-#		ALTIMGDIR=$HOME/data/jpeg2000_images
-#		;;
-#	vortex*)
-#		ALTIMGDIR=d:/users/mdadams/images
-#		;;
-#	*)
-#		echo "ERROR: UNKNOWN HOST $HOSTNAME"
-#		exit 1
-#		;;
-#	esac
-
-#	case $HOSTNAME in
-#	aurora)
-#		VMTOPDIR=$HOME/work/vm90/VM9.0
-#		;;
-#	ondelette*)
-#		VMTOPDIR=$HOME/work/vm90/VM9.0
-#		;;
-#	vortex*)
-#		VMTOPDIR=/
-#		EXEEXT=".exe"
-#		;;
-#	*)
-#		echo "ERROR: UNKNOWN HOST $HOSTNAME"
-#		exit 1
-#		;;
-#	esac
-
 	#IMGDIR=$JASPERTOPDIR/data/images
 	#JASPER=$JASPERTOPDIR/src/appl/jasper$EXEEXT
 	#JIV=$JASPERTOPDIR/src/appl/jiv$EXEEXT
@@ -83,18 +44,6 @@ init()
 	VMDEC=$VMTOPDIR/bin/vm9_expand_32$EXEEXT
 	JJCOD=$CMDDIR/jj2k
 	IMGPATH="$IMGDIR:${IMGDIR}2:$ALTIMGDIR"
-
-#	case $HOSTNAME in
-#	aurora)
-#		SHOWIMG="display -geometry 256x256> -geometry +0+0"
-#		;;
-#	ondelette*)
-#		SHOWIMG="display -geometry 256x256> -geometry +0+0"
-#		;;
-#	sisley*)
-#		SHOWIMG=xv
-#		;;
-#	esac
 
 }
 

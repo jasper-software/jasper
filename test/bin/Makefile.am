@@ -60,11 +60,13 @@ EXTRA_DIST = \
 	run_test_1 \
 	run_test_2 \
 	run_test_3 \
+	run_test_4 \
 	jpcod \
 	jpdec \
 	jpenc \
-	run_test \
-	tests \
+	run_codec_test \
+	decoder_tests \
+	codec_tests \
 	utilities
 
 AM_TESTS_ENVIRONMENT = \
@@ -76,4 +78,5 @@ AM_TESTS_ENVIRONMENT = \
 TESTS = \
 	run_test_1 \
 	run_test_2 \
-	run_test_3
+	run_test_3 \
+	run_test_4

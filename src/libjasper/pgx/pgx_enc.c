@@ -112,7 +112,7 @@ int pgx_encode(jas_image_t *image, jas_stream_t *out, char *optstr)
 		}
 		break;
 	default:
-		jas_eprintf("error: BMP format does not support color space\n");
+		jas_eprintf("error: PGX format does not support color space\n");
 		return -1;
 		break;
 	}
@@ -139,9 +139,9 @@ int pgx_encode(jas_image_t *image, jas_stream_t *out, char *optstr)
 	hdr.width = width;
 	hdr.height = height;
 
-#ifdef PGX_DEBUG
-	pgx_dumphdr(stderr, &hdr);
-#endif
+	if (jas_getdbglevel() >= 10) {
+		pgx_dumphdr(stderr, &hdr);
+	}
 
 	if (pgx_puthdr(out, &hdr)) {
 		return -1;

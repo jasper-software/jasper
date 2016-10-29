@@ -1,9 +1,9 @@
 #! /bin/bash
 # Copyright (c) 2016 Michael David Adams
 
-CMDDIR=`dirname $0` || exit 1
-. $CMDDIR/utilities || exit 1
-. $CMDDIR/jpcod || exit 1
+cmd_dir=$(dirname "$0") || exit 1
+source "$cmd_dir/utilities" || exit 1
+source "$cmd_dir/jpcod" || exit 1
 
 set_source_and_build_dirs || panic "cannot set source and build directories"
 
@@ -43,7 +43,7 @@ jasper_dec()
 
 
 	if [ $DEBUG -ne 0 ]; then
-		DECOPTS="$DECOPTS -o debug=$DEBUG"
+		DECOPTS="$DECOPTS -o debug=$DEBUG --debug-level 50"
 	fi
 	if [ $MAXLYRS -ne 0 ]; then
 		DECOPTS="$DECOPTS -o maxlyrs=$MAXLYRS"
