@@ -132,6 +132,16 @@ AH_TOP([
 /* If configure is being used, this symbol will be defined automatically
   at this point in the configuration header file. */
 
+#if defined(__GNUC__)
+#define JAS_ATTRIBUTE_DISABLE_USAN \
+  __attribute__((no_sanitize_undefined))
+#elif defined(__clang__)
+#define JAS_ATTRIBUTE_DISABLE_USAN \
+  __attribute__((no_sanitize("undefined")))
+#else
+#define JAS_ATTRIBUTE_DISABLE_USAN
+#endif
+
 /* The preprocessor symbol JAS_WIN_MSVC_BUILD should not be defined
   unless the JasPer software is being built under Microsoft Windows
   using Microsoft Visual C. */

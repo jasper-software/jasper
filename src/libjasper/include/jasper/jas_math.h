@@ -116,7 +116,7 @@ extern "C" {
 *
 \******************************************************************************/
 
-__attribute__ ((no_sanitize_undefined))
+JAS_ATTRIBUTE_DISABLE_USAN
 inline static int jas_int_asr(int x, int n)
 {
 	assert(n >= 0);
@@ -126,7 +126,7 @@ inline static int jas_int_asr(int x, int n)
 	return x >> n;
 }
 
-__attribute__ ((no_sanitize_undefined))
+JAS_ATTRIBUTE_DISABLE_USAN
 inline static int jas_int_asl(int x, int n)
 {
 	assert(n >= 0);
@@ -136,7 +136,7 @@ inline static int jas_int_asl(int x, int n)
 	return x << n;
 }
 
-__attribute__ ((no_sanitize_undefined))
+JAS_ATTRIBUTE_DISABLE_USAN
 inline static int jas_fast32_asr(int_fast32_t x, int n)
 {
 	assert(n >= 0);
@@ -146,7 +146,7 @@ inline static int jas_fast32_asr(int_fast32_t x, int n)
 	return x >> n;
 }
 
-__attribute__ ((no_sanitize_undefined))
+JAS_ATTRIBUTE_DISABLE_USAN
 inline static int jas_fast32_asl(int_fast32_t x, int n)
 {
 	assert(n >= 0);
