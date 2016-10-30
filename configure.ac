@@ -73,6 +73,9 @@ dnl Initialize automake.
 AM_INIT_AUTOMAKE([1.11 foreign dist-xz dist-bzip2])
 
 m4_include([ac_m4/m4_ax_generate_changelog.m4])
+m4_include([ac_m4/m4_ax_cflags_gcc_option.m4])
+m4_include([ac_m4/m4_ax_check_compile_flag.m4])
+m4_include([ac_m4/m4_ax_append_flag.m4])
 
 AX_GENERATE_CHANGELOG
 
@@ -151,7 +154,13 @@ AH_BOTTOM([
 ############################################################
 
 AC_PROG_CC
+
+# In the ideal world, AC_PROG_CC_C11 would exist and work.
 #AC_PROG_CC_C11
+
+# Attempt to enable C11 support if available.
+AX_CHECK_COMPILE_FLAG([-std=c11], [AX_APPEND_FLAG([-std=c11])], [])
+
 AC_PROG_INSTALL
 # AC_PROG_AWK
 # AC_PROG_CPP
@@ -161,6 +170,36 @@ AM_DISABLE_SHARED
 AC_PROG_LIBTOOL
 
 AC_PATH_XTRA
+
+############################################################
+# Add a few other compiler flags.
+############################################################
+
+if test "$GCC" = yes; then
+	CFLAGS="$CFLAGS -pedantic"
+	CFLAGS="$CFLAGS -Wall -Wno-unused"
+	#CFLAGS="$CFLAGS -W -Wformat -Wmissing-prototypes -Wstrict-prototypes"
+fi
+
+AC_ARG_ENABLE(strict,
+[  --disable-strict    Disable pedantic errors.], [
+case "${enableval}" in
+yes)
+	ENABLE_STRICT=yes;;
+no)
+	ENABLE_STRICT=no;;
+*)
+	AC_MSG_ERROR(bad value ${enableval} for --disable-strict)
+	;;
+esac
+], [
+	ENABLE_STRICT=yes
+])
+if test $ENABLE_STRICT = yes; then
+	if test "$GCC" = yes; then
+		AX_APPEND_FLAG([-pedantic-errors])
+	fi
+fi
 
 ############################################################
 # Check for the IJG JPEG library.
@@ -370,16 +409,6 @@ no)
 	;;
 esac
 ], [debug=no])
-
-if test "$GCC" = yes; then
-	#CFLAGS="$CFLAGS"
-	#CFLAGS="$CFLAGS -std=c99"
-	#CFLAGS="$CFLAGS -std=c11"
-	CFLAGS="$CFLAGS -pedantic"
-	CFLAGS="$CFLAGS -pedantic-errors"
-	CFLAGS="$CFLAGS -Wall -Wno-unused"
-	#CFLAGS="$CFLAGS -W -Wformat -Wmissing-prototypes -Wstrict-prototypes"
-fi
 
 ############################################################
 # Extra stuff for research purposes.
