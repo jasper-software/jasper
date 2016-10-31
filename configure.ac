@@ -394,6 +394,17 @@ esac
 ],
 [])
 
+AC_ARG_ENABLE(msan,
+[  --enable-msan    Enable Memory Sanitizer.],
+[
+case "${enableval}" in
+yes)
+	CFLAGS="$CFLAGS -fsanitize=memory"
+	LDFLAGS="$LDFLAGS -fsanitize=memory"
+esac
+],
+[])
+
 ############################################################
 # Enable/disable extra code for debugging.
 ############################################################
