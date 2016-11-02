@@ -1122,14 +1122,14 @@ static int jpc_enc_encodemainbody(jpc_enc_t *enc)
 	int samestepsizes;
 	jpc_enc_ccp_t *ccps;
 	jpc_enc_tccp_t *tccp;
-int bandno;
-uint_fast32_t x;
-uint_fast32_t y;
-int mingbits;
-int actualnumbps;
-jpc_fix_t mxmag;
-jpc_fix_t mag;
-int numgbits;
+	int bandno;
+	uint_fast32_t x;
+	uint_fast32_t y;
+	int mingbits;
+	int actualnumbps;
+	jpc_fix_t mxmag;
+	jpc_fix_t mag;
+	int numgbits;
 
 	cp = enc->cp;
 
@@ -1215,7 +1215,7 @@ assert(jas_image_numcmpts(enc->image) == 3);
 					mxmag = 0;
 					for (y = 0; y < JAS_CAST(uint_fast32_t, jas_matrix_numrows(band->data)); ++y) {
 						for (x = 0; x < JAS_CAST(uint_fast32_t, jas_matrix_numcols(band->data)); ++x) {
-							mag = abs(jas_matrix_get(band->data, y, x));
+							mag = JAS_ABS(jas_matrix_get(band->data, y, x));
 							if (mag > mxmag) {
 								mxmag = mag;
 							}

@@ -117,9 +117,9 @@ int jpc_enc_enccblks(jpc_enc_t *enc)
 	jpc_enc_cblk_t *endcblks;
 	int i;
 	int j;
-	int mx;
-	int bmx;
-	int v;
+	jpc_fix_t mx;
+	jpc_fix_t bmx;
+	jpc_fix_t v;
 	jpc_enc_tile_t *tile;
 	uint_fast32_t prcno;
 	jpc_enc_prc_t *prc;
@@ -148,7 +148,7 @@ int jpc_enc_enccblks(jpc_enc_t *enc)
 						mx = 0;
 						for (i = 0; i < jas_matrix_numrows(cblk->data); ++i) {
 							for (j = 0; j < jas_matrix_numcols(cblk->data); ++j) {
-								v = abs(jas_matrix_get(cblk->data, i, j));
+								v = JAS_ABS(jas_matrix_get(cblk->data, i, j));
 								if (v > mx) {
 									mx = v;
 								}
@@ -407,15 +407,15 @@ dump_passes(cblk->passes, cblk->numpasses, cblk);
 
 #define	sigpass_step(fp, frowstep, dp, bitpos, one, nmsedec, orient, mqenc, vcausalflag) \
 { \
-	int f; \
+	jpc_fix_t f; \
 	int v; \
 	f = *(fp); \
 	if ((f & JPC_OTHSIGMSK) && !(f & (JPC_SIG | JPC_VISIT))) { \
-		v = (abs(*(dp)) & (one)) ? 1 : 0; \
+		v = (JAS_ABS(*(dp)) & (one)) ? 1 : 0; \
 		jpc_mqenc_setcurctx(mqenc, JPC_GETZCCTXNO(f, (orient))); \
 		jpc_mqenc_putbit(mqenc, v); \
 		if (v) { \
-			*(nmsedec) += JPC_GETSIGNMSEDEC(abs(*(dp)), (bitpos) + JPC_NUMEXTRABITS); \
+			*(nmsedec) += JPC_GETSIGNMSEDEC(JAS_ABS(*(dp)), (bitpos) + JPC_NUMEXTRABITS); \
 			v = ((*(dp) < 0) ? 1 : 0); \
 			jpc_mqenc_setcurctx(mqenc, JPC_GETSCCTXNO(f)); \
 			jpc_mqenc_putbit(mqenc, v ^ JPC_GETSPB(f)); \
@@ -506,14 +506,14 @@ static int jpc_encsigpass(jpc_mqenc_t *mqenc, int bitpos, int orient, int vcausa
 #define	rawsigpass_step(fp, frowstep, dp, bitpos, one, nmsedec, out, vcausalflag) \
 { \
 	jpc_fix_t f = *(fp); \
-	jpc_fix_t v; \
+	int v; \
 	if ((f & JPC_OTHSIGMSK) && !(f & (JPC_SIG | JPC_VISIT))) { \
-		v = (abs(*(dp)) & (one)) ? 1 : 0; \
+		v = (JAS_ABS(*(dp)) & (one)) ? 1 : 0; \
 		if ((jpc_bitstream_putbit((out), v)) == EOF) { \
 			return -1; \
 		} \
 		if (v) { \
-			*(nmsedec) += JPC_GETSIGNMSEDEC(abs(*(dp)), (bitpos) + JPC_NUMEXTRABITS); \
+			*(nmsedec) += JPC_GETSIGNMSEDEC(JAS_ABS(*(dp)), (bitpos) + JPC_NUMEXTRABITS); \
 			v = ((*(dp) < 0) ? 1 : 0); \
 			if (jpc_bitstream_putbit(out, v) == EOF) { \
 				return -1; \
@@ -619,9 +619,9 @@ static int jpc_encrawsigpass(jpc_bitstream_t *out, int bitpos, int vcausalflag, 
 	int v; \
 	if (((*(fp)) & (JPC_SIG | JPC_VISIT)) == JPC_SIG) { \
 		(d) = *(dp); \
-		*(nmsedec) += JPC_GETREFNMSEDEC(abs(d), (bitpos) + JPC_NUMEXTRABITS); \
+		*(nmsedec) += JPC_GETREFNMSEDEC(JAS_ABS(d), (bitpos) + JPC_NUMEXTRABITS); \
 		jpc_mqenc_setcurctx((mqenc), JPC_GETMAGCTXNO(*(fp))); \
-		v = (abs(d) & (one)) ? 1 : 0; \
+		v = (JAS_ABS(d) & (one)) ? 1 : 0; \
 		jpc_mqenc_putbit((mqenc), v); \
 		*(fp) |= JPC_REFINE; \
 	} \
@@ -708,11 +708,11 @@ int k;
 #define	rawrefpass_step(fp, dp, bitpos, one, nmsedec, out, vcausalflag) \
 { \
 	jpc_fix_t d; \
-	jpc_fix_t v; \
+	int v; \
 	if (((*(fp)) & (JPC_SIG | JPC_VISIT)) == JPC_SIG) { \
 		d = *(dp); \
-		*(nmsedec) += JPC_GETREFNMSEDEC(abs(d), (bitpos) + JPC_NUMEXTRABITS); \
-		v = (abs(d) & (one)) ? 1 : 0; \
+		*(nmsedec) += JPC_GETREFNMSEDEC(JAS_ABS(d), (bitpos) + JPC_NUMEXTRABITS); \
+		v = (JAS_ABS(d) & (one)) ? 1 : 0; \
 		if (jpc_bitstream_putbit((out), v) == EOF) { \
 			return -1; \
 		} \
@@ -803,19 +803,19 @@ static int jpc_encrawrefpass(jpc_bitstream_t *out, int bitpos, int vcausalflag, 
 
 #define	clnpass_step(fp, frowstep, dp, bitpos, one, orient, nmsedec, mqenc, label1, label2, vcausalflag) \
 { \
-	int f; \
+	jpc_fix_t f; \
 	int v; \
 label1 \
 	f = *(fp); \
 	if (!(f & (JPC_SIG | JPC_VISIT))) { \
 		jpc_mqenc_setcurctx(mqenc, JPC_GETZCCTXNO(f, (orient))); \
-		v = (abs(*(dp)) & (one)) ? 1 : 0; \
+		v = (JAS_ABS(*(dp)) & (one)) ? 1 : 0; \
 		jpc_mqenc_putbit((mqenc), v); \
 		if (v) { \
 label2 \
 			f = *(fp); \
 			/* Coefficient is significant. */ \
-			*(nmsedec) += JPC_GETSIGNMSEDEC(abs(*(dp)), (bitpos) + JPC_NUMEXTRABITS); \
+			*(nmsedec) += JPC_GETSIGNMSEDEC(JAS_ABS(*(dp)), (bitpos) + JPC_NUMEXTRABITS); \
 			jpc_mqenc_setcurctx((mqenc), JPC_GETSCCTXNO(f)); \
 			v = ((*(dp) < 0) ? 1 : 0); \
 			jpc_mqenc_putbit((mqenc), v ^ JPC_GETSPB(f)); \
@@ -876,7 +876,7 @@ static int jpc_encclnpass(jpc_mqenc_t *mqenc, int bitpos, int orient, int vcausa
 			  !((*fp) & (JPC_SIG | JPC_VISIT | JPC_OTHSIGMSK)))) {
 				dp = dvscanstart;
 				for (k = 0; k < vscanlen; ++k) {
-					v = (abs(*dp) & one) ? 1 : 0;
+					v = (JAS_ABS(*dp) & one) ? 1 : 0;
 					if (v) {
 						break;
 					}

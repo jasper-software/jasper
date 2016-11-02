@@ -75,6 +75,7 @@
 \******************************************************************************/
 
 #include <jasper/jas_config.h>
+#include <jasper/jas_types.h>
 
 #include <assert.h>
 #include <stdio.h>
@@ -119,6 +120,9 @@ extern "C" {
 JAS_ATTRIBUTE_DISABLE_USAN
 inline static int jas_int_asr(int x, int n)
 {
+	// Ensure that the shift of a negative value appears to behave as a
+	// signed arithmetic shift.
+	assert(((-1) >> 1) == -1);
 	assert(n >= 0);
 	// The behavior is undefined when x is negative. */
 	// We tacitly assume the behavior is equivalent to a signed
@@ -129,6 +133,9 @@ inline static int jas_int_asr(int x, int n)
 JAS_ATTRIBUTE_DISABLE_USAN
 inline static int jas_int_asl(int x, int n)
 {
+	// Ensure that the shift of a negative value appears to behave as a
+	// signed arithmetic shift.
+	assert(((-1) << 1) == -2);
 	assert(n >= 0);
 	// The behavior is undefined when x is negative. */
 	// We tacitly assume the behavior is equivalent to a signed
@@ -139,6 +146,9 @@ inline static int jas_int_asl(int x, int n)
 JAS_ATTRIBUTE_DISABLE_USAN
 inline static int jas_fast32_asr(int_fast32_t x, int n)
 {
+	// Ensure that the shift of a negative value appears to behave as a
+	// signed arithmetic shift.
+	assert(((JAS_CAST(int_fast32_t, -1)) >> 1) == JAS_CAST(int_fast32_t, -1));
 	assert(n >= 0);
 	// The behavior is undefined when x is negative. */
 	// We tacitly assume the behavior is equivalent to a signed
@@ -149,6 +159,9 @@ inline static int jas_fast32_asr(int_fast32_t x, int n)
 JAS_ATTRIBUTE_DISABLE_USAN
 inline static int jas_fast32_asl(int_fast32_t x, int n)
 {
+	// Ensure that the shift of a negative value appears to behave as a
+	// signed arithmetic shift.
+	assert(((JAS_CAST(int_fast32_t, -1)) << 1) == JAS_CAST(int_fast32_t, -2));
 	assert(n >= 0);
 	// The behavior is undefined when x is negative. */
 	// We tacitly assume the behavior is equivalent to a signed

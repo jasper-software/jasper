@@ -93,8 +93,12 @@ extern "C" {
  * Miscellaneous constants.
  */
 
+/* Basic units */
+#define JAS_IMAGE_KIBI			(JAS_CAST(size_t, 1024))
+#define JAS_IMAGE_MEBI			(JAS_IMAGE_KIBI * JAS_IMAGE_KIBI)
+
 /* The threshold at which image data is no longer stored in memory. */
-#define JAS_IMAGE_INMEMTHRESH	(16 * 1024 * 1024)
+#define JAS_IMAGE_INMEMTHRESH	(256 * JAS_IMAGE_MEBI)
 
 /*
  * Component types

@@ -440,7 +440,7 @@ double pae(jas_matrix_t *x, jas_matrix_t *y)
 	s = 0.0;
 	for (i = 0; i < jas_matrix_numrows(x); i++) {
 		for (j = 0; j < jas_matrix_numcols(x); j++) {
-			d = abs(jas_matrix_get(y, i, j) - jas_matrix_get(x, i, j));
+			d = JAS_ABS(jas_matrix_get(y, i, j) - jas_matrix_get(x, i, j));
 			if (d > s) {
 				s = d;
 			}

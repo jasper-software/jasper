@@ -377,7 +377,7 @@ static void displayfunc()
 
 	assert(regwidth > 0);
 	assert(regheight > 0);
-	assert(abs(((double) regheight / regwidth) - ((double) gs.viewportheight / gs.viewportwidth)) < 1e-5);
+	assert(JAS_ABS(((double) regheight / regwidth) - ((double) gs.viewportheight / gs.viewportwidth)) < 1e-5);
 
 	glClear(GL_COLOR_BUFFER_BIT);
 	glPixelStorei(GL_UNPACK_ALIGNMENT, sizeof(GLshort));
