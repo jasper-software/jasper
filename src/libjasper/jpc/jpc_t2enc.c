@@ -189,6 +189,9 @@ int jpc_enc_encpkt(jpc_enc_t *enc, jas_stream_t *out, int compno, int lvlno, int
 	jpc_enc_cp_t *cp;
 	jpc_ms_t *ms;
 
+	JAS_DBGLOG(10, ("encoding packet begin %d %d %d %d\n", compno, lvlno,
+	  prcno, lyrno));
+
 	tile = enc->curtile;
 	cp = enc->cp;
 
@@ -203,14 +206,15 @@ int jpc_enc_encpkt(jpc_enc_t *enc, jas_stream_t *out, int compno, int lvlno, int
 		jpc_ms_destroy(ms);
 	}
 
-	outb = jpc_bitstream_sopen(out, "w+");
-	assert(outb);
+	if (!(outb = jpc_bitstream_sopen(out, "w+"))) {
+		abort();
+	}
 
 	if (jpc_bitstream_putbit(outb, 1) == EOF) {
 		return -1;
 	}
-	JAS_DBGLOG(10, ("\n"));
-	JAS_DBGLOG(10, ("present. "));
+	//JAS_DBGLOG(10, ("\n"));
+	JAS_DBGLOG(10, ("present.\n"));
 
 	comp = &tile->tcmpts[compno];
 	lvl = &comp->rlvls[lvlno];
@@ -247,8 +251,8 @@ int jpc_enc_encpkt(jpc_enc_t *enc, jas_stream_t *out, int compno, int lvlno, int
 			if (!cblk->numencpasses) {
 				leaf = jpc_tagtree_getleaf(prc->incltree,
 				  cblk - prc->cblks);
-				if (jpc_tagtree_encode(prc->incltree, leaf, lyrno
-				  + 1, outb) < 0) {
+				if (jpc_tagtree_encode(prc->incltree, leaf, lyrno + 1, outb) <
+				  0) {
 					return -1;
 				}
 			} else {
@@ -264,7 +268,8 @@ int jpc_enc_encpkt(jpc_enc_t *enc, jas_stream_t *out, int compno, int lvlno, int
 				i = 1;
 				leaf = jpc_tagtree_getleaf(prc->nlibtree, cblk - prc->cblks);
 				for (;;) {
-					if ((ret = jpc_tagtree_encode(prc->nlibtree, leaf, i, outb)) < 0) {
+					if ((ret = jpc_tagtree_encode(prc->nlibtree, leaf, i,
+					  outb)) < 0) {
 						return -1;
 					}
 					if (ret) {
@@ -315,8 +320,10 @@ int jpc_enc_encpkt(jpc_enc_t *enc, jas_stream_t *out, int compno, int lvlno, int
 			for (pass = startpass; pass != endpass; ++pass) {
 				if (pass->term || pass == lastpass) {
 					datalen = pass->end - n;
-assert(jpc_firstone(datalen) < cblk->numlenbits + jpc_floorlog2(passcount));
-					if (jpc_bitstream_putbits(outb, cblk->numlenbits + jpc_floorlog2(passcount), datalen) == EOF) {
+					assert(jpc_firstone(datalen) < cblk->numlenbits +
+					  jpc_floorlog2(passcount));
+					if (jpc_bitstream_putbits(outb, cblk->numlenbits +
+					  jpc_floorlog2(passcount), datalen) == EOF) {
 						return -1;
 					}
 					n += datalen;
@@ -375,7 +382,8 @@ assert(jpc_firstone(datalen) < cblk->numlenbits + jpc_floorlog2(passcount));
 
 			jas_stream_seek(cblk->stream, startpass->start, SEEK_SET);
 			assert(jas_stream_tell(cblk->stream) == startpass->start);
-			if (jas_stream_copy(out, cblk->stream, lastpass->end - startpass->start)) {
+			if (jas_stream_copy(out, cblk->stream, lastpass->end -
+			  startpass->start)) {
 				return -1;
 			}
 			cblk->curpass = (endpass != endpasses) ? endpass : 0;
@@ -383,6 +391,8 @@ assert(jpc_firstone(datalen) < cblk->numlenbits + jpc_floorlog2(passcount));
 
 		}
 	}
+
+	JAS_DBGLOG(10, ("encoding packet end\n"));
 
 	return 0;
 }

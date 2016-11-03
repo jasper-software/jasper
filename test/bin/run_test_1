@@ -34,6 +34,7 @@ for in_file in "${good_list[@]}"; do
 	echo "exit status: $status"
 	if [ "$status" -ne 0 ]; then
 		#panic "Command has unexpected exit status"
+		echo "imginfo command had unexpected exit status (expected 0 got $status)"
 		error_count=$((error_count + 1))
 	fi
 done
@@ -60,6 +61,7 @@ for in_file in "${bad_list[@]}"; do
 	echo "exit status: $status"
 	if [ "$status" -ne 1 ]; then
 		#panic "Command has unexpected exit status"
+		echo "imginfo command had unexpected exit status (expected 1 got $status)"
 		error_count=$((error_count + 1))
 	fi
 done

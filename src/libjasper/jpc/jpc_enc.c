@@ -1330,11 +1330,13 @@ and other characteristics */
 			}
 		}
 
-		for (cmptno = 0, comp = tile->tcmpts; cmptno < JAS_CAST(int, cp->numcmpts); ++cmptno, ++comp) {
+		for (cmptno = 0, comp = tile->tcmpts; cmptno < JAS_CAST(int,
+		  cp->numcmpts); ++cmptno, ++comp) {
 			ccps = &cp->ccps[cmptno];
 			if (JAS_CAST(int, ccps->numstepsizes) == comp->numstepsizes) {
 				samestepsizes = 1;
-				for (bandno = 0; bandno < JAS_CAST(int, ccps->numstepsizes); ++bandno) {
+				for (bandno = 0; bandno < JAS_CAST(int, ccps->numstepsizes);
+				  ++bandno) {
 					if (ccps->stepsizes[bandno] != comp->stepsizes[bandno]) {
 						samestepsizes = 0;
 						break;
@@ -1373,16 +1375,17 @@ and other characteristics */
 		}
 		jpc_ms_destroy(enc->mrk);
 		enc->mrk = 0;
-tilehdrlen = jas_stream_getrwcount(enc->tmpstream);
+		tilehdrlen = jas_stream_getrwcount(enc->tmpstream);
+		assert(tilehdrlen >= 0);
 
 /************************************************************************/
 /************************************************************************/
 /************************************************************************/
 
-if (jpc_enc_enccblks(enc)) {
-	abort();
-	return -1;
-}
+		if (jpc_enc_enccblks(enc)) {
+			abort();
+			return -1;
+		}
 
 		cp = enc->cp;
 		rho = (double) (tile->brx - tile->tlx) * (tile->bry - tile->tly) /
@@ -1394,11 +1397,24 @@ if (jpc_enc_enccblks(enc)) {
 			tile->lyrsizes[lyrno] = tile->rawsize * jpc_fixtodbl(
 			  cp->tcp.ilyrrates[lyrno]);
 		}
-		tile->lyrsizes[tile->numlyrs - 1] = (cp->totalsize != UINT_FAST32_MAX) ?
+#if !defined(__clang__)
+		// WARNING:
+		// Some versions of Clang (e.g., 3.7.1 and 3.8.1) appear to generate
+		// incorrect code for the following line.
+		tile->lyrsizes[tile->numlyrs - 1] =
+		  (cp->totalsize != UINT_FAST32_MAX) ?
 		  (rho * enc->mainbodysize) : UINT_FAST32_MAX;
+#else
+		if (cp->totalsize != UINT_FAST32_MAX) {
+			tile->lyrsizes[tile->numlyrs - 1] = (rho * enc->mainbodysize);
+		} else {
+			tile->lyrsizes[tile->numlyrs - 1] = UINT_FAST32_MAX;
+		}
+#endif
+//jas_eprintf("TESTING %ld %ld\n", cp->totalsize != UINT_FAST32_MAX, tile->lyrsizes[0]);
 		for (lyrno = 0; lyrno < tile->numlyrs; ++lyrno) {
 			if (tile->lyrsizes[lyrno] != UINT_FAST32_MAX) {
-				if (tilehdrlen <= JAS_CAST(long, tile->lyrsizes[lyrno])) {
+				if (JAS_CAST(uint_fast32_t, tilehdrlen) <= tile->lyrsizes[lyrno]) {
 					tile->lyrsizes[lyrno] -= tilehdrlen;
 				} else {
 					tile->lyrsizes[lyrno] = 0;
@@ -1630,7 +1646,7 @@ int rateallocate(jpc_enc_t *enc, int numlyrs, uint_fast32_t *cumlens)
 	jpc_flt_t lo;
 	jpc_flt_t hi;
 	jas_stream_t *out;
-	long cumlen;
+	uint_fast32_t cumlen;
 	int lyrno;
 	jpc_flt_t thresh;
 	jpc_flt_t goodthresh;
@@ -1655,6 +1671,8 @@ int rateallocate(jpc_enc_t *enc, int numlyrs, uint_fast32_t *cumlens)
 	jpc_enc_tile_t *tile;
 	jpc_enc_prc_t *prc;
 	int prcno;
+
+	JAS_DBGLOG(10, ("starting rate allocation\n"));
 
 	tile = enc->curtile;
 
@@ -1684,7 +1702,8 @@ int rateallocate(jpc_enc_t *enc, int numlyrs, uint_fast32_t *cumlens)
 				if (!band->data) {
 					continue;
 				}
-				for (prcno = 0, prc = band->prcs; prcno < lvl->numprcs; ++prcno, ++prc) {
+				for (prcno = 0, prc = band->prcs; prcno < lvl->numprcs;
+				  ++prcno, ++prc) {
 					if (!prc->cblks) {
 						continue;
 					}
@@ -1707,9 +1726,8 @@ int rateallocate(jpc_enc_t *enc, int numlyrs, uint_fast32_t *cumlens)
 			}
 		}
 	}
-if (jas_getdbglevel()) {
-	jas_eprintf("min rdslope = %f max rdslope = %f\n", mnrdslope, mxrdslope);
-}
+	JAS_DBGLOG(10, ("min rdslope = %f max rdslope = %f\n", mnrdslope,
+	  mxrdslope));
 
 	jpc_init_t2state(enc, 1);
 
@@ -1755,7 +1773,8 @@ if (jas_getdbglevel()) {
 						if (!band->data) {
 							continue;
 						}
-						for (prcno = 0, prc = band->prcs; prcno < lvl->numprcs; ++prcno, ++prc) {
+						for (prcno = 0, prc = band->prcs; prcno < lvl->numprcs;
+						  ++prcno, ++prc) {
 							if (!prc->cblks) {
 								continue;
 							}
@@ -1764,12 +1783,14 @@ if (jas_getdbglevel()) {
 								if (cblk->curpass) {
 									endpasses = &cblk->passes[cblk->numpasses];
 									pass1 = cblk->curpass;
-									for (pass = cblk->curpass; pass != endpasses; ++pass) {
+									for (pass = cblk->curpass; pass !=
+									  endpasses; ++pass) {
 										if (pass->rdslope >= thresh) {
 											pass1 = &pass[1];
 										}
 									}
-									for (pass = cblk->curpass; pass != pass1; ++pass) {
+									for (pass = cblk->curpass; pass != pass1;
+									  ++pass) {
 										pass->lyrno = lyrno;
 									}
 									for (; pass != endpasses; ++pass) {
@@ -1791,7 +1812,8 @@ if (jas_getdbglevel()) {
 						continue;
 					}
 					for (prcno = 0; prcno < lvl->numprcs; ++prcno) {
-						if (jpc_enc_encpkt(enc, out, comp - tile->tcmpts, lvl - comp->rlvls, prcno, lyrno)) {
+						if (jpc_enc_encpkt(enc, out, comp - tile->tcmpts,
+						  lvl - comp->rlvls, prcno, lyrno)) {
 							return -1;
 						}
 					}
@@ -1820,9 +1842,8 @@ if (jas_getdbglevel()) {
 				abort();
 			}
 
-if (jas_getdbglevel()) {
-jas_eprintf("maxlen=%08ld actuallen=%08ld thresh=%f\n", cumlen, pos, thresh);
-}
+			JAS_DBGLOG(10, ("maxlen=%08ld actuallen=%08ld thresh=%f\n",
+			  cumlen, pos, thresh));
 
 			++numiters;
 		} while (lo < hi - 1e-3 && numiters < 32);
@@ -1831,9 +1852,7 @@ jas_eprintf("maxlen=%08ld actuallen=%08ld thresh=%f\n", cumlen, pos, thresh);
 			jas_eprintf("warning: empty layer generated\n");
 		}
 
-if (jas_getdbglevel()) {
-jas_eprintf("success %d goodthresh %f\n", success, goodthresh);
-}
+		JAS_DBGLOG(10, ("success %d goodthresh %f\n", success, goodthresh));
 
 		/* Assign all passes with R-D slopes greater than or
 		  equal to the selected threshold to this layer. */
@@ -1841,15 +1860,16 @@ jas_eprintf("success %d goodthresh %f\n", success, goodthresh);
 		for (comp = tile->tcmpts; comp != endcomps; ++comp) {
 			endlvls = &comp->rlvls[comp->numrlvls];
 			for (lvl = comp->rlvls; lvl != endlvls; ++lvl) {
-if (!lvl->bands) {
-	continue;
-}
+				if (!lvl->bands) {
+					continue;
+				}
 				endbands = &lvl->bands[lvl->numbands];
 				for (band = lvl->bands; band != endbands; ++band) {
 					if (!band->data) {
 						continue;
 					}
-					for (prcno = 0, prc = band->prcs; prcno < lvl->numprcs; ++prcno, ++prc) {
+					for (prcno = 0, prc = band->prcs; prcno < lvl->numprcs;
+					  ++prcno, ++prc) {
 						if (!prc->cblks) {
 							continue;
 						}
@@ -1859,13 +1879,15 @@ if (!lvl->bands) {
 								endpasses = &cblk->passes[cblk->numpasses];
 								pass1 = cblk->curpass;
 								if (success) {
-									for (pass = cblk->curpass; pass != endpasses; ++pass) {
+									for (pass = cblk->curpass; pass !=
+									  endpasses; ++pass) {
 										if (pass->rdslope >= goodthresh) {
 											pass1 = &pass[1];
 										}
 									}
 								}
-								for (pass = cblk->curpass; pass != pass1; ++pass) {
+								for (pass = cblk->curpass; pass != pass1;
+								  ++pass) {
 									pass->lyrno = lyrno;
 								}
 								for (; pass != endpasses; ++pass) {
@@ -1887,7 +1909,8 @@ if (!lvl->bands) {
 					continue;
 				}
 				for (prcno = 0; prcno < lvl->numprcs; ++prcno) {
-					if (jpc_enc_encpkt(enc, out, comp - tile->tcmpts, lvl - comp->rlvls, prcno, lyrno)) {
+					if (jpc_enc_encpkt(enc, out, comp - tile->tcmpts,
+					  lvl - comp->rlvls, prcno, lyrno)) {
 						return -1;
 					}
 				}
@@ -1901,10 +1924,7 @@ if (!lvl->bands) {
 
 	jas_stream_close(out);
 
-	JAS_DBGLOG(10, ("done doing rateallocation\n"));
-#if 0
-jas_eprintf("DONE RATE ALLOCATE\n");
-#endif
+	JAS_DBGLOG(10, ("finished rate allocation\n"));
 
 	return 0;
 }

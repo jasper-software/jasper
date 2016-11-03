@@ -27,6 +27,8 @@ jiv="$abs_top_builddir/src/appl/jiv"
 image_path="$data_dir/images"
 
 in_files=()
+in_files+=(small_1x1.pnm)
+in_files+=(small_16x1.pnm)
 in_files+=(stawamuschief.pnm)
 in_files+=(stawamuschief_gray.pnm)
 in_files+=(goldenears.bmp)
@@ -66,8 +68,14 @@ for in_file in "${in_files[@]}"; do
 		fi
 		echo "TEST CASE: $in_file_base $image_format"
 		rm -f "$tmp_file"
-		"$jasper" -f "$in_file" -T "$image_format" 2> /dev/null | \
-		  "$jasper" -T "$image_format" > "$tmp_file" 2> /dev/null
+		enc_opts=()
+		enc_opts+=(-f "$in_file")
+		enc_opts+=(-T "$image_format")
+		dec_opts=()
+		dec_opts+=(-T "$image_format")
+		echo "Running $jasper ${enc_opts[@]} | $jasper ${dec_opts[@]} > $tmp_file"
+		"$jasper" "${enc_opts[@]}" 2> /dev/null | \
+		  "$jasper" "${dec_opts[@]}" > "$tmp_file" 2> /dev/null
 		pae=$("$imgcmp" -f "$in_file" -F "$tmp_file" -m pae --max \
 		  2> /dev/null) || \
 		  panic "cannot compare image files $in_file and $tmp_file"
