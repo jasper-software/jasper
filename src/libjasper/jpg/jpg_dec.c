@@ -145,7 +145,14 @@ jas_image_t *jpg_decode(jas_stream_t *in, char *optstr)
 	/* Avoid compiler warnings about unused parameters. */
 	optstr = 0;
 
+	// In theory, the two memset calls that follow are not needed.
+	// They are only here to make the code more predictable in the event
+	// that the JPEG library fails to initialize a member.
+	memset(&cinfo, 0, sizeof(struct jpeg_decompress_struct));
+	memset(dest_mgr, 0, sizeof(jpg_dest_t));
+
 	dest_mgr->data = 0;
+
 	image = 0;
 	input_file = 0;
 	if (!(input_file = tmpfile())) {
