@@ -181,7 +181,9 @@ inline static bool jas_safe_size_mul(size_t x, size_t y, size_t *result)
 		/* Overflow would occur. */
 		return false;
 	}
-	*result = x * y;
+	if (result) {
+		*result = x * y;
+	}
 	return true;
 }
 
@@ -191,7 +193,9 @@ inline static bool jas_safe_size_add(size_t x, size_t y, size_t *result)
 	if (y > SIZE_MAX - x) {
 		return false;
 	}
-	*result = x + y;
+	if (result) {
+		*result = x + y;
+	}
 	return true;
 }
 
@@ -201,7 +205,23 @@ inline static bool jas_safe_size_sub(size_t x, size_t y, size_t *result)
 	if (y > x) {
 		return false;
 	}
-	*result = x - y;
+	if (result) {
+		*result = x - y;
+	}
+	return true;
+}
+
+/* Compute the sum of two size_t integer with overflow checking. */
+inline static bool jas_safe_intfast32_add(int_fast32_t x, int_fast32_t y,
+  int_fast32_t *result)
+{
+	if ((y > 0 && x > INT_FAST32_MAX - y) ||
+	  (y < 0 && x < INT_FAST32_MIN - y)) {
+		return false;
+	}
+	if (result) {
+		*result = x + y;
+	}
 	return true;
 }
 

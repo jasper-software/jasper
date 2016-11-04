@@ -97,9 +97,10 @@
 
 static jas_image_cmpt_t *jas_image_cmpt_create0(void);
 static void jas_image_cmpt_destroy(jas_image_cmpt_t *cmpt);
-static jas_image_cmpt_t *jas_image_cmpt_create(uint_fast32_t tlx, uint_fast32_t tly,
-  uint_fast32_t hstep, uint_fast32_t vstep, uint_fast32_t width, uint_fast32_t
-  height, uint_fast16_t depth, bool sgnd, uint_fast32_t inmem);
+static jas_image_cmpt_t *jas_image_cmpt_create(int_fast32_t tlx,
+  int_fast32_t tly, int_fast32_t hstep, int_fast32_t vstep,
+  int_fast32_t width, int_fast32_t height, uint_fast16_t depth, bool sgnd,
+  uint_fast32_t inmem);
 static void jas_image_setbbox(jas_image_t *image);
 static jas_image_cmpt_t *jas_image_cmpt_copy(jas_image_cmpt_t *cmpt);
 static int jas_image_growcmpts(jas_image_t *image, int maxcmpts);
@@ -306,13 +307,22 @@ void jas_image_destroy(jas_image_t *image)
 	jas_free(image);
 }
 
-static jas_image_cmpt_t *jas_image_cmpt_create(uint_fast32_t tlx,
-  uint_fast32_t tly, uint_fast32_t hstep, uint_fast32_t vstep,
-  uint_fast32_t width, uint_fast32_t height, uint_fast16_t depth, bool sgnd,
+static jas_image_cmpt_t *jas_image_cmpt_create(int_fast32_t tlx,
+  int_fast32_t tly, int_fast32_t hstep, int_fast32_t vstep,
+  int_fast32_t width, int_fast32_t height, uint_fast16_t depth, bool sgnd,
   uint_fast32_t inmem)
 {
 	jas_image_cmpt_t *cmpt;
 	size_t size;
+
+	cmpt = 0;
+	if (width < 0 || height < 0 || hstep <= 0 || vstep <= 0) {
+		goto error;
+	}
+	if (!jas_safe_intfast32_add(tlx, width, 0) ||
+	  !jas_safe_intfast32_add(tly, height, 0)) {
+		goto error;
+	}
 
 	if (!(cmpt = jas_malloc(sizeof(jas_image_cmpt_t)))) {
 		goto error;

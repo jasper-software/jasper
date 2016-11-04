@@ -124,6 +124,8 @@ extern "C" {
 
 /* Image coordinate. */
 typedef int_fast32_t jas_image_coord_t;
+#define JAS_IMAGE_COORD_MAX INT_FAST32_MAX
+#define JAS_IMAGE_COORD_MIN INT_FAST32_MIN
 
 /* Color space (e.g., RGB, YCbCr). */
 typedef int_fast16_t jas_image_colorspc_t;
