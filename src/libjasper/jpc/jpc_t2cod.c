@@ -432,18 +432,18 @@ static int jpc_pi_nextcprl(register jpc_pi_t *pi)
 	  &pi->picomps[pi->compno]; pi->compno < JAS_CAST(int, pchg->compnoend) && pi->compno < pi->numcomps; ++pi->compno,
 	  ++pi->picomp) {
 		pirlvl = pi->picomp->pirlvls;
-		pi->xstep = pi->picomp->hsamp * (1 << (pirlvl->prcwidthexpn +
-		  pi->picomp->numrlvls - 1));
-		pi->ystep = pi->picomp->vsamp * (1 << (pirlvl->prcheightexpn +
-		  pi->picomp->numrlvls - 1));
+		pi->xstep = pi->picomp->hsamp * (JAS_CAST(uint_fast32_t, 1) <<
+		  (pirlvl->prcwidthexpn + pi->picomp->numrlvls - 1));
+		pi->ystep = pi->picomp->vsamp * (JAS_CAST(uint_fast32_t, 1) <<
+		  (pirlvl->prcheightexpn + pi->picomp->numrlvls - 1));
 		for (rlvlno = 1, pirlvl = &pi->picomp->pirlvls[1];
 		  rlvlno < pi->picomp->numrlvls; ++rlvlno, ++pirlvl) {
-			pi->xstep = JAS_MIN(pi->xstep, pi->picomp->hsamp * (1 <<
-			  (pirlvl->prcwidthexpn + pi->picomp->numrlvls -
-			  rlvlno - 1)));
-			pi->ystep = JAS_MIN(pi->ystep, pi->picomp->vsamp * (1 <<
-			  (pirlvl->prcheightexpn + pi->picomp->numrlvls -
-			  rlvlno - 1)));
+			pi->xstep = JAS_MIN(pi->xstep, pi->picomp->hsamp *
+			  (JAS_CAST(uint_fast32_t, 1) << (pirlvl->prcwidthexpn +
+			  pi->picomp->numrlvls - rlvlno - 1)));
+			pi->ystep = JAS_MIN(pi->ystep, pi->picomp->vsamp *
+			  (JAS_CAST(uint_fast32_t, 1) << (pirlvl->prcheightexpn +
+			  pi->picomp->numrlvls - rlvlno - 1)));
 		}
 		for (pi->y = pi->ystart; pi->y < pi->yend;
 		  pi->y += pi->ystep - (pi->y % pi->ystep)) {
