@@ -159,13 +159,17 @@ jas_image_t *jpg_decode(jas_stream_t *in, char *optstr)
 	rewind(input_file);
 
 	/* Allocate and initialize a JPEG decompression object. */
+	JAS_DBGLOG(10, ("jpeg_std_error(%p)\n", &jerr));
 	cinfo.err = jpeg_std_error(&jerr);
+	JAS_DBGLOG(10, ("jpeg_create_decompress(%p)\n", &cinfo));
 	jpeg_create_decompress(&cinfo);
 
 	/* Specify the data source for decompression. */
+	JAS_DBGLOG(10, ("jpeg_stdio_src(%p, %p)\n", &cinfo, input_file));
 	jpeg_stdio_src(&cinfo, input_file);
 
 	/* Read the file header to obtain the image information. */
+	JAS_DBGLOG(10, ("jpeg_read_header(%p, TRUE)\n", &cinfo));
 	jpeg_read_header(&cinfo, TRUE);
 	JAS_DBGLOG(10, (
 	  "header: image_width %d; image_height %d; num_components %d\n",
@@ -173,6 +177,7 @@ jas_image_t *jpg_decode(jas_stream_t *in, char *optstr)
 	  );
 
 	/* Start the decompressor. */
+	JAS_DBGLOG(10, ("jpeg_start_decompress(%p)\n", &cinfo));
 	jpeg_start_decompress(&cinfo);
 	JAS_DBGLOG(10, (
 	  "header: output_width %d; output_height %d; output_components %d\n",
@@ -203,6 +208,8 @@ jas_image_t *jpg_decode(jas_stream_t *in, char *optstr)
 	/* Process the compressed data. */
 	(*dest_mgr->start_output)(&cinfo, dest_mgr);
 	while (cinfo.output_scanline < cinfo.output_height) {
+		JAS_DBGLOG(10, ("jpeg_read_scanlines(%p, %p, %ul)\n", &cinfo,
+		  dest_mgr->buffer, JAS_CAST(unsigned long, dest_mgr->buffer_height)));
 		num_scanlines = jpeg_read_scanlines(&cinfo, dest_mgr->buffer,
 		  dest_mgr->buffer_height);
 		(*dest_mgr->put_pixel_rows)(&cinfo, dest_mgr, num_scanlines);
@@ -210,13 +217,16 @@ jas_image_t *jpg_decode(jas_stream_t *in, char *optstr)
 	(*dest_mgr->finish_output)(&cinfo, dest_mgr);
 
 	/* Complete the decompression process. */
+	JAS_DBGLOG(10, ("jpeg_finish_decompress(%p)\n", &cinfo));
 	jpeg_finish_decompress(&cinfo);
 
 	/* Destroy the JPEG decompression object. */
+	JAS_DBGLOG(10, ("jpeg_destroy_decompress(%p)\n", &cinfo));
 	jpeg_destroy_decompress(&cinfo);
 
 	jas_matrix_destroy(dest_mgr->data);
 
+	JAS_DBGLOG(10, ("fclose(%p)\n", input_file));
 	fclose(input_file);
 	input_file = 0;
 
@@ -321,6 +331,8 @@ static void jpg_start_output(j_decompress_ptr cinfo, jpg_dest_t *dinfo)
 	/* Avoid compiler warnings about unused parameters. */
 	cinfo = 0;
 
+	JAS_DBGLOG(10, ("jpg_start_output(%p, %p)\n", cinfo, dinfo));
+
 	dinfo->row = 0;
 }
 
@@ -331,6 +343,8 @@ static void jpg_put_pixel_rows(j_decompress_ptr cinfo, jpg_dest_t *dinfo,
 	int cmptno;
 	JDIMENSION x;
 	uint_fast32_t width;
+
+	JAS_DBGLOG(10, ("jpg_put_pixel_rows(%p, %p)\n", cinfo, dinfo));
 
 	if (dinfo->error) {
 		return;
@@ -355,6 +369,8 @@ static void jpg_put_pixel_rows(j_decompress_ptr cinfo, jpg_dest_t *dinfo,
 
 static void jpg_finish_output(j_decompress_ptr cinfo, jpg_dest_t *dinfo)
 {
+	JAS_DBGLOG(10, ("jpg_finish_output(%p, %p)\n", cinfo, dinfo));
+
 	/* Avoid compiler warnings about unused parameters. */
 	cinfo = 0;
 	dinfo = 0;

@@ -86,6 +86,7 @@
 #include <io.h>
 #endif
 
+#include "jasper/jas_debug.h"
 #include "jasper/jas_types.h"
 #include "jasper/jas_stream.h"
 #include "jasper/jas_malloc.h"
@@ -173,6 +174,8 @@ jas_stream_t *jas_stream_memopen(char *buf, int bufsize)
 	jas_stream_t *stream;
 	jas_stream_memobj_t *obj;
 
+	JAS_DBGLOG(100, ("jas_stream_memopen(%p, %d)\n", buf, bufsize));
+
 	if (!(stream = jas_stream_create())) {
 		return 0;
 	}
@@ -219,6 +222,8 @@ jas_stream_t *jas_stream_memopen(char *buf, int bufsize)
 		jas_stream_close(stream);
 		return 0;
 	}
+	JAS_DBGLOG(100, ("jas_stream_memopen buffer buf=%p myalloc=%d\n",
+	  obj->buf_, obj->myalloc_));
 
 	if (bufsize > 0 && buf) {
 		/* If a buffer was supplied by the caller and its length is positive,
@@ -454,6 +459,8 @@ static void jas_stream_destroy(jas_stream_t *stream)
 	/* If the memory for the buffer was allocated with malloc, free
 	this memory. */
 	if ((stream->bufmode_ & JAS_STREAM_FREEBUF) && stream->bufbase_) {
+		JAS_DBGLOG(100, ("jas_stream_destroy freeing buffer %p\n",
+		  stream->bufbase_));
 		jas_free(stream->bufbase_);
 		stream->bufbase_ = 0;
 	}
@@ -984,6 +991,8 @@ static int mem_read(jas_stream_obj_t *obj, char *buf, int cnt)
 	int n;
 	assert(cnt >= 0);
 	assert(buf);
+
+	JAS_DBGLOG(100, ("mem_read(%p, %p, %d)\n", obj, buf, cnt));
 	jas_stream_memobj_t *m = (jas_stream_memobj_t *)obj;
 	n = m->len_ - m->pos_;
 	cnt = JAS_MIN(n, cnt);
@@ -998,10 +1007,14 @@ static int mem_resize(jas_stream_memobj_t *m, int bufsize)
 
 	//assert(m->buf_);
 	assert(bufsize >= 0);
+
+	JAS_DBGLOG(100, ("mem_resize(%p, %d)\n", m, bufsize));
 	if (!(buf = jas_realloc2(m->buf_, bufsize, sizeof(unsigned char))) &&
 	  bufsize) {
+		JAS_DBGLOG(100, ("mem_resize realloc failed\n"));
 		return -1;
 	}
+	JAS_DBGLOG(100, ("mem_resize realloc succeeded\n"));
 	m->buf_ = buf;
 	m->bufsize_ = bufsize;
 	return 0;
@@ -1017,6 +1030,8 @@ static int mem_write(jas_stream_obj_t *obj, char *buf, int cnt)
 
 	assert(buf);
 	assert(cnt >= 0);
+
+	JAS_DBGLOG(100, ("mem_write(%p, %p, %d)\n", obj, buf, cnt));
 	newpos = m->pos_ + cnt;
 	if (newpos > m->bufsize_ && m->growable_) {
 		newbufsize = m->bufsize_;
@@ -1024,6 +1039,10 @@ static int mem_write(jas_stream_obj_t *obj, char *buf, int cnt)
 			newbufsize <<= 1;
 			assert(newbufsize >= 0);
 		}
+		JAS_DBGLOG(100, ("mem_write resizing from %d to %z\n", m->bufsize_,
+		  newbufsize));
+		JAS_DBGLOG(100, ("mem_write resizing from %d to %ul\n", m->bufsize_,
+		  JAS_CAST(unsigned long, newbufsize)));
 		if (mem_resize(m, newbufsize)) {
 			return -1;
 		}
@@ -1059,6 +1078,7 @@ static long mem_seek(jas_stream_obj_t *obj, long offset, int origin)
 	jas_stream_memobj_t *m = (jas_stream_memobj_t *)obj;
 	long newpos;
 
+	JAS_DBGLOG(100, ("mem_seek(%p, %ld, %d)\n", obj, offset, origin));
 	switch (origin) {
 	case SEEK_SET:
 		newpos = offset;
@@ -1083,8 +1103,11 @@ static long mem_seek(jas_stream_obj_t *obj, long offset, int origin)
 
 static int mem_close(jas_stream_obj_t *obj)
 {
+	JAS_DBGLOG(100, ("mem_close(%p)\n", obj));
 	jas_stream_memobj_t *m = (jas_stream_memobj_t *)obj;
+	JAS_DBGLOG(100, ("mem_close myalloc=%d\n", m->myalloc_));
 	if (m->myalloc_ && m->buf_) {
+		JAS_DBGLOG(100, ("mem_close freeing buffer %p\n", m->buf_));
 		jas_free(m->buf_);
 		m->buf_ = 0;
 	}
@@ -1098,25 +1121,33 @@ static int mem_close(jas_stream_obj_t *obj)
 
 static int file_read(jas_stream_obj_t *obj, char *buf, int cnt)
 {
-	jas_stream_fileobj_t *fileobj = JAS_CAST(jas_stream_fileobj_t *, obj);
+	jas_stream_fileobj_t *fileobj;
+	JAS_DBGLOG(100, ("file_read(%p, %p, %d)\n", obj, buf, cnt));
+	fileobj = JAS_CAST(jas_stream_fileobj_t *, obj);
 	return read(fileobj->fd, buf, cnt);
 }
 
 static int file_write(jas_stream_obj_t *obj, char *buf, int cnt)
 {
-	jas_stream_fileobj_t *fileobj = JAS_CAST(jas_stream_fileobj_t *, obj);
+	jas_stream_fileobj_t *fileobj;
+	JAS_DBGLOG(100, ("file_write(%p, %p, %d)\n", obj, buf, cnt));
+	fileobj = JAS_CAST(jas_stream_fileobj_t *, obj);
 	return write(fileobj->fd, buf, cnt);
 }
 
 static long file_seek(jas_stream_obj_t *obj, long offset, int origin)
 {
-	jas_stream_fileobj_t *fileobj = JAS_CAST(jas_stream_fileobj_t *, obj);
+	jas_stream_fileobj_t *fileobj;
+	JAS_DBGLOG(100, ("file_seek(%p, %ld, %d)\n", obj, offset, origin));
+	fileobj = JAS_CAST(jas_stream_fileobj_t *, obj);
 	return lseek(fileobj->fd, offset, origin);
 }
 
 static int file_close(jas_stream_obj_t *obj)
 {
-	jas_stream_fileobj_t *fileobj = JAS_CAST(jas_stream_fileobj_t *, obj);
+	jas_stream_fileobj_t *fileobj;
+	JAS_DBGLOG(100, ("file_close(%p)\n", obj));
+	fileobj = JAS_CAST(jas_stream_fileobj_t *, obj);
 	int ret;
 	ret = close(fileobj->fd);
 	if (fileobj->flags & JAS_STREAM_FILEOBJ_DELONCLOSE) {
@@ -1135,6 +1166,7 @@ static int sfile_read(jas_stream_obj_t *obj, char *buf, int cnt)
 	FILE *fp;
 	size_t n;
 	int result;
+	JAS_DBGLOG(100, ("sfile_read(%p, %p, %d)\n", obj, buf, cnt));
 	fp = JAS_CAST(FILE *, obj);
 	n = fread(buf, 1, cnt, fp);
 	if (n != cnt) {
@@ -1148,6 +1180,7 @@ static int sfile_write(jas_stream_obj_t *obj, char *buf, int cnt)
 {
 	FILE *fp;
 	size_t n;
+	JAS_DBGLOG(100, ("sfile_write(%p, %p, %d)\n", obj, buf, cnt));
 	fp = JAS_CAST(FILE *, obj);
 	n = fwrite(buf, 1, cnt, fp);
 	return (n != JAS_CAST(size_t, cnt)) ? (-1) : cnt;
@@ -1156,6 +1189,7 @@ static int sfile_write(jas_stream_obj_t *obj, char *buf, int cnt)
 static long sfile_seek(jas_stream_obj_t *obj, long offset, int origin)
 {
 	FILE *fp;
+	JAS_DBGLOG(100, ("sfile_seek(%p, %ld, %d)\n", obj, offset, origin));
 	fp = JAS_CAST(FILE *, obj);
 	return fseek(fp, offset, origin);
 }
@@ -1163,6 +1197,7 @@ static long sfile_seek(jas_stream_obj_t *obj, long offset, int origin)
 static int sfile_close(jas_stream_obj_t *obj)
 {
 	FILE *fp;
+	JAS_DBGLOG(100, ("sfile_close(%p)\n", obj));
 	fp = JAS_CAST(FILE *, obj);
 	return fclose(fp);
 }
