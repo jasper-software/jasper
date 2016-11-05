@@ -150,7 +150,6 @@ stripblanklines()
 tcf_preprocessor()
 {
 	cpp -P 2> /dev/null | stripblanklines
-	#cpp -P | stripblanklines
 }
 
 tcf_gettest()
@@ -180,12 +179,14 @@ tcf_gettest()
 			buf = buf "[" key "]=" val " ";
 		}
 		if (length(id) > 0 && TESTID == id) {
-#			print $0;
 			print buf;
 		}
 	}
-	')
+	') || return 1
 	#eecho "BUFFER $buffer"
+	if [ -z "$buffer" ]; then
+		return 1
+	fi
 	eval declare -g -A "$name"=\("$buffer"\)
 }
 

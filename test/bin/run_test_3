@@ -34,16 +34,34 @@ fi
 
 echo "STARTING AT `date`"
 
+num_errors=0
+failed_tests=()
+
 for codec_selector in "${codec_selectors[@]}"; do
 	enc=$(echo "$codec_selector" | awk -v FS=_ '{print $1}' -)
 	dec=$(echo "$codec_selector" | awk -v FS=_ '{print $2}' -)
-	echo "***** START OF TESTS FOR ENCODER=$enc DECODER=$dec *****"
-	"$run_test" "$enc" "$dec" "$@"
+	echo "############################################################"
+	echo "START OF TESTS FOR ENCODER=$enc DECODER=$dec"
+	echo "############################################################"
+	"$run_test" -v -B -E ignore -e "$enc" -d "$dec" "$@"
 	status=$?
 	if [ $status -ne 0 ]; then
-		panic "running tests failed"
+		num_errors=$((num_errors + 1))
+		failed_tests+=($codec_selector)
+		#panic "running tests failed"
 	fi
-	echo "***** END OF TESTS *****"
+	echo "############################################################"
+	echo "END OF TESTS"
+	echo "############################################################"
 done
 
 echo "ENDING AT `date`"
+
+echo "############################################################"
+echo "TEST SUMMARY"
+echo "Number of errors: $num_errors"
+if [ "$num_errors" -gt 0 ]; then
+	echo "STATUS: FAILED"
+	exit 1
+fi
+echo "STATUS: PASSED"
