@@ -29,6 +29,7 @@ RATEVIOLFATAL=0
 # Distortion constraint violation yields fatal error.
 DISTVIOLFATAL=1
 #DISTVIOLFATAL=0
+stop_on_error=0
 
 #TMPDIR=/tmp/mdadams
 TSTSFILE=$cmd_dir/codec_tests
@@ -150,6 +151,9 @@ NUMRATEVIOLS=0
 RATEVIOLLIST=""
 NUMDISTVIOLS=0
 DISTVIOLLIST=""
+
+num_errors=0
+failed_tests=()
 
 for TESTID in $TESTIDS; do
 	TST=`gettest $TESTID`
@@ -276,10 +280,10 @@ for TESTID in $TESTIDS; do
 		continue
 	fi
 
-# These variables are the same and should be merged.
-if [ $TSTID != $TESTID ]; then
-	exit 1
-fi
+	# These variables are the same and should be merged.
+	if [ $TSTID != $TESTID ]; then
+		exit 1
+	fi
 
 	if [ ! -f $INFILE ]; then
 		INFILE=$(image_which "$IMAGE_PATH" "$INFILE") || \
@@ -307,11 +311,6 @@ fi
 		DECOPTS="$DECOPTS debug=$DEBUG"
 	fi
 
-#	IMGDATA=$(image_info "$INFILE"  2> /dev/null)
-#	if [ $? -ne 0 ]; then
-#		echo "ERROR: cannot get image information for $INFILE"
-#		exit 1
-#	fi
 	IMGFMT=$(image_info "$INFILE" format) || \
 	  panic "cannot get image format"
 	IMGNUMCMPTS=$(image_info "$INFILE" num_components) || \
@@ -328,16 +327,12 @@ fi
 	if [ $IMGFMT = mif -o $IMGFMT = jpc -o $IMGFMT = jp2 -o $IMGFMT = pgx ]; then
 		DECFMT=$IMGFMT
 	else
+		DECFMT=$IMGFMT
 		if [ $IMGNUMCMPTS -eq 1 -a $IMGPREC -gt 8 ]; then
 			DECFMT=pgx
 		else
 			DECFMT=pnm
 		fi
-#		if [ $IMGNUMCMPTS -eq 1 ]; then
-#			DECFMT=pgx
-#		else
-#			DECFMT=pnm
-#		fi
 	fi
 
 	if [ $RATE = 0 ]; then
@@ -371,7 +366,7 @@ fi
 		continue
 	fi
 
-	echo "------------------------------------------------------------"
+	echo "############################################################"
 	echo "TESTID=$TESTID ENC=$ENC DEC=$DEC"
 	if [ $VERBOSE -ne 0 ]; then
 		echo "FMT=$IMGFMT WIDTH=$IMGWIDTH HEIGHT=$IMGHEIGHT PREC=$IMGPREC NUMCMPTS=$IMGNUMCMPTS RAWSIZE=$IMGRAWSIZE"
@@ -389,17 +384,29 @@ fi
 	fi
 	if [ $ENCSTATUS -ne 0 ]; then
 		echo "ERROR: ENCODER FAILURE"
-		exit 1
+		error_count=$((error_count + 1))
+		failed_tests+=($TESTID.encode)
+		if [ "$stop_on_error" -ne 0 ]; then
+			exit 1
+		else
+			continue
+		fi
 	fi
+
+	ENCFILESIZE=`wc -c $ENCFILE | awk '{print $1}' -`
 
 	$JPDEC software=$DEC input=$ENCFILE output=$DECFILE $DECOPTS
 	DECSTATUS=$?
 	if [ $DECSTATUS -ne 0 ]; then
 		echo "ERROR: DECODER FAILURE"
-		exit 1
+		error_count=$((error_count + 1))
+		failed_tests+=($TESTID.decode)
+		if [ "$stop_on_error" -ne 0 ]; then
+			exit 1
+		else
+			continue
+		fi
 	fi
-
-	ENCFILESIZE=`wc -c $ENCFILE | awk '{print $1}' -`
 
 	if [ \( -z "$MAXPAE" \) -a \( -z "$MINPSNR" \) ]; then
 		echo "ERROR: NO ERROR CONSTRAINT SPECIFIED"
@@ -491,3 +498,14 @@ fi
 if [ \( $RATEVIOLFATAL -ne 0 \) -a \( $NUMRATEVIOLS -gt 0 \) ]; then
 	exit 1
 fi
+
+echo "error count: $num_errors"
+echo "failed tests:"
+for i in "${failed_tests[@]}"; do
+	echo "    $i"
+done
+if [ "$num_errors" -gt 0 ]; then
+	echo "FAILED"
+	exit 1
+fi
+

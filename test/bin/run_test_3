@@ -22,9 +22,9 @@ run_test="$cmd_dir/run_codec_test"
 
 codec_selectors=()
 codec_selectors+=(jasper_jasper)
-#if [ -n "$oj_decompress" ]; then
-#	codec_selectors+=(jasper_oj)
-#fi
+if [ -n "$oj_decompress" ]; then
+	codec_selectors+=(jasper_oj)
+fi
 #codec_selectors+=(jasper_jj2k)
 #codec_selectors+=(jj2k_jasper)
 #codec_selectors+=(kakadu_jasper)

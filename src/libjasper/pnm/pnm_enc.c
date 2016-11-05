@@ -129,14 +129,19 @@ int pnm_encode(jas_image_t *image, jas_stream_t *out, char *optstr)
 	int sgnd;
 	pnm_enc_t encbuf;
 	pnm_enc_t *enc = &encbuf;
+	int clrspc_fam;
+
+	JAS_DBGLOG(10, ("pnm_encode(%p, %p, \"%s\")\n", image, out,
+	  optstr ? optstr : ""));
 
 	/* Parse the encoder option string. */
-	if (pnm_parseencopts(optstr, &encopts)) {
+	if (pnm_parseencopts(optstr ? optstr : "", &encopts)) {
 		jas_eprintf("invalid PNM encoder options specified\n");
 		return -1;
 	}
 
-	switch (jas_clrspc_fam(jas_image_clrspc(image))) {
+	clrspc_fam = jas_clrspc_fam(jas_image_clrspc(image));
+	switch (clrspc_fam) {
 	case JAS_CLRSPC_FAM_RGB:
 		if (jas_image_clrspc(image) != JAS_CLRSPC_SRGB)
 			jas_eprintf("warning: inaccurate color\n");
@@ -162,7 +167,7 @@ int pnm_encode(jas_image_t *image, jas_stream_t *out, char *optstr)
 		}
 		break;
 	default:
-		jas_eprintf("error: unsupported color space\n");
+		jas_eprintf("error: unsupported color space %d\n", clrspc_fam);
 		return -1;
 		break;
 	}

@@ -108,6 +108,8 @@ jas_image_t *ras_decode(jas_stream_t *in, char *optstr)
 	int numcmpts;
 	int i;
 
+	JAS_DBGLOG(10, ("ras_decode(%p, %p, \"%s\"\n", in, optstr ? optstr : ""));
+
 	if (optstr) {
 		jas_eprintf("warning: ignoring RAS decoder options\n");
 	}
@@ -402,7 +404,7 @@ static int ras_gethdr(jas_stream_t *in, ras_hdr_t *hdr)
 
 static int ras_getint(jas_stream_t *in, int_fast32_t *val)
 {
-	int x;
+	int_fast32_t x;
 	int c;
 	int i;
 

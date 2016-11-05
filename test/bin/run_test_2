@@ -24,18 +24,25 @@ jasper="$abs_top_builddir/src/appl/jasper"
 imgcmp="$abs_top_builddir/src/appl/imgcmp"
 jiv="$abs_top_builddir/src/appl/jiv"
 
+debug=0
+
 image_path="$data_dir/images"
 
 in_files=()
-in_files+=(small_1x1.pnm)
-in_files+=(small_16x1.pnm)
-in_files+=(stawamuschief.pnm)
-in_files+=(stawamuschief_gray.pnm)
+#in_files+=(feep2.pnm)
+#in_files+=(feep.pnm)
 in_files+=(goldenears.bmp)
-in_files+=(goldenears.ras)
+in_files+=(goldenears_gray.jpg)
+in_files+=(goldenears_gray.pnm)
 in_files+=(goldenears_gray.ras)
-##in_files+=(goldenears_gray.bmp)
-##in_files+=(target.pnm)
+in_files+=(goldenears.jpg)
+in_files+=(goldenears.pnm)
+in_files+=(goldenears.ras)
+in_files+=(small_16x1.pnm)
+in_files+=(small_1x1.pnm)
+in_files+=(stawamuschief_gray.pnm)
+in_files+=(stawamuschief.pnm)
+in_files+=(test.pnm)
 
 image_formats=()
 image_formats+=(bmp)
@@ -44,38 +51,48 @@ image_formats+=(jpc)
 image_formats+=(pgx)
 image_formats+=(pnm)
 image_formats+=(ras)
-#image_formats+=(mif)
+image_formats+=(mif)
+# NOTE: Since the test requires lossless coding, we cannot use JPEG format.
 #image_formats+=(jpg)
 
 error_count=0
 
-for in_file in "${in_files[@]}"; do
-	echo "############################################################"
-	in_file_base="$in_file"
-	in_file=$(image_which "$image_path" "$in_file_base") || \
-	  panic "cannot find image $in_file_base"
-	image_type=$(image_info "$in_file" "type") || \
-	  panic "cannot get image type $in_file"
-	if [ ! -f "$in_file" ]; then
-		echo "warning: cannot find image file $in_file_base"
-		continue
-	fi
+for in_file_base in "${in_files[@]}"; do
 	for image_format in "${image_formats[@]}"; do
 		echo "############################################################"
-		if [ "$image_type" = rgb -a "$image_format" = pgx ]; then
-			echo "SKIPPING: $in_file_base $image_format"
+		in_file=$(image_which "$image_path" "$in_file_base") || \
+		  panic "cannot find image $in_file_base"
+		image_type=$(image_info "$in_file" "type") || \
+		  panic "cannot get image type $in_file"
+		image_prec=$(image_info "$in_file" "depth") || \
+		  panic "cannot get image depth $in_file"
+		echo "input: $in_file_base"
+		echo "target format: $image_format"
+		if [ ! -f "$in_file" ]; then
+			echo "warning: cannot find image file $in_file_base"
 			continue
 		fi
-		echo "TEST CASE: $in_file_base $image_format"
+		if [ "$image_type" = rgb -a "$image_format" = pgx ]; then
+			echo "The PGX format does not support color images."
+			echo "Skipping the conversion of a color image to the PGX format."
+			continue
+		fi
+		if [ "$image_prec" -ne 8 -a "$image_format" = bmp ]; then
+			continue
+		fi
 		rm -f "$tmp_file"
 		enc_opts=()
 		enc_opts+=(-f "$in_file")
 		enc_opts+=(-T "$image_format")
 		dec_opts=()
 		dec_opts+=(-T "$image_format")
+		if [ "$debug" -ge 1 ]; then
+			enc_opts+=(--debug-level 10)
+			dec_opts+=(--debug-level 10)
+		fi
 		echo "Running $jasper ${enc_opts[@]} | $jasper ${dec_opts[@]} > $tmp_file"
-		"$jasper" "${enc_opts[@]}" 2> /dev/null | \
-		  "$jasper" "${dec_opts[@]}" > "$tmp_file" 2> /dev/null
+		"$jasper" "${enc_opts[@]}" | \
+		  "$jasper" "${dec_opts[@]}" > "$tmp_file"
 		pae=$("$imgcmp" -f "$in_file" -F "$tmp_file" -m pae --max \
 		  2> /dev/null) || \
 		  panic "cannot compare image files $in_file and $tmp_file"
@@ -84,11 +101,14 @@ for in_file in "${in_files[@]}"; do
 			error_count=$((error_count + 1))
 			#"$jiv" $tmp_file $in_file
 		fi
-		echo "STATUS: $in_file_base $image_format OK"
+		echo "STATUS: OK"
 	done
 done
 
+echo "############################################################"
+echo "error count: $error_count"
 if [ "$error_count" -gt 0 ]; then
-	echo "error count: $error_count"
+	echo "STATUS: FAILED"
 	exit 1
 fi
+echo "STATUS: PASSED"

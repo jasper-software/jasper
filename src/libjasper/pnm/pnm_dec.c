@@ -118,6 +118,8 @@ jas_image_t *pnm_decode(jas_stream_t *in, char *opts)
 	jas_image_cmptparm_t *cmptparm;
 	int i;
 
+	JAS_DBGLOG(10, ("pnm_decode(%p, \"%s\")\n", in, opts ? opts : ""));
+
 	if (opts) {
 		jas_eprintf("warning: ignoring options\n");
 	}
@@ -126,6 +128,12 @@ jas_image_t *pnm_decode(jas_stream_t *in, char *opts)
 	if (pnm_gethdr(in, &hdr)) {
 		return 0;
 	}
+	JAS_DBGLOG(10, (
+	  "magic %lx; width %lu; height %ld; numcmpts %d; maxval %ld; sgnd %d\n",
+	  JAS_CAST(unsigned long, hdr.magic), JAS_CAST(long, hdr.width),
+	  JAS_CAST(long, hdr.height), hdr.numcmpts, JAS_CAST(long, hdr.maxval),
+	  hdr.sgnd)
+	  );
 
 	/* Create an image of the correct size. */
 	for (i = 0, cmptparm = cmptparms; i < hdr.numcmpts; ++i, ++cmptparm) {
@@ -138,7 +146,8 @@ jas_image_t *pnm_decode(jas_stream_t *in, char *opts)
 		cmptparm->prec = pnm_maxvaltodepth(hdr.maxval);
 		cmptparm->sgnd = hdr.sgnd;
 	}
-	if (!(image = jas_image_create(hdr.numcmpts, cmptparms, JAS_CLRSPC_UNKNOWN))) {
+	if (!(image = jas_image_create(hdr.numcmpts, cmptparms,
+	  JAS_CLRSPC_UNKNOWN))) {
 		return 0;
 	}
 

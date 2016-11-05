@@ -26,18 +26,28 @@ imginfo="$abs_top_builddir/src/appl/imginfo"
 
 error_count=0
 
+echo "############################################################"
+echo "Testing valid data sets"
+echo "############################################################"
+
 for in_file in "${good_list[@]}"; do
 	echo "############################################################"
+	expected_status=0
 	echo "Input file: $in_file"
 	"$imginfo" < "$in_file"
 	status=$?
-	echo "exit status: $status"
-	if [ "$status" -ne 0 ]; then
-		#panic "Command has unexpected exit status"
-		echo "imginfo command had unexpected exit status (expected 0 got $status)"
+	echo "actual exit status: $status"
+	echo "expected exit status: $expected_status"
+	if [ "$status" -ne "$expected_status" ]; then
+		echo "imginfo command had unexpected exit status " \
+		  "(expected $expected_status got $status)"
 		error_count=$((error_count + 1))
 	fi
 done
+echo "############################################################"
+
+echo "############################################################"
+echo "Testing invalid data sets"
 echo "############################################################"
 
 for in_file in "${bad_list[@]}"; do
@@ -56,20 +66,23 @@ for in_file in "${bad_list[@]}"; do
 	special_asan_options+=(allocator_may_return_null=true)
 	special_asan_options+=(detect_leaks=false)
 	#special_asan_options+=(soft_rss_limit_mb=1024)
+	expected_status=1
 	ASAN_OPTIONS="${special_asan_options[*]}" "$imginfo" < "$in_file"
 	status=$?
-	echo "exit status: $status"
+	echo "actual exit status: $status"
+	echo "expected exit status: $expected_status"
 	if [ "$status" -ne 1 ]; then
-		#panic "Command has unexpected exit status"
-		echo "imginfo command had unexpected exit status (expected 1 got $status)"
+		echo "imginfo command had unexpected exit status " \
+		  "(expected $expected_status got $status)"
 		error_count=$((error_count + 1))
 	fi
 done
 echo "############################################################"
 
+echo "error count: $error_count"
 if [ "$error_count" -gt 0 ]; then
-	echo "error count: $error_count"
+	echo "status: FAILED"
 	panic "FAILED"
 fi
 
-echo "OK"
+echo "status: PASSED"
