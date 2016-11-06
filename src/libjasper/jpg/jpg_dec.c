@@ -274,9 +274,7 @@ static jas_image_t *jpg_mkimage(j_decompress_ptr cinfo)
 		goto error;
 	}
 	for (cmptno = 0; cmptno < numcmpts; ++cmptno) {
-		if (cinfo->image_width < JAS_IMAGE_COORD_MIN ||
-		  cinfo->image_width > JAS_IMAGE_COORD_MAX ||
-		  cinfo->image_height < JAS_IMAGE_COORD_MIN ||
+		if (cinfo->image_width > JAS_IMAGE_COORD_MAX ||
 		  cinfo->image_height > JAS_IMAGE_COORD_MAX) {
 			goto error;
 		}
