@@ -347,7 +347,7 @@ static jas_image_cmpt_t *jas_image_cmpt_create(int_fast32_t tlx,
 	  !jas_safe_size_mul(size, cmpt->cps_, &size)) {
 		goto error;
 	}
-	cmpt->stream_ = (inmem) ? jas_stream_memopen(0, size) :
+	cmpt->stream_ = (inmem) ? jas_stream_memopen2(0, size) :
 	  jas_stream_tmpfile();
 	if (!cmpt->stream_) {
 		goto error;
