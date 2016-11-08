@@ -54,7 +54,10 @@ for in_file in "${bad_list[@]}"; do
 	name=$(basename "$in_file")
 	echo "############################################################"
 	case "$name" in
-	2_crashes.bmp)
+	2_crashes.bmp|jasper-doublefree-mem_close.jpg)
+		# The file jasper-doublefree-mem_close.jpg must be skipped
+		# since this test could pass or fail depending on the version of
+		# the JPEG library used (and if it passes it will be VERY SLOW).
 		echo "Skipping $in_file"
 		continue
 		;;
