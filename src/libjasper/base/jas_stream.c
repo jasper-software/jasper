@@ -378,6 +378,8 @@ jas_stream_t *jas_stream_fopen(const char *filename, const char *mode)
 	jas_stream_fileobj_t *obj;
 	int openflags;
 
+	JAS_DBGLOG(100, ("jas_stream_fopen(\"%s\", \"%s\")\n", filename, mode));
+
 	/* Allocate a stream object. */
 	if (!(stream = jas_stream_create())) {
 		return 0;
@@ -440,6 +442,9 @@ jas_stream_t *jas_stream_freopen(const char *path, const char *mode, FILE *fp)
 	jas_stream_t *stream;
 	int openflags;
 
+	JAS_DBGLOG(100, ("jas_stream_freopen(\"%s\", \"%s\", %p)\n", path, mode,
+	  fp));
+
 	/* Eliminate compiler warning about unused variable. */
 	path = 0;
 
@@ -487,6 +492,8 @@ jas_stream_t *jas_stream_tmpfile()
 {
 	jas_stream_t *stream;
 	jas_stream_fileobj_t *obj;
+
+	JAS_DBGLOG(100, ("jas_stream_tmpfile()\n"));
 
 	if (!(stream = jas_stream_create())) {
 		return 0;
@@ -540,6 +547,8 @@ jas_stream_t *jas_stream_fdopen(int fd, const char *mode)
 	jas_stream_t *stream;
 	jas_stream_fileobj_t *obj;
 
+	JAS_DBGLOG(100, ("jas_stream_fdopen(%d, \"%s\")\n", fd, mode));
+
 	/* Allocate a stream object. */
 	if (!(stream = jas_stream_create())) {
 		return 0;
@@ -590,6 +599,8 @@ jas_stream_t *jas_stream_fdopen(int fd, const char *mode)
 
 static void jas_stream_destroy(jas_stream_t *stream)
 {
+	JAS_DBGLOG(100, ("jas_stream_destroy(%p)\n", stream));
+
 	/* If the memory for the buffer was allocated with malloc, free
 	this memory. */
 	if ((stream->bufmode_ & JAS_STREAM_FREEBUF) && stream->bufbase_) {
@@ -603,6 +614,8 @@ static void jas_stream_destroy(jas_stream_t *stream)
 
 int jas_stream_close(jas_stream_t *stream)
 {
+	JAS_DBGLOG(100, ("jas_stream_close(%p)\n", stream));
+
 	/* Flush buffer if necessary. */
 	jas_stream_flush(stream);
 
@@ -654,6 +667,8 @@ int jas_stream_read(jas_stream_t *stream, void *buf, int cnt)
 	int c;
 	char *bufptr;
 
+	JAS_DBGLOG(100, ("jas_stream_read(%p, %p, %d)\n", stream, buf, cnt));
+
 	if (cnt < 0) {
 		jas_deprecated("negative count for jas_stream_read");
 	}
@@ -676,6 +691,8 @@ int jas_stream_write(jas_stream_t *stream, const void *buf, int cnt)
 {
 	int n;
 	const char *bufptr;
+
+	JAS_DBGLOG(100, ("jas_stream_write(%p, %p, %d)\n", stream, buf, cnt));
 
 	if (cnt < 0) {
 		jas_deprecated("negative count for jas_stream_write");
@@ -728,6 +745,8 @@ char *jas_stream_gets(jas_stream_t *stream, char *buf, int bufsize)
 	char *bufptr;
 	assert(bufsize > 0);
 
+	JAS_DBGLOG(100, ("jas_stream_gets(%p, %p, %d)\n", stream, buf, bufsize));
+
 	bufptr = buf;
 	while (bufsize > 1) {
 		if ((c = jas_stream_getc(stream)) == EOF) {
@@ -746,6 +765,9 @@ char *jas_stream_gets(jas_stream_t *stream, char *buf, int bufsize)
 int jas_stream_gobble(jas_stream_t *stream, int n)
 {
 	int m;
+
+	JAS_DBGLOG(100, ("jas_stream_gobble(%p, %d)\n", stream, n));
+
 	if (n < 0) {
 		jas_deprecated("negative count for jas_stream_gobble");
 	}
@@ -761,6 +783,9 @@ int jas_stream_gobble(jas_stream_t *stream, int n)
 int jas_stream_pad(jas_stream_t *stream, int n, int c)
 {
 	int m;
+
+	JAS_DBGLOG(100, ("jas_stream_pad(%p, %d, %d)\n", stream, n, c));
+
 	if (n < 0) {
 		jas_deprecated("negative count for jas_stream_pad");
 	}
@@ -792,12 +817,16 @@ int jas_stream_isseekable(jas_stream_t *stream)
 
 int jas_stream_rewind(jas_stream_t *stream)
 {
+	JAS_DBGLOG(100, ("jas_stream_rewind(%p)\n", stream));
 	return jas_stream_seek(stream, 0, SEEK_SET);
 }
 
 long jas_stream_seek(jas_stream_t *stream, long offset, int origin)
 {
 	long newpos;
+
+	JAS_DBGLOG(100, ("jas_stream_seek(%p, %ld, %d)\n", stream, offset,
+	  origin));
 
 	/* The buffer cannot be in use for both reading and writing. */
 	assert(!((stream->bufmode_ & JAS_STREAM_RDBUF) && (stream->bufmode_ &
@@ -831,6 +860,8 @@ long jas_stream_tell(jas_stream_t *stream)
 {
 	int adjust;
 	int offset;
+
+	JAS_DBGLOG(100, ("jas_stream_tell(%p)\n", stream));
 
 	if (stream->bufmode_ & JAS_STREAM_RDBUF) {
 		adjust = -stream->cnt_;

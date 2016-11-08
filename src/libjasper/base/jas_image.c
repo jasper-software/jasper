@@ -78,6 +78,7 @@
 #include <ctype.h>
 #include <inttypes.h>
 #include <stdbool.h>
+#include <limits.h>
 
 #include "jasper/jas_math.h"
 #include "jasper/jas_image.h"
@@ -356,10 +357,15 @@ static jas_image_cmpt_t *jas_image_cmpt_create(int_fast32_t tlx,
 	/* Zero the component data.  This isn't necessary, but it is
 	convenient for debugging purposes. */
 	/* Note: conversion of size - 1 to long can overflow */
-	if (jas_stream_seek(cmpt->stream_, size - 1, SEEK_SET) < 0 ||
-	  jas_stream_putc(cmpt->stream_, 0) == EOF ||
-	  jas_stream_seek(cmpt->stream_, 0, SEEK_SET) < 0) {
-		goto error;
+	if (size > 0) {
+		if (size - 1 > LONG_MAX) {
+			goto error;
+		}
+		if (jas_stream_seek(cmpt->stream_, size - 1, SEEK_SET) < 0 ||
+		  jas_stream_putc(cmpt->stream_, 0) == EOF ||
+		  jas_stream_seek(cmpt->stream_, 0, SEEK_SET) < 0) {
+			goto error;
+		}
 	}
 
 	return cmpt;
@@ -449,6 +455,10 @@ int jas_image_readcmpt(jas_image_t *image, int cmptno, jas_image_coord_t x,
 	jas_seqent_t *d;
 	int drs;
 
+	JAS_DBGLOG(10, ("jas_image_readcmpt(%p, %d, %ld, %ld, %ld, %ld, %p)\n",
+	  image, cmptno, JAS_CAST(long, x), JAS_CAST(long, y),
+	  JAS_CAST(long, width), JAS_CAST(long, height), data));
+
 	if (cmptno < 0 || cmptno >= image->numcmpts_) {
 		return -1;
 	}
@@ -493,8 +503,9 @@ int jas_image_readcmpt(jas_image_t *image, int cmptno, jas_image_coord_t x,
 	return 0;
 }
 
-int jas_image_writecmpt(jas_image_t *image, int cmptno, jas_image_coord_t x, jas_image_coord_t y, jas_image_coord_t width,
-  jas_image_coord_t height, jas_matrix_t *data)
+int jas_image_writecmpt(jas_image_t *image, int cmptno, jas_image_coord_t x,
+  jas_image_coord_t y, jas_image_coord_t width, jas_image_coord_t height,
+  jas_matrix_t *data)
 {
 	jas_image_cmpt_t *cmpt;
 	jas_image_coord_t i;
@@ -505,6 +516,10 @@ int jas_image_writecmpt(jas_image_t *image, int cmptno, jas_image_coord_t x, jas
 	jas_seqent_t v;
 	int k;
 	int c;
+
+	JAS_DBGLOG(10, ("jas_image_writecmpt(%p, %d, %ld, %ld, %ld, %ld, %p)\n",
+	  image, cmptno, JAS_CAST(long, x), JAS_CAST(long, y),
+	  JAS_CAST(long, width), JAS_CAST(long, height), data));
 
 	if (cmptno < 0 || cmptno >= image->numcmpts_) {
 		return -1;
@@ -521,7 +536,8 @@ int jas_image_writecmpt(jas_image_t *image, int cmptno, jas_image_coord_t x, jas
 		return -1;
 	}
 
-	if (jas_matrix_numrows(data) != height || jas_matrix_numcols(data) != width) {
+	if (jas_matrix_numrows(data) != height ||
+	  jas_matrix_numcols(data) != width) {
 		return -1;
 	}
 

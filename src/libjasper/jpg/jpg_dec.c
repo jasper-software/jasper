@@ -139,8 +139,9 @@ jas_image_t *jpg_decode(jas_stream_t *in, char *optstr)
 	FILE *input_file;
 	jpg_dest_t dest_mgr_buf;
 	jpg_dest_t *dest_mgr = &dest_mgr_buf;
-	int num_scanlines;
+	JDIMENSION num_scanlines;
 	jas_image_t *image;
+	int ret;
 
 	/* Avoid compiler warnings about unused parameters. */
 	optstr = 0;
@@ -177,7 +178,11 @@ jas_image_t *jpg_decode(jas_stream_t *in, char *optstr)
 
 	/* Read the file header to obtain the image information. */
 	JAS_DBGLOG(10, ("jpeg_read_header(%p, TRUE)\n", &cinfo));
-	jpeg_read_header(&cinfo, TRUE);
+	ret = jpeg_read_header(&cinfo, TRUE);
+	JAS_DBGLOG(10, ("jpeg_read_header return value %d\n", ret));
+	if (ret != JPEG_HEADER_OK) {
+		jas_eprintf("jpeg_read_header did not return JPEG_HEADER_OK\n");
+	}
 	JAS_DBGLOG(10, (
 	  "header: image_width %d; image_height %d; num_components %d\n",
 	  cinfo.image_width, cinfo.image_height, cinfo.num_components)
@@ -185,7 +190,8 @@ jas_image_t *jpg_decode(jas_stream_t *in, char *optstr)
 
 	/* Start the decompressor. */
 	JAS_DBGLOG(10, ("jpeg_start_decompress(%p)\n", &cinfo));
-	jpeg_start_decompress(&cinfo);
+	ret = jpeg_start_decompress(&cinfo);
+	JAS_DBGLOG(10, ("jpeg_start_decompress return value %d\n", ret));
 	JAS_DBGLOG(10, (
 	  "header: output_width %d; output_height %d; output_components %d\n",
 	  cinfo.output_width, cinfo.output_height, cinfo.output_components)
@@ -219,6 +225,8 @@ jas_image_t *jpg_decode(jas_stream_t *in, char *optstr)
 		  dest_mgr->buffer, JAS_CAST(unsigned long, dest_mgr->buffer_height)));
 		num_scanlines = jpeg_read_scanlines(&cinfo, dest_mgr->buffer,
 		  dest_mgr->buffer_height);
+		JAS_DBGLOG(10, ("jpeg_read_scanlines return value %lu\n",
+		  JAS_CAST(unsigned long, num_scanlines)));
 		(*dest_mgr->put_pixel_rows)(&cinfo, dest_mgr, num_scanlines);
 	}
 	(*dest_mgr->finish_output)(&cinfo, dest_mgr);
@@ -267,6 +275,8 @@ static jas_image_t *jpg_mkimage(j_decompress_ptr cinfo)
 	int cmptno;
 	jas_image_cmptparm_t cmptparm;
 	int numcmpts;
+
+	JAS_DBGLOG(10, ("jpg_mkimage(%p)\n", cinfo));
 
 	image = 0;
 	numcmpts = cinfo->output_components;
@@ -370,6 +380,9 @@ static void jpg_put_pixel_rows(j_decompress_ptr cinfo, jpg_dest_t *dinfo,
 			jas_matrix_set(dinfo->data, 0, x, GETJSAMPLE(*bufptr));
 			bufptr += cinfo->output_components;
 		}
+		JAS_DBGLOG(10, (
+		  "jas_image_writecmpt called for component %d row %lu\n", cmptno,
+		  JAS_CAST(unsigned long, dinfo->row)));
 		if (jas_image_writecmpt(dinfo->image, cmptno, 0, dinfo->row, width, 1,
 		  dinfo->data)) {
 			dinfo->error = 1;
