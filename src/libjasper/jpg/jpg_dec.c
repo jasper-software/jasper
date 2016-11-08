@@ -281,7 +281,7 @@ jas_image_t *jpg_decode(jas_stream_t *in, char *optstr)
 	/* Process the compressed data. */
 	(*dest_mgr->start_output)(&cinfo, dest_mgr);
 	while (cinfo.output_scanline < cinfo.output_height) {
-		JAS_DBGLOG(10, ("jpeg_read_scanlines(%p, %p, %ul)\n", &cinfo,
+		JAS_DBGLOG(10, ("jpeg_read_scanlines(%p, %p, %lu)\n", &cinfo,
 		  dest_mgr->buffer, JAS_CAST(unsigned long, dest_mgr->buffer_height)));
 		num_scanlines = jpeg_read_scanlines(&cinfo, dest_mgr->buffer,
 		  dest_mgr->buffer_height);

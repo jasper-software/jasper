@@ -167,7 +167,7 @@ void *jas_realloc(void *ptr, size_t size)
 	size_t ext_size;
 	size_t mem;
 
-	JAS_DBGLOG(100, ("jas_realloc(%x, %zu)\n", ptr, size));
+	JAS_DBGLOG(100, ("jas_realloc(%p, %zu)\n", ptr, size));
 	if (!ptr) {
 		return jas_malloc(size);
 	}
@@ -180,7 +180,7 @@ void *jas_realloc(void *ptr, size_t size)
 	}
 	old_mb = jas_get_mb(ptr);
 	old_size = old_mb->size;
-	JAS_DBGLOG(101, ("jas_realloc: old_mb=%x; old_size=%zu\n", old_mb,
+	JAS_DBGLOG(101, ("jas_realloc: old_mb=%p; old_size=%zu\n", old_mb,
 	  old_size));
 	if (size > old_size) {
 		if (!jas_safe_size_add(jas_mem, ext_size, &mem) || mem > jas_max_mem) {
@@ -247,7 +247,7 @@ void *jas_malloc(size_t size)
 void *jas_realloc(void *ptr, size_t size)
 {
 	void *result;
-	JAS_DBGLOG(101, ("jas_realloc(%x, %zu)\n", ptr, size));
+	JAS_DBGLOG(101, ("jas_realloc(%p, %zu)\n", ptr, size));
 	result = realloc(ptr, size);
 	JAS_DBGLOG(100, ("jas_realloc(%p, %zu) -> %p\n", ptr, size, result));
 	return result;
