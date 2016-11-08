@@ -480,11 +480,13 @@ double msen(jas_matrix_t *x, jas_matrix_t *y, int n)
 
 double psnr(jas_matrix_t *x, jas_matrix_t *y, int depth)
 {
-	double m;
+	double mse;
+	double rmse;
 	double p;
-	m = msen(x, y, 2);
+	mse = msen(x, y, 2);
+	rmse = sqrt(mse);
 	p = ((1 << depth) - 1);
-	return 20.0 * log10(p / sqrt(m));
+	return (rmse != 0) ? (20.0 * log10(p / rmse)) : INFINITY;
 }
 
 /******************************************************************************\
