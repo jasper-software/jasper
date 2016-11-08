@@ -113,7 +113,7 @@ typedef enum {
 	OPT_QUAL
 } jpg_optid_t;
 
-jas_taginfo_t jpg_opttab[] = {
+static jas_taginfo_t jpg_opttab[] = {
 	{OPT_QUAL, "quality"},
 	{-1, 0}
 };

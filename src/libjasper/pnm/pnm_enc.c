@@ -97,7 +97,7 @@ typedef enum {
 	OPT_TEXT
 } pnm_optid_t;
 
-jas_taginfo_t pnm_opttab[] = {
+static jas_taginfo_t pnm_opttab[] = {
 	{OPT_TEXT, "text"},
 	{-1, 0}
 };

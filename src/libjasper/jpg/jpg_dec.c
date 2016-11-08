@@ -127,6 +127,51 @@ static int jpg_copystreamtofile(FILE *out, jas_stream_t *in);
 static jas_image_t *jpg_mkimage(j_decompress_ptr cinfo);
 
 /******************************************************************************\
+*
+\******************************************************************************/
+
+typedef struct {
+	size_t max_size;
+} jpg_dec_importopts_t;
+
+typedef enum {
+	OPT_MAXSIZE,
+} optid_t;
+
+static jas_taginfo_t decopts[] = {
+	{OPT_MAXSIZE, "max_size"},
+	{-1, 0}
+};
+
+static int jpg_dec_parseopts(char *optstr, jpg_dec_importopts_t *opts)
+{
+	jas_tvparser_t *tvp;
+
+	opts->max_size = 0;
+
+	if (!(tvp = jas_tvparser_create(optstr ? optstr : ""))) {
+		return -1;
+	}
+
+	while (!jas_tvparser_next(tvp)) {
+		switch (jas_taginfo_nonull(jas_taginfos_lookup(decopts,
+		  jas_tvparser_gettag(tvp)))->id) {
+		case OPT_MAXSIZE:
+			opts->max_size = atoi(jas_tvparser_getval(tvp));
+			break;
+		default:
+			jas_eprintf("warning: ignoring invalid option %s\n",
+			  jas_tvparser_gettag(tvp));
+			break;
+		}
+	}
+
+	jas_tvparser_destroy(tvp);
+
+	return 0;
+}
+
+/******************************************************************************\
 * Code for load operation.
 \******************************************************************************/
 
@@ -142,9 +187,12 @@ jas_image_t *jpg_decode(jas_stream_t *in, char *optstr)
 	JDIMENSION num_scanlines;
 	jas_image_t *image;
 	int ret;
+	jpg_dec_importopts_t opts;
+	size_t size;
 
-	/* Avoid compiler warnings about unused parameters. */
-	optstr = 0;
+	if (jpg_dec_parseopts(optstr, &opts)) {
+		goto error;
+	}
 
 	// In theory, the two memset calls that follow are not needed.
 	// They are only here to make the code more predictable in the event
@@ -196,6 +244,18 @@ jas_image_t *jpg_decode(jas_stream_t *in, char *optstr)
 	  "header: output_width %d; output_height %d; output_components %d\n",
 	  cinfo.output_width, cinfo.output_height, cinfo.output_components)
 	  );
+
+	if (opts.max_size) {
+		if (!jas_safe_size_mul(cinfo.output_width, cinfo.output_height,
+		  &size) ||
+		  !jas_safe_size_mul(size, cinfo.output_components, &size)) {
+			goto error;
+		}
+		if (size > opts.max_size) {
+			jas_eprintf("image is too large\n");
+			goto error;
+		}
+	}
 
 	/* Create an image object to hold the decoded data. */
 	if (!(image = jpg_mkimage(&cinfo))) {

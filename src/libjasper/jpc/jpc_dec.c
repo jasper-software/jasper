@@ -294,7 +294,7 @@ typedef enum {
 	OPT_DEBUG
 } optid_t;
 
-jas_taginfo_t decopts[] = {
+static jas_taginfo_t decopts[] = {
 	{OPT_MAXLYRS, "maxlyrs"},
 	{OPT_MAXPKTS, "maxpkts"},
 	{OPT_DEBUG, "debug"},

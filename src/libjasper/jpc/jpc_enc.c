@@ -216,7 +216,7 @@ typedef enum {
 	OPT_JP2OVERHEAD
 } optid_t;
 
-jas_taginfo_t encopts[] = {
+static jas_taginfo_t encopts[] = {
 	{OPT_DEBUG, "debug"},
 	{OPT_IMGAREAOFFX, "imgareatlx"},
 	{OPT_IMGAREAOFFY, "imgareatly"},
@@ -253,7 +253,7 @@ typedef enum {
 } poid_t;
 
 
-jas_taginfo_t prgordtab[] = {
+static jas_taginfo_t prgordtab[] = {
 	{JPC_COD_LRCPPRG, "lrcp"},
 	{JPC_COD_RLCPPRG, "rlcp"},
 	{JPC_COD_RPCLPRG, "rpcl"},
@@ -267,7 +267,7 @@ typedef enum {
 	MODE_REAL
 } modeid_t;
 
-jas_taginfo_t modetab[] = {
+static jas_taginfo_t modetab[] = {
 	{MODE_INT, "int"},
 	{MODE_REAL, "real"},
 	{-1, 0}
