@@ -182,8 +182,8 @@ jas_seq2d_t *jas_seq2d_copy(jas_seq2d_t *x)
 	jas_matrix_t *y;
 	int i;
 	int j;
-	y = jas_seq2d_create(jas_seq2d_xstart(x), jas_seq2d_ystart(x), jas_seq2d_xend(x),
-	  jas_seq2d_yend(x));
+	y = jas_seq2d_create(jas_seq2d_xstart(x), jas_seq2d_ystart(x),
+	  jas_seq2d_xend(x), jas_seq2d_yend(x));
 	assert(y);
 	for (i = 0; i < x->numrows_; ++i) {
 		for (j = 0; j < x->numcols_; ++j) {
@@ -211,15 +211,15 @@ jas_matrix_t *jas_matrix_copy(jas_matrix_t *x)
 * Bind operations.
 \******************************************************************************/
 
-void jas_seq2d_bindsub(jas_matrix_t *s, jas_matrix_t *s1, int xstart, int ystart,
-  int xend, int yend)
+void jas_seq2d_bindsub(jas_matrix_t *s, jas_matrix_t *s1, int xstart,
+  int ystart, int xend, int yend)
 {
 	jas_matrix_bindsub(s, s1, ystart - s1->ystart_, xstart - s1->xstart_,
 	  yend - s1->ystart_ - 1, xend - s1->xstart_ - 1);
 }
 
-void jas_matrix_bindsub(jas_matrix_t *mat0, jas_matrix_t *mat1, int r0, int c0,
-  int r1, int c1)
+void jas_matrix_bindsub(jas_matrix_t *mat0, jas_matrix_t *mat1, int r0,
+  int c0, int r1, int c1)
 {
 	int i;
 
@@ -304,7 +304,8 @@ void jas_matrix_divpow2(jas_matrix_t *matrix, int n)
 	}
 }
 
-void jas_matrix_clip(jas_matrix_t *matrix, jas_seqent_t minval, jas_seqent_t maxval)
+void jas_matrix_clip(jas_matrix_t *matrix, jas_seqent_t minval,
+  jas_seqent_t maxval)
 {
 	int i;
 	int j;
@@ -440,7 +441,8 @@ jas_matrix_t *jas_seq2d_input(FILE *in)
 	if (!(matrix = jas_seq2d_create(xoff, yoff, xoff + numcols, yoff + numrows)))
 		return 0;
 
-	if (jas_matrix_numrows(matrix) != numrows || jas_matrix_numcols(matrix) != numcols) {
+	if (jas_matrix_numrows(matrix) != numrows ||
+	  jas_matrix_numcols(matrix) != numcols) {
 		abort();
 	}
 
