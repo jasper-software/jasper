@@ -43,7 +43,7 @@ dnl 4) If any interfaces have been removed since the last public release, then
 dnl set AGE to zero.
 
 dnl The most recent interface number that this library implements.
-define(AC_JAS_LT_CURRENT, 1)
+define(AC_JAS_LT_CURRENT, 2)
 
 dnl The implementation number of the current interface.
 define(AC_JAS_LT_REVISION, 0)
