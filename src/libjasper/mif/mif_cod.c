@@ -141,7 +141,7 @@ jas_taginfo_t mif_tags[] = {
 
 /* Load an image from a stream in the MIF format. */
 
-jas_image_t *mif_decode(jas_stream_t *in, char *optstr)
+jas_image_t *mif_decode(jas_stream_t *in, const char *optstr)
 {
 	mif_hdr_t *hdr;
 	jas_image_t *image;
@@ -179,7 +179,7 @@ jas_image_t *mif_decode(jas_stream_t *in, char *optstr)
 			jas_eprintf("cannot open component file %s\n", cmpt->data);
 			goto error;
 		}
-		if (!(tmpimage = jas_image_decode(tmpstream, -1, 0))) {
+		if (!(tmpimage = jas_image_decode(tmpstream, -1, "allow_trunc=1"))) {
 			goto error;
 		}
 		if (tmpstream != in) {
@@ -263,7 +263,7 @@ error:
 
 /* Save an image to a stream in the the MIF format. */
 
-int mif_encode(jas_image_t *image, jas_stream_t *out, char *optstr)
+int mif_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 {
 	mif_hdr_t *hdr;
 	jas_image_t *tmpimage;

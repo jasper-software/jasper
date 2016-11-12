@@ -106,7 +106,7 @@ static jas_taginfo_t pnm_opttab[] = {
 * Local function prototypes.
 \******************************************************************************/
 
-static int pnm_parseencopts(char *optstr, pnm_encopts_t *encopts);
+static int pnm_parseencopts(const char *optstr, pnm_encopts_t *encopts);
 static int pnm_puthdr(jas_stream_t *out, pnm_hdr_t *hdr);
 static int pnm_putdata(jas_stream_t *out, pnm_hdr_t *hdr, jas_image_t *image, int numcmpts, int *cmpts);
 
@@ -118,7 +118,7 @@ static int pnm_putuint16(jas_stream_t *out, uint_fast16_t val);
 * Save function.
 \******************************************************************************/
 
-int pnm_encode(jas_image_t *image, jas_stream_t *out, char *optstr)
+int pnm_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 {
 	int width;
 	int height;
@@ -242,7 +242,7 @@ int pnm_encode(jas_image_t *image, jas_stream_t *out, char *optstr)
 \******************************************************************************/
 
 /* Parse the encoder options string. */
-static int pnm_parseencopts(char *optstr, pnm_encopts_t *encopts)
+static int pnm_parseencopts(const char *optstr, pnm_encopts_t *encopts)
 {
 	jas_tvparser_t *tvp;
 	int ret;

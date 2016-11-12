@@ -95,7 +95,7 @@ static int bmp_putint32(jas_stream_t *out, int_fast32_t val);
 * Interface functions.
 \******************************************************************************/
 
-int bmp_encode(jas_image_t *image, jas_stream_t *out, char *optstr)
+int bmp_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 {
 	jas_image_coord_t width;
 	jas_image_coord_t height;

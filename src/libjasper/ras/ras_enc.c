@@ -95,7 +95,7 @@ static int ras_putdatastd(jas_stream_t *out, ras_hdr_t *hdr, jas_image_t *image,
 * Code.
 \******************************************************************************/
 
-int ras_encode(jas_image_t *image, jas_stream_t *out, char *optstr)
+int ras_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 {
 	int_fast32_t width;
 	int_fast32_t height;

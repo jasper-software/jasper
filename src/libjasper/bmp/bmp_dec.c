@@ -114,7 +114,7 @@ static jas_taginfo_t decopts[] = {
 	{-1, 0}
 };
 
-static int bmp_dec_parseopts(char *optstr, bmp_dec_importopts_t *opts)
+static int bmp_dec_parseopts(const char *optstr, bmp_dec_importopts_t *opts)
 {
 	jas_tvparser_t *tvp;
 
@@ -146,7 +146,7 @@ static int bmp_dec_parseopts(char *optstr, bmp_dec_importopts_t *opts)
 * Interface functions.
 \******************************************************************************/
 
-jas_image_t *bmp_decode(jas_stream_t *in, char *optstr)
+jas_image_t *bmp_decode(jas_stream_t *in, const char *optstr)
 {
 	jas_image_t *image;
 	bmp_hdr_t hdr;

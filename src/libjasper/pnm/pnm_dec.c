@@ -80,15 +80,31 @@
 #include "jasper/jas_stream.h"
 #include "jasper/jas_image.h"
 #include "jasper/jas_debug.h"
+#include "jasper/jas_tvp.h"
 
 #include "pnm_cod.h"
+
+/******************************************************************************\
+* Local types.
+\******************************************************************************/
+
+typedef struct {
+	int allow_trunc;
+	size_t max_samples;
+} pnm_dec_importopts_t;
+
+typedef enum {
+	OPT_ALLOWTRUNC,
+	OPT_MAXSIZE,
+} optid_t;
 
 /******************************************************************************\
 * Local function prototypes.
 \******************************************************************************/
 
 static int pnm_gethdr(jas_stream_t *in, pnm_hdr_t *hdr);
-static int pnm_getdata(jas_stream_t *in, pnm_hdr_t *hdr, jas_image_t *image);
+static int pnm_getdata(jas_stream_t *in, pnm_hdr_t *hdr, jas_image_t *image,
+  int allow_trunc);
 
 static int pnm_getsintstr(jas_stream_t *in, int_fast32_t *val);
 static int pnm_getuintstr(jas_stream_t *in, uint_fast32_t *val);
@@ -101,32 +117,72 @@ static int pnm_getint16(jas_stream_t *in, int *val);
 #define	pnm_getuint32(in, val)	pnm_getuint(in, 32, val)
 
 /******************************************************************************\
-* Local data.
+* Option parsing.
 \******************************************************************************/
 
-static int pnm_allowtrunc = 1;
+static jas_taginfo_t pnm_decopts[] = {
+	{OPT_ALLOWTRUNC, "allow_trunc"},
+	{OPT_MAXSIZE, "max_samples"},
+	{-1, 0}
+};
+
+static int pnm_dec_parseopts(const char *optstr, pnm_dec_importopts_t *opts)
+{
+	jas_tvparser_t *tvp;
+
+	opts->max_samples = JAS_DEC_DEFAULT_MAX_SAMPLES;
+	opts->allow_trunc = 0;
+
+	if (!(tvp = jas_tvparser_create(optstr ? optstr : ""))) {
+		return -1;
+	}
+
+	while (!jas_tvparser_next(tvp)) {
+		switch (jas_taginfo_nonull(jas_taginfos_lookup(pnm_decopts,
+		  jas_tvparser_gettag(tvp)))->id) {
+		case OPT_ALLOWTRUNC:
+			opts->allow_trunc = atoi(jas_tvparser_getval(tvp));
+			break;
+		case OPT_MAXSIZE:
+			opts->max_samples = strtoull(jas_tvparser_getval(tvp), 0, 10);
+			break;
+		default:
+			jas_eprintf("warning: ignoring invalid option %s\n",
+			  jas_tvparser_gettag(tvp));
+			break;
+		}
+	}
+
+	jas_tvparser_destroy(tvp);
+
+	return 0;
+}
 
 /******************************************************************************\
 * Load function.
 \******************************************************************************/
 
-jas_image_t *pnm_decode(jas_stream_t *in, char *opts)
+jas_image_t *pnm_decode(jas_stream_t *in, const char *optstr)
 {
 	pnm_hdr_t hdr;
 	jas_image_t *image;
 	jas_image_cmptparm_t cmptparms[3];
 	jas_image_cmptparm_t *cmptparm;
 	int i;
+	pnm_dec_importopts_t opts;
+	size_t num_samples;
 
-	JAS_DBGLOG(10, ("pnm_decode(%p, \"%s\")\n", in, opts ? opts : ""));
+	image = 0;
 
-	if (opts) {
-		jas_eprintf("warning: ignoring options\n");
+	JAS_DBGLOG(10, ("pnm_decode(%p, \"%s\")\n", in, optstr ? optstr : ""));
+
+	if (pnm_dec_parseopts(optstr, &opts)) {
+		goto error;
 	}
 
 	/* Read the file header. */
 	if (pnm_gethdr(in, &hdr)) {
-		return 0;
+		goto error;
 	}
 	JAS_DBGLOG(10, (
 	  "magic %lx; width %lu; height %ld; numcmpts %d; maxval %ld; sgnd %d\n",
@@ -134,6 +190,18 @@ jas_image_t *pnm_decode(jas_stream_t *in, char *opts)
 	  JAS_CAST(long, hdr.height), hdr.numcmpts, JAS_CAST(long, hdr.maxval),
 	  hdr.sgnd)
 	  );
+
+	if (!jas_safe_size_mul3(hdr.width, hdr.height, hdr.numcmpts,
+	  &num_samples)) {
+		jas_eprintf("image too large\n");
+		goto error;
+	}
+	if (opts.max_samples > 0 && num_samples > opts.max_samples) {
+		jas_eprintf(
+		  "maximum number of samples would be exceeded (%zu > %zu)\n",
+		  num_samples, opts.max_samples);
+		goto error;
+	}
 
 	/* Create an image of the correct size. */
 	for (i = 0, cmptparm = cmptparms; i < hdr.numcmpts; ++i, ++cmptparm) {
@@ -148,7 +216,7 @@ jas_image_t *pnm_decode(jas_stream_t *in, char *opts)
 	}
 	if (!(image = jas_image_create(hdr.numcmpts, cmptparms,
 	  JAS_CLRSPC_UNKNOWN))) {
-		return 0;
+		goto error;
 	}
 
 	if (hdr.numcmpts == 3) {
@@ -166,12 +234,17 @@ jas_image_t *pnm_decode(jas_stream_t *in, char *opts)
 	}
 
 	/* Read image data from stream into image. */
-	if (pnm_getdata(in, &hdr, image)) {
-		jas_image_destroy(image);
-		return 0;
+	if (pnm_getdata(in, &hdr, image, opts.allow_trunc)) {
+		goto error;
 	}
 
 	return image;
+
+error:
+	if (image) {
+		jas_image_destroy(image);
+	}
+	return 0;
 }
 
 /******************************************************************************\
@@ -262,7 +335,8 @@ static int pnm_gethdr(jas_stream_t *in, pnm_hdr_t *hdr)
 * Functions for processing the sample data.
 \******************************************************************************/
 
-static int pnm_getdata(jas_stream_t *in, pnm_hdr_t *hdr, jas_image_t *image)
+static int pnm_getdata(jas_stream_t *in, pnm_hdr_t *hdr, jas_image_t *image,
+  int allow_trunc)
 {
 	int ret;
 #if 0
@@ -331,7 +405,7 @@ static int pnm_getdata(jas_stream_t *in, pnm_hdr_t *hdr, jas_image_t *image)
 							/* The sample data is signed. */
 							int_fast32_t sv;
 							if (pnm_getsint(in, depth, &sv)) {
-								if (!pnm_allowtrunc) {
+								if (!allow_trunc) {
 									goto done;
 								}
 								jas_eprintf("bad sample data\n");
@@ -342,7 +416,7 @@ static int pnm_getdata(jas_stream_t *in, pnm_hdr_t *hdr, jas_image_t *image)
 							/* The sample data is unsigned. */
 							uint_fast32_t uv;
 							if (pnm_getuint(in, depth, &uv)) {
-								if (!pnm_allowtrunc) {
+								if (!allow_trunc) {
 									goto done;
 								}
 								jas_eprintf("bad sample data\n");
@@ -356,7 +430,7 @@ static int pnm_getdata(jas_stream_t *in, pnm_hdr_t *hdr, jas_image_t *image)
 							/* The sample data is signed. */
 							int_fast32_t sv;
 							if (pnm_getsintstr(in, &sv)) {
-								if (!pnm_allowtrunc) {
+								if (!allow_trunc) {
 									goto done;
 								}
 								jas_eprintf("bad sample data\n");
@@ -367,7 +441,7 @@ static int pnm_getdata(jas_stream_t *in, pnm_hdr_t *hdr, jas_image_t *image)
 							/* The sample data is unsigned. */
 							uint_fast32_t uv;
 							if (pnm_getuintstr(in, &uv)) {
-								if (!pnm_allowtrunc) {
+								if (!allow_trunc) {
 									goto done;
 								}
 								jas_eprintf("bad sample data\n");

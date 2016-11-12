@@ -161,7 +161,7 @@ static int jpc_enc_encodemainbody(jpc_enc_t *enc);
 int jpc_enc_encodetiledata(jpc_enc_t *enc);
 int rateallocate(jpc_enc_t *enc, int numlyrs, uint_fast32_t *cumlens);
 int setins(int numvalues, jpc_flt_t *values, jpc_flt_t value);
-static jpc_enc_cp_t *cp_create(char *optstr, jas_image_t *image);
+static jpc_enc_cp_t *cp_create(const char *optstr, jas_image_t *image);
 void jpc_enc_cp_destroy(jpc_enc_cp_t *cp);
 static uint_fast32_t jpc_abstorelstepsize(jpc_fix_t absdelta, int scaleexpn);
 
@@ -277,7 +277,7 @@ static jas_taginfo_t modetab[] = {
 * The main encoder entry point.
 \******************************************************************************/
 
-int jpc_encode(jas_image_t *image, jas_stream_t *out, char *optstr)
+int jpc_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 {
 	jpc_enc_t *enc;
 	jpc_enc_cp_t *cp;
@@ -340,7 +340,7 @@ error:
 * Option parsing code.
 \******************************************************************************/
 
-static jpc_enc_cp_t *cp_create(char *optstr, jas_image_t *image)
+static jpc_enc_cp_t *cp_create(const char *optstr, jas_image_t *image)
 {
 	jpc_enc_cp_t *cp;
 	jas_tvparser_t *tvp;

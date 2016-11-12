@@ -421,7 +421,7 @@ static void jas_image_cmpt_destroy(jas_image_cmpt_t *cmpt)
 * Load and save operations.
 \******************************************************************************/
 
-jas_image_t *jas_image_decode(jas_stream_t *in, int fmt, char *optstr)
+jas_image_t *jas_image_decode(jas_stream_t *in, int fmt, const char *optstr)
 {
 	jas_image_fmtinfo_t *fmtinfo;
 	jas_image_t *image;
@@ -459,7 +459,8 @@ error:
 	return 0;
 }
 
-int jas_image_encode(jas_image_t *image, jas_stream_t *out, int fmt, char *optstr)
+int jas_image_encode(jas_image_t *image, jas_stream_t *out, int fmt,
+  const char *optstr)
 {
 	jas_image_fmtinfo_t *fmtinfo;
 	if (!(fmtinfo = jas_image_lookupfmtbyid(fmt))) {

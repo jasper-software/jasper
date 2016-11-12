@@ -86,7 +86,7 @@ static int clrspctojp2(jas_clrspc_t clrspc);
 * Functions.
 \******************************************************************************/
 
-int jp2_encode(jas_image_t *image, jas_stream_t *out, char *optstr)
+int jp2_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 {
 	jp2_box_t *box;
 	jp2_ftyp_t *ftyp;
@@ -103,12 +103,12 @@ int jp2_encode(jas_image_t *image, jas_stream_t *out, char *optstr)
 	jp2_cdef_t *cdef;
 	int i;
 	uint_fast32_t typeasoc;
-jas_iccprof_t *iccprof;
-jas_stream_t *iccstream;
-int pos;
-int needcdef;
-int prec;
-int sgnd;
+	jas_iccprof_t *iccprof;
+	jas_stream_t *iccstream;
+	int pos;
+	int needcdef;
+	int prec;
+	int sgnd;
 
 	box = 0;
 	tmpstream = 0;

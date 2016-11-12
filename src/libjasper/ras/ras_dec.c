@@ -97,7 +97,7 @@ static int ras_getcmap(jas_stream_t *in, ras_hdr_t *hdr, ras_cmap_t *cmap);
 * Code.
 \******************************************************************************/
 
-jas_image_t *ras_decode(jas_stream_t *in, char *optstr)
+jas_image_t *ras_decode(jas_stream_t *in, const char *optstr)
 {
 	ras_hdr_t hdr;
 	ras_cmap_t cmap;

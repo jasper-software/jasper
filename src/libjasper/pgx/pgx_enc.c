@@ -90,7 +90,7 @@ static uint_fast32_t pgx_inttoword(int_fast32_t val, int prec, bool sgnd);
 
 /* Save an image to a stream in the the PGX format. */
 
-int pgx_encode(jas_image_t *image, jas_stream_t *out, char *optstr)
+int pgx_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 {
 	pgx_hdr_t hdr;
 	uint_fast32_t width;

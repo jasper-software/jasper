@@ -143,7 +143,7 @@ static jas_taginfo_t decopts[] = {
 	{-1, 0}
 };
 
-static int jpg_dec_parseopts(char *optstr, jpg_dec_importopts_t *opts)
+static int jpg_dec_parseopts(const char *optstr, jpg_dec_importopts_t *opts)
 {
 	jas_tvparser_t *tvp;
 
@@ -177,7 +177,7 @@ static int jpg_dec_parseopts(char *optstr, jpg_dec_importopts_t *opts)
 
 /* Load an image from a stream in the JPG format. */
 
-jas_image_t *jpg_decode(jas_stream_t *in, char *optstr)
+jas_image_t *jpg_decode(jas_stream_t *in, const char *optstr)
 {
 	struct jpeg_decompress_struct cinfo;
 	struct jpeg_error_mgr jerr;

@@ -127,7 +127,7 @@ static void jpg_start_input(j_compress_ptr cinfo, struct jpg_src_s *sinfo);
 static JDIMENSION jpg_get_pixel_rows(j_compress_ptr cinfo, struct jpg_src_s *sinfo);
 static void jpg_finish_input(j_compress_ptr cinfo, struct jpg_src_s *sinfo);
 static J_COLOR_SPACE tojpgcs(int colorspace);
-static int jpg_parseencopts(char *optstr, jpg_encopts_t *encopts);
+static int jpg_parseencopts(const char *optstr, jpg_encopts_t *encopts);
 
 /******************************************************************************\
 *
@@ -194,7 +194,7 @@ static void jpg_finish_input(j_compress_ptr cinfo, struct jpg_src_s *sinfo)
 
 /* Save an image to a stream in the the JPG format. */
 
-int jpg_encode(jas_image_t *image, jas_stream_t *out, char *optstr)
+int jpg_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 {
 	JDIMENSION numscanlines;
 	struct jpeg_compress_struct cinfo;
@@ -211,8 +211,9 @@ int jpg_encode(jas_image_t *image, jas_stream_t *out, char *optstr)
 
 	output_file = 0;
 
-	if (jpg_parseencopts(optstr, &encopts))
+	if (jpg_parseencopts(optstr, &encopts)) {
 		goto error;
+	}
 
 	switch (jas_clrspc_fam(jas_image_clrspc(image))) {
 	case JAS_CLRSPC_FAM_RGB:
@@ -363,7 +364,7 @@ static J_COLOR_SPACE tojpgcs(int colorspace)
 }
 
 /* Parse the encoder options string. */
-static int jpg_parseencopts(char *optstr, jpg_encopts_t *encopts)
+static int jpg_parseencopts(const char *optstr, jpg_encopts_t *encopts)
 {
 	jas_tvparser_t *tvp;
 	char *qual_str;

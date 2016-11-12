@@ -235,7 +235,7 @@ jpc_dec_mstabent_t jpc_dec_mstab[] = {
 * The main entry point for the JPEG-2000 decoder.
 \******************************************************************************/
 
-jas_image_t *jpc_decode(jas_stream_t *in, char *optstr)
+jas_image_t *jpc_decode(jas_stream_t *in, const char *optstr)
 {
 	jpc_dec_importopts_t *opts;
 	jpc_dec_t *dec;

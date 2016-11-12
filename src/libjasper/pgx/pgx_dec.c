@@ -93,7 +93,7 @@ static jas_seqent_t pgx_wordtoint(uint_fast32_t word, int prec, bool sgnd);
 
 /* Load an image from a stream in the PGX format. */
 
-jas_image_t *pgx_decode(jas_stream_t *in, char *optstr)
+jas_image_t *pgx_decode(jas_stream_t *in, const char *optstr)
 {
 	jas_image_t *image;
 	pgx_hdr_t hdr;
