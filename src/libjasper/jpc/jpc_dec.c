@@ -244,6 +244,8 @@ jas_image_t *jpc_decode(jas_stream_t *in, char *optstr)
 	dec = 0;
 	opts = 0;
 
+	JAS_DBGLOG(100, ("jpc_decode(%p, \"%s\")\n", in, optstr));
+
 	if (!(opts = jpc_dec_opts_create(optstr))) {
 		goto error;
 	}

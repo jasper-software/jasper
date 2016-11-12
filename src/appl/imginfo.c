@@ -174,6 +174,7 @@ int main(int argc, char **argv)
 			break;
 		case OPT_MAXSAMPLES:
 			max_samples = strtoull(jas_optarg, 0, 10);
+			max_samples_valid = true;
 			break;
 		case OPT_MAXMEM:
 			max_mem = strtoull(jas_optarg, 0, 10);

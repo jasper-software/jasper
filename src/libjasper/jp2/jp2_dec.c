@@ -121,6 +121,8 @@ jas_image_t *jp2_decode(jas_stream_t *in, char *optstr)
 	box = 0;
 	image = 0;
 
+	JAS_DBGLOG(100, ("jp2_decode(%p, \"%s\")\n", in, optstr));
+
 	if (!(dec = jp2_dec_create())) {
 		goto error;
 	}
