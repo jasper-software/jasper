@@ -39,7 +39,7 @@ for in_file in "${good_list[@]}"; do
 	echo "actual exit status: $status"
 	echo "expected exit status: $expected_status"
 	if [ "$status" -ne "$expected_status" ]; then
-		echo "imginfo command had unexpected exit status " \
+		echo "ERROR: imginfo command had unexpected exit status " \
 		  "(expected $expected_status got $status)"
 		error_count=$((error_count + 1))
 	fi
@@ -81,7 +81,7 @@ for in_file in "${bad_list[@]}"; do
 	echo "actual exit status: $status"
 	echo "expected exit status: $expected_status"
 	if [ "$status" -ne 1 ]; then
-		echo "imginfo command had unexpected exit status " \
+		echo "ERROR: imginfo command had unexpected exit status " \
 		  "(expected $expected_status got $status)"
 		error_count=$((error_count + 1))
 	fi
@@ -90,8 +90,8 @@ echo "############################################################"
 
 echo "error count: $error_count"
 if [ "$error_count" -gt 0 ]; then
-	echo "status: FAILED"
+	echo "STATUS: FAILED"
 	panic "FAILED"
 fi
 
-echo "status: PASSED"
+echo "STATUS: PASSED"
