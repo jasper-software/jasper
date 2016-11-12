@@ -180,7 +180,7 @@ jas_image_t *pnm_decode(jas_stream_t *in, char *opts)
 
 int pnm_validate(jas_stream_t *in)
 {
-	uchar buf[2];
+	jas_uchar buf[2];
 	int i;
 	int n;
 

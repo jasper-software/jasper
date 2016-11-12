@@ -71,18 +71,21 @@
 * Includes.
 \******************************************************************************/
 
+/* The configuration header file should be included first. */
+#include "jasper/jas_config.h"
+
 #include <assert.h>
-#if defined(HAVE_FCNTL_H)
+#if defined(JAS_HAVE_FCNTL_H)
 #include <fcntl.h>
 #endif
 #include <stdlib.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <ctype.h>
-#if defined(HAVE_UNISTD_H)
+#if defined(JAS_HAVE_UNISTD_H)
 #include <unistd.h>
 #endif
-#if defined(WIN32) || defined(HAVE_IO_H)
+#if defined(WIN32) || defined(JAS_HAVE_IO_H)
 #include <io.h>
 #endif
 
@@ -909,7 +912,7 @@ static void jas_stream_initbuf(jas_stream_t *stream, int bufmode, char *buf,
 			/* The buffer must be large enough to accommodate maximum
 			  putback. */
 			assert(bufsize > JAS_STREAM_MAXPUTBACK);
-			stream->bufbase_ = JAS_CAST(uchar *, buf);
+			stream->bufbase_ = JAS_CAST(jas_uchar *, buf);
 			stream->bufsize_ = bufsize - JAS_STREAM_MAXPUTBACK;
 		}
 	} else {

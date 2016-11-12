@@ -961,7 +961,7 @@ startoff = jas_stream_getrwcount(enc->out);
 	com = &enc->mrk->parms.com;
 	com->len = JAS_CAST(uint_fast16_t, strlen(buf));
 	com->regid = JPC_COM_LATIN;
-	if (!(com->data = JAS_CAST(uchar *, jas_strdup(buf)))) {
+	if (!(com->data = JAS_CAST(jas_uchar *, jas_strdup(buf)))) {
 		abort();
 	}
 	if (jpc_putms(enc->out, enc->cstate, enc->mrk)) {

@@ -74,6 +74,7 @@
 extern "C" {
 #endif
 
+/* The configuration header file should be included first. */
 #include <jasper/jas_config.h>
 
 /******************************************************************************\

@@ -370,7 +370,7 @@ error:
 
 int mif_validate(jas_stream_t *in)
 {
-	uchar buf[MIF_MAGICLEN];
+	jas_uchar buf[MIF_MAGICLEN];
 	uint_fast32_t magic;
 	int i;
 	int n;
@@ -462,7 +462,7 @@ static int mif_hdr_growcmpts(mif_hdr_t *hdr, int maxcmpts)
 
 static mif_hdr_t *mif_hdr_get(jas_stream_t *in)
 {
-	uchar magicbuf[MIF_MAGICLEN];
+	jas_uchar magicbuf[MIF_MAGICLEN];
 	char buf[4096];
 	mif_hdr_t *hdr;
 	bool done;

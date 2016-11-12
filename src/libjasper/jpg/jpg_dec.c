@@ -80,6 +80,14 @@
 * Types.
 \******************************************************************************/
 
+typedef struct {
+	size_t max_samples;
+} jpg_dec_importopts_t;
+
+typedef enum {
+	OPT_MAXSIZE,
+} optid_t;
+
 /* JPEG decoder data sink type. */
 
 typedef struct jpg_dest_s {
@@ -127,19 +135,11 @@ static int jpg_copystreamtofile(FILE *out, jas_stream_t *in);
 static jas_image_t *jpg_mkimage(j_decompress_ptr cinfo);
 
 /******************************************************************************\
-*
+* Option parsing.
 \******************************************************************************/
 
-typedef struct {
-	size_t max_size;
-} jpg_dec_importopts_t;
-
-typedef enum {
-	OPT_MAXSIZE,
-} optid_t;
-
 static jas_taginfo_t decopts[] = {
-	{OPT_MAXSIZE, "max_size"},
+	{OPT_MAXSIZE, "max_samples"},
 	{-1, 0}
 };
 
@@ -147,7 +147,7 @@ static int jpg_dec_parseopts(char *optstr, jpg_dec_importopts_t *opts)
 {
 	jas_tvparser_t *tvp;
 
-	opts->max_size = 0;
+	opts->max_samples = 64 * JAS_MEBI;
 
 	if (!(tvp = jas_tvparser_create(optstr ? optstr : ""))) {
 		return -1;
@@ -157,7 +157,7 @@ static int jpg_dec_parseopts(char *optstr, jpg_dec_importopts_t *opts)
 		switch (jas_taginfo_nonull(jas_taginfos_lookup(decopts,
 		  jas_tvparser_gettag(tvp)))->id) {
 		case OPT_MAXSIZE:
-			opts->max_size = atoi(jas_tvparser_getval(tvp));
+			opts->max_samples = atoi(jas_tvparser_getval(tvp));
 			break;
 		default:
 			jas_eprintf("warning: ignoring invalid option %s\n",
@@ -188,7 +188,9 @@ jas_image_t *jpg_decode(jas_stream_t *in, char *optstr)
 	jas_image_t *image;
 	int ret;
 	jpg_dec_importopts_t opts;
-	size_t size;
+	size_t num_samples;
+
+	JAS_DBGLOG(100, ("jpg_decode(%p, \"%s\")\n", in, optstr));
 
 	if (jpg_dec_parseopts(optstr, &opts)) {
 		goto error;
@@ -236,6 +238,18 @@ jas_image_t *jpg_decode(jas_stream_t *in, char *optstr)
 	  cinfo.image_width, cinfo.image_height, cinfo.num_components)
 	  );
 
+	if (opts.max_samples > 0) {
+		if (!jas_safe_size_mul3(cinfo.image_width, cinfo.image_height,
+		  cinfo.num_components, &num_samples)) {
+			goto error;
+		}
+		if (num_samples > opts.max_samples) {
+			jas_eprintf("image is too large (%zu > %zu)\n", num_samples,
+			  opts.max_samples);
+			goto error;
+		}
+	}
+
 	/* Start the decompressor. */
 	JAS_DBGLOG(10, ("jpeg_start_decompress(%p)\n", &cinfo));
 	ret = jpeg_start_decompress(&cinfo);
@@ -244,18 +258,6 @@ jas_image_t *jpg_decode(jas_stream_t *in, char *optstr)
 	  "header: output_width %d; output_height %d; output_components %d\n",
 	  cinfo.output_width, cinfo.output_height, cinfo.output_components)
 	  );
-
-	if (opts.max_size) {
-		if (!jas_safe_size_mul(cinfo.output_width, cinfo.output_height,
-		  &size) ||
-		  !jas_safe_size_mul(size, cinfo.output_components, &size)) {
-			goto error;
-		}
-		if (size > opts.max_size) {
-			jas_eprintf("image is too large\n");
-			goto error;
-		}
-	}
 
 	/* Create an image object to hold the decoded data. */
 	if (!(image = jpg_mkimage(&cinfo))) {

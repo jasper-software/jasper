@@ -185,7 +185,7 @@ jas_image_t *ras_decode(jas_stream_t *in, char *optstr)
 
 int ras_validate(jas_stream_t *in)
 {
-	uchar buf[RAS_MAGICLEN];
+	jas_uchar buf[RAS_MAGICLEN];
 	int i;
 	int n;
 	uint_fast32_t magic;

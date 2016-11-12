@@ -1,0 +1,27 @@
+#ifndef JAS_CONFIG_H
+#define JAS_CONFIG_H
+
+/* This preprocessor symbol identifies the version of JasPer. */
+#define	JAS_VERSION "@JAS_VERSION@"
+
+@JAS_HAVE_FCNTL_H@
+@JAS_HAVE_IO_H@
+@JAS_HAVE_UNISTD_H@
+@JAS_HAVE_WINDOWS_H@
+@JAS_HAVE_SYS_TIME_H@
+@JAS_HAVE_SYS_TYPES_H@
+
+@JAS_HAVE_GETTIMEOFDAY@
+@JAS_HAVE_GETRUSAGE@
+
+#if defined(__GNUC__) && !defined(__clang__)
+#define JAS_ATTRIBUTE_DISABLE_USAN \
+  __attribute__((no_sanitize_undefined))
+#elif defined(__clang__)
+#define JAS_ATTRIBUTE_DISABLE_USAN \
+  __attribute__((no_sanitize("undefined")))
+#else
+#define JAS_ATTRIBUTE_DISABLE_USAN
+#endif
+
+#endif

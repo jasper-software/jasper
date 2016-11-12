@@ -70,23 +70,10 @@
  * normally defined by configure.
  */
 
-#define	uchar		unsigned char
-#define	ushort		unsigned short
-#define	uint		unsigned int
-#define	ulong		unsigned long
-#undef longlong
-#define	longlong	long long
-#undef ulonglong
-#define	ulonglong	unsigned long long
-/*#define	ssize_t		int*/
-
 #define	HAVE_FCNTL_H		1
-#define	HAVE_LIMITS_H		1
 #define	HAVE_IO_H		1
 #define	HAVE_WINDOWS_H		1
 #define	HAVE_SYS_TYPES_H	1
-#define	HAVE_STDLIB_H		1
-#define	HAVE_STDDEF_H		1
 
 #ifndef __cplusplus
 #undef inline

@@ -151,7 +151,7 @@ error:
 
 int pgx_validate(jas_stream_t *in)
 {
-	uchar buf[PGX_MAGICLEN];
+	jas_uchar buf[PGX_MAGICLEN];
 	uint_fast32_t magic;
 	int i;
 	int n;
@@ -195,7 +195,7 @@ int pgx_validate(jas_stream_t *in)
 static int pgx_gethdr(jas_stream_t *in, pgx_hdr_t *hdr)
 {
 	int c;
-	uchar buf[2];
+	jas_uchar buf[2];
 
 	if ((c = jas_stream_getc(in)) == EOF) {
 		goto error;

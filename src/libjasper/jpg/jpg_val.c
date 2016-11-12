@@ -77,7 +77,7 @@
 
 int jpg_validate(jas_stream_t *in)
 {
-	uchar buf[JPG_MAGICLEN];
+	jas_uchar buf[JPG_MAGICLEN];
 	int i;
 	int n;
 

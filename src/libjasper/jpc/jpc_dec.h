@@ -99,7 +99,7 @@ typedef struct {
 	uint_fast32_t len;
 
 	/* The data. */
-	uchar *data;
+	jas_uchar *data;
 
 } jpc_ppxstabent_t;
 

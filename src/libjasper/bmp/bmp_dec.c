@@ -78,8 +78,21 @@
 #include "jasper/jas_image.h"
 #include "jasper/jas_malloc.h"
 #include "jasper/jas_debug.h"
+#include "jasper/jas_tvp.h"
 
 #include "bmp_cod.h"
+
+/******************************************************************************\
+* Local types.
+\******************************************************************************/
+
+typedef struct {
+	size_t max_samples;
+} bmp_dec_importopts_t;
+
+typedef enum {
+	OPT_MAXSIZE,
+} optid_t;
 
 /******************************************************************************\
 * Local prototypes.
@@ -91,6 +104,43 @@ static int bmp_getdata(jas_stream_t *in, bmp_info_t *info, jas_image_t *image);
 static int bmp_getint16(jas_stream_t *in, int_fast16_t *val);
 static int bmp_getint32(jas_stream_t *in, int_fast32_t *val);
 static int bmp_gobble(jas_stream_t *in, long n);
+
+/******************************************************************************\
+* Option parsing.
+\******************************************************************************/
+
+static jas_taginfo_t decopts[] = {
+	{OPT_MAXSIZE, "max_samples"},
+	{-1, 0}
+};
+
+static int bmp_dec_parseopts(char *optstr, bmp_dec_importopts_t *opts)
+{
+	jas_tvparser_t *tvp;
+
+	opts->max_samples = 128 * JAS_MEBI;
+
+	if (!(tvp = jas_tvparser_create(optstr ? optstr : ""))) {
+		return -1;
+	}
+
+	while (!jas_tvparser_next(tvp)) {
+		switch (jas_taginfo_nonull(jas_taginfos_lookup(decopts,
+		  jas_tvparser_gettag(tvp)))->id) {
+		case OPT_MAXSIZE:
+			opts->max_samples = atoi(jas_tvparser_getval(tvp));
+			break;
+		default:
+			jas_eprintf("warning: ignoring invalid option %s\n",
+			  jas_tvparser_gettag(tvp));
+			break;
+		}
+	}
+
+	jas_tvparser_destroy(tvp);
+
+	return 0;
+}
 
 /******************************************************************************\
 * Interface functions.
@@ -106,12 +156,14 @@ jas_image_t *bmp_decode(jas_stream_t *in, char *optstr)
 	jas_image_cmptparm_t *cmptparm;
 	uint_fast16_t numcmpts;
 	long n;
+	bmp_dec_importopts_t opts;
+	size_t num_samples;
 
 	image = 0;
 	info = 0;
 
-	if (optstr) {
-		jas_eprintf("warning: ignoring BMP decoder options\n");
+	if (bmp_dec_parseopts(optstr, &opts)) {
+		goto error;
 	}
 
 	jas_eprintf(
@@ -125,7 +177,6 @@ jas_image_t *bmp_decode(jas_stream_t *in, char *optstr)
 	if (bmp_gethdr(in, &hdr)) {
 		jas_eprintf("cannot get header\n");
 		goto error;
-		//return 0;
 	}
 	JAS_DBGLOG(1, (
 	  "BMP header: magic 0x%x; siz %d; res1 %d; res2 %d; off %d\n",
@@ -135,7 +186,6 @@ jas_image_t *bmp_decode(jas_stream_t *in, char *optstr)
 	/* Read the bitmap information. */
 	if (!(info = bmp_getinfo(in))) {
 		jas_eprintf("cannot get info\n");
-		//return 0;
 		goto error;
 	}
 	JAS_DBGLOG(1,
@@ -154,11 +204,21 @@ jas_image_t *bmp_decode(jas_stream_t *in, char *optstr)
 		goto error;
 	}
 
+	if (!jas_safe_size_mul3(info->width, info->height, info->numplanes,
+	  &num_samples)) {
+		jas_eprintf("image size too large\n");
+		goto error;
+	}
+
+	if (opts.max_samples > 0 && num_samples > opts.max_samples) {
+		jas_eprintf("maximum number of pixels exceeded (%zu)\n",
+		  opts.max_samples);
+		goto error;
+	}
+
 	/* Ensure that we support this type of BMP file. */
 	if (!bmp_issupported(&hdr, info)) {
 		jas_eprintf("error: unsupported BMP encoding\n");
-		//bmp_info_destroy(info);
-		//return 0;
 		goto error;
 	}
 
@@ -167,13 +227,10 @@ jas_image_t *bmp_decode(jas_stream_t *in, char *optstr)
 	if ((n = hdr.off - (BMP_HDRLEN + BMP_INFOLEN + BMP_PALLEN(info))) < 0) {
 		jas_eprintf("error: possibly bad bitmap offset?\n");
 		goto error;
-		//return 0;
 	}
 	if (n > 0) {
 		jas_eprintf("skipping unknown data in BMP file\n");
 		if (bmp_gobble(in, n)) {
-			//bmp_info_destroy(info);
-			//return 0;
 			goto error;
 		}
 	}
@@ -196,8 +253,6 @@ jas_image_t *bmp_decode(jas_stream_t *in, char *optstr)
 	/* Create image object. */
 	if (!(image = jas_image_create(numcmpts, cmptparms,
 	  JAS_CLRSPC_UNKNOWN))) {
-		//bmp_info_destroy(info);
-		//return 0;
 		goto error;
 	}
 
@@ -217,9 +272,6 @@ jas_image_t *bmp_decode(jas_stream_t *in, char *optstr)
 
 	/* Read the bitmap data. */
 	if (bmp_getdata(in, info, image)) {
-		//bmp_info_destroy(info);
-		//jas_image_destroy(image);
-		//return 0;
 		goto error;
 	}
 
@@ -241,7 +293,7 @@ int bmp_validate(jas_stream_t *in)
 {
 	int n;
 	int i;
-	uchar buf[2];
+	jas_uchar buf[2];
 
 	assert(JAS_STREAM_MAXPUTBACK >= 2);
 

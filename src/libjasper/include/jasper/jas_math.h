@@ -74,7 +74,9 @@
 * Includes
 \******************************************************************************/
 
+/* The configuration header file should be included first. */
 #include <jasper/jas_config.h>
+
 #include <jasper/jas_types.h>
 
 #include <assert.h>
@@ -90,6 +92,9 @@ extern "C" {
 /******************************************************************************\
 * Macros
 \******************************************************************************/
+
+#define JAS_KIBI	JAS_CAST(size_t, 1024)
+#define JAS_MEBI	(JAS_KIBI * JAS_KIBI)
 
 /* Compute the absolute value. */
 #define	JAS_ABS(x) \
@@ -187,6 +192,20 @@ inline static bool jas_safe_size_mul(size_t x, size_t y, size_t *result)
 	return true;
 }
 
+inline static bool jas_safe_size_mul3(size_t a, size_t b, size_t c,
+  size_t *result)
+{
+	size_t tmp;
+	if (!jas_safe_size_mul(a, b, &tmp) ||
+	  !jas_safe_size_mul(tmp, c, &tmp)) {
+		return false;
+	}
+	if (result) {
+		*result = tmp;
+	}
+	return true;
+}
+
 /* Compute the sum of two size_t integer with overflow checking. */
 inline static bool jas_safe_size_add(size_t x, size_t y, size_t *result)
 {
@@ -207,6 +226,57 @@ inline static bool jas_safe_size_sub(size_t x, size_t y, size_t *result)
 	}
 	if (result) {
 		*result = x - y;
+	}
+	return true;
+}
+
+/* Compute the sum of two size_t integer with overflow checking. */
+inline static bool jas_safe_intfast32_mul(int_fast32_t x, int_fast32_t y,
+  int_fast32_t *result)
+{
+	if (x > 0) {
+		/* x is positive */
+		if (y > 0) {
+			/* x and y are positive */
+			if (x > INT_FAST32_MAX / y) {
+				return false;
+			}
+		} else {
+			/* x positive, y nonpositive */
+			if (y < INT_FAST32_MIN / x) {
+				return false;
+			}
+		}
+	} else {
+		/* x is nonpositive */
+		if (y > 0) {
+			/* x is nonpositive, y is positive */
+			if (x < INT_FAST32_MIN / y) {
+				return false;
+			}
+		} else { /* x and y are nonpositive */
+			if (x != 0 && y < INT_FAST32_MAX / x) {
+				return false;
+			}
+		}
+	}
+
+	if (result) {
+		*result = x * y;
+	}
+	return true;
+}
+
+inline static bool jas_safe_intfast32_mul3(int_fast32_t a, int_fast32_t b,
+  int_fast32_t c, int_fast32_t *result)
+{
+	int_fast32_t tmp;
+	if (!jas_safe_intfast32_mul(a, b, &tmp) ||
+	  !jas_safe_intfast32_mul(tmp, c, &tmp)) {
+		return false;
+	}
+	if (result) {
+		*result = tmp;
 	}
 	return true;
 }

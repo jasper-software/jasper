@@ -74,7 +74,9 @@
 * Includes.
 \******************************************************************************/
 
+/* The configuration header file should be included first. */
 #include <jasper/jas_config.h>
+
 #include <jasper/jas_stream.h>
 #include <jasper/jas_seq.h>
 #include <jasper/jas_cm.h>
@@ -217,7 +219,7 @@ typedef struct {
 
 	jas_cmprof_t *cmprof_;
 
-	bool inmem_;
+//	bool inmem_;
 
 } jas_image_t;
 

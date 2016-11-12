@@ -69,6 +69,9 @@
 * Includes.
 \******************************************************************************/
 
+/* The configuration header file should be included first. */
+#include "jasper/jas_config.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -79,7 +82,7 @@
 * Code.
 \******************************************************************************/
 
-#if defined(HAVE_GETTIMEOFDAY)
+#if defined(JAS_HAVE_GETTIMEOFDAY)
 
 void jas_tmr_start(jas_tmr_t *tmr)
 {
@@ -104,7 +107,7 @@ double jas_tmr_get(jas_tmr_t *tmr)
 	return t1 - t0;
 }
 
-#elif defined(HAVE_GETRUSAGE)
+#elif defined(JAS_HAVE_GETRUSAGE)
 
 void jas_tmr_start(jas_tmr_t *tmr)
 {

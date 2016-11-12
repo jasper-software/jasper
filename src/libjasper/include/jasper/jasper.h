@@ -62,7 +62,9 @@
 #ifndef JAS_JASPER_H
 #define JAS_JASPER_H
 
+/* The configuration header file should be included first. */
 #include <jasper/jas_config.h>
+
 #include <jasper/jas_types.h>
 #include <jasper/jas_version.h>
 

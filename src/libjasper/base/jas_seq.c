@@ -84,7 +84,8 @@
 * Constructors and destructors.
 \******************************************************************************/
 
-jas_matrix_t *jas_seq2d_create(int xstart, int ystart, int xend, int yend)
+jas_matrix_t *jas_seq2d_create(jas_matind_t xstart, jas_matind_t ystart,
+  jas_matind_t xend, jas_matind_t yend)
 {
 	jas_matrix_t *matrix;
 	assert(xstart <= xend && ystart <= yend);
@@ -98,10 +99,10 @@ jas_matrix_t *jas_seq2d_create(int xstart, int ystart, int xend, int yend)
 	return matrix;
 }
 
-jas_matrix_t *jas_matrix_create(int numrows, int numcols)
+jas_matrix_t *jas_matrix_create(jas_matind_t numrows, jas_matind_t numcols)
 {
 	jas_matrix_t *matrix;
-	int i;
+	jas_matind_t i;
 	size_t size;
 
 	matrix = 0;
@@ -180,8 +181,8 @@ void jas_matrix_destroy(jas_matrix_t *matrix)
 jas_seq2d_t *jas_seq2d_copy(jas_seq2d_t *x)
 {
 	jas_matrix_t *y;
-	int i;
-	int j;
+	jas_matind_t i;
+	jas_matind_t j;
 	y = jas_seq2d_create(jas_seq2d_xstart(x), jas_seq2d_ystart(x),
 	  jas_seq2d_xend(x), jas_seq2d_yend(x));
 	assert(y);
@@ -196,8 +197,8 @@ jas_seq2d_t *jas_seq2d_copy(jas_seq2d_t *x)
 jas_matrix_t *jas_matrix_copy(jas_matrix_t *x)
 {
 	jas_matrix_t *y;
-	int i;
-	int j;
+	jas_matind_t i;
+	jas_matind_t j;
 	y = jas_matrix_create(x->numrows_, x->numcols_);
 	for (i = 0; i < x->numrows_; ++i) {
 		for (j = 0; j < x->numcols_; ++j) {
@@ -211,17 +212,17 @@ jas_matrix_t *jas_matrix_copy(jas_matrix_t *x)
 * Bind operations.
 \******************************************************************************/
 
-void jas_seq2d_bindsub(jas_matrix_t *s, jas_matrix_t *s1, int xstart,
-  int ystart, int xend, int yend)
+void jas_seq2d_bindsub(jas_matrix_t *s, jas_matrix_t *s1, jas_matind_t xstart,
+  jas_matind_t ystart, jas_matind_t xend, jas_matind_t yend)
 {
 	jas_matrix_bindsub(s, s1, ystart - s1->ystart_, xstart - s1->xstart_,
 	  yend - s1->ystart_ - 1, xend - s1->xstart_ - 1);
 }
 
-void jas_matrix_bindsub(jas_matrix_t *mat0, jas_matrix_t *mat1, int r0,
-  int c0, int r1, int c1)
+void jas_matrix_bindsub(jas_matrix_t *mat0, jas_matrix_t *mat1,
+  jas_matind_t r0, jas_matind_t c0, jas_matind_t r1, jas_matind_t c1)
 {
-	int i;
+	jas_matind_t i;
 
 	if (mat0->data_) {
 		if (!(mat0->flags_ & JAS_MATRIX_REF)) {
@@ -265,8 +266,8 @@ void jas_matrix_bindsub(jas_matrix_t *mat0, jas_matrix_t *mat1, int r0,
 
 int jas_matrix_cmp(jas_matrix_t *mat0, jas_matrix_t *mat1)
 {
-	int i;
-	int j;
+	jas_matind_t i;
+	jas_matind_t j;
 
 	if (mat0->numrows_ != mat1->numrows_ || mat0->numcols_ !=
 	  mat1->numcols_) {
@@ -284,10 +285,10 @@ int jas_matrix_cmp(jas_matrix_t *mat0, jas_matrix_t *mat1)
 
 void jas_matrix_divpow2(jas_matrix_t *matrix, int n)
 {
-	int i;
-	int j;
+	jas_matind_t i;
+	jas_matind_t j;
 	jas_seqent_t *rowstart;
-	int rowstep;
+	jas_matind_t rowstep;
 	jas_seqent_t *data;
 
 	if (jas_matrix_numrows(matrix) > 0 && jas_matrix_numcols(matrix) > 0) {
@@ -307,12 +308,12 @@ void jas_matrix_divpow2(jas_matrix_t *matrix, int n)
 void jas_matrix_clip(jas_matrix_t *matrix, jas_seqent_t minval,
   jas_seqent_t maxval)
 {
-	int i;
-	int j;
+	jas_matind_t i;
+	jas_matind_t j;
 	jas_seqent_t v;
 	jas_seqent_t *rowstart;
 	jas_seqent_t *data;
-	int rowstep;
+	jas_matind_t rowstep;
 
 	if (jas_matrix_numrows(matrix) > 0 && jas_matrix_numcols(matrix) > 0) {
 		assert(matrix->rows_);
@@ -335,10 +336,10 @@ void jas_matrix_clip(jas_matrix_t *matrix, jas_seqent_t minval,
 
 void jas_matrix_asr(jas_matrix_t *matrix, int n)
 {
-	int i;
-	int j;
+	jas_matind_t i;
+	jas_matind_t j;
 	jas_seqent_t *rowstart;
-	int rowstep;
+	jas_matind_t rowstep;
 	jas_seqent_t *data;
 
 	assert(n >= 0);
@@ -358,10 +359,10 @@ void jas_matrix_asr(jas_matrix_t *matrix, int n)
 
 void jas_matrix_asl(jas_matrix_t *matrix, int n)
 {
-	int i;
-	int j;
+	jas_matind_t i;
+	jas_matind_t j;
 	jas_seqent_t *rowstart;
-	int rowstep;
+	jas_matind_t rowstep;
 	jas_seqent_t *data;
 
 	if (jas_matrix_numrows(matrix) > 0 && jas_matrix_numcols(matrix) > 0) {
@@ -382,10 +383,11 @@ void jas_matrix_asl(jas_matrix_t *matrix, int n)
 * Code.
 \******************************************************************************/
 
-int jas_matrix_resize(jas_matrix_t *matrix, int numrows, int numcols)
+int jas_matrix_resize(jas_matrix_t *matrix, jas_matind_t numrows,
+  jas_matind_t numcols)
 {
-	int size;
-	int i;
+	jas_matind_t size;
+	jas_matind_t i;
 
 	size = numrows * numcols;
 	if (size > matrix->datasize_ || numrows > matrix->maxrows_) {
@@ -404,10 +406,10 @@ int jas_matrix_resize(jas_matrix_t *matrix, int numrows, int numcols)
 
 void jas_matrix_setall(jas_matrix_t *matrix, jas_seqent_t val)
 {
-	int i;
-	int j;
+	jas_matind_t i;
+	jas_matind_t j;
 	jas_seqent_t *rowstart;
-	int rowstep;
+	jas_matind_t rowstep;
 	jas_seqent_t *data;
 
 	if (jas_matrix_numrows(matrix) > 0 && jas_matrix_numcols(matrix) > 0) {
@@ -426,20 +428,32 @@ void jas_matrix_setall(jas_matrix_t *matrix, jas_seqent_t val)
 jas_matrix_t *jas_seq2d_input(FILE *in)
 {
 	jas_matrix_t *matrix;
-	int i;
-	int j;
+	jas_matind_t i;
+	jas_matind_t j;
 	long x;
-	int numrows;
-	int numcols;
-	int xoff;
-	int yoff;
+	jas_matind_t numrows;
+	jas_matind_t numcols;
+	jas_matind_t xoff;
+	jas_matind_t yoff;
+	long tmp_xoff;
+	long tmp_yoff;
+	long tmp_numrows;
+	long tmp_numcols;
 
-	if (fscanf(in, "%d %d", &xoff, &yoff) != 2)
+	if (fscanf(in, "%ld %ld", &tmp_xoff, &tmp_yoff) != 2) {
 		return 0;
-	if (fscanf(in, "%d %d", &numcols, &numrows) != 2)
+	}
+	xoff = tmp_xoff;
+	yoff = tmp_yoff;
+	if (fscanf(in, "%ld %ld", &tmp_numcols, &tmp_numrows) != 2) {
 		return 0;
-	if (!(matrix = jas_seq2d_create(xoff, yoff, xoff + numcols, yoff + numrows)))
+	}
+	numrows = tmp_numrows;
+	numcols = tmp_numcols;
+	if (!(matrix = jas_seq2d_create(xoff, yoff, xoff + numcols,
+	  yoff + numrows))) {
 		return 0;
+	}
 
 	if (jas_matrix_numrows(matrix) != numrows ||
 	  jas_matrix_numcols(matrix) != numcols) {
@@ -463,8 +477,8 @@ jas_matrix_t *jas_seq2d_input(FILE *in)
 int jas_seq2d_output(jas_matrix_t *matrix, FILE *out)
 {
 #define MAXLINELEN	80
-	int i;
-	int j;
+	jas_matind_t i;
+	jas_matind_t j;
 	jas_seqent_t x;
 	char buf[MAXLINELEN + 1];
 	char sbuf[MAXLINELEN + 1];

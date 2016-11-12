@@ -62,9 +62,11 @@
 #ifndef JAS_TMR_H
 #define JAS_TMR_H
 
-#include<time.h>
+/* The configuration header file should be included first. */
 #include <jasper/jas_config.h>
-#if defined(HAVE_SYS_TIME_H)
+
+#include<time.h>
+#if defined(JAS_HAVE_SYS_TIME_H)
 #include <sys/time.h>
 #endif
 
@@ -72,14 +74,14 @@
 extern "C" {
 #endif
 
-#if defined(HAVE_GETTIMEOFDAY)
+#if defined(JAS_HAVE_GETTIMEOFDAY)
 
 typedef struct {
 	struct timeval start;
 	struct timeval stop;
 } jas_tmr_t;
 
-#elif defined(HAVE_GETRUSAGE)
+#elif defined(JAS_HAVE_GETRUSAGE)
 
 typedef struct {
 	struct rusage start;

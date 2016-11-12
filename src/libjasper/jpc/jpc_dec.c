@@ -2276,7 +2276,7 @@ int jpc_ppxstab_insert(jpc_ppxstab_t *tab, jpc_ppxstabent_t *ent)
 jpc_streamlist_t *jpc_ppmstabtostreams(jpc_ppxstab_t *tab)
 {
 	jpc_streamlist_t *streams;
-	uchar *dataptr;
+	jas_uchar *dataptr;
 	uint_fast32_t datacnt;
 	uint_fast32_t tpcnt;
 	jpc_ppxstabent_t *ent;

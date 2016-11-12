@@ -70,11 +70,13 @@
 #ifndef JAS_TYPES_H
 #define JAS_TYPES_H
 
+/* The configuration header file should be included first. */
 #include <jasper/jas_config.h>
 
 #if !defined(JAS_CONFIGURE)
 
-#if defined(WIN32) || defined(HAVE_WINDOWS_H)
+#if defined(WIN32) || defined(JAS_HAVE_WINDOWS_H)
+// THIS SHOULD NO LONGER BE NEEDED SINCE MSVC SUPPORTS LONG LONG.
 /*
    We are dealing with Microsoft Windows and most likely Microsoft
    Visual C (MSVC).  (Heaven help us.)  Sadly, MSVC does not correctly
@@ -84,10 +86,10 @@
    and "UINT64" types that are defined in the header file "windows.h".
  */
 #include <windows.h>
-#undef longlong
-#define	longlong	INT64
-#undef ulonglong
-#define	ulonglong	UINT64
+//#undef longlong
+//#define	longlong	INT64
+//#undef ulonglong
+//#define	ulonglong	UINT64
 #endif
 
 #endif
@@ -98,29 +100,15 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#if defined(HAVE_SYS_TYPES_H)
+#if defined(JAS_HAVE_SYS_TYPES_H)
 #include <sys/types.h>
 #endif
 
-/* Hopefully, these macro definitions will fix more problems than they cause. */
-#if !defined(uchar)
-#define uchar unsigned char
-#endif
-#if !defined(ushort)
-#define ushort unsigned short
-#endif
-#if !defined(uint)
-#define uint unsigned int
-#endif
-#if !defined(ulong)
-#define ulong unsigned long
-#endif
-#if !defined(longlong)
-#define longlong long long
-#endif
-#if !defined(ulonglong)
-#define ulonglong unsigned long long
-#endif
+#define jas_uchar unsigned char
+#define jas_uint unsigned int
+#define jas_ulong unsigned long
+#define jas_longlong long long
+#define jas_ulonglong unsigned long long
 
 /* The below macro is intended to be used for type casts.  By using this
   macro, type casts can be easily located in the source code with

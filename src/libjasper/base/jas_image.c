@@ -133,30 +133,35 @@ jas_image_t *jas_image_create(int numcmpts, jas_image_cmptparm_t *cmptparms,
   int clrspc)
 {
 	jas_image_t *image;
-	uint_fast32_t rawsize;
+	size_t rawsize;
 	uint_fast32_t inmem;
 	int cmptno;
 	jas_image_cmptparm_t *cmptparm;
 
+	image = 0;
+
+	JAS_DBGLOG(100, ("jas_image_create(%d, %p, %d)\n", numcmpts, cmptparms,
+	  clrspc));
+
 	if (!(image = jas_image_create0())) {
-		return 0;
+		goto error;
 	}
 
 	image->clrspc_ = clrspc;
 	image->maxcmpts_ = numcmpts;
-	image->inmem_ = true;
+//	image->inmem_ = true;
 
 	/* Allocate memory for the per-component information. */
 	if (!(image->cmpts_ = jas_alloc2(image->maxcmpts_,
 	  sizeof(jas_image_cmpt_t *)))) {
-		jas_image_destroy(image);
-		return 0;
+		goto error;
 	}
 	/* Initialize in case of failure. */
 	for (cmptno = 0; cmptno < image->maxcmpts_; ++cmptno) {
 		image->cmpts_[cmptno] = 0;
 	}
 
+#if 0
 	/* Compute the approximate raw size of the image. */
 	rawsize = 0;
 	for (cmptno = 0, cmptparm = cmptparms; cmptno < numcmpts; ++cmptno,
@@ -167,16 +172,22 @@ jas_image_t *jas_image_create(int numcmpts, jas_image_cmptparm_t *cmptparms,
 	/* Decide whether to buffer the image data in memory, based on the
 	  raw size of the image. */
 	inmem = (rawsize < JAS_IMAGE_INMEMTHRESH);
+#endif
 
 	/* Create the individual image components. */
 	for (cmptno = 0, cmptparm = cmptparms; cmptno < numcmpts; ++cmptno,
 	  ++cmptparm) {
+		if (!jas_safe_size_mul3(cmptparm->width, cmptparm->height,
+		  (cmptparm->prec + 7), &rawsize)) {
+			goto error;
+		}
+		rawsize /= 8;
+		inmem = (rawsize < JAS_IMAGE_INMEMTHRESH);
 		if (!(image->cmpts_[cmptno] = jas_image_cmpt_create(cmptparm->tlx,
 		  cmptparm->tly, cmptparm->hstep, cmptparm->vstep,
 		  cmptparm->width, cmptparm->height, cmptparm->prec,
 		  cmptparm->sgnd, inmem))) {
-			jas_image_destroy(image);
-			return 0;
+			goto error;
 		}
 		++image->numcmpts_;
 	}
@@ -186,6 +197,12 @@ jas_image_t *jas_image_create(int numcmpts, jas_image_cmptparm_t *cmptparms,
 	jas_image_setbbox(image);
 
 	return image;
+
+error:
+	if (image) {
+		jas_image_destroy(image);
+	}
+	return 0;
 }
 
 jas_image_t *jas_image_create0()
@@ -204,7 +221,7 @@ jas_image_t *jas_image_create0()
 	image->numcmpts_ = 0;
 	image->maxcmpts_ = 0;
 	image->cmpts_ = 0;
-	image->inmem_ = true;
+//	image->inmem_ = true;
 	image->cmprof_ = 0;
 
 	return image;
@@ -316,12 +333,28 @@ static jas_image_cmpt_t *jas_image_cmpt_create(int_fast32_t tlx,
 	jas_image_cmpt_t *cmpt;
 	size_t size;
 
+	JAS_DBGLOG(100, (
+	  "jas_image_cmpt_create(%ld, %ld, %ld, %ld, %ld, %ld, %d, %d, %d)\n",
+	  JAS_CAST(long, tlx),
+	  JAS_CAST(long, tly),
+	  JAS_CAST(long, hstep),
+	  JAS_CAST(long, vstep),
+	  JAS_CAST(long, width),
+	  JAS_CAST(long, height),
+	  JAS_CAST(int, depth),
+	  sgnd,
+	  inmem
+	  ));
+
 	cmpt = 0;
 	if (width < 0 || height < 0 || hstep <= 0 || vstep <= 0) {
 		goto error;
 	}
 	if (!jas_safe_intfast32_add(tlx, width, 0) ||
 	  !jas_safe_intfast32_add(tly, height, 0)) {
+		goto error;
+	}
+	if (!jas_safe_intfast32_mul3(width, height, depth, 0)) {
 		goto error;
 	}
 
@@ -344,8 +377,7 @@ static jas_image_cmpt_t *jas_image_cmpt_create(int_fast32_t tlx,
 	// Compute the number of samples in the image component, while protecting
 	// against overflow.
 	// size = cmpt->width_ * cmpt->height_ * cmpt->cps_;
-	if (!jas_safe_size_mul(cmpt->width_, cmpt->height_, &size) ||
-	  !jas_safe_size_mul(size, cmpt->cps_, &size)) {
+	if (!jas_safe_size_mul3(cmpt->width_, cmpt->height_, cmpt->cps_, &size)) {
 		goto error;
 	}
 	cmpt->stream_ = (inmem) ? jas_stream_memopen2(0, size) :
@@ -1279,7 +1311,7 @@ static void jas_image_calcbbox2(jas_image_t *image, jas_image_coord_t *tlx,
 	*bry = tmpbry;
 }
 
-static inline long decode_twos_comp(ulong c, int prec)
+static inline long decode_twos_comp(jas_ulong c, int prec)
 {
 	long result;
 	assert(prec >= 2);
@@ -1289,9 +1321,9 @@ static inline long decode_twos_comp(ulong c, int prec)
 	return result;
 }
 
-static inline ulong encode_twos_comp(long n, int prec)
+static inline jas_ulong encode_twos_comp(long n, int prec)
 {
-	ulong result;
+	jas_ulong result;
 	assert(prec >= 2);
 	jas_eprintf("warning: support for signed data is untested\n");
 	// NOTE: Is this correct?
@@ -1332,7 +1364,7 @@ static int putint(jas_stream_t *out, int sgnd, int prec, long val)
 	int n;
 	int c;
 	bool s;
-	ulong tmp;
+	jas_ulong tmp;
 	assert((!sgnd && prec >= 1) || (sgnd && prec >= 2));
 	if (sgnd) {
 		val = encode_twos_comp(val, prec);

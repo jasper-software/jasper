@@ -77,6 +77,7 @@
 #include "jasper/jas_debug.h"
 #include "jasper/jas_malloc.h"
 #include "jasper/jas_version.h"
+#include "jasper/jas_types.h"
 
 #include "jp2_cod.h"
 #include "jp2_dec.h"
@@ -225,7 +226,7 @@ jas_image_t *jp2_decode(jas_stream_t *in, char *optstr)
 
 	/* Does the number of components indicated in the IHDR box match
 	  the value specified in the code stream? */
-	if (dec->ihdr->data.ihdr.numcmpts != JAS_CAST(uint,
+	if (dec->ihdr->data.ihdr.numcmpts != JAS_CAST(jas_uint,
 	  jas_image_numcmpts(dec->image))) {
 		jas_eprintf("warning: number of components mismatch\n");
 	}
@@ -239,7 +240,7 @@ jas_image_t *jp2_decode(jas_stream_t *in, char *optstr)
 	/* Determine if all components have the same data type. */
 	samedtype = true;
 	dtype = jas_image_cmptdtype(dec->image, 0);
-	for (i = 1; i < JAS_CAST(uint, jas_image_numcmpts(dec->image)); ++i) {
+	for (i = 1; i < JAS_CAST(jas_uint, jas_image_numcmpts(dec->image)); ++i) {
 		if (jas_image_cmptdtype(dec->image, i) != dtype) {
 			samedtype = false;
 			break;
@@ -262,14 +263,14 @@ jas_image_t *jp2_decode(jas_stream_t *in, char *optstr)
 	if (dec->bpcc) {
 		/* Is the number of components indicated in the BPCC box
 		  consistent with the code stream data? */
-		if (dec->bpcc->data.bpcc.numcmpts != JAS_CAST(uint, jas_image_numcmpts(
+		if (dec->bpcc->data.bpcc.numcmpts != JAS_CAST(jas_uint, jas_image_numcmpts(
 		  dec->image))) {
 			jas_eprintf("warning: number of components mismatch\n");
 		}
 		/* Is the component data type information indicated in the BPCC
 		  box consistent with the code stream data? */
 		if (!samedtype) {
-			for (i = 0; i < JAS_CAST(uint, jas_image_numcmpts(dec->image));
+			for (i = 0; i < JAS_CAST(jas_uint, jas_image_numcmpts(dec->image));
 			  ++i) {
 				if (jas_image_cmptdtype(dec->image, i) !=
 				  JP2_BPCTODTYPE(dec->bpcc->data.bpcc.bpcs[i])) {
@@ -324,13 +325,13 @@ jas_image_t *jp2_decode(jas_stream_t *in, char *optstr)
 	/* Determine the number of channels (which is essentially the number
 	  of components after any palette mappings have been applied). */
 	dec->numchans = dec->cmap ? dec->cmap->data.cmap.numchans :
-	  JAS_CAST(uint, jas_image_numcmpts(dec->image));
+	  JAS_CAST(jas_uint, jas_image_numcmpts(dec->image));
 
 	/* Perform a basic sanity check on the CMAP box if present. */
 	if (dec->cmap) {
 		for (i = 0; i < dec->numchans; ++i) {
 			/* Is the component number reasonable? */
-			if (dec->cmap->data.cmap.ents[i].cmptno >= JAS_CAST(uint,
+			if (dec->cmap->data.cmap.ents[i].cmptno >= JAS_CAST(jas_uint,
 			  jas_image_numcmpts(dec->image))) {
 				jas_eprintf("error: invalid component number in CMAP box\n");
 				goto error;
@@ -391,7 +392,7 @@ jas_image_t *jp2_decode(jas_stream_t *in, char *optstr)
 
 	/* Mark all components as being of unknown type. */
 
-	for (i = 0; i < JAS_CAST(uint, jas_image_numcmpts(dec->image)); ++i) {
+	for (i = 0; i < JAS_CAST(jas_uint, jas_image_numcmpts(dec->image)); ++i) {
 		jas_image_setcmpttype(dec->image, i, JAS_IMAGE_CT_UNKNOWN);
 	}
 

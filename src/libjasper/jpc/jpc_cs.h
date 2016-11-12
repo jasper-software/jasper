@@ -490,7 +490,7 @@ typedef struct {
 	uint_fast16_t len;
 
 	/* The data. */
-	uchar *data;
+	jas_uchar *data;
 
 } jpc_ppm_t;
 
@@ -529,7 +529,7 @@ typedef struct {
 	uint_fast16_t len;
 
 	/* The data. */
-	uchar *data;
+	jas_uchar *data;
 
 } jpc_com_t;
 
@@ -577,7 +577,7 @@ typedef struct {
 typedef struct {
 
 	/* The data. */
-	uchar *data;
+	jas_uchar *data;
 
 	/* The length. */
 	uint_fast16_t len;

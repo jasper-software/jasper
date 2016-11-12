@@ -40,6 +40,7 @@ Makefile.in
 
 # ./src/libjasper/include/jasper directory
 /src/libjasper/include/jasper/jas_config.h
-/src/libjasper/include/jasper/jas_config.h.in
-/src/libjasper/include/jasper/jas_config.h.in~
+/src/libjasper/include/jasper/jas_pconf.h
+/src/libjasper/include/jasper/jas_pconf.h.in
+/src/libjasper/include/jasper/jas_pconf.h.in~
 /src/libjasper/include/jasper/stamp-h1
