@@ -159,7 +159,11 @@ AC_PROG_CC
 #AC_PROG_CC_C11
 
 # Attempt to enable C11 support if available.
-AX_CHECK_COMPILE_FLAG([-std=c11], [AX_APPEND_FLAG([-std=c11])], [])
+# If C11 support is not available, attempt to fall back on C99 support
+# if available.
+AX_CHECK_COMPILE_FLAG([-std=c11], [AX_APPEND_FLAG([-std=c11])], [
+  AX_CHECK_COMPILE_FLAG([-std=c99], [AX_APPEND_FLAG([-std=c99])], [])
+])
 
 AC_PROG_INSTALL
 # AC_PROG_AWK
