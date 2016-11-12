@@ -16,7 +16,7 @@ dnl ************************************************************
 dnl The major, minor, and micro version numbers of the package.
 define(AC_JAS_MAJOR_VERSION, 1)
 define(AC_JAS_MINOR_VERSION, 900)
-define(AC_JAS_MICRO_VERSION, 25)
+define(AC_JAS_MICRO_VERSION, 26)
 
 dnl The package version.
 define(AC_JAS_VERSION,
