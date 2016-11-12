@@ -16,7 +16,7 @@ dnl ************************************************************
 dnl The major, minor, and micro version numbers of the package.
 define(AC_JAS_MAJOR_VERSION, 1)
 define(AC_JAS_MINOR_VERSION, 900)
-define(AC_JAS_MICRO_VERSION, 24)
+define(AC_JAS_MICRO_VERSION, 25)
 
 dnl The package version.
 define(AC_JAS_VERSION,
@@ -43,7 +43,7 @@ dnl 4) If any interfaces have been removed since the last public release, then
 dnl set AGE to zero.
 
 dnl The most recent interface number that this library implements.
-define(AC_JAS_LT_CURRENT, 2)
+define(AC_JAS_LT_CURRENT, 3)
 
 dnl The implementation number of the current interface.
 define(AC_JAS_LT_REVISION, 0)
