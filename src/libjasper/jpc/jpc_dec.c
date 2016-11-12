@@ -174,7 +174,8 @@ static int jpc_dec_cp_setfrompoc(jpc_dec_cp_t *cp, jpc_poc_t *poc, int reset);
 static int jpc_pi_addpchgfrompoc(jpc_pi_t *pi, jpc_poc_t *poc);
 
 static int jpc_dec_decode(jpc_dec_t *dec);
-static jpc_dec_t *jpc_dec_create(jpc_dec_importopts_t *impopts, jas_stream_t *in);
+static jpc_dec_t *jpc_dec_create(jpc_dec_importopts_t *impopts,
+  jas_stream_t *in);
 static void jpc_dec_destroy(jpc_dec_t *dec);
 static void jpc_dequantize(jas_matrix_t *x, jpc_fix_t absstepsize);
 static void jpc_undo_roi(jas_matrix_t *x, int roishift, int bgshift, int numbps);
@@ -198,7 +199,8 @@ static int jpc_dec_process_ppt(jpc_dec_t *dec, jpc_ms_t *ms);
 static int jpc_dec_process_com(jpc_dec_t *dec, jpc_ms_t *ms);
 static int jpc_dec_process_unk(jpc_dec_t *dec, jpc_ms_t *ms);
 static int jpc_dec_process_crg(jpc_dec_t *dec, jpc_ms_t *ms);
-static int jpc_dec_parseopts(char *optstr, jpc_dec_importopts_t *opts);
+static jpc_dec_importopts_t *jpc_dec_opts_create(const char *optstr);
+static void jpc_dec_opts_destroy(jpc_dec_importopts_t *opts);
 
 static jpc_dec_mstabent_t *jpc_dec_mstab_lookup(uint_fast16_t id);
 
@@ -235,21 +237,24 @@ jpc_dec_mstabent_t jpc_dec_mstab[] = {
 
 jas_image_t *jpc_decode(jas_stream_t *in, char *optstr)
 {
-	jpc_dec_importopts_t opts;
+	jpc_dec_importopts_t *opts;
 	jpc_dec_t *dec;
 	jas_image_t *image;
 
 	dec = 0;
+	opts = 0;
 
-	if (jpc_dec_parseopts(optstr, &opts)) {
+	if (!(opts = jpc_dec_opts_create(optstr))) {
 		goto error;
 	}
 
 	jpc_initluts();
 
-	if (!(dec = jpc_dec_create(&opts, in))) {
+	if (!(dec = jpc_dec_create(opts, in))) {
 		goto error;
 	}
+	jpc_dec_opts_destroy(opts);
+	opts = 0;
 
 	/* Do most of the work. */
 	if (jpc_dec_decode(dec)) {
@@ -282,6 +287,9 @@ jas_image_t *jpc_decode(jas_stream_t *in, char *optstr)
 	return image;
 
 error:
+	if (opts) {
+		jpc_dec_opts_destroy(opts);
+	}
 	if (dec) {
 		jpc_dec_destroy(dec);
 	}
@@ -291,26 +299,36 @@ error:
 typedef enum {
 	OPT_MAXLYRS,
 	OPT_MAXPKTS,
+	OPT_MAXSAMPLES,
 	OPT_DEBUG
 } optid_t;
 
 static jas_taginfo_t decopts[] = {
 	{OPT_MAXLYRS, "maxlyrs"},
 	{OPT_MAXPKTS, "maxpkts"},
+	{OPT_MAXSAMPLES, "max_samples"},
 	{OPT_DEBUG, "debug"},
 	{-1, 0}
 };
 
-static int jpc_dec_parseopts(char *optstr, jpc_dec_importopts_t *opts)
+static jpc_dec_importopts_t *jpc_dec_opts_create(const char *optstr)
 {
+	jpc_dec_importopts_t *opts;
 	jas_tvparser_t *tvp;
+
+	opts = 0;
+
+	if (!(opts = jas_malloc(sizeof(jpc_dec_importopts_t)))) {
+		goto error;
+	}
 
 	opts->debug = 0;
 	opts->maxlyrs = JPC_MAXLYRS;
 	opts->maxpkts = -1;
+	opts->max_samples = JAS_DEC_DEFAULT_MAX_SAMPLES;
 
 	if (!(tvp = jas_tvparser_create(optstr ? optstr : ""))) {
-		return -1;
+		goto error;
 	}
 
 	while (!jas_tvparser_next(tvp)) {
@@ -325,6 +343,9 @@ static int jpc_dec_parseopts(char *optstr, jpc_dec_importopts_t *opts)
 		case OPT_MAXPKTS:
 			opts->maxpkts = atoi(jas_tvparser_getval(tvp));
 			break;
+		case OPT_MAXSAMPLES:
+			opts->max_samples = strtoull(jas_tvparser_getval(tvp), 0, 10);
+			break;
 		default:
 			jas_eprintf("warning: ignoring invalid option %s\n",
 			  jas_tvparser_gettag(tvp));
@@ -334,7 +355,18 @@ static int jpc_dec_parseopts(char *optstr, jpc_dec_importopts_t *opts)
 
 	jas_tvparser_destroy(tvp);
 
+	return opts;
+
+error:
+	if (opts) {
+		jpc_dec_opts_destroy(opts);
+	}
 	return 0;
+}
+
+static void jpc_dec_opts_destroy(jpc_dec_importopts_t *opts)
+{
+	jas_free(opts);
 }
 
 /******************************************************************************\
@@ -1206,6 +1238,8 @@ static int jpc_dec_process_siz(jpc_dec_t *dec, jpc_ms_t *ms)
 	int vtileno;
 	jpc_dec_cmpt_t *cmpt;
 	size_t size;
+	size_t num_samples;
+	size_t num_samples_delta;
 
 	dec->xstart = siz->xoff;
 	dec->ystart = siz->yoff;
@@ -1225,6 +1259,7 @@ static int jpc_dec_process_siz(jpc_dec_t *dec, jpc_ms_t *ms)
 		return -1;
 	}
 
+	num_samples = 0;
 	for (compno = 0, cmpt = dec->cmpts; compno < dec->numcomps; ++compno,
 	  ++cmpt) {
 		cmpt->prec = siz->comps[compno].prec;
@@ -1237,6 +1272,20 @@ static int jpc_dec_process_siz(jpc_dec_t *dec, jpc_ms_t *ms)
 		  JPC_CEILDIV(dec->ystart, cmpt->vstep);
 		cmpt->hsubstep = 0;
 		cmpt->vsubstep = 0;
+
+		if (!jas_safe_size_mul(cmpt->width, cmpt->height, &num_samples_delta)) {
+			jas_eprintf("image too large\n");
+			return -1;
+		}
+		if (!jas_safe_size_add(num_samples, num_samples_delta, &num_samples)) {
+			jas_eprintf("image too large\n");
+		}
+	}
+
+	if (dec->max_samples > 0 && num_samples > dec->max_samples) {
+		jas_eprintf("maximum number of samples exceeded (%zu > %zu)\n",
+		  num_samples, dec->max_samples);
+		return -1;
 	}
 
 	dec->image = 0;
@@ -1934,6 +1983,7 @@ dec->numpkts = 0;
 	dec->pkthdrstreams = 0;
 	dec->ppmstab = 0;
 	dec->curtileendoff = 0;
+	dec->max_samples = impopts->max_samples;
 
 	return dec;
 }

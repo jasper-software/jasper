@@ -147,7 +147,7 @@ static int jpg_dec_parseopts(char *optstr, jpg_dec_importopts_t *opts)
 {
 	jas_tvparser_t *tvp;
 
-	opts->max_samples = 64 * JAS_MEBI;
+	opts->max_samples = JAS_DEC_DEFAULT_MAX_SAMPLES;
 
 	if (!(tvp = jas_tvparser_create(optstr ? optstr : ""))) {
 		return -1;
@@ -157,7 +157,7 @@ static int jpg_dec_parseopts(char *optstr, jpg_dec_importopts_t *opts)
 		switch (jas_taginfo_nonull(jas_taginfos_lookup(decopts,
 		  jas_tvparser_gettag(tvp)))->id) {
 		case OPT_MAXSIZE:
-			opts->max_samples = atoi(jas_tvparser_getval(tvp));
+			opts->max_samples = strtoull(jas_tvparser_getval(tvp), 0, 10);
 			break;
 		default:
 			jas_eprintf("warning: ignoring invalid option %s\n",

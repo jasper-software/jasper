@@ -138,6 +138,7 @@ int main(int argc, char **argv)
 	int debug;
 	size_t max_mem;
 	size_t max_samples;
+	bool max_samples_valid;
 	char optstr[32];
 
 	if (jas_init()) {
@@ -146,7 +147,8 @@ int main(int argc, char **argv)
 
 	cmdname = argv[0];
 
-	max_samples = 64 * JAS_MEBI;
+	max_samples = 0;
+	max_samples_valid = false;
 	infile = 0;
 	verbose = 0;
 	debug = 0;
@@ -207,7 +209,10 @@ int main(int argc, char **argv)
 		fprintf(stderr, "unknown image format\n");
 	}
 
-	snprintf(optstr, sizeof(optstr), "max_samples=%-zu", max_samples);
+	optstr[0] = '\0';
+	if (max_samples_valid) {
+		snprintf(optstr, sizeof(optstr), "max_samples=%-zu", max_samples);
+	}
 
 	/* Decode the image. */
 	if (!(image = jas_image_decode(instream, fmtid, optstr))) {
