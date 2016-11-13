@@ -1,8 +1,9 @@
 language: c
 
 dist: trusty
+sudo: false
 
-sudo: required
+#sudo: required
 
 os:
     - linux
