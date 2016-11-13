@@ -3,8 +3,6 @@ language: c
 dist: trusty
 sudo: false
 
-#sudo: required
-
 os:
     - linux
     - osx
@@ -15,9 +13,9 @@ compiler:
 
 before_install:
     - bash --version
-    - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; fi
-    - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew outdated bash || brew upgrade bash; fi
-    - bash --version
+#    - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; fi
+#    - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew outdated bash || brew upgrade bash; fi
+#    - bash --version
 
 install: autoreconf -i
 

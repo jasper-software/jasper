@@ -4,6 +4,12 @@
 
 ################################################################################
 
+if [ "${BASH_VERSINFO[0]}" -lt 4 ]; then
+	echo "This test requires Bash 4 or greater."
+	echo "This test is being skipped."
+	exit 0
+fi
+
 cmd_dir=$(dirname "$0") || exit 1
 source "$cmd_dir"/utilities || exit 1
 source "$cmd_dir/jpcod" || exit 1
