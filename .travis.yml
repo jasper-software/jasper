@@ -3,3 +3,5 @@ language: c
 compiler:
     - clang
     - gcc
+
+install: autoreconf -i
