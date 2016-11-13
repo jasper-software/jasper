@@ -7,4 +7,6 @@ compiler:
 install: autoreconf -i
 
 script:
-    - ./configure && make clean && make && make check
+    - ./configure --prefix=/tmp/jasper && make clean && make && make install
+
+#    - ./configure && make clean && make && make check
