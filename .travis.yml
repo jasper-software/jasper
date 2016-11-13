@@ -13,6 +13,10 @@ compiler:
     - clang
     - gcc
 
+before_install:
+    - brew update
+    - brew outdated bash || brew upgrade bash
+
 install: autoreconf -i
 
 script:
