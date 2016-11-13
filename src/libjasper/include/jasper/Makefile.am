@@ -61,7 +61,6 @@ libjasperincludedir = $(includedir)/jasper
 libjasperinclude_HEADERS = \
 	jasper.h \
 	jas_config.h \
-	jas_config2.h \
 	jas_cm.h \
 	jas_fix.h \
 	jas_debug.h \
