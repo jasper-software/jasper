@@ -522,4 +522,3 @@ pkgconfig/jasper.pc
 jasper.spec
 ])
 AC_OUTPUT
-
