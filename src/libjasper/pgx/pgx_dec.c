@@ -75,6 +75,20 @@
 #include "pgx_cod.h"
 
 /******************************************************************************\
+* Local types.
+\******************************************************************************/
+
+typedef struct {
+	int allow_trunc;
+	size_t max_samples;
+} pgx_dec_importopts_t;
+
+typedef enum {
+	OPT_ALLOWTRUNC,
+	OPT_MAXSIZE,
+} optid_t;
+
+/******************************************************************************\
 * Local prototypes.
 \******************************************************************************/
 
@@ -88,6 +102,49 @@ static int pgx_getuint32(jas_stream_t *in, uint_fast32_t *val);
 static jas_seqent_t pgx_wordtoint(uint_fast32_t word, int prec, bool sgnd);
 
 /******************************************************************************\
+* Option parsing.
+\******************************************************************************/
+
+static jas_taginfo_t pgx_decopts[] = {
+	// Not yet supported
+	// {OPT_ALLOWTRUNC, "allow_trunc"},
+	{OPT_MAXSIZE, "max_samples"},
+	{-1, 0}
+};
+
+static int pgx_dec_parseopts(const char *optstr, pgx_dec_importopts_t *opts)
+{
+	jas_tvparser_t *tvp;
+
+	opts->max_samples = JAS_DEC_DEFAULT_MAX_SAMPLES;
+	opts->allow_trunc = 0;
+
+	if (!(tvp = jas_tvparser_create(optstr ? optstr : ""))) {
+		return -1;
+	}
+
+	while (!jas_tvparser_next(tvp)) {
+		switch (jas_taginfo_nonull(jas_taginfos_lookup(pgx_decopts,
+		  jas_tvparser_gettag(tvp)))->id) {
+		case OPT_ALLOWTRUNC:
+			opts->allow_trunc = atoi(jas_tvparser_getval(tvp));
+			break;
+		case OPT_MAXSIZE:
+			opts->max_samples = strtoull(jas_tvparser_getval(tvp), 0, 10);
+			break;
+		default:
+			jas_eprintf("warning: ignoring invalid option %s\n",
+			  jas_tvparser_gettag(tvp));
+			break;
+		}
+	}
+
+	jas_tvparser_destroy(tvp);
+
+	return 0;
+}
+
+/******************************************************************************\
 * Code for load operation.
 \******************************************************************************/
 
@@ -98,11 +155,16 @@ jas_image_t *pgx_decode(jas_stream_t *in, const char *optstr)
 	jas_image_t *image;
 	pgx_hdr_t hdr;
 	jas_image_cmptparm_t cmptparm;
-
-	/* Avoid compiler warnings about unused parameters. */
-	optstr = 0;
+	pgx_dec_importopts_t opts;
+	size_t num_samples;
 
 	image = 0;
+
+	JAS_DBGLOG(10, ("pgx_decode(%p, \"%s\")\n", in, optstr ? optstr : ""));
+
+	if (pgx_dec_parseopts(optstr, &opts)) {
+		goto error;
+	}
 
 	if (pgx_gethdr(in, &hdr)) {
 		jas_eprintf("cannot get header\n");
@@ -111,6 +173,17 @@ jas_image_t *pgx_decode(jas_stream_t *in, const char *optstr)
 
 	if (jas_getdbglevel() >= 10) {
 		pgx_dumphdr(stderr, &hdr);
+	}
+
+	if (!jas_safe_size_mul(hdr.width, hdr.height, &num_samples)) {
+		jas_eprintf("image too large\n");
+		goto error;
+	}
+	if (opts.max_samples > 0 && num_samples > opts.max_samples) {
+		jas_eprintf(
+		  "maximum number of samples would be exceeded (%zu > %zu)\n",
+		  num_samples, opts.max_samples);
+		goto error;
 	}
 
 	if (!(image = jas_image_create0())) {

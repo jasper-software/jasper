@@ -77,8 +77,23 @@
 #include "jasper/jas_stream.h"
 #include "jasper/jas_image.h"
 #include "jasper/jas_debug.h"
+#include "jasper/jas_tvp.h"
 
 #include "ras_cod.h"
+
+/******************************************************************************\
+* Local types.
+\******************************************************************************/
+
+typedef struct {
+	int allow_trunc;
+	size_t max_samples;
+} ras_dec_importopts_t;
+
+typedef enum {
+	OPT_ALLOWTRUNC,
+	OPT_MAXSIZE,
+} optid_t;
 
 /******************************************************************************\
 * Prototypes.
@@ -94,6 +109,49 @@ static int ras_getdatastd(jas_stream_t *in, ras_hdr_t *hdr, ras_cmap_t *cmap,
 static int ras_getcmap(jas_stream_t *in, ras_hdr_t *hdr, ras_cmap_t *cmap);
 
 /******************************************************************************\
+* Option parsing.
+\******************************************************************************/
+
+static jas_taginfo_t ras_decopts[] = {
+	// Not yet supported
+	// {OPT_ALLOWTRUNC, "allow_trunc"},
+	{OPT_MAXSIZE, "max_samples"},
+	{-1, 0}
+};
+
+static int ras_dec_parseopts(const char *optstr, ras_dec_importopts_t *opts)
+{
+	jas_tvparser_t *tvp;
+
+	opts->max_samples = JAS_DEC_DEFAULT_MAX_SAMPLES;
+	opts->allow_trunc = 0;
+
+	if (!(tvp = jas_tvparser_create(optstr ? optstr : ""))) {
+		return -1;
+	}
+
+	while (!jas_tvparser_next(tvp)) {
+		switch (jas_taginfo_nonull(jas_taginfos_lookup(ras_decopts,
+		  jas_tvparser_gettag(tvp)))->id) {
+		case OPT_ALLOWTRUNC:
+			opts->allow_trunc = atoi(jas_tvparser_getval(tvp));
+			break;
+		case OPT_MAXSIZE:
+			opts->max_samples = strtoull(jas_tvparser_getval(tvp), 0, 10);
+			break;
+		default:
+			jas_eprintf("warning: ignoring invalid option %s\n",
+			  jas_tvparser_gettag(tvp));
+			break;
+		}
+	}
+
+	jas_tvparser_destroy(tvp);
+
+	return 0;
+}
+
+/******************************************************************************\
 * Code.
 \******************************************************************************/
 
@@ -107,22 +165,38 @@ jas_image_t *ras_decode(jas_stream_t *in, const char *optstr)
 	int clrspc;
 	int numcmpts;
 	int i;
+	ras_dec_importopts_t opts;
+	size_t num_samples;
+
+	image = 0;
 
 	JAS_DBGLOG(10, ("ras_decode(%p, %p, \"%s\"\n", in, optstr ? optstr : ""));
 
-	if (optstr) {
-		jas_eprintf("warning: ignoring RAS decoder options\n");
+	if (ras_dec_parseopts(optstr, &opts)) {
+		goto error;
 	}
 
 	/* Read the header. */
 	if (ras_gethdr(in, &hdr)) {
-		return 0;
+		goto error;
 	}
 
 	/* Does the header information look reasonably sane? */
 	if (hdr.magic != RAS_MAGIC || hdr.width <= 0 || hdr.height <= 0 ||
 	  hdr.depth <= 0 || hdr.depth > 32) {
-		return 0;
+		goto error;
+	}
+
+	if (!jas_safe_size_mul3(hdr.width, hdr.height, (hdr.depth + 7) / 8,
+	  &num_samples)) {
+		jas_eprintf("image too large\n");
+		goto error;
+	}
+	if (opts.max_samples > 0 && num_samples > opts.max_samples) {
+		jas_eprintf(
+		  "maximum number of samples would be exceeded (%zu > %zu)\n",
+		  num_samples, opts.max_samples);
+		goto error;
 	}
 
 	/* In the case of the old format, do not rely on the length field
@@ -152,19 +226,17 @@ jas_image_t *ras_decode(jas_stream_t *in, const char *optstr)
 	}
 	/* Create the image object. */
 	if (!(image = jas_image_create(numcmpts, cmptparms, JAS_CLRSPC_UNKNOWN))) {
-		return 0;
+		goto error;
 	}
 
 	/* Read the color map (if there is one). */
 	if (ras_getcmap(in, &hdr, &cmap)) {
-		jas_image_destroy(image);
-		return 0;
+		goto error;
 	}
 
 	/* Read the pixel data. */
 	if (ras_getdata(in, &hdr, &cmap, image)) {
-		jas_image_destroy(image);
-		return 0;
+		goto error;
 	}
 
 	jas_image_setclrspc(image, clrspc);
@@ -181,6 +253,12 @@ jas_image_t *ras_decode(jas_stream_t *in, const char *optstr)
 	}
 
 	return image;
+
+error:
+	if (image) {
+		jas_image_destroy(image);
+	}
+	return 0;
 }
 
 int ras_validate(jas_stream_t *in)
