@@ -14,8 +14,9 @@ compiler:
     - gcc
 
 before_install:
-    - brew update
-    - brew outdated bash || brew upgrade bash
+    - bash --version
+#    - brew update
+#    - brew outdated bash || brew upgrade bash
 
 install: autoreconf -i
 
