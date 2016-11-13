@@ -17,6 +17,6 @@ install: autoreconf -i
 
 script:
     - ./configure --prefix=/tmp/jasper && make clean && make && make install
-    - make check
+    - make check || (cat test/bin/run_test_*.log)
 
 #    - ./configure && make clean && make && make check
