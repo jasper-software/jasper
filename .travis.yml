@@ -5,3 +5,6 @@ compiler:
     - gcc
 
 install: autoreconf -i
+
+script:
+    - ./configure && make clean && make && make check
