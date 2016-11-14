@@ -1,6 +1,5 @@
 #build:
 #  project: src/msvc/libjasper.dsp
 
-build:
-    - cmd: ECHO Hello
+build: disabled
 
