@@ -1,4 +1,4 @@
-image: Visual Studio 2008
+image: Visual Studio 2010
 
 build:
   project: src/msvc/libjasper.dsp
