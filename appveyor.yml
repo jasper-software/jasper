@@ -1,4 +1,4 @@
-os: Visual Studio 2008
+os: Visual Studio 2013
 
 build:
   project: src/msvc/libjasper.dsp
