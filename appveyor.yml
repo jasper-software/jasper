@@ -1,4 +1,4 @@
-image: Visual Studio 2015
+os: Visual Studio 2008
 
 build:
   project: src/msvc/libjasper.dsp
