@@ -1,5 +1,7 @@
-#build:
-#  project: src/msvc/libjasper.dsp
+image: Visual Studio 2008
 
-build: disabled
+build:
+  project: src/msvc/libjasper.dsp
+
+#build: disabled
 
