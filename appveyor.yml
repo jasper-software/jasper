@@ -1,1 +1,3 @@
+build:
+  project: src/msvc/libjasper.dsp
 
