@@ -2,9 +2,9 @@ version: 1.0.{build}
 
 image: Visual Studio 2013
 
-build:
-  verbosity: minimal
-  project: src/msvc/libjasper.dsp
+#build:
+#  verbosity: minimal
+#  project: src/msvc/libjasper.dsp
 
-#build: disabled
+build: disabled
 
