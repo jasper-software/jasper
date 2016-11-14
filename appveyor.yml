@@ -1,6 +1,6 @@
 #build:
 #  project: src/msvc/libjasper.dsp
 
-script:
+build:
     - cmd: ECHO Hello
 
