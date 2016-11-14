@@ -8,8 +8,8 @@ os:
     - osx
 
 osx_image:
-    - xcode8
     - xcode7.3
+#    - xcode8
 
 compiler:
     - clang
