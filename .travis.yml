@@ -9,7 +9,7 @@ os:
 
 osx_image:
     - xcode7.3
-#    - xcode8
+    #- xcode8
 
 compiler:
     - clang
@@ -18,13 +18,13 @@ compiler:
 before_install:
     - bash --version
     - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; fi
-#    - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew outdated bash || brew upgrade bash; fi
-#    - bash --version
+    #- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew outdated bash || brew upgrade bash; fi
+    - bash --version
 
-install: autoreconf -i
+install:
+    - autoreconf -i
 
 script:
     - ./configure --prefix=/tmp/jasper && make clean && make && make install
     - make check || (cat test/bin/run_test_*.log; exit 1)
 
-#    - ./configure && make clean && make && make check

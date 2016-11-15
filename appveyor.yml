@@ -13,7 +13,7 @@ init:
 
 configuration:
     - Release
-    - Debug
+    #- Debug
 
 platform:
     #- x86
