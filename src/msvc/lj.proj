@@ -8,13 +8,34 @@
 </Target>  
 -->
 
-<Import Project="$(VCTargetsPath)\Microsoft.Cpp.default.props" /> 
-<Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
-
-<Target Name="Build">  
-	<ClCompile Include="../libjasper/base/jas_version.c" />
-</Target>  
-
-<Import Project="$(VCTargetsPath)\Microsoft.Cpp.Targets" /> 
+  <ItemGroup>  
+    <ProjectConfiguration Include="Debug|Win32">  
+      <Configuration>Debug</Configuration>  
+      <Platform>Win32</Platform>  
+    </ProjectConfiguration>  
+    <ProjectConfiguration Include="Release|Win32">  
+      <Configuration>Release</Configuration>  
+      <Platform>Win32</Platform>  
+    </ProjectConfiguration>  
+  </ItemGroup>  
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.default.props" />  
+  <PropertyGroup>  
+    <ConfigurationType>Application</ConfigurationType>  
+    <PlatformToolset>v120</PlatformToolset>  
+  </PropertyGroup>  
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />  
+  <ItemGroup>  
+    <ClCompile Include="../libjasper/base/jas_version.c" />  
+  </ItemGroup>  
+  <ItemGroup>  
+    <ClInclude Include="../libjasper/include/jasper/jas_version.h" />  
+  </ItemGroup>  
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Targets" />  
 
 </Project>
+
+
+
+
+
+
