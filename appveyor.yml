@@ -3,7 +3,8 @@ version: 1.0.{build}
 image: Visual Studio 2013
 
 build:
-  verbosity: minimal
+  #verbosity: minimal
+  verbosity: detailed
   project: src/msvc/lj.proj
 
 #build: disabled
