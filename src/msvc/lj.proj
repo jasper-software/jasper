@@ -9,9 +9,7 @@
 -->
 
 <Target Name="Build">  
-	<ItemGroup>
-		<ClCompile Include="../libjasper/base/jas_version.c" />
-	</ItemGroup>
+	<ClCompile Include="../libjasper/base/jas_version.c" />
 </Target>  
 
 </Project>
