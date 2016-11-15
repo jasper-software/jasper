@@ -4,7 +4,7 @@ version: 1.0.{build}
 # build worker image (VM template)
 #image: Visual Studio 2013
 image:
-    - Visual Studio 2013
+    #- Visual Studio 2013
     - Visual Studio 2015
 
 # Scripts that are called at the very beginning, before repository cloning.
@@ -12,7 +12,7 @@ init:
     - git config --global core.autocrlf input
 
 platform:
-    - x86
+    #- x86
     - x64
 
 build:
