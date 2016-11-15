@@ -11,6 +11,10 @@ image:
 init:
     - git config --global core.autocrlf input
 
+configuration:
+    - Release
+    - Debug
+
 platform:
     #- x86
     - x64
