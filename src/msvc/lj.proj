@@ -3,11 +3,12 @@
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
 <!--
+-->
 <Target Name="Build">  
 	<Message Text="Hello"></Message> <Message Text="World"></Message>  
 </Target>  
--->
 
+<!--
   <ItemGroup>  
     <ProjectConfiguration Include="Debug|Win32">  
       <Configuration>Debug</Configuration>  
@@ -31,6 +32,7 @@
     <ClInclude Include="../libjasper/include/jasper/jas_version.h" />  
   </ItemGroup>  
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Targets" />  
+-->
 
 </Project>
 
