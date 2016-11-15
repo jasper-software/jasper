@@ -8,8 +8,13 @@
 </Target>  
 -->
 
+<Import Project="$(VCTargetsPath)\Microsoft.Cpp.default.props" /> 
+<Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+
 <Target Name="Build">  
 	<ClCompile Include="../libjasper/base/jas_version.c" />
 </Target>  
+
+<Import Project="$(VCTargetsPath)\Microsoft.Cpp.Targets" /> 
 
 </Project>
