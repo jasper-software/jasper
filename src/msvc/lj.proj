@@ -2,8 +2,14 @@
 
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
+<!--
 <Target Name="Build">  
 	<Message Text="Hello"></Message> <Message Text="World"></Message>  
+</Target>  
+-->
+
+<Target Name="Build">  
+	<Compile Include="../libjasper/base/jas_version.c" />
 </Target>  
 
 </Project>
