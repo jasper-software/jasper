@@ -1,6 +1,6 @@
 language: c
 
-dist: trusty
+#dist: trusty
 sudo: false
 
 os:
