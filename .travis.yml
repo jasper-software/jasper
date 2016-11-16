@@ -28,3 +28,8 @@ script:
     - ./configure --prefix=/tmp/jasper && make clean && make && make install
     - make check || (cat test/bin/run_test_*.log; exit 1)
 
+notifications:
+    email:
+        on_success: change
+        on_failure: always
+
