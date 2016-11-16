@@ -21,7 +21,7 @@ platform:
 #- x64
 
 before_build:
-    - copy src/libjasper/include/jasper/jas_config.h.in src/libjasper/include/jasper/jas_config.h
+    - copy src\libjasper\include\jasper\jas_config.h.in src\libjasper\include\jasper\jas_config.h
 
 build:
   #verbosity: minimal
