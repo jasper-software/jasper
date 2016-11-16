@@ -5,7 +5,7 @@ version: 1.0.{build}
 #image: Visual Studio 2013
 image:
     - Visual Studio 2013
-    #- Visual Studio 2015
+    - Visual Studio 2015
 
 # Scripts that are called at the very beginning, before repository cloning.
 init:
