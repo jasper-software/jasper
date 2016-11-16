@@ -12,20 +12,19 @@ init:
 
 configuration:
     - Release
-    #- Debug
+    - Debug
 
 platform:
     - Win32
-#    - x86
-#- x64
+    #- x86
+    #- x64
 
 before_build:
     - copy src\libjasper\include\jasper\jas_config.h.in src\libjasper\include\jasper\jas_config.h
 
 build:
-  #verbosity: minimal
-  verbosity: detailed
+  #verbosity: detailed
+  verbosity: minimal
   project: src/msvc/jasper.sln
 
 #build: disabled
-
