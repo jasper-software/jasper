@@ -1,6 +1,6 @@
 language: c
 
-#dist: trusty
+dist: trusty
 sudo: false
 
 os:
@@ -16,10 +16,10 @@ compiler:
     - gcc
 
 before_install:
-    #- bash --version
+    - bash --version
     #- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; fi
     #- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew outdated bash || brew upgrade bash; fi
-    - bash --version
+    #- bash --version
 
 install:
     - autoreconf -i
