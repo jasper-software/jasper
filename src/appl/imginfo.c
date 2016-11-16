@@ -212,7 +212,11 @@ int main(int argc, char **argv)
 
 	optstr[0] = '\0';
 	if (max_samples_valid) {
+#if defined(JAS_HAVE_SNPRINTF)
 		snprintf(optstr, sizeof(optstr), "max_samples=%-zu", max_samples);
+#else
+		sprintf(optstr, "max_samples=%-zu", max_samples);
+#endif
 	}
 
 	/* Decode the image. */
