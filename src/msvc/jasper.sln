@@ -9,8 +9,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "imginfo", "imginfo.vcxproj"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "jasper", "jasper.vcxproj", "{FDB1250B-252C-4D93-89C8-390FF6FC0DBB}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "jiv", "jiv.vcxproj", "{1A32980E-E9C4-475B-9A48-9C94A379AADD}"
-EndProject
+#Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "jiv", "jiv.vcxproj", "{1A32980E-E9C4-475B-9A48-9C94A379AADD}"
+#EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libjasper", "libjasper.vcxproj", "{A7F6A0B4-455E-41D4-8C02-A9ECB03C064E}"
 EndProject
 Global
