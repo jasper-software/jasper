@@ -1,2 +1,2 @@
-This directory contains the workspace and project files necessary to
-build JasPer under Windows using MS Visual C Studio.
+This directory contains the solution and project files necessary to
+build JasPer under Windows using Microsoft Visual Studio.

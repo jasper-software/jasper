@@ -58,6 +58,12 @@
 
 EXTRA_DIST = \
 	README \
+	jasper.sln \
+	imgcmp.vcxproj \
+	imginfo.vcxproj \
+	jasper.vcxproj \
+	jiv.vcxproj \
+	libjasper.vcxproj \
 	jasper.dsw \
 	libjasper.dsp \
 	jasper.dsp \
