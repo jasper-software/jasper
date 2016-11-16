@@ -4,8 +4,8 @@ version: 1.0.{build}
 # build worker image (VM template)
 #image: Visual Studio 2013
 image:
-    #- Visual Studio 2013
-    - Visual Studio 2015
+    - Visual Studio 2013
+    #- Visual Studio 2015
 
 # Scripts that are called at the very beginning, before repository cloning.
 init:
@@ -22,7 +22,7 @@ platform:
 build:
   #verbosity: minimal
   verbosity: detailed
-  project: src/msvc/lj.proj
+  project: src/msvc/jasper.sln
 
 #build: disabled
 
