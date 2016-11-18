@@ -63,13 +63,7 @@ EXTRA_DIST = \
 	imginfo.vcxproj \
 	jasper.vcxproj \
 	jiv.vcxproj \
-	libjasper.vcxproj \
-	jasper.dsw \
-	libjasper.dsp \
-	jasper.dsp \
-	jiv.dsp \
-	imgcmp.dsp \
-	imginfo.dsp
+	libjasper.vcxproj
 
 clean-local:
 	rm -rf *Win32_Debug *Win32_Release
