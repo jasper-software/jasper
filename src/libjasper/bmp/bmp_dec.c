@@ -337,8 +337,12 @@ static bmp_info_t *bmp_getinfo(jas_stream_t *in)
 	bmp_info_t *info;
 	int i;
 	bmp_palent_t *palent;
+	size_t num_pixels;
+
+	info = 0;
 
 	if (!(info = bmp_info_create())) {
+		goto error;
 		return 0;
 	}
 
@@ -350,8 +354,7 @@ static bmp_info_t *bmp_getinfo(jas_stream_t *in)
 	  bmp_getint32(in, &info->hres) || bmp_getint32(in, &info->vres) ||
 	  bmp_getint32(in, &info->numcolors) ||
 	  bmp_getint32(in, &info->mincolors)) {
-		bmp_info_destroy(info);
-		return 0;
+		goto error;
 	}
 
 	if (info->height < 0) {
@@ -363,21 +366,28 @@ static bmp_info_t *bmp_getinfo(jas_stream_t *in)
 
 	if (info->width <= 0 || info->height <= 0 || info->numplanes <= 0 ||
 	  info->depth <= 0  || info->numcolors < 0 || info->mincolors < 0) {
-		bmp_info_destroy(info);
-		return 0;
+		goto error;
+	}
+
+	if (!jas_safe_size_mul(info->width, info->height, &num_pixels)) {
+		jas_eprintf("image dimensions too large\n");
+		goto error;
 	}
 
 	if (info->enctype != BMP_ENC_RGB) {
 		jas_eprintf("unsupported BMP encoding\n");
-		bmp_info_destroy(info);
-		return 0;
+		goto error;
+	}
+
+	if (info->numcolors > 0 && info->numcolors > num_pixels) {
+		jas_eprintf("palette size is greater than the number of pixels\n");
+		goto error;
 	}
 
 	if (info->numcolors > 0) {
 		if (!(info->palents = jas_alloc2(info->numcolors,
 		  sizeof(bmp_palent_t)))) {
-			bmp_info_destroy(info);
-			return 0;
+			goto error;
 		}
 	} else {
 		info->palents = 0;
@@ -389,12 +399,17 @@ static bmp_info_t *bmp_getinfo(jas_stream_t *in)
 		  (palent->grn = jas_stream_getc(in)) == EOF ||
 		  (palent->red = jas_stream_getc(in)) == EOF ||
 		  (palent->res = jas_stream_getc(in)) == EOF) {
-			bmp_info_destroy(info);
-			return 0;
+			goto error;
 		}
 	}
 
 	return info;
+
+error:
+	if (info) {
+		bmp_info_destroy(info);
+	}
+	return 0;
 }
 
 static int bmp_getdata(jas_stream_t *in, bmp_info_t *info, jas_image_t *image)

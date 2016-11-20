@@ -53,22 +53,34 @@ echo "############################################################"
 for in_file in "${bad_list[@]}"; do
 	name=$(basename "$in_file")
 	echo "############################################################"
+
+	# Select the maximum number of samples that is allowed to be decoded.
+	#
+	# The information below should be taken into consideration when
+	# selecting the maximum number of samples for decoding.
+	#
+	# The file 5_crashes.bmp may effectively hang some systems by requesting
+	# a very large amount of virtual memory.
+	#
+	# The file jasper-doublefree-mem_close.jpg must restrict the number
+	# of samples;  ottherwise this test could pass or fail depending on
+	# the version of the JPEG library used (and if it passes it will be
+	# EXTREMELY SLOW due to the large image involved).
 	case "$name" in
-	2_crashes.bmp)
-		#jasper-doublefree-mem_close.jpg
-		# The file jasper-doublefree-mem_close.jpg must be skipped
-		# since this test could pass or fail depending on the version of
-		# the JPEG library used (and if it passes it will be VERY SLOW).
-		# Thie file 2_crashes.bmp must be skipped since it will try
-		# to allocate a huge palette which can cause an ASAN failure.
-		echo "Skipping $in_file"
-		continue
-		;;
+	00047-jasper-stackoverflow-jpc_tsfb_getbands2.jpc)
+		max_samples=0;;
+	5_crashes.bmp | \
+	2_crashes.bmp | \
+	jasper-doublefree-mem_close.jpg \
+	)
+		max_samples=100000000;;
+	*)
+		max_samples=0;;
 	esac
 
 	echo "Input file: $in_file"
 	imginfo_opts=()
-	imginfo_opts+=(--max-samples 100000000)
+	imginfo_opts+=(--max-samples "$max_samples")
 	special_asan_options=()
 	special_asan_options+=(exitcode=10)
 	special_asan_options+=(allocator_may_return_null=true)
