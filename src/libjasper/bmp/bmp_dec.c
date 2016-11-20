@@ -369,6 +369,13 @@ static bmp_info_t *bmp_getinfo(jas_stream_t *in)
 		goto error;
 	}
 
+	if (info->depth != 8 && info->depth != 24) {
+		jas_eprintf(
+		  "BMP decoder only supports images with depth 8 or 24 "
+		  "(depth %d)\n", info->depth);
+		goto error;
+	}
+
 	if (!jas_safe_size_mul(info->width, info->height, &num_pixels)) {
 		jas_eprintf("image dimensions too large\n");
 		goto error;
@@ -379,8 +386,12 @@ static bmp_info_t *bmp_getinfo(jas_stream_t *in)
 		goto error;
 	}
 
-	if (info->numcolors > 0 && info->numcolors > num_pixels) {
-		jas_eprintf("palette size is greater than the number of pixels\n");
+	/* Check for a palette whose size is unreasonably large. */
+	if (info->numcolors > 256 && info->numcolors > num_pixels) {
+		jas_eprintf("palette size is greater than 256 and "
+		  "greater than the number of pixels "
+		  "(%zu > %zu)\n",
+		  info->numcolors > num_pixels);
 		goto error;
 	}
 
