@@ -712,7 +712,7 @@ static int jpc_dec_tileinit(jpc_dec_t *dec, jpc_dec_tile_t *tile)
 	uint_fast32_t tmpxend;
 	uint_fast32_t tmpyend;
 	jpc_dec_cp_t *cp;
-	jpc_tsfb_band_t bnds[64];
+	jpc_tsfb_band_t bnds[JPC_MAXBANDS];
 	jpc_pchg_t *pchg;
 	int pchgno;
 	jpc_dec_cmpt_t *cmpt;
