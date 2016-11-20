@@ -2,7 +2,7 @@ language: c
 
 dist: trusty
 sudo: false
-group: beta
+#group: beta
 
 os:
     - linux
