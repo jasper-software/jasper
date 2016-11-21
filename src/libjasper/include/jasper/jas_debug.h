@@ -112,6 +112,12 @@ int jas_memdump(FILE *out, void *data, size_t len);
 /* Warn about use of deprecated functionality. */
 void jas_deprecated(const char *s);
 
+/* Convert to a string literal */
+#define JAS_STRINGIFY(x) #x
+
+/* Convert to a string literal after macro expansion */
+#define JAS_STRINGIFYX(x) JAS_STRINGIFY(x)
+
 #ifdef __cplusplus
 }
 #endif

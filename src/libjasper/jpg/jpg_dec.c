@@ -82,10 +82,12 @@
 
 typedef struct {
 	size_t max_samples;
+	bool print_version;
 } jpg_dec_importopts_t;
 
 typedef enum {
 	OPT_MAXSIZE,
+	OPT_VERSION,
 } optid_t;
 
 /* JPEG decoder data sink type. */
@@ -135,10 +137,22 @@ static int jpg_copystreamtofile(FILE *out, jas_stream_t *in);
 static jas_image_t *jpg_mkimage(j_decompress_ptr cinfo);
 
 /******************************************************************************\
+*
+\******************************************************************************/
+
+#if defined(LIBJPEG_TURBO_VERSION)
+#define JAS_LIBJPEG_TURBO_VERSION JAS_STRINGIFYX(LIBJPEG_TURBO_VERSION)
+#else
+#define JAS_LIBJPEG_TURBO_VERSION ""
+#endif
+static const char jas_libjpeg_turbo_version[] = JAS_LIBJPEG_TURBO_VERSION;
+
+/******************************************************************************\
 * Option parsing.
 \******************************************************************************/
 
 static jas_taginfo_t decopts[] = {
+	{OPT_VERSION, "version"},
 	{OPT_MAXSIZE, "max_samples"},
 	{-1, 0}
 };
@@ -148,6 +162,7 @@ static int jpg_dec_parseopts(const char *optstr, jpg_dec_importopts_t *opts)
 	jas_tvparser_t *tvp;
 
 	opts->max_samples = JAS_DEC_DEFAULT_MAX_SAMPLES;
+	opts->print_version = false;
 
 	if (!(tvp = jas_tvparser_create(optstr ? optstr : ""))) {
 		return -1;
@@ -158,6 +173,9 @@ static int jpg_dec_parseopts(const char *optstr, jpg_dec_importopts_t *opts)
 		  jas_tvparser_gettag(tvp)))->id) {
 		case OPT_MAXSIZE:
 			opts->max_samples = strtoull(jas_tvparser_getval(tvp), 0, 10);
+			break;
+		case OPT_VERSION:
+			opts->print_version = true;
 			break;
 		default:
 			jas_eprintf("warning: ignoring invalid option %s\n",
@@ -190,22 +208,31 @@ jas_image_t *jpg_decode(jas_stream_t *in, const char *optstr)
 	jpg_dec_importopts_t opts;
 	size_t num_samples;
 
-	JAS_DBGLOG(100, ("jpg_decode(%p, \"%s\")\n", in, optstr));
-
-	if (jpg_dec_parseopts(optstr, &opts)) {
-		goto error;
-	}
-
 	// In theory, the two memset calls that follow are not needed.
 	// They are only here to make the code more predictable in the event
 	// that the JPEG library fails to initialize a member.
 	memset(&cinfo, 0, sizeof(struct jpeg_decompress_struct));
 	memset(dest_mgr, 0, sizeof(jpg_dest_t));
 
-	dest_mgr->data = 0;
-
 	image = 0;
 	input_file = 0;
+	dest_mgr->data = 0;
+
+	JAS_DBGLOG(10, ("jpg_decode(%p, \"%s\")\n", in, optstr));
+
+	if (jpg_dec_parseopts(optstr, &opts)) {
+		goto error;
+	}
+
+	if (opts.print_version) {
+		printf("%d %s\n", JPEG_LIB_VERSION, jas_libjpeg_turbo_version);
+		goto error;
+	}
+
+	JAS_DBGLOG(10, ("JPEG library version: %d\n", JPEG_LIB_VERSION));
+	JAS_DBGLOG(10, ("JPEG Turbo library version: %s\n",
+	  jas_libjpeg_turbo_version));
+
 	if (!(input_file = tmpfile())) {
 		jas_eprintf("cannot make temporary file\n");
 		goto error;
@@ -283,11 +310,11 @@ jas_image_t *jpg_decode(jas_stream_t *in, const char *optstr)
 	/* Process the compressed data. */
 	(*dest_mgr->start_output)(&cinfo, dest_mgr);
 	while (cinfo.output_scanline < cinfo.output_height) {
-		JAS_DBGLOG(10, ("jpeg_read_scanlines(%p, %p, %lu)\n", &cinfo,
+		JAS_DBGLOG(100, ("jpeg_read_scanlines(%p, %p, %lu)\n", &cinfo,
 		  dest_mgr->buffer, JAS_CAST(unsigned long, dest_mgr->buffer_height)));
 		num_scanlines = jpeg_read_scanlines(&cinfo, dest_mgr->buffer,
 		  dest_mgr->buffer_height);
-		JAS_DBGLOG(10, ("jpeg_read_scanlines return value %lu\n",
+		JAS_DBGLOG(100, ("jpeg_read_scanlines return value %lu\n",
 		  JAS_CAST(unsigned long, num_scanlines)));
 		(*dest_mgr->put_pixel_rows)(&cinfo, dest_mgr, num_scanlines);
 	}
@@ -427,7 +454,7 @@ static void jpg_put_pixel_rows(j_decompress_ptr cinfo, jpg_dest_t *dinfo,
 	JDIMENSION x;
 	uint_fast32_t width;
 
-	JAS_DBGLOG(10, ("jpg_put_pixel_rows(%p, %p)\n", cinfo, dinfo));
+	JAS_DBGLOG(100, ("jpg_put_pixel_rows(%p, %p)\n", cinfo, dinfo));
 
 	if (dinfo->error) {
 		return;
@@ -442,7 +469,7 @@ static void jpg_put_pixel_rows(j_decompress_ptr cinfo, jpg_dest_t *dinfo,
 			jas_matrix_set(dinfo->data, 0, x, GETJSAMPLE(*bufptr));
 			bufptr += cinfo->output_components;
 		}
-		JAS_DBGLOG(10, (
+		JAS_DBGLOG(100, (
 		  "jas_image_writecmpt called for component %d row %lu\n", cmptno,
 		  JAS_CAST(unsigned long, dinfo->row)));
 		if (jas_image_writecmpt(dinfo->image, cmptno, 0, dinfo->row, width, 1,

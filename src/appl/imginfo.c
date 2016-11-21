@@ -89,7 +89,8 @@ typedef enum {
 	OPT_INFILE,
 	OPT_DEBUG,
 	OPT_MAXSAMPLES,
-	OPT_MAXMEM
+	OPT_MAXMEM,
+	OPT_DECOPT
 } optid_t;
 
 /******************************************************************************\
@@ -113,6 +114,8 @@ static jas_opt_t opts[] = {
 #if defined(JAS_DEFAULT_MAX_MEM_USAGE)
 	{OPT_MAXMEM, "memory-limit", JAS_OPT_HASARG},
 #endif
+	{OPT_DECOPT, "decoder-option", JAS_OPT_HASARG},
+	{OPT_DECOPT, "o", JAS_OPT_HASARG},
 	{-1, 0, 0}
 };
 
@@ -140,6 +143,7 @@ int main(int argc, char **argv)
 	size_t max_samples;
 	bool max_samples_valid;
 	char optstr[32];
+	char dec_opt_spec[256];
 
 	if (jas_init()) {
 		abort();
@@ -155,6 +159,7 @@ int main(int argc, char **argv)
 #if defined(JAS_DEFAULT_MAX_MEM_USAGE)
 	max_mem = JAS_DEFAULT_MAX_MEM_USAGE;
 #endif
+	dec_opt_spec[0] = '\0';
 
 	/* Parse the command line options. */
 	while ((id = jas_getopt(argc, argv, opts)) >= 0) {
@@ -178,6 +183,14 @@ int main(int argc, char **argv)
 			break;
 		case OPT_MAXMEM:
 			max_mem = strtoull(jas_optarg, 0, 10);
+			break;
+		case OPT_DECOPT:
+			if (dec_opt_spec[0] != '\0') {
+				strncat(dec_opt_spec, " ",
+				  sizeof(dec_opt_spec) - 1 - strlen(dec_opt_spec));
+			}
+			strncat(dec_opt_spec, jas_optarg,
+			  sizeof(dec_opt_spec) - 1 - strlen(dec_opt_spec));
 			break;
 		case OPT_HELP:
 		default:
@@ -217,10 +230,12 @@ int main(int argc, char **argv)
 #else
 		sprintf(optstr, "max_samples=%-zu", max_samples);
 #endif
+		strncat(dec_opt_spec, optstr,
+		  sizeof(dec_opt_spec) - 1 - strlen(dec_opt_spec));
 	}
 
 	/* Decode the image. */
-	if (!(image = jas_image_decode(instream, fmtid, optstr))) {
+	if (!(image = jas_image_decode(instream, fmtid, dec_opt_spec))) {
 		jas_stream_close(instream);
 		fprintf(stderr, "cannot load image\n");
 		return EXIT_FAILURE;

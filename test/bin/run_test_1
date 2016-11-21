@@ -15,16 +15,26 @@ source "$cmd_dir"/utilities || exit 1
 set_source_and_build_dirs || panic "cannot set source and build directories"
 
 top_dir="$cmd_dir/../.."
-data_dir="$top_dir/data/test"
+data_dir="$top_dir/data"
 
 ################################################################################
 
-good_list=($data_dir/good/*.*)
-bad_list=($data_dir/bad/*.*)
+good_list=($data_dir/test/good/*.*)
+bad_list=($data_dir/test/bad/*.*)
 
 imginfo="$abs_top_builddir/src/appl/imginfo"
 
 error_count=0
+
+jpeg_turbo_lib_version=$("$imginfo" -o version \
+  < "$data_dir/images/goldenears.jpg" | \
+  awk '{print $2;}' ) || \
+  panic "cannot get JPEG turbo library version"
+if [ -z "$jpeg_turbo_lib_version" ]; then
+	jpeg_turbo_lib_version=unknown
+fi
+
+echo "JPEG Turbo Library version: $jpeg_turbo_lib_version"
 
 echo "############################################################"
 echo "Testing valid data sets"
@@ -59,18 +69,30 @@ for in_file in "${bad_list[@]}"; do
 	# The information below should be taken into consideration when
 	# selecting the maximum number of samples for decoding.
 	#
-	# The file 5_crashes.bmp may effectively hang some systems by requesting
-	# a very large amount of virtual memory.
+	# 5_crashes.bmp
+	# This file will effectively hang some systems by requesting
+	# a very large amount of virtual memory.  So, the number of samples
+	# to be decoded must be restricted to make decoding fail from the start.
 	#
-	# The file jasper-doublefree-mem_close.jpg must restrict the number
-	# of samples;  ottherwise this test could pass or fail depending on
-	# the version of the JPEG library used (and if it passes it will be
-	# EXTREMELY SLOW due to the large image involved).
+	# jasper-doublefree-mem_close.jpg
+	# 1_crash.jpg
+	# 00028-jasper-uaf-jas_realloc.jpg
+	# These files must restrict the number of samples to be decoded in order
+	# to force decoding to fail; otherwise the test could pass or fail
+	# depending on the version of the JPEG library used.
+	# Furthermore, if the decoding test passes, it will take a very long
+	# time due complete due to the large image involved.
+	#
+	# 00047-jasper-stackoverflow-jpc_tsfb_getbands2.jpc
+	# This test must be allowed to fully decode in order to check for
+	# array/buffer overrun.
 	case "$name" in
 	00047-jasper-stackoverflow-jpc_tsfb_getbands2.jpc)
 		max_samples=0;;
 	5_crashes.bmp | \
 	2_crashes.bmp | \
+	1_crash.jpg | \
+	00028-jasper-uaf-jas_realloc.jpg | \
 	jasper-doublefree-mem_close.jpg \
 	)
 		max_samples=100000000;;
@@ -79,6 +101,11 @@ for in_file in "${bad_list[@]}"; do
 	esac
 
 	echo "Input file: $in_file"
+	case "$name" in
+	*.jpg)
+		echo "JPEG Turbo Library version: $jpeg_turbo_lib_version"
+		;;
+	esac
 	imginfo_opts=()
 	imginfo_opts+=(--max-samples "$max_samples")
 	special_asan_options=()
