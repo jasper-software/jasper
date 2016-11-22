@@ -63,7 +63,7 @@
 #define JPC_UTIL_H
 
 /* Parse a comma separated list of real numbers into an array of doubles. */
-int jpc_atoaf(char *s, int *numvalues, double **values);
+int jpc_atoaf(const char *s, int *numvalues, double **values);
 
 /* Upsample a sequence. */
 jas_seq_t *jpc_seq_upsample(jas_seq_t *seq, int n);

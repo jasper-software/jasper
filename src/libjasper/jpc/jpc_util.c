@@ -88,7 +88,7 @@
 * Miscellaneous Functions
 \******************************************************************************/
 
-int jpc_atoaf(char *s, int *numvalues, double **values)
+int jpc_atoaf(const char *s, int *numvalues, double **values)
 {
 	static char delim[] = ", \t\n";
 	char buf[4096];
