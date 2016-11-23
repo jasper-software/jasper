@@ -12,15 +12,15 @@
 /* This preprocessor symbol identifies the version of JasPer. */
 #define	JAS_VERSION "@JAS_VERSION@"
 
-@JAS_HAVE_FCNTL_H@
-@JAS_HAVE_IO_H@
-@JAS_HAVE_UNISTD_H@
-@JAS_HAVE_WINDOWS_H@
-@JAS_HAVE_SYS_TIME_H@
-@JAS_HAVE_SYS_TYPES_H@
+#cmakedefine JAS_HAVE_FCNTL_H 1
+#cmakedefine JAS_HAVE_IO_H 1
+#cmakedefine JAS_HAVE_UNISTD_H 1
+#cmakedefine JAS_HAVE_WINDOWS_H 1
+#cmakedefine JAS_HAVE_SYS_TIME_H 1
+#cmakedefine JAS_HAVE_SYS_TYPES_H 1
 
-@JAS_HAVE_GETTIMEOFDAY@
-@JAS_HAVE_GETRUSAGE@
+#cmakedefine JAS_HAVE_GETTIMEOFDAY 1
+#cmakedefine JAS_HAVE_GETRUSAGE 1
 
 #define JAS_HAVE_SNPRINTF	1
 

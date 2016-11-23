@@ -1,0 +1,16 @@
+list(APPEND libjasper_SOURCES
+	"${CMAKE_CURRENT_LIST_DIR}/jas_cm.c"
+	"${CMAKE_CURRENT_LIST_DIR}/jas_debug.c"
+	"${CMAKE_CURRENT_LIST_DIR}/jas_getopt.c"
+	"${CMAKE_CURRENT_LIST_DIR}/jas_icc.c"
+	"${CMAKE_CURRENT_LIST_DIR}/jas_iccdata.c"
+	"${CMAKE_CURRENT_LIST_DIR}/jas_image.c"
+	"${CMAKE_CURRENT_LIST_DIR}/jas_init.c"
+	"${CMAKE_CURRENT_LIST_DIR}/jas_malloc.c"
+	"${CMAKE_CURRENT_LIST_DIR}/jas_seq.c"
+	"${CMAKE_CURRENT_LIST_DIR}/jas_stream.c"
+	"${CMAKE_CURRENT_LIST_DIR}/jas_string.c"
+	"${CMAKE_CURRENT_LIST_DIR}/jas_tmr.c"
+	"${CMAKE_CURRENT_LIST_DIR}/jas_tvp.c"
+	"${CMAKE_CURRENT_LIST_DIR}/jas_version.c"
+)
