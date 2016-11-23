@@ -28,6 +28,7 @@ before_install:
 script:
     - cmake -DCMAKE_INSTALL_PREFIX=/tmp/jasper . && make clean && make && make install
     - CTEST_OUTPUT_ON_FAILURE=TRUE make test || (echo "FAILED"; exit 1)
+    - cat Testing/Temporary/LastTest.log
 
 notifications:
     email:
