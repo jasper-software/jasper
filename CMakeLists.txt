@@ -1,9 +1,11 @@
 cmake_minimum_required (VERSION 2.6)
-include(CheckIncludeFiles)
-include(CheckFunctionExists)
-cmake_policy(SET CMP0012 NEW)
 
 project(jasper)
+
+include(CheckIncludeFiles)
+include(CheckFunctionExists)
+include(CTest)
+cmake_policy(SET CMP0012 NEW)
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_VERBOSE_MAKEFILE on)
@@ -48,4 +50,9 @@ subdirs(src/libjasper src/appl)
 include_directories(src/libjasper/include)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/libjasper/include/jasper/jas_config.h.in ${CMAKE_CURRENT_BINARY_DIR}/src/libjasper/include/jasper/jas_config.h)
+
+add_test(run_test_1 test/bin/run_test_1)
+add_test(run_test_2 test/bin/run_test_2)
+add_test(run_test_3 test/bin/run_test_3)
+add_test(run_test_4 test/bin/run_test_4)
 

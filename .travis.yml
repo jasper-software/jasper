@@ -24,12 +24,11 @@ before_install:
 #    - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew outdated bash || brew upgrade bash; fi
 #    - bash --version
 
-#install: autoreconf -i
+#install:
 
 script:
     - cmake -DCMAKE_INSTALL_PREFIX=/tmp/jasper . && make clean && make && make install
-#    - ./configure --prefix=/tmp/jasper && make clean && make && make install
-#    - make check || (cat test/bin/run_test_*.log; exit 1)
+    - CTEST_OUTPUT_ON_FAILURE=TRUE make test || (echo "FAILED"; exit 1)
 
 notifications:
     email:
