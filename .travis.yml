@@ -27,6 +27,7 @@ install: autoreconf -i
 script:
     - ./configure --prefix=/tmp/jasper && make clean && make && make install
     - make check || (cat test/bin/run_test_*.log; exit 1)
+    - cat test/bin/run_test_*.log
 
 notifications:
     email:
