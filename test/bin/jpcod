@@ -8,7 +8,8 @@
 init()
 {
 	CMDDIR=$(dirname "$0") || return 1
-	CMDDIR=$(realpath "$CMDDIR") || return 1
+	#CMDDIR=$(realpath "$CMDDIR") || return 1
+	CMDDIR=$(readlink -f "$CMDDIR") || return 1
 	ABSCMDDIR="$CMDDIR"
 	TMPDIR=$(make_tmp_dir jpcod) || return 1
 #	HOSTNAME=`hostname`
