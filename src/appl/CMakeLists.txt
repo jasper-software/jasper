@@ -9,6 +9,7 @@ target_link_libraries(imgcmp libjasper ${JPEG_LIBRARIES} ${MATH_LIBRARY})
 
 install(TARGETS jasper imginfo imgcmp DESTINATION bin)
 
+message("GLUT_FOUND ${GLUT_FOUND}")
 if(${GLUT_FOUND})
 	add_executable(jiv jiv.c)
 	target_link_libraries(jiv libjasper ${JPEG_LIBRARIES} ${GLUT_LIBRARIES} ${MATH_LIBRARY})
