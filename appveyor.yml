@@ -15,12 +15,13 @@ configuration:
     - Debug
 
 platform:
-    - Win32
+    - Win64
+    #- Win32
     #- x86
     #- x64
 
 before_build:
-    - cmake -G "Visual Studio 14 2015 Win32" -DCMAKE_INSTALL_PREFIX=c:\tmp\jasper
+    - cmake -G "Visual Studio 14 2015 Win64" -DCMAKE_INSTALL_PREFIX=c:\tmp\jasper
 #    - copy src\libjasper\include\jasper\jas_config.h.in src\libjasper\include\jasper\jas_config.h
 
 build:
