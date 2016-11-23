@@ -1,6 +1,7 @@
 language: c
 
-dist: trusty
+dist: precise
+#dist: trusty
 sudo: false
 #group: beta
 
