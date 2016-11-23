@@ -26,6 +26,12 @@ check_function_exists(getrusage JAS_HAVE_GETRUSAGE)
 find_package(JPEG)
 find_package(GLUT)
 
+if(UNIX)
+	set(MATH_LIBRARY m)
+else()
+	set(MATH_LIBRARY "")
+endif()
+
 subdirs(src/libjasper src/appl)
 
 include_directories(src/libjasper/include)
