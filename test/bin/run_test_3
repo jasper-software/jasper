@@ -65,6 +65,7 @@ echo "ENDING AT `date`"
 
 echo "############################################################"
 echo "TEST SUMMARY"
+echo "Number of codec selectors: ${#codec_selectors[@]}"
 echo "Number of errors: $num_errors"
 if [ "$num_errors" -gt 0 ]; then
 	echo "STATUS: FAILED"
