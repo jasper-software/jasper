@@ -452,6 +452,7 @@ fi
 
 echo "############################################################"
 echo "TEST SUMMARY"
+echo "Number of tests: ${#tests[@]}"
 echo "Number of errors: $num_errors"
 if [ "${#failed_tests[@]}" -ne 0 ]; then
 	echo "failed tests:"
