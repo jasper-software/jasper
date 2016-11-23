@@ -24,7 +24,13 @@ check_function_exists(gettimeofday JAS_HAVE_GETTIMEOFDAY)
 check_function_exists(getrusage JAS_HAVE_GETRUSAGE)
 
 find_package(JPEG)
+
 find_package(GLUT)
+check_include_files(GL/glut.h JAS_HAVE_GLUT_H)
+if(NOT ${JAS_HAVE_GLUT_H})
+	set(GLUT_FOUND false)
+endif()
+#set(GLUT_FOUND false)
 
 if(UNIX)
 	set(MATH_LIBRARY m)
