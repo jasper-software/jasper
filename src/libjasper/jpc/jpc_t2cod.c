@@ -85,7 +85,6 @@ int jpc_pi_next(jpc_pi_t *pi)
 	jpc_pchg_t *pchg;
 	int ret;
 
-
 	for (;;) {
 
 		pi->valid = false;
