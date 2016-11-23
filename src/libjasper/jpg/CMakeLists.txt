@@ -1,4 +1,4 @@
-if(${JPEG_FOUND})
+if(JPEG_FOUND)
 	list(APPEND libjasper_SOURCES
 		"${CMAKE_CURRENT_LIST_DIR}/jpg_dec.c"
 		"${CMAKE_CURRENT_LIST_DIR}/jpg_enc.c"
