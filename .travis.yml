@@ -1,7 +1,8 @@
 language: c
 
 dist: trusty
-sudo: false
+sudo: required
+#sudo: false
 #group: beta
 
 os:
