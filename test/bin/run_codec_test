@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /bin/bash -xv
 # Copyright (c) 2016 Michael David Adams
 
 cmd_dir=$(dirname "$0") || exit 1
