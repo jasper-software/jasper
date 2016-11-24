@@ -1,6 +1,6 @@
 option(ALLOW_IN_SOURCE_BUILD "Allow an in-source build" false)
 
-function(check_for_in_source_build)
+function(prevent_in_source_build)
 	get_filename_component(source_dir "${CMAKE_SOURCE_DIR}" REALPATH)
 	get_filename_component(binary_dir "${CMAKE_BINARY_DIR}" REALPATH)
 	if("${source_dir}" STREQUAL "${binary_dir}")
@@ -12,4 +12,6 @@ function(check_for_in_source_build)
 	endif()
 endfunction()
 
-check_for_in_source_build()
+if (ALLOW_IN_SOURCE_BUILD)
+	check_for_in_source_build()
+endif()
