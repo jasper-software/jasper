@@ -12,6 +12,6 @@ function(prevent_in_source_build)
 	endif()
 endfunction()
 
-if (ALLOW_IN_SOURCE_BUILD)
+if (NOT ALLOW_IN_SOURCE_BUILD)
 	prevent_in_source_build()
 endif()
