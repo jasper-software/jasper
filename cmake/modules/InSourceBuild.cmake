@@ -13,5 +13,5 @@ function(prevent_in_source_build)
 endfunction()
 
 if (ALLOW_IN_SOURCE_BUILD)
-	check_for_in_source_build()
+	prevent_in_source_build()
 endif()
