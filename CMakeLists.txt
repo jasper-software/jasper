@@ -2,10 +2,18 @@ cmake_minimum_required (VERSION 2.6)
 
 project(jasper)
 
+set(CMAKE_MODULE_PATH
+  ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
+
 include(CheckIncludeFiles)
 include(CheckFunctionExists)
 include(CTest)
+include(Sanitizers)
 cmake_policy(SET CMP0012 NEW)
+
+option(JAS_ENABLE_LIBJPEG "Enable use of JPEG Library" true)
+option(JAS_ENABLE_OPENGL "Enable use of OpenGL Library" true)
+option(JAS_STRICT "Enable pedantic error checking" false)
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_VERBOSE_MAKEFILE on)
@@ -25,7 +33,17 @@ check_include_files(sys/types.h JAS_HAVE_SYS_TYPES_H)
 check_function_exists(gettimeofday JAS_HAVE_GETTIMEOFDAY)
 check_function_exists(getrusage JAS_HAVE_GETRUSAGE)
 
+if (JAS_STRICT)
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wno-unused")
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pedantic")
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -W -Wformat -Wmissing-prototypes -Wstrict-prototypes")
+endif()
+
 find_package(JPEG)
+if(NOT JAS_ENABLE_LIBJPEG)
+	set(JPEG_FOUND false)
+endif()
+message("JPEG_FOUND ${JPEG_FOUND}")
 
 find_package(GLUT)
 if(GLUT_FOUND)
@@ -33,10 +51,11 @@ if(GLUT_FOUND)
 endif()
 check_include_files(GL/glut.h JAS_HAVE_GL_GLUT_H)
 if(NOT JAS_HAVE_GL_GLUT_H)
-	message("setting GLUT_FOUND to false")
 	set(GLUT_FOUND false)
 endif()
-#set(GLUT_FOUND false)
+if(NOT JAS_ENABLE_OPENGL)
+	set(GLUT_FOUND false)
+endif()
 message("GLUT_FOUND ${GLUT_FOUND}")
 
 if(UNIX)
