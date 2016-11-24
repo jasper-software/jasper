@@ -1,4 +1,9 @@
-list(APPEND libjasper_SOURCES
+configure_file(
+	"${CMAKE_CURRENT_SOURCE_DIR}/include/jasper/jas_config.h.in"
+	"${CMAKE_CURRENT_BINARY_DIR}/include/jasper/jas_config.h"
+)
+
+list(APPEND libjasper_sources
 	base/jas_cm.c
 	base/jas_debug.c
 	base/jas_getopt.c
@@ -52,18 +57,19 @@ list(APPEND libjasper_SOURCES
 )
 
 if(JPEG_FOUND)
-	list(APPEND libjasper_SOURCES
+	list(APPEND libjasper_sources
 		jpg/jpg_dec.c
 		jpg/jpg_enc.c
 	)
 else()
-	list(APPEND libjasper_SOURCES
+	list(APPEND libjasper_sources
 		jpg/jpg_dummy.c
 	)
 endif()
 
-set(libjasper_HEADERS
+set(libjasper_headers
 	include/jasper/jas_cm.h
+	${CMAKE_CURRENT_BINARY_DIR}/include/jasper/jas_config.h
 	include/jasper/jas_debug.h
 	include/jasper/jas_fix.h
 	include/jasper/jas_getopt.h
@@ -81,12 +87,16 @@ set(libjasper_HEADERS
 	include/jasper/jas_types.h
 	include/jasper/jas_version.h
 )
-#	include/jasper/jas_config.h
 
-add_library(libjasper ${libjasper_SOURCES})
+add_library(libjasper ${libjasper_sources})
 
 install(TARGETS libjasper DESTINATION lib)
-install(FILES ${libjasper_HEADERS} DESTINATION include/jasper)
+install(FILES ${libjasper_headers} DESTINATION include/jasper)
+
+target_include_directories(libjasper PUBLIC 
+	"${CMAKE_CURRENT_BINARY_DIR}/include"
+	"${CMAKE_CURRENT_SOURCE_DIR}/include"
+)
 
 #install(TARGETS "${CMAKE_CURRENT_LIST_DIR}/include/jasper/jas_config.h" PUBLIC_HEADER DESTINATION include/jasper)
 

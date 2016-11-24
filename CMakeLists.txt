@@ -86,10 +86,16 @@ endif()
 
 subdirs(src/libjasper src/appl)
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR}/src/libjasper/include)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/libjasper/include)
+#include_directories(${CMAKE_CURRENT_BINARY_DIR}/src/libjasper/include)
+#include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/libjasper/include)
+#target_include_directories(libjasper PUBLIC 
+#"${CMAKE_CURRENT_BINARY_DIR}/src/libjasper/include"
+#"${CMAKE_CURRENT_SOURCE_DIR}/src/libjasper/include")
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/libjasper/include/jasper/jas_config.h.in ${CMAKE_CURRENT_BINARY_DIR}/src/libjasper/include/jasper/jas_config.h)
+#configure_file(
+#	"${CMAKE_CURRENT_SOURCE_DIR}/src/libjasper/include/jasper/jas_config.h.in"
+#	"${CMAKE_CURRENT_BINARY_DIR}/src/libjasper/include/jasper/jas_config.h"
+#)
 
 set(CTEST_ENVIRONMENT
 	"JAS_ABS_TOP_BUILDDIR=${CMAKE_CURRENT_BINARY_DIR}"
