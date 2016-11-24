@@ -102,3 +102,11 @@ add_test(run_test_2 ${CMAKE_CURRENT_SOURCE_DIR}/test/bin/run_test_2)
 add_test(run_test_3 ${CMAKE_CURRENT_SOURCE_DIR}/test/bin/run_test_3)
 add_test(run_test_4 ${CMAKE_CURRENT_SOURCE_DIR}/test/bin/run_test_4)
 
+#find_package(MakeDist)
+
+#set(EXTRA_DIST data)
+
+#add_makedist(
+#	${CMAKE_CURRENT_BINARY_DIR}/README
+#	${CMAKE_CURRENT_BINARY_DIR}/LICENSE
+#)
