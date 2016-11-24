@@ -1,14 +1,17 @@
-cmake_minimum_required (VERSION 2.6)
+cmake_minimum_required (VERSION 2.8.11)
 
 project(jasper)
+
+set(CMAKE_MODULE_PATH
+  ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
+
+# This include should be placed as early as possible.
+include(InSourceBuild)
 
 set(JAS_MAJOR_VERSION 1)
 set(JAS_MINOR_VERSION 900)
 set(JAS_MICRO_VERSION 31)
 set(JAS_VERSION "${JAS_MAJOR_VERSION}.${JAS_MINOR_VERSION}.${JAS_MICRO_VERSION}")
-
-set(CMAKE_MODULE_PATH
-  ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
 
 include(CheckIncludeFiles)
 include(CheckFunctionExists)

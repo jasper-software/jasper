@@ -27,7 +27,7 @@ before_install:
 #install:
 
 script:
-    - cmake -DCMAKE_INSTALL_PREFIX=/tmp/jasper . && make clean && make && make install
+    - cmake -DCMAKE_INSTALL_PREFIX=/tmp/jasper -DALLOW_IN_SOURCE_BUILD=true . && make clean && make && make install
     - CTEST_OUTPUT_ON_FAILURE=TRUE JAS_ABS_TOP_BUILDDIR="$TRAVIS_BUILD_DIR" JAS_ABS_TOP_SRCDIR="$TRAVIS_BUILD_DIR" JAS_TOP_BUILDDIR="../.." JAS_TOP_SRCDIR="../.." make test || (echo "FAILED"; exit 1)
 
 notifications:
