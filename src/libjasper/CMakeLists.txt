@@ -62,7 +62,26 @@ else()
 	)
 endif()
 
-include(include/jasper/CMakeLists.txt)
+set(libjasper_HEADERS
+	include/jasper/jas_cm.h
+	include/jasper/jas_debug.h
+	include/jasper/jas_fix.h
+	include/jasper/jas_getopt.h
+	include/jasper/jas_icc.h
+	include/jasper/jas_image.h
+	include/jasper/jas_init.h
+	include/jasper/jas_malloc.h
+	include/jasper/jas_math.h
+	include/jasper/jasper.h
+	include/jasper/jas_seq.h
+	include/jasper/jas_stream.h
+	include/jasper/jas_string.h
+	include/jasper/jas_tmr.h
+	include/jasper/jas_tvp.h
+	include/jasper/jas_types.h
+	include/jasper/jas_version.h
+)
+#	include/jasper/jas_config.h
 
 add_library(libjasper ${libjasper_SOURCES})
 
