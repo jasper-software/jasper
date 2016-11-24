@@ -3,70 +3,6 @@ configure_file(
 	"${CMAKE_CURRENT_BINARY_DIR}/include/jasper/jas_config.h"
 )
 
-list(APPEND libjasper_sources
-	base/jas_cm.c
-	base/jas_debug.c
-	base/jas_getopt.c
-	base/jas_icc.c
-	base/jas_iccdata.c
-	base/jas_image.c
-	base/jas_init.c
-	base/jas_malloc.c
-	base/jas_seq.c
-	base/jas_stream.c
-	base/jas_string.c
-	base/jas_tmr.c
-	base/jas_tvp.c
-	base/jas_version.c
-	bmp/bmp_cod.c
-	bmp/bmp_dec.c
-	bmp/bmp_enc.c
-	jp2/jp2_cod.c
-	jp2/jp2_dec.c
-	jp2/jp2_enc.c
-	jpc/jpc_bs.c
-	jpc/jpc_cs.c
-	jpc/jpc_dec.c
-	jpc/jpc_enc.c
-	jpc/jpc_math.c
-	jpc/jpc_mct.c
-	jpc/jpc_mqcod.c
-	jpc/jpc_mqdec.c
-	jpc/jpc_mqenc.c
-	jpc/jpc_qmfb.c
-	jpc/jpc_t1cod.c
-	jpc/jpc_t1dec.c
-	jpc/jpc_t1enc.c
-	jpc/jpc_t2cod.c
-	jpc/jpc_t2dec.c
-	jpc/jpc_t2enc.c
-	jpc/jpc_tagtree.c
-	jpc/jpc_tsfb.c
-	jpc/jpc_util.c
-	jpg/jpg_val.c
-	mif/mif_cod.c
-	pgx/pgx_cod.c
-	pgx/pgx_dec.c
-	pgx/pgx_enc.c
-	pnm/pnm_cod.c
-	pnm/pnm_dec.c
-	pnm/pnm_enc.c
-	ras/ras_cod.c
-	ras/ras_dec.c
-	ras/ras_enc.c
-)
-
-if(JPEG_FOUND)
-	list(APPEND libjasper_sources
-		jpg/jpg_dec.c
-		jpg/jpg_enc.c
-	)
-else()
-	list(APPEND libjasper_sources
-		jpg/jpg_dummy.c
-	)
-endif()
-
 set(libjasper_headers
 	include/jasper/jas_cm.h
 	${CMAKE_CURRENT_BINARY_DIR}/include/jasper/jas_config.h
@@ -88,19 +24,115 @@ set(libjasper_headers
 	include/jasper/jas_version.h
 )
 
-add_library(libjasper ${libjasper_sources})
+set(libjasper_base_sources
+	base/jas_cm.c
+	base/jas_debug.c
+	base/jas_getopt.c
+	base/jas_icc.c
+	base/jas_iccdata.c
+	base/jas_image.c
+	base/jas_init.c
+	base/jas_malloc.c
+	base/jas_seq.c
+	base/jas_stream.c
+	base/jas_string.c
+	base/jas_tmr.c
+	base/jas_tvp.c
+	base/jas_version.c
+)
 
-install(TARGETS libjasper DESTINATION lib)
-install(FILES ${libjasper_headers} DESTINATION include/jasper)
+set(libjasper_bmp_sources
+	bmp/bmp_cod.c
+	bmp/bmp_dec.c
+	bmp/bmp_enc.c
+)
+
+set(libjasper_jp2_sources
+	jp2/jp2_cod.c
+	jp2/jp2_dec.c
+	jp2/jp2_enc.c
+)
+
+set(libjasper_jpc_sources
+	jpc/jpc_bs.c
+	jpc/jpc_cs.c
+	jpc/jpc_dec.c
+	jpc/jpc_enc.c
+	jpc/jpc_math.c
+	jpc/jpc_mct.c
+	jpc/jpc_mqcod.c
+	jpc/jpc_mqdec.c
+	jpc/jpc_mqenc.c
+	jpc/jpc_qmfb.c
+	jpc/jpc_t1cod.c
+	jpc/jpc_t1dec.c
+	jpc/jpc_t1enc.c
+	jpc/jpc_t2cod.c
+	jpc/jpc_t2dec.c
+	jpc/jpc_t2enc.c
+	jpc/jpc_tagtree.c
+	jpc/jpc_tsfb.c
+	jpc/jpc_util.c
+)
+
+set(libjasper_jpg_sources
+	jpg/jpg_val.c
+)
+if(JPEG_FOUND)
+	list(APPEND libjasper_jpg_sources
+		jpg/jpg_dec.c
+		jpg/jpg_enc.c
+	)
+else()
+	list(APPEND libjasper_jpg_sources
+		jpg/jpg_dummy.c
+	)
+endif()
+
+set(libjasper_mif_sources
+	mif/mif_cod.c
+)
+
+set(libjasper_pgx_sources
+	pgx/pgx_cod.c
+	pgx/pgx_dec.c
+	pgx/pgx_enc.c
+)
+
+set(libjasper_pnm_sources
+	pnm/pnm_cod.c
+	pnm/pnm_dec.c
+	pnm/pnm_enc.c
+)
+
+set(libjasper_ras_sources
+	ras/ras_cod.c
+	ras/ras_dec.c
+	ras/ras_enc.c
+)
+
+add_library(libjasper
+	${libjasper_headers}
+	${libjasper_base_sources}
+	${libjasper_bmp_sources}
+	${libjasper_jp2_sources}
+	${libjasper_jpc_sources}
+	${libjasper_jpg_sources}
+	${libjasper_mif_sources}
+	${libjasper_pgx_sources}
+	${libjasper_pnm_sources}
+	${libjasper_ras_sources}
+)
 
 target_include_directories(libjasper PUBLIC 
 	"${CMAKE_CURRENT_BINARY_DIR}/include"
 	"${CMAKE_CURRENT_SOURCE_DIR}/include"
 )
 
-#install(TARGETS "${CMAKE_CURRENT_LIST_DIR}/include/jasper/jas_config.h" PUBLIC_HEADER DESTINATION include/jasper)
+if (UNIX)
+	set_target_properties(libjasper PROPERTIES OUTPUT_NAME jasper)
+endif()
+set_target_properties(libjasper PROPERTIES LINKER_LANGUAGE C)
 
-set_target_properties(libjasper
-  PROPERTIES OUTPUT_NAME jasper)
-set_target_properties(libjasper
-  PROPERTIES LINKER_LANGUAGE C)
+install(TARGETS libjasper DESTINATION lib)
+install(FILES ${libjasper_headers} DESTINATION include/jasper)
