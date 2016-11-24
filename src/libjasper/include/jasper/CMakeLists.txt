@@ -1,6 +1,5 @@
 set(libjasper_HEADERS
 	"${CMAKE_CURRENT_LIST_DIR}/jas_cm.h"
-	"${CMAKE_CURRENT_LIST_DIR}/jas_config.h"
 	"${CMAKE_CURRENT_LIST_DIR}/jas_debug.h"
 	"${CMAKE_CURRENT_LIST_DIR}/jas_fix.h"
 	"${CMAKE_CURRENT_LIST_DIR}/jas_getopt.h"
@@ -18,3 +17,4 @@ set(libjasper_HEADERS
 	"${CMAKE_CURRENT_LIST_DIR}/jas_types.h"
 	"${CMAKE_CURRENT_LIST_DIR}/jas_version.h"
 )
+#	"${CMAKE_CURRENT_LIST_DIR}/jas_config.h"

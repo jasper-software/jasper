@@ -24,6 +24,8 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_VERBOSE_MAKEFILE on)
 
 INCLUDE(InstallRequiredSystemLibraries)
+SET(CPACK_PACKAGE_NAME "${CMAKE_PROJECT_NAME}")
+SET(CPACK_PACKAGE_VERSION "${JAS_VERSION}")
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "JasPer Image Processing Tool Kit")
 SET(CPACK_PACKAGE_VENDOR "Michael Adams")
 SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/README")
@@ -33,6 +35,9 @@ SET(CPACK_PACKAGE_VERSION_MINOR "${JAS_MINOR_VERSION}")
 SET(CPACK_PACKAGE_VERSION_PATCH "${JAS_MICRO_VERSION}")
 SET(CPACK_PACKAGE_INSTALL_DIRECTORY
   "CMake ${CMake_VERSION_MAJOR}.${CMake_VERSION_MINOR}")
+SET(CPACK_PACKAGE_FILE_NAME
+  "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}")
+SET(CPACK_GENERATOR "TGZ")
 include(CPack)
 
 check_include_files(fcntl.h JAS_HAVE_FCNTL_H)
@@ -78,12 +83,22 @@ endif()
 
 subdirs(src/libjasper src/appl)
 
-include_directories(src/libjasper/include)
+include_directories(${CMAKE_CURRENT_BINARY_DIR}/src/libjasper/include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/libjasper/include)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/libjasper/include/jasper/jas_config.h.in ${CMAKE_CURRENT_BINARY_DIR}/src/libjasper/include/jasper/jas_config.h)
 
-add_test(run_test_1 test/bin/run_test_1)
-add_test(run_test_2 test/bin/run_test_2)
-add_test(run_test_3 test/bin/run_test_3)
-add_test(run_test_4 test/bin/run_test_4)
+set(CTEST_ENVIRONMENT
+	"JAS_ABS_TOP_BUILDDIR=${CMAKE_CURRENT_BINARY_DIR}"
+	"JAS_ABS_TOP_SRCDIR=${CMAKE_CURRENT_SOURCE_DIR}"
+	"JAS_TOP_BUILDDIR=${CMAKE_CURRENT_BINARY_DIR}"
+	"JAS_TOP_SRCDIR=${CMAKE_CURRENT_SOURCE_DIR}"
+)
+#	"JAS_TOP_BUILDDIR=../../build"
+#	"JAS_TOP_SRCDIR=../.."
+
+add_test(run_test_1 ${CMAKE_CURRENT_SOURCE_DIR}/test/bin/run_test_1)
+add_test(run_test_2 ${CMAKE_CURRENT_SOURCE_DIR}/test/bin/run_test_2)
+add_test(run_test_3 ${CMAKE_CURRENT_SOURCE_DIR}/test/bin/run_test_3)
+add_test(run_test_4 ${CMAKE_CURRENT_SOURCE_DIR}/test/bin/run_test_4)
 
