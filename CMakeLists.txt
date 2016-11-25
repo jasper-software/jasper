@@ -8,10 +8,47 @@ set(CMAKE_MODULE_PATH
 # This include should be placed as early as possible.
 include(InSourceBuild)
 
-set(JAS_MAJOR_VERSION 1)
-set(JAS_MINOR_VERSION 900)
-set(JAS_MICRO_VERSION 31)
-set(JAS_VERSION "${JAS_MAJOR_VERSION}.${JAS_MINOR_VERSION}.${JAS_MICRO_VERSION}")
+################################################################################
+# Version information.
+################################################################################
+
+# The major, minor, and micro version numbers of the project.
+set(JAS_VERSION_MAJOR 2)
+set(JAS_VERSION_MINOR 0)
+set(JAS_VERSION_PATCH 0)
+
+# The project version.
+set(JAS_VERSION
+	"${JAS_VERSION_MAJOR}.${JAS_VERSION_MINOR}.${JAS_VERSION_PATCH}")
+
+# The RPM version information.
+set(JAS_RPM_RELEASE 1)
+
+# The shared library versioning information, which is specified by the
+# following variables: JAS_SO_VERSION, JAS_SO_MINOR, and JAS_SO_RELEASE.
+# Each new software release should update the values of these variables.
+#
+# Guidelines for updating this information:
+# If the code did not change (e.g., only documentation was updated), do
+# nothing.
+# If the code changed and the binary interface for the library did not change
+# from the previous release (e.g., most bug fixes), increment JAS_SO_RELEASE.
+# If the binary interface changed, but remains compatible with the previous
+# release (e.g., only new functions were added), increment JAS_SO_MINOR and
+# set JAS_SO_RELEASE to 0.
+# If the binary interface changed in a way that breaks compatibility with the
+# previous release (e.g., a function was deleted), increment JAS_SO_VERSION and
+# set both JAS_SO_MINOR and JAS_SO_RELEASE to 0.
+#
+# History of shared library versioning information:
+# JasPer 2.0.0: 4.0.0
+
+set(JAS_SO_VERSION 4)
+set(JAS_SO_MINOR 0)
+set(JAS_SO_RELEASE 0)
+set(JAS_SO_NAME "${JAS_SO_VERSION}.${JAS_SO_MINOR}.${JAS_SO_RELEASE}")
+
+################################################################################
 
 include(CheckIncludeFiles)
 include(CheckFunctionExists)
@@ -21,7 +58,8 @@ cmake_policy(SET CMP0012 NEW)
 
 option(JAS_ENABLE_LIBJPEG "Enable use of JPEG Library" true)
 option(JAS_ENABLE_OPENGL "Enable use of OpenGL Library" true)
-option(JAS_STRICT "Enable pedantic error checking" false)
+option(JAS_ENABLE_STRICT "Enable pedantic error checking" false)
+option(JAS_ENABLE_SHARED "Enable building of shared library" true)
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_VERBOSE_MAKEFILE on)
@@ -33,15 +71,17 @@ SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "JasPer Image Processing Tool Kit")
 SET(CPACK_PACKAGE_VENDOR "Michael Adams")
 SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/README")
 SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
-SET(CPACK_PACKAGE_VERSION_MAJOR "${JAS_MAJOR_VERSION}")
-SET(CPACK_PACKAGE_VERSION_MINOR "${JAS_MINOR_VERSION}")
-SET(CPACK_PACKAGE_VERSION_PATCH "${JAS_MICRO_VERSION}")
+SET(CPACK_PACKAGE_VERSION_MAJOR "${JAS_VERSION_MAJOR}")
+SET(CPACK_PACKAGE_VERSION_MINOR "${JAS_VERSION_MINOR}")
+SET(CPACK_PACKAGE_VERSION_PATCH "${JAS_VERSION_PATCH}")
 SET(CPACK_PACKAGE_INSTALL_DIRECTORY
   "CMake ${CMake_VERSION_MAJOR}.${CMake_VERSION_MINOR}")
 SET(CPACK_PACKAGE_FILE_NAME
   "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}")
 SET(CPACK_GENERATOR "TGZ")
 include(CPack)
+
+find_program(BASH_PROGRAM bash)
 
 check_include_files(fcntl.h JAS_HAVE_FCNTL_H)
 check_include_files(io.h JAS_HAVE_IO_H)
@@ -92,24 +132,19 @@ subdirs(src/libjasper src/appl)
 #"${CMAKE_CURRENT_BINARY_DIR}/src/libjasper/include"
 #"${CMAKE_CURRENT_SOURCE_DIR}/src/libjasper/include")
 
-#configure_file(
-#	"${CMAKE_CURRENT_SOURCE_DIR}/src/libjasper/include/jasper/jas_config.h.in"
-#	"${CMAKE_CURRENT_BINARY_DIR}/src/libjasper/include/jasper/jas_config.h"
-#)
-
-set(CTEST_ENVIRONMENT
-	"JAS_ABS_TOP_BUILDDIR=${CMAKE_CURRENT_BINARY_DIR}"
-	"JAS_ABS_TOP_SRCDIR=${CMAKE_CURRENT_SOURCE_DIR}"
-	"JAS_TOP_BUILDDIR=${CMAKE_CURRENT_BINARY_DIR}"
-	"JAS_TOP_SRCDIR=${CMAKE_CURRENT_SOURCE_DIR}"
-)
+set(ENV{JAS_ABS_TOP_BUILDDIR} "${CMAKE_CURRENT_BINARY_DIR}")
+set(ENV{JAS_ABS_TOP_SRCDIR} "${CMAKE_CURRENT_SOURCE_DIR}")
+set(ENV{JAS_TOP_BUILDDIR} "${CMAKE_CURRENT_BINARY_DIR}")
+set(ENV{JAS_TOP_SRCDIR} "${CMAKE_CURRENT_SOURCE_DIR}")
 #	"JAS_TOP_BUILDDIR=../../build"
 #	"JAS_TOP_SRCDIR=../.."
 
-add_test(run_test_1 ${CMAKE_CURRENT_SOURCE_DIR}/test/bin/run_test_1)
-add_test(run_test_2 ${CMAKE_CURRENT_SOURCE_DIR}/test/bin/run_test_2)
-add_test(run_test_3 ${CMAKE_CURRENT_SOURCE_DIR}/test/bin/run_test_3)
-add_test(run_test_4 ${CMAKE_CURRENT_SOURCE_DIR}/test/bin/run_test_4)
+if (BASH_PROGRAM)
+	add_test(run_test_1 ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/test/bin/run_test_1)
+	add_test(run_test_2 ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/test/bin/run_test_2)
+	add_test(run_test_3 ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/test/bin/run_test_3)
+	add_test(run_test_4 ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/test/bin/run_test_4)
+endif()
 
 #find_package(MakeDist)
 

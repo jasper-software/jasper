@@ -111,7 +111,13 @@ set(libjasper_ras_sources
 	ras/ras_enc.c
 )
 
-add_library(libjasper
+if (JAS_ENABLE_SHARED)
+	set(libjasper_type SHARED)
+else()
+	set(libjasper_type STATIC)
+endif()
+
+add_library(libjasper ${libjasper_type}
 	${libjasper_headers}
 	${libjasper_base_sources}
 	${libjasper_bmp_sources}
@@ -133,6 +139,10 @@ if (UNIX)
 	set_target_properties(libjasper PROPERTIES OUTPUT_NAME jasper)
 endif()
 set_target_properties(libjasper PROPERTIES LINKER_LANGUAGE C)
+set_target_properties(libjasper PROPERTIES
+	VERSION ${JAS_SO_NAME}
+	SOVERSION ${JAS_SO_VERSION}
+)
 
 install(TARGETS libjasper DESTINATION lib)
 install(FILES ${libjasper_headers} DESTINATION include/jasper)
