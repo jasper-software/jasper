@@ -65,7 +65,7 @@ option(JAS_ENABLE_STRICT "Enable pedantic error checking" false)
 option(JAS_ENABLE_SHARED "Enable building of shared library" true)
 
 if (MACOSX)
-	set(MAXOSX_PATH true)
+	set(MACOSX_PATH true)
 endif()
 
 if (WIN32)
