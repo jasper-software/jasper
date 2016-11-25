@@ -139,10 +139,13 @@ if (UNIX)
 	set_target_properties(libjasper PROPERTIES OUTPUT_NAME jasper)
 endif()
 set_target_properties(libjasper PROPERTIES LINKER_LANGUAGE C)
+
+if (UNIX)
 set_target_properties(libjasper PROPERTIES
 	VERSION ${JAS_SO_NAME}
 	SOVERSION ${JAS_SO_VERSION}
 )
+endif()
 
 install(TARGETS libjasper DESTINATION lib)
 install(FILES ${libjasper_headers} DESTINATION include/jasper)
