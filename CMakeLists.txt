@@ -83,7 +83,7 @@ include(CPack)
 
 find_program(BASH_PROGRAM bash)
 # HACK
-set(BASH_PROGRAM "")
+#set(BASH_PROGRAM "")
 
 check_include_files(fcntl.h JAS_HAVE_FCNTL_H)
 check_include_files(io.h JAS_HAVE_IO_H)
