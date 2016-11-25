@@ -64,6 +64,14 @@ option(JAS_ENABLE_OPENGL "Enable use of OpenGL Library" true)
 option(JAS_ENABLE_STRICT "Enable pedantic error checking" false)
 option(JAS_ENABLE_SHARED "Enable building of shared library" true)
 
+if (WIN32)
+	if (JAS_ENABLED_SHARED)
+		message("shared library support for Windows is not currently supported")
+		message("disabling shared library build")
+		set(JAS_ENABLE_SHARED false)
+	endif()
+endif()
+
 INCLUDE(InstallRequiredSystemLibraries)
 SET(CPACK_PACKAGE_NAME "${CMAKE_PROJECT_NAME}")
 SET(CPACK_PACKAGE_VERSION "${JAS_VERSION}")
@@ -82,7 +90,7 @@ SET(CPACK_GENERATOR "TGZ")
 include(CPack)
 
 find_program(BASH_PROGRAM bash)
-# HACK
+# HACK to disable tests
 #set(BASH_PROGRAM "")
 
 check_include_files(fcntl.h JAS_HAVE_FCNTL_H)
