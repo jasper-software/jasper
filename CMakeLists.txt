@@ -68,11 +68,11 @@ if (MACOSX)
 	set(MAXOSX_PATH true)
 endif()
 
-if (WIN32)
+if (WIN32 OR MACOSX)
 	if (JAS_ENABLE_SHARED)
 		message(WARNING
 		  "Disabling the building of shared libraries "
-		  "(since this does not currently work on the Windows platform). "
+		  "(since this does not currently work on this platform). "
 		  "Setting JAS_ENABLE_SHARED to false."
 		)
 		set(JAS_ENABLE_SHARED false)

@@ -1,22 +1,23 @@
-Detailed instructions on how to build and install the JasPer software
-can be found in the JasPer Software Reference Manual which is located
-in the doc directory.  (See the section titled "Building the Software".)
+To build and install JasPer do the following:
 
-If you are building the JasPer software directly from the contents of
-the official JasPer GitHub repository (instead of from a proper release
-archive file), you will need to do the following in order to install
-JasPer:
+In what follows, let $SOURCE_DIR denote the top-level directory of the JasPer
+software source tree.
 
-    1) Ensure that the Autotools are installed on your system (i.e.,
-    autoconf, automake, etc).
+1) Select an empty or new directory to use for building the software.
+Let $BUILD_DIR denote this directory.
 
-    2) Set your current directory to the top-level directory of the JasPer
-    software tree (i.e., the directory containing the file named
-    configure.ac), and run the command:
+2) Run cmake:
+cmake -H$SOURCE_DIR -B$BUILD_DIR
 
-        autoreconf -i
+3) Build the code:
+cd $BUILD_DIR
 
-    3) Jump to the step in the installation instructions in the JasPer
-    Software Reference Manual just after the step that extracted the
-    archive file contents, and proceed from there.
+4) Build the code
+make clean all
+
+5) Run test suite:
+make test
+
+6) Install the software:
+make install
 
