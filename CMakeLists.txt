@@ -59,7 +59,7 @@ cmake_policy(SET CMP0012 NEW)
 option(JAS_ENABLE_LIBJPEG "Enable use of JPEG Library" true)
 option(JAS_ENABLE_OPENGL "Enable use of OpenGL Library" true)
 option(JAS_ENABLE_STRICT "Enable pedantic error checking" false)
-option(JAS_ENABLE_SHARED "Enable building of shared library" true)
+option(JAS_ENABLE_SHARED "Enable building of shared library" false)
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_VERBOSE_MAKEFILE on)
