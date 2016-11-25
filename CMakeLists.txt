@@ -68,10 +68,6 @@ if (APPLE AND ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 	set(MACOSX true)
 endif()
 
-if (MACOSX)
-	set(CMAKE_MACOSX_RPATH true)
-endif()
-
 if (UNIX)
 	if (MACOSX)
 		set(JAS_PLATFORM "UNIX (OSX)")
@@ -85,7 +81,7 @@ else()
 endif()
 message("Platform ${JAS_PLATFORM}")
 
-if (WIN32)
+if (WIN32 OR MACOSX)
 	if (JAS_ENABLE_SHARED)
 		message(WARNING
 		  "Disabling the building of shared libraries "
@@ -94,6 +90,10 @@ if (WIN32)
 		)
 		set(JAS_ENABLE_SHARED false)
 	endif()
+endif()
+
+if (JAS_ENABLE_SHARED AND MACOSX)
+	set(CMAKE_MACOSX_RPATH true)
 endif()
 
 INCLUDE(InstallRequiredSystemLibraries)
