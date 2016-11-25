@@ -158,6 +158,10 @@ else()
 	set(MATH_LIBRARY "")
 endif()
 
+if (JAS_MEMORY_LIMIT)
+	add_definitions(-DJAS_MEMORY_LIMIT=${JAS_MEMORY_LIMIT})
+endif()
+
 ################################################################################
 
 # use, i.e. don't skip the full RPATH for the build tree
@@ -199,13 +203,21 @@ set(ENV{JAS_TOP_SRCDIR} "${CMAKE_CURRENT_SOURCE_DIR}")
 
 if (BASH_PROGRAM)
 	add_test(run_test_1
-		${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/test/bin/run_test_1)
+	  "${BASH_PROGRAM}" "${CMAKE_CURRENT_SOURCE_DIR}/test/bin/wrapper"
+	  "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}"
+	  "${CMAKE_CURRENT_SOURCE_DIR}/test/bin/run_test_1")
 	add_test(run_test_2
-		${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/test/bin/run_test_2)
+	  "${BASH_PROGRAM}" "${CMAKE_CURRENT_SOURCE_DIR}/test/bin/wrapper"
+	  "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}"
+	  "${CMAKE_CURRENT_SOURCE_DIR}/test/bin/run_test_2")
 	add_test(run_test_3
-		${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/test/bin/run_test_3)
+	  "${BASH_PROGRAM}" "${CMAKE_CURRENT_SOURCE_DIR}/test/bin/wrapper"
+	  "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}"
+	  "${CMAKE_CURRENT_SOURCE_DIR}/test/bin/run_test_3")
 	add_test(run_test_4
-		${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/test/bin/run_test_4)
+	  "${BASH_PROGRAM}" "${CMAKE_CURRENT_SOURCE_DIR}/test/bin/wrapper"
+	  "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}"
+	  "${CMAKE_CURRENT_SOURCE_DIR}/test/bin/run_test_4")
 endif()
 
 #find_package(MakeDist)

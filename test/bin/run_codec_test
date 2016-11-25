@@ -100,7 +100,8 @@ fi
 #
 ################################################################################
 
-if [ -z "${tests[@]}" ]; then
+#if [ -z "${tests[@]}" ]; then
+if [ "${#tests[@]}" -eq 0 ]; then
 	tcf_gettestids "$test_file" tests || panic "cannot get tests"
 fi
 

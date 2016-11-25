@@ -12,14 +12,15 @@ tmp_dir=$(make_tmp_dir)
 
 ################################################################################
 
-echo "abs_top_builddir $abs_top_builddir"
-echo "abs_top_srcdir $abs_top_srcdir"
+#abs_source_dir="$1"
+#abs_build_dir="$2"
 
 tmp_file=$tmp_dir/data
 
-export IMGINFO_COMMAND="$abs_top_builddir/src/appl/imginfo"
-data_dir="$abs_top_srcdir/data"
+top_dir="$cmd_dir/../.."
+data_dir="$top_dir/data"
 
+export IMGINFO_COMMAND="$abs_top_builddir/src/appl/imginfo"
 jasper="$abs_top_builddir/src/appl/jasper"
 imgcmp="$abs_top_builddir/src/appl/imgcmp"
 jiv="$abs_top_builddir/src/appl/jiv"
