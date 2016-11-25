@@ -67,8 +67,8 @@ option(JAS_ENABLE_SHARED "Enable building of shared library" true)
 if (WIN32)
 	if (JAS_ENABLE_SHARED)
 		message(WARNING
-		  "Shared library support for Windows is not yet working."
-		  "Disabling shared libraries. "
+		  "Disabling the building of shared libraries "
+		  "(since this does not currently work on the Windows platform). "
 		  "Setting JAS_ENABLE_SHARED to false."
 		)
 		set(JAS_ENABLE_SHARED false)
