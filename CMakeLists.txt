@@ -72,6 +72,17 @@ if (MACOSX)
 	set(MACOSX_PATH true)
 endif()
 
+if (UNIX)
+	set(JAS_PLATFORM UNIX)
+elseif (MACOSX)
+	set(JAS_PLATFORM OSX)
+elseif (WIN32)
+	set(JAS_PLATFORM WIN32)
+else()
+	set(JAS_PLATFORM UNKNOWN)
+endif()
+message("Platform ${JAS_PLATFORM}")
+
 if (WIN32)
 	if (JAS_ENABLE_SHARED)
 		message(WARNING
