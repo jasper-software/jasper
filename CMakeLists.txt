@@ -68,7 +68,7 @@ if (MACOSX)
 	set(MAXOSX_PATH true)
 endif()
 
-if (WIN32 OR MACOSX)
+if (WIN32)
 	if (JAS_ENABLE_SHARED)
 		message(WARNING
 		  "Disabling the building of shared libraries "
@@ -129,6 +129,13 @@ message("JPEG include directory: ${JPEG_INCLUDE_DIR}")
 message("JAS_ENABLE_LIBJPEG: ${JAS_ENABLE_LIBJPEG}")
 message("JAS_HAVE_JPEGLIB_H: ${JAS_HAVE_JPEGLIB_H}")
 if(JPEG_FOUND AND (NOT JAS_ENABLE_LIBJPEG OR NOT JAS_HAVE_JPEGLIB_H))
+	message("disabling LIBJPEG")
+	set(JPEG_FOUND false)
+	set(JPEG_LIBRARIES "")
+	set(JPEG_INCLUDE_DIR "")
+endif()
+# HACK
+if (MACOSX)
 	message("disabling LIBJPEG")
 	set(JPEG_FOUND false)
 	set(JPEG_LIBRARIES "")
