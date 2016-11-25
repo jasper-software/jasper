@@ -62,7 +62,7 @@ cmake_policy(SET CMP0012 NEW)
 option(JAS_ENABLE_LIBJPEG "Enable use of JPEG Library" true)
 option(JAS_ENABLE_OPENGL "Enable use of OpenGL Library" true)
 option(JAS_ENABLE_STRICT "Enable pedantic error checking" false)
-option(JAS_ENABLE_SHARED "Enable building of shared library" false)
+option(JAS_ENABLE_SHARED "Enable building of shared library" true)
 
 INCLUDE(InstallRequiredSystemLibraries)
 SET(CPACK_PACKAGE_NAME "${CMAKE_PROJECT_NAME}")
@@ -82,6 +82,8 @@ SET(CPACK_GENERATOR "TGZ")
 include(CPack)
 
 find_program(BASH_PROGRAM bash)
+# HACK
+set(BASH_PROGRAM "")
 
 check_include_files(fcntl.h JAS_HAVE_FCNTL_H)
 check_include_files(io.h JAS_HAVE_IO_H)
@@ -104,6 +106,7 @@ if (JPEG_FOUND)
 	include_directories("${JPEG_INCLUDE_DIR}")
 endif()
 #check_include_files(jpeglib.h JAS_HAVE_JPEGLIB_H)
+# HACK
 set(JAS_HAVE_JPEGLIB_H 1)
 message("JPEG library found: ${JPEG_FOUND}")
 message("JPEG libraries: ${JPEG_LIBRARIES}")
@@ -156,10 +159,14 @@ set(ENV{JAS_TOP_SRCDIR} "${CMAKE_CURRENT_SOURCE_DIR}")
 #	"JAS_TOP_SRCDIR=../.."
 
 if (BASH_PROGRAM)
-	add_test(run_test_1 ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/test/bin/run_test_1)
-	add_test(run_test_2 ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/test/bin/run_test_2)
-	add_test(run_test_3 ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/test/bin/run_test_3)
-	add_test(run_test_4 ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/test/bin/run_test_4)
+	add_test(run_test_1
+		${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/test/bin/run_test_1)
+	add_test(run_test_2
+		${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/test/bin/run_test_2)
+	add_test(run_test_3
+		${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/test/bin/run_test_3)
+	add_test(run_test_4
+		${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/test/bin/run_test_4)
 endif()
 
 #find_package(MakeDist)
@@ -170,3 +177,6 @@ endif()
 #	${CMAKE_CURRENT_BINARY_DIR}/README
 #	${CMAKE_CURRENT_BINARY_DIR}/LICENSE
 #)
+
+#file(GENERATE OUTPUT ChangeLog2 CONTENT echo)
+execute_process(COMMAND git log OUTPUT_FILE ${CMAKE_CURRENT_BINARY_DIR}/ChangeLog2)
