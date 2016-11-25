@@ -64,6 +64,10 @@ option(JAS_ENABLE_OPENGL "Enable use of OpenGL Library" true)
 option(JAS_ENABLE_STRICT "Enable pedantic error checking" false)
 option(JAS_ENABLE_SHARED "Enable building of shared library" true)
 
+if (APPLE)
+	set(MAXOSX true)
+endif()
+
 if (MACOSX)
 	set(MACOSX_PATH true)
 endif()
