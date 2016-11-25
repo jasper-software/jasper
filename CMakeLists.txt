@@ -69,7 +69,7 @@ if (APPLE AND ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 endif()
 
 if (MACOSX)
-	set(MACOSX_PATH true)
+	set(CMAKE_MACOSX_RPATH true)
 endif()
 
 if (UNIX)
