@@ -50,6 +50,9 @@ set(JAS_SO_NAME "${JAS_SO_VERSION}.${JAS_SO_MINOR}.${JAS_SO_RELEASE}")
 
 ################################################################################
 
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_VERBOSE_MAKEFILE on)
+
 include(CheckIncludeFiles)
 include(CheckFunctionExists)
 include(CTest)
@@ -60,9 +63,6 @@ option(JAS_ENABLE_LIBJPEG "Enable use of JPEG Library" true)
 option(JAS_ENABLE_OPENGL "Enable use of OpenGL Library" true)
 option(JAS_ENABLE_STRICT "Enable pedantic error checking" false)
 option(JAS_ENABLE_SHARED "Enable building of shared library" false)
-
-set(CMAKE_C_STANDARD 11)
-set(CMAKE_VERBOSE_MAKEFILE on)
 
 INCLUDE(InstallRequiredSystemLibraries)
 SET(CPACK_PACKAGE_NAME "${CMAKE_PROJECT_NAME}")
@@ -101,9 +101,10 @@ endif()
 
 find_package(JPEG)
 if (JPEG_FOUND)
-	include_directories(${JPEG_INCLUDE_DIR})
+	include_directories("${JPEG_INCLUDE_DIR}")
 endif()
-check_include_files(jpeglib.h JAS_HAVE_JPEGLIB_H)
+#check_include_files(jpeglib.h JAS_HAVE_JPEGLIB_H)
+set(JAS_HAVE_JPEGLIB_H 1)
 message("JPEG library found: ${JPEG_FOUND}")
 message("JPEG libraries: ${JPEG_LIBRARIES}")
 message("JPEG include directory: ${JPEG_INCLUDE_DIR}")
@@ -118,7 +119,7 @@ endif()
 
 find_package(GLUT)
 if(GLUT_FOUND)
-	include_directories(${GLUT_INCLUDE_DIR})
+	include_directories("${GLUT_INCLUDE_DIR}")
 endif()
 check_include_files(GL/glut.h JAS_HAVE_GL_GLUT_H)
 message("GLUT library found: ${GLUT_FOUND}")
