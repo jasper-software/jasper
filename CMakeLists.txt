@@ -260,9 +260,13 @@ endif()
 #file(GENERATE OUTPUT ChangeLog2 CONTENT echo)
 execute_process(COMMAND git log OUTPUT_FILE ${CMAKE_CURRENT_BINARY_DIR}/ChangeLog2)
 
-# NOTE: The jasper.pc file should be installed in $(libdir)/pkgconfig
+# The package configuation (pc) file should be installed in
+# ${CMAKE_INSTALL_PREFIX}/lib/pkgconfig.
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/build/jasper.pc.in
   ${CMAKE_CURRENT_BINARY_DIR}/build/jasper.pc @ONLY)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/build/jasper.pc
+  DESTINATION lib/pkgconfig)
+
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/build/jasper.spec.in
   ${CMAKE_CURRENT_BINARY_DIR}/build/jasper.spec @ONLY)
 
