@@ -5,7 +5,7 @@ set(JAS_PROJECT_NAME "JasPer")
 project("${JAS_PROJECT_NAME}")
 
 set(CMAKE_MODULE_PATH
-  ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
+  ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/build/cmake/modules/")
 
 # This include should be placed as early as possible.
 include(InSourceBuild)
@@ -259,4 +259,10 @@ endif()
 
 #file(GENERATE OUTPUT ChangeLog2 CONTENT echo)
 execute_process(COMMAND git log OUTPUT_FILE ${CMAKE_CURRENT_BINARY_DIR}/ChangeLog2)
+
+# NOTE: The jasper.pc file should be installed in $(libdir)/pkgconfig
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/build/jasper.pc.in
+  ${CMAKE_CURRENT_BINARY_DIR}/build/jasper.pc @ONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/build/jasper.spec.in
+  ${CMAKE_CURRENT_BINARY_DIR}/build/jasper.spec @ONLY)
 
