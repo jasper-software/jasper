@@ -1,0 +1,63 @@
+#! /bin/bash
+
+panic()
+{
+	echo "FATAL ERROR: $@"
+	exit 1
+}
+
+usage()
+{
+	echo "usage: $0 commit name"
+	exit 2
+}
+
+user=$(whoami) || panic "cannot get username"
+host=$(hostname) || panic "cannot get hostname"
+
+if [ $# -ne 2 ]; then
+	usage
+fi
+
+commit="$1"
+name="$2"
+
+tmp_dir="/tmp/jasper-makedist-$user@$host-$$"
+build_dir="$tmp_dir/build"
+source_dir="$tmp_dir/$name"
+install_dir="$tmp_dir/install"
+
+if [ ! -d "$tmp_dir" ]; then
+	mkdir -p "$tmp_dir" || panic "cannot make directory"
+fi
+
+git clone https://github.com/mdadams/jasper.git "$source_dir" || \
+  panic "cannot clone repository"
+
+(cd "$source_dir" && git checkout "$commit") || \
+  panic "cannot checkout commit $commit"
+
+cmake \
+  -G "Unix Makefiles" \
+  -DCMAKE_INSTALL_PREFIX="$install_dir" \
+  -DJAS_ENABLE_OPENGL=false \
+  -H"$source_dir" -B"$build_dir" || \
+  panic "cmake failed"
+
+(cd "$build_dir" && make clean all) || \
+  panic "make clean/all failed"
+
+mv "$build_dir/doc/html" "$source_dir/doc/html" || \
+  panic "cannot move html"
+
+(cd "$source_dir" && \
+  git log --stat -M -C --name-status --no-color | \
+  fmt --split-only > ChangeLog) || \
+  panic "cannot generate changelog"
+
+(cd "$source_dir" && rm -rf .git) || \
+  panic "cannot remove .git directory"
+
+tar -C "$tmp_dir" -czf - "$name" > "$name.tar.gz" || \
+  panic "cannot make archive"
+
