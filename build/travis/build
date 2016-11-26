@@ -1,0 +1,51 @@
+#! /bin/bash
+
+panic()
+{
+	echo "FATAL ERROR: $@"
+	exit 1
+}
+
+in_source_build=0
+
+install_prefix=/tmp/jasper/install
+source_dir=$(pwd) || panic
+
+if [ "$in_source_build" -ne 0 ]; then
+
+	echo "In-source build"
+
+	(cd "$source_dir" && \
+	  cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$install_prefix" \
+	  -DALLOW_IN_SOURCE_BUILD=true .) || panic "cmake failed"
+
+	(cd "$source_dir" && make clean && make all) || \
+	  panic "make clean/all failed"
+
+	(cd "$source_dir" && make install) || panic "make install failed"
+
+	(cd "$source_dir" && CTEST_OUTPUT_ON_FAILURE=TRUE make test ARGS="-V") || \
+	  panic "make test failed"
+
+else
+
+	build_dir=/tmp/jasper/build
+
+	echo "Out-of-source build"
+
+	(cd "$source_dir" && \
+	  cmake \
+	  -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$install_prefix" \
+	  -H. -B"$build_dir" \
+	  "$@" \
+	  ) || panic "cmake failed"
+
+	(cd "$build_dir" && make clean && make all) || \
+	  panic "make clean/all failed"
+
+	(cd "$build_dir" && make install) || panic "make install failed"
+
+	(cd "$build_dir" && CTEST_OUTPUT_ON_FAILURE=TRUE make test ARGS="-V") || \
+	  panic "make test failed"
+
+fi

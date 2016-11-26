@@ -19,6 +19,10 @@ function eecho()
 function set_source_and_build_dirs()
 {
 	eecho "PATH -> $PATH"
+	eecho "JAS_ABS_TOP_BUILDDIR $JAS_ABS_TOP_BUILDDIR"
+	eecho "JAS_TOP_BUILDDIR $JAS_TOP_BUILDDIR"
+	eecho "JAS_ABS_TOP_SRCDIR $JAS_ABS_TOP_SRCDIR"
+	eecho "JAS_TOP_SRCDIR $JAS_TOP_SRCDIR"
 	abs_top_builddir=${JAS_ABS_TOP_BUILDDIR:-$(realpath "$cmd_dir/../..")} || \
 	  return 1
 	top_builddir=${JAS_TOP_BUILDDIR:-$(realpath --relative-to \

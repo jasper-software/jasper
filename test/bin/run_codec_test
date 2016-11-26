@@ -100,7 +100,8 @@ fi
 #
 ################################################################################
 
-if [ -z "${tests[@]}" ]; then
+#if [ -z "${tests[@]}" ]; then
+if [ "${#tests[@]}" -eq 0 ]; then
 	tcf_gettestids "$test_file" tests || panic "cannot get tests"
 fi
 
@@ -452,6 +453,7 @@ fi
 
 echo "############################################################"
 echo "TEST SUMMARY"
+echo "Number of tests: ${#tests[@]}"
 echo "Number of errors: $num_errors"
 if [ "${#failed_tests[@]}" -ne 0 ]; then
 	echo "failed tests:"

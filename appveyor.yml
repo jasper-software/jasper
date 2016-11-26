@@ -6,25 +6,29 @@ image:
     - Visual Studio 2015
     - Visual Studio 2013
 
-# Scripts that are called at the very beginning, before repository cloning.
-init:
-    - git config --global core.autocrlf input
-
 configuration:
     - Release
     - Debug
 
 platform:
-    - Win32
-    #- x86
-    #- x64
+    - Win64
+    #- Win32
 
-before_build:
-    - copy src\libjasper\include\jasper\jas_config.h.in src\libjasper\include\jasper\jas_config.h
+# The commands to be run at the very beginning, before repository cloning.
+init:
+    - git config --global core.autocrlf input
 
-build:
-  #verbosity: detailed
-  verbosity: minimal
-  project: src/msvc/jasper.sln
+# The commands to run just before building.
+#before_build:
+
+#build:
+#  verbosity: detailed
+#  verbosity: minimal
+#  project: INSTALL.vcxproj
 
 #build: disabled
+
+# The command to run for building.
+build_script:
+    - build\appveyor\build.bat
+

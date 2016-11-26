@@ -14,15 +14,18 @@ source "$cmd_dir"/utilities || exit 1
 
 set_source_and_build_dirs || panic "cannot set source and build directories"
 
+#abs_source_dir="$1"
+#abs_build_dir="$2"
+
 top_dir="$cmd_dir/../.."
 data_dir="$top_dir/data"
+
+imginfo="$abs_top_builddir/src/appl/imginfo"
 
 ################################################################################
 
 good_list=($data_dir/test/good/*.*)
 bad_list=($data_dir/test/bad/*.*)
-
-imginfo="$abs_top_builddir/src/appl/imginfo"
 
 error_count=0
 

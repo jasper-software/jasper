@@ -19,6 +19,14 @@ set_source_and_build_dirs || panic "cannot set source and build directories"
 
 ################################################################################
 
+#abs_source_dir="$1"
+#abs_build_dir="$2"
+
+#export JAS_ABS_TOP_BUILDDIR="$abs_build_dir"
+#export JAS_TOP_BUILDDIR="$abs_build_dir"
+#export JAS_ABS_TOP_SRCDIR="$abs_source_dir"
+#export JAS_TOP_SRCDIR="$abs_source_dir"
+
 #$CMDDIR/rundectests jasper || exit 1
 
 oj_compress=$(which opj2_compress) || oj_compress=""
@@ -65,6 +73,7 @@ echo "ENDING AT `date`"
 
 echo "############################################################"
 echo "TEST SUMMARY"
+echo "Number of codec selectors: ${#codec_selectors[@]}"
 echo "Number of errors: $num_errors"
 if [ "$num_errors" -gt 0 ]; then
 	echo "STATUS: FAILED"

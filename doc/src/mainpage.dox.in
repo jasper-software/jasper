@@ -1,0 +1,22 @@
+/*!
+ * @mainpage @JAS_PROJECT_NAME@ Reference Manual (Version @JAS_VERSION@)
+ *
+ * @section intro Introduction
+ *
+ * The JasPer software provides functionality
+ * that is useful for various image processing
+ * applications.
+ * This software was developed by
+ * <a href="http://www.ece.uvic.ca/~mdadams">Michael Adams</a>
+ * from the Department of Electrical and Computer Engineering at the 
+ * University of Victoria, Victoria, BC, Canada.
+ *
+ * @section license License
+ * @verbinclude @CMAKE_SOURCE_DIR@/LICENSE
+ *
+ * @section bugs Reporting Bugs
+ *
+ * Please send any bug reports to mdadams@ece.uvic.ca.
+ */
+
+//@mainpage notitle
