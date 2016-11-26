@@ -28,7 +28,7 @@ platform:
 #  verbosity: minimal
 #  project: INSTALL.vcxproj
 
-build:
+build_script:
     - ci/appveyor/build
 
 #build: disabled
