@@ -29,6 +29,6 @@ platform:
 #  project: INSTALL.vcxproj
 
 build_script:
-    - cmd: ci\appveyor\build
+    - cmd: ci\appveyor\build.bat
 
 #build: disabled
