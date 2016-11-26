@@ -47,8 +47,14 @@ cmake \
 (cd "$build_dir" && make clean all) || \
   panic "make clean/all failed"
 
+(cd "$build_dir/doc/latex" && make clean all) || \
+  panic "make clean/all in doc/latex failed"
+
 mv "$build_dir/doc/html" "$source_dir/doc/html" || \
   panic "cannot move html"
+
+mv "$build_dir/doc/latex/refman.pdf" "$source_dir/doc/manual.pdf" || \
+  panic "cannot move manual.pdf"
 
 (cd "$source_dir" && \
   git log --stat -M -C --name-status --no-color | \
