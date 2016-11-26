@@ -1,18 +1,41 @@
 #! /bin/bash
 
-install_prefix=/tmp/jasper
-
 panic()
 {
 	echo "FATAL ERROR: $@"
 	exit 1
 }
 
-cmake -DCMAKE_INSTALL_PREFIX="$install_prefix" \
-  -DALLOW_IN_SOURCE_BUILD=true . || panic
+in_source_build=0
 
-make clean && make all || panic
+install_prefix=/tmp/jasper/install
+source_dir=$(pwd) || panic
 
-make install || panic
+if [ "$in_source_build" -ne 0 ]; then
 
-CTEST_OUTPUT_ON_FAILURE=TRUE make test ARGS="-V" || panic
+	(cd "$source_dir" && cmake -DCMAKE_INSTALL_PREFIX="$install_prefix" \
+	  -DALLOW_IN_SOURCE_BUILD=true .) || panic "cmake failed"
+
+	(cd "$source_dir" && make clean && make all) || panic "build failed"
+
+	(cd "$source_dir" && make install) || panic "install failed"
+
+	(cd "$source_dir" && CTEST_OUTPUT_ON_FAILURE=TRUE make test ARGS="-V") || \
+	  panic "test failed"
+
+else
+
+	build_dir=/tmp/jasper/build
+
+	(cd "$source_dir" && \
+	  cmake -H. -B"$build_dir" -DCMAKE_INSTALL_PREFIX="$install_prefix" \
+	  ) || panic "cmake failed"
+
+	(cd "$build_dir" && make clean && make all) || panic "build failed"
+
+	(cd "$build_dir" && make install) || panic "install failed"
+
+	(cd "$build_dir" && CTEST_OUTPUT_ON_FAILURE=TRUE make test ARGS="-V") || \
+	  panic "test failed"
+
+fi
