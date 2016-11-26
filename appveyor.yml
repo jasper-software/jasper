@@ -6,10 +6,6 @@ image:
     - Visual Studio 2015
     - Visual Studio 2013
 
-# Scripts that are called at the very beginning, before repository cloning.
-init:
-    - git config --global core.autocrlf input
-
 configuration:
     - Release
     - Debug
@@ -17,9 +13,12 @@ configuration:
 platform:
     - Win64
     #- Win32
-    #- x86
-    #- x64
 
+# The commands to be run at the very beginning, before repository cloning.
+init:
+    - git config --global core.autocrlf input
+
+# The commands to run just before building.
 #before_build:
 
 #build:
@@ -27,7 +26,9 @@ platform:
 #  verbosity: minimal
 #  project: INSTALL.vcxproj
 
+#build: disabled
+
+# The command to run for building.
 build_script:
     - ci\appveyor\build.bat
 
-#build: disabled
