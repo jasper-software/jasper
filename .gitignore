@@ -11,36 +11,17 @@ Makefile.in
 *.trs
 *.log
 
-# Top-level directory
-/autom4te.cache
-/ac_aux
-/aclocal.m4
-/config.log
-/config.status
-/configure
-/jasper.spec
-/libtool
+# build directory
+/build/jasper.spec
+/build/jasper.pc
 
-# ac_m4 directory
-/ac_m4/libtool.m4
-/ac_m4/ltoptions.m4
-/ac_m4/ltsugar.m4
-/ac_m4/ltversion.m4
-/ac_m4/lt~obsolete.m4
-
-# pkgconfig directory
-/pkgconfig/jasper.pc
-
-# /src/appl directory
+# src/appl directory
 /src/appl/imgcmp
 /src/appl/imginfo
 /src/appl/jasper
 /src/appl/jiv
 /src/appl/tmrdemo
 
-# ./src/libjasper/include/jasper directory
+# src/libjasper/include/jasper directory
 /src/libjasper/include/jasper/jas_config.h
-/src/libjasper/include/jasper/jas_pconf.h
-/src/libjasper/include/jasper/jas_pconf.h.in
-/src/libjasper/include/jasper/jas_pconf.h.in~
 /src/libjasper/include/jasper/stamp-h1
