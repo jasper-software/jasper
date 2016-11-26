@@ -3,9 +3,12 @@ echo on
 set install_prefix=c:\tmp\jasper\install
 set source_dir=%APPVEYOR_BUILD_FOLDER%
 
-rem set build_dir=c:\tmp\jasper\build
-set build_dir=%source_dir%
-set allow_in_source_build=-DALLOW_IN_SOURCE_BUILD=true
+rem THE FOLLOWING IS FOR AN IN-SOURCE BUILD:
+rem set build_dir=%source_dir%
+rem set allow_in_source_build=-DALLOW_IN_SOURCE_BUILD=true
+
+rem THE FOLLOWING IS FOR AN OUT-OF-SOURCE BUILD:
+set build_dir=c:\tmp\jasper\build
 
 cmake -G "Visual Studio 12 2013 Win64" -H%source_dir% -B%build_dir% %allow_in_source_build% -DCMAKE_INSTALL_PREFIX=%install_prefix% || exit /B 1
 
