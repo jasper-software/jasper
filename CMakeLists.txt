@@ -81,7 +81,7 @@ else()
 endif()
 message("Platform ${JAS_PLATFORM}")
 
-if (WIN32 OR MACOSX)
+if (WIN32)
 	if (JAS_ENABLE_SHARED)
 		message(WARNING
 		  "Disabling the building of shared libraries "
