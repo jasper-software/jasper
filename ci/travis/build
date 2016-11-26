@@ -1,0 +1,18 @@
+#! /bin/bash
+
+install_prefix=/tmp/jasper
+
+panic()
+{
+	echo "FATAL ERROR: $@"
+	exit 1
+}
+
+cmake -DCMAKE_INSTALL_PREFIX="$install_prefix" \
+  -DALLOW_IN_SOURCE_BUILD=true . || panic
+
+make clean && make all || panic
+
+make install || panic
+
+CTEST_OUTPUT_ON_FAILURE=TRUE make test ARGS="-V" || panic
