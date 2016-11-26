@@ -1,6 +1,8 @@
 cmake_minimum_required (VERSION 2.8.11)
 
-project(jasper)
+set(JAS_PROJECT_NAME "JasPer")
+
+project("${JAS_PROJECT_NAME}")
 
 set(CMAKE_MODULE_PATH
   ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
@@ -113,6 +115,8 @@ SET(CPACK_PACKAGE_FILE_NAME
 SET(CPACK_GENERATOR "TGZ")
 include(CPack)
 
+find_package(Doxygen)
+
 find_program(BASH_PROGRAM bash)
 # HACK to disable tests
 #set(BASH_PROGRAM "")
@@ -210,7 +214,7 @@ ENDIF("${isSystemDir}" STREQUAL "-1")
 
 ################################################################################
 
-subdirs(src/libjasper src/appl)
+subdirs(src/libjasper src/appl doc)
 
 #include_directories(${CMAKE_CURRENT_BINARY_DIR}/src/libjasper/include)
 #include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/libjasper/include)
