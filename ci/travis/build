@@ -33,7 +33,7 @@ else
 	echo "Out-of-source build"
 
 	(cd "$source_dir" && \
-	  cmake -H. -B"$build_dir" -DCMAKE_INSTALL_PREFIX="$install_prefix" \
+	  cmake -H. -B"$build_dir" -DCMAKE_INSTALL_PREFIX="$install_prefix" "$@" \
 	  ) || panic "cmake failed"
 
 	(cd "$build_dir" && make clean && make all) || \

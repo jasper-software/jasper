@@ -147,5 +147,7 @@ set_target_properties(libjasper PROPERTIES
 )
 endif()
 
+target_link_libraries(libjasper ${JPEG_LIBRARIES})
+
 install(TARGETS libjasper DESTINATION lib)
 install(FILES ${libjasper_headers} DESTINATION include/jasper)
