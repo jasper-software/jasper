@@ -15,7 +15,8 @@ if [ "$in_source_build" -ne 0 ]; then
 
 	echo "In-source build"
 
-	(cd "$source_dir" && cmake -DCMAKE_INSTALL_PREFIX="$install_prefix" \
+	(cd "$source_dir" && \
+	  cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$install_prefix" \
 	  -DALLOW_IN_SOURCE_BUILD=true .) || panic "cmake failed"
 
 	(cd "$source_dir" && make clean && make all) || \
@@ -33,7 +34,10 @@ else
 	echo "Out-of-source build"
 
 	(cd "$source_dir" && \
-	  cmake -H. -B"$build_dir" -DCMAKE_INSTALL_PREFIX="$install_prefix" "$@" \
+	  cmake \
+	  -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$install_prefix" \
+	  -H. -B"$build_dir" \
+	  "$@" \
 	  ) || panic "cmake failed"
 
 	(cd "$build_dir" && make clean && make all) || \

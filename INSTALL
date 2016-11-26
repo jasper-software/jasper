@@ -1,13 +1,18 @@
 To build and install JasPer do the following:
 
+Installation on Systems Running Unix
+
 In what follows, let $SOURCE_DIR denote the top-level directory of the JasPer
 software source tree.
+Let $INSTALL_DIR denote the target directory for installation.
 
-1) Select an empty or new directory to use for building the software.
+1) Select an empty directory to use for building the software.
 Let $BUILD_DIR denote this directory.
 
 2) Run cmake:
-cmake -H$SOURCE_DIR -B$BUILD_DIR
+cmake -G "Unix Makefiles" -H$SOURCE_DIR -B$BUILD_DIR $OPTIONS
+where $OPTIONS is zero or more -D options as described below
+under the heading "Cmake Options".
 
 3) Build the code:
 cd $BUILD_DIR
@@ -20,4 +25,68 @@ make test
 
 6) Install the software:
 make install
+
+Installation on Systems Running Microsoft Windows
+
+In what follows, let %SOURCE_DIR% denote the top-level directory of the JasPer
+software source tree.
+Let %INSTALL_DIR% denote the directory for installation.
+
+1) Select an empty directory to use for building the software.
+Let %BUILD_DIR% denote this directory.
+
+2) Run cmake:
+cmake -G "Visual Studio 12 2013 Win64" -H%SOURCE_DIR% -B%BUILD_DIR% -DCMAKE_INSTALL_PREFIX=%INSTALL_DIR% %OPTIONS%
+where %OPTIONS% is zero or more -D options as described below
+under the heading "Cmake Options".
+
+3) Build and install the software:
+msbuild %build_dir%\INSTALL.vcxproj
+
+Cmake Options
+
+The option OPTION can be set to the value VALUE with a command-line option
+of the form -DOPTION=VALUE
+
+CMAKE_INSTALL_PREFIX
+    Specify the installation directory.
+	Value: A directory name.
+
+JAS_ENABLE_LIBJPEG
+    Enable the use of the JPEG library
+    Valid values: true and false
+
+JAS_ENABLE_OPENGL
+	Enable the use of the OpenGL and GLUT libraries.
+	Valid values: true and false
+
+JAS_ENABLE_STRICT
+	Enable pedantic errors for building the code.
+	Valid values: true or false
+
+JAS_ENABLE_SHARED
+	Enable the building of shared libraries.
+	Valid values: true or false
+
+JAS_ENABLE_ASAN
+	Enable the Address Sanitizer.
+	Valid values: true or false
+
+JAS_ENABLE_USAN
+	Enable the Undefined-Behavior Sanitizer.
+	Valid values: true or false
+
+JAS_ENABLE_LSAN
+	Enable the Leak Sanitizer.
+	Valid values: true or false
+
+JAS_ENABLE_MSAN
+	Enable the Memory Sanitizer.
+	Valid values: true or false
+
+JAS_MEMORY_LIMIT
+	DO NOT RELY ON THIS OPTION, AS IT IS LIKELY TO BE REMOVED IN THE FUTURE.
+	Set the maximum amount of memory that can be allocated with jas_malloc
+	and friends.
+	Value: a value of unsigned integral type (e.g., 10000000 or SIZE_MAX).
 
