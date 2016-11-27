@@ -1,6 +1,6 @@
 #! /bin/bash
 
-verbose=1
+verbose=0
 
 abs_source_dir="$1"
 abs_build_dir="$2"
