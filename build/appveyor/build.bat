@@ -10,7 +10,9 @@ rem set allow_in_source_build=-DALLOW_IN_SOURCE_BUILD=true
 rem THE FOLLOWING IS FOR AN OUT-OF-SOURCE BUILD:
 set build_dir=c:\tmp\jasper\build
 
-cmake -G "Visual Studio 12 2013 Win64" -H%source_dir% -B%build_dir% %allow_in_source_build% -DCMAKE_INSTALL_PREFIX=%install_prefix% || exit /B 1
+cmake -G "Visual Studio 12 2013 Win64" ^
+  -H%source_dir% -B%build_dir% %allow_in_source_build% ^
+  -DCMAKE_INSTALL_PREFIX=%install_prefix% || exit /B 1
 
 msbuild %build_dir%\INSTALL.vcxproj || exit /B 1
 
