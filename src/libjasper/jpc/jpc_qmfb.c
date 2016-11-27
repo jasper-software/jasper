@@ -374,7 +374,7 @@ void jpc_qmfb_split_col(jpc_fix_t *a, int numrows, int stride,
 	register jpc_fix_t *dstptr;
 	register int n;
 	register int m;
-	int hstartcol;
+	int hstartrow;
 
 	/* Get a buffer. */
 	if (bufsize > QMFB_SPLITBUFSIZE) {
@@ -385,9 +385,9 @@ void jpc_qmfb_split_col(jpc_fix_t *a, int numrows, int stride,
 	}
 
 	if (numrows >= 2) {
-		hstartcol = (numrows + 1 - parity) >> 1;
-		// ORIGINAL (WRONG): m = (parity) ? hstartcol : (numrows - hstartcol);
-		m = numrows - hstartcol;
+		hstartrow = (numrows + 1 - parity) >> 1;
+		// ORIGINAL (WRONG): m = (parity) ? hstartrow : (numrows - hstartrow);
+		m = numrows - hstartrow;
 
 		/* Save the samples destined for the highpass channel. */
 		n = m;
@@ -408,7 +408,7 @@ void jpc_qmfb_split_col(jpc_fix_t *a, int numrows, int stride,
 			srcptr += stride << 1;
 		}
 		/* Copy the saved samples into the highpass channel. */
-		dstptr = &a[hstartcol * stride];
+		dstptr = &a[hstartrow * stride];
 		srcptr = buf;
 		n = m;
 		while (n-- > 0) {
@@ -439,20 +439,21 @@ void jpc_qmfb_split_colgrp(jpc_fix_t *a, int numrows, int stride,
 	register int n;
 	register int i;
 	int m;
-	int hstartcol;
+	int hstartrow;
 
 	/* Get a buffer. */
 	if (bufsize > QMFB_SPLITBUFSIZE) {
-		if (!(buf = jas_alloc2(bufsize, sizeof(jpc_fix_t)))) {
+		if (!(buf = jas_alloc3(bufsize, JPC_QMFB_COLGRPSIZE,
+		  sizeof(jpc_fix_t)))) {
 			/* We have no choice but to commit suicide in this case. */
 			abort();
 		}
 	}
 
 	if (numrows >= 2) {
-		hstartcol = (numrows + 1 - parity) >> 1;
-		// ORIGINAL (WRONG): m = (parity) ? hstartcol : (numrows - hstartcol);
-		m = numrows - hstartcol;
+		hstartrow = (numrows + 1 - parity) >> 1;
+		// ORIGINAL (WRONG): m = (parity) ? hstartrow : (numrows - hstartrow);
+		m = numrows - hstartrow;
 
 		/* Save the samples destined for the highpass channel. */
 		n = m;
@@ -485,7 +486,7 @@ void jpc_qmfb_split_colgrp(jpc_fix_t *a, int numrows, int stride,
 			srcptr += stride << 1;
 		}
 		/* Copy the saved samples into the highpass channel. */
-		dstptr = &a[hstartcol * stride];
+		dstptr = &a[hstartrow * stride];
 		srcptr = buf;
 		n = m;
 		while (n-- > 0) {
@@ -526,7 +527,7 @@ void jpc_qmfb_split_colres(jpc_fix_t *a, int numrows, int numcols,
 
 	/* Get a buffer. */
 	if (bufsize > QMFB_SPLITBUFSIZE) {
-		if (!(buf = jas_alloc2(bufsize, sizeof(jpc_fix_t)))) {
+		if (!(buf = jas_alloc3(bufsize, numcols, sizeof(jpc_fix_t)))) {
 			/* We have no choice but to commit suicide in this case. */
 			abort();
 		}
@@ -721,7 +722,8 @@ void jpc_qmfb_join_colgrp(jpc_fix_t *a, int numrows, int stride,
 
 	/* Allocate memory for the join buffer from the heap. */
 	if (bufsize > QMFB_JOINBUFSIZE) {
-		if (!(buf = jas_alloc3(bufsize, JPC_QMFB_COLGRPSIZE, sizeof(jpc_fix_t)))) {
+		if (!(buf = jas_alloc3(bufsize, JPC_QMFB_COLGRPSIZE,
+		  sizeof(jpc_fix_t)))) {
 			/* We have no choice but to commit suicide. */
 			abort();
 		}
