@@ -8,34 +8,72 @@ panic()
 
 usage()
 {
-	echo "usage: $0 commit name"
+	echo "usage: $0 [-n NAME] [-l COMMIT] [-r LOCAL_DIR]"
 	exit 2
 }
 
 user=$(whoami) || panic "cannot get username"
 host=$(hostname) || panic "cannot get hostname"
 
-if [ $# -ne 2 ]; then
-	usage
+repo_location=""
+commit=""
+local_dir=""
+name=""
+
+while getopts l:r:n: opt; do
+	case $opt in
+	n)
+		name="$OPTARG"
+		;;
+	l)
+		repo_location=local
+		local_dir="$OPTARG"
+		;;
+	r)
+		repo_location=remote
+		commit="$OPTARG"
+		;;
+	\?)
+		usage
+		break;;
+	esac
+done
+shift $((OPTIND - 1))
+
+if [ -z "$name" ]; then
+	usage "no name specified"
 fi
 
-commit="$1"
-name="$2"
+if [ -z "$repo_location" ]; then
+	usage "no repo location specified"
+fi
 
 tmp_dir="/tmp/jasper-makedist-$user@$host-$$"
 build_dir="$tmp_dir/build"
 source_dir="$tmp_dir/$name"
 install_dir="$tmp_dir/install"
 
-if [ ! -d "$tmp_dir" ]; then
-	mkdir -p "$tmp_dir" || panic "cannot make directory"
-fi
+for dir in "$tmp_dir" "$build_dir" "$source_dir" "$install_dir"; do
+	if [ ! -d "$dir" ]; then
+		mkdir -p "$dir" || panic "cannot make directory $dir"
+	fi
+done
 
-git clone https://github.com/mdadams/jasper.git "$source_dir" || \
-  panic "cannot clone repository"
-
-(cd "$source_dir" && git checkout "$commit") || \
-  panic "cannot checkout commit $commit"
+case "$repo_location" in
+remote)
+	git clone https://github.com/mdadams/jasper.git "$source_dir" || \
+	  panic "cannot clone repository"
+	(cd "$source_dir" && git checkout "$commit") || \
+	  panic "cannot checkout commit $commit"
+	;;
+local)
+	(cd "$local_dir" && tar -cf - . ) | (cd "$source_dir" && tar -xf -) || \
+	  panic "cannot copy"
+	;;
+*)
+	usage "invalid repo location"
+	;;
+esac
 
 cmake \
   -G "Unix Makefiles" \
@@ -63,8 +101,15 @@ mv "$build_dir/doc/latex/refman.pdf" "$source_dir/doc/manual.pdf" || \
 
 remove_list=()
 remove_list+=(build/my_build)
+remove_list+=(build/appveyor)
+remove_list+=(build/travis)
+remove_list+=(build/make_dist)
+remove_list+=(appveyor.yml)
+remove_list+=(.travis.yml)
+remove_list+=(.gitignore)
+remove_list+=(.gitattributes)
 for file in "${remove_list[@]}"; do
-	(cd "$source_dir" && rm -f "$file") || \
+	(cd "$source_dir" && rm -rf "$file") || \
 	  panic "cannot remove file "$file""
 done
 
@@ -73,4 +118,3 @@ done
 
 tar -C "$tmp_dir" -czf - "$name" > "$name.tar.gz" || \
   panic "cannot make archive"
-
