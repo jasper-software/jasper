@@ -1,22 +1,34 @@
 /*!
- * @mainpage @JAS_PROJECT_NAME@ Reference Manual (Version @JAS_VERSION@)
- *
- * @section intro Introduction
- *
- * The JasPer software provides functionality
- * that is useful for various image processing
- * applications.
- * This software was developed by
- * <a href="http://www.ece.uvic.ca/~mdadams">Michael Adams</a>
- * from the Department of Electrical and Computer Engineering at the 
- * University of Victoria, Victoria, BC, Canada.
- *
- * @section license License
- * @verbinclude @CMAKE_SOURCE_DIR@/LICENSE
- *
- * @section bugs Reporting Bugs
- *
- * Please send any bug reports to mdadams@ece.uvic.ca.
- */
+@mainpage @JAS_PROJECT_NAME@ Reference Manual (Version @JAS_VERSION@)
+
+@section intro Introduction
+
+JasPer is a collection
+of software (i.e., a library and application programs) for the
+coding and manipulation of images.  This software can handle image
+data in a variety of formats.  One such format supported by JasPer
+is the JPEG-2000 format defined in ISO/IEC 15444-1.
+This software was developed by
+<a href="http://www.ece.uvic.ca/~mdadams">Michael Adams</a>
+from the Department of Electrical and Computer Engineering at the 
+University of Victoria, Victoria, BC, Canada.
+
+@section license License
+@verbinclude @CMAKE_SOURCE_DIR@/LICENSE
+
+@section bugs Reporting Bugs
+
+All bug reports should be submitted via the issue-tracking system
+provided by GitHub.  To submit a bug report, go the the following
+URL and click on the "New issue" button:
+
+    https://github.com/mdadams/jasper/issues
+
+Please do not submit bug reports directly to the author of JasPer
+via email, as bug reports that are not submitted via the above
+issue-tracking system on GitHub are easy to be lost.
+*/
 
 //@mainpage notitle
+
+
