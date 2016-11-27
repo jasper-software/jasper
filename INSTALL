@@ -57,6 +57,10 @@ CMAKE_INSTALL_PREFIX
     Specify the installation directory.
 	Value: A directory name.
 
+CMAKE_BUILD_TYPE
+    Specify the build type (i.e., release or debug).
+    Valid values: Debug or Release
+
 JAS_ENABLE_LIBJPEG
     Enable the use of the JPEG library
     Valid values: true and false
@@ -94,4 +98,3 @@ JAS_MEMORY_LIMIT
 	Set the maximum amount of memory that can be allocated with jas_malloc
 	and friends.
 	Value: a value of unsigned integral type (e.g., 10000000 or SIZE_MAX).
-

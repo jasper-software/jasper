@@ -16,10 +16,16 @@ install_dir="$source_dir/tmp/install"
 echo "source directory $source_dir"
 echo "build directory $build_dir"
 echo "install directory $install_dir"
+if [ -n "$CC" ]; then
+	echo "C compiler $CC"
+fi
 
 cmake -B"$build_dir" -H"$source_dir" -DCMAKE_INSTALL_PREFIX="$install_dir" \
+  "$@" \
+  -DCMAKE_BUILD_TYPE=Debug \
+  -DJAS_ENABLE_SHARED=false \
   -DJAS_ENABLE_OPENGL=false \
-  -DJAS_ENABLE_ASAN=true -DJAS_ENABLE_USAN=true -DJAS_ENABLE_STRICT=true || \
-  panic
+  -DJAS_ENABLE_ASAN=true -DJAS_ENABLE_USAN=true -DJAS_ENABLE_STRICT=true \
+  || panic "cmake failed"
 
-(cd "$build_dir" && make clean && make all) || panic
+(cd "$build_dir" && make clean && make all) || panic "make failed"
