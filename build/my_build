@@ -1,0 +1,25 @@
+#! /bin/bash
+
+panic()
+{
+	echo "ERROR: $@"
+	exit 1
+}
+
+cmd_dir=$(dirname "$0") || exit 1
+abs_cmd_dir=$(readlink -f "$cmd_dir") || panic
+
+source_dir="$abs_cmd_dir/.."
+build_dir="$source_dir/tmp/build"
+install_dir="$source_dir/tmp/install"
+
+echo "source directory $source_dir"
+echo "build directory $build_dir"
+echo "install directory $install_dir"
+
+cmake -B"$build_dir" -H"$source_dir" -DCMAKE_INSTALL_PREFIX="$install_dir" \
+  -DJAS_ENABLE_OPENGL=false \
+  -DJAS_ENABLE_ASAN=true -DJAS_ENABLE_USAN=true -DJAS_ENABLE_STRICT=true || \
+  panic
+
+(cd "$build_dir" && make clean && make all) || panic
