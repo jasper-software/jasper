@@ -128,8 +128,6 @@ include(CPack)
 find_package(Doxygen)
 
 find_program(BASH_PROGRAM bash)
-# HACK to disable tests
-#set(BASH_PROGRAM "")
 
 check_include_files(fcntl.h JAS_HAVE_FCNTL_H)
 check_include_files(io.h JAS_HAVE_IO_H)
@@ -165,13 +163,6 @@ if(JPEG_FOUND AND (NOT JAS_ENABLE_LIBJPEG OR NOT JAS_HAVE_JPEGLIB_H))
 	set(JPEG_LIBRARIES "")
 	set(JPEG_INCLUDE_DIR "")
 endif()
-# HACK
-#if (MACOSX)
-#	message("disabling LIBJPEG")
-#	set(JPEG_FOUND false)
-#	set(JPEG_LIBRARIES "")
-#	set(JPEG_INCLUDE_DIR "")
-#endif()
 
 find_package(GLUT)
 if(GLUT_FOUND)
@@ -226,18 +217,10 @@ ENDIF("${isSystemDir}" STREQUAL "-1")
 
 subdirs(src/libjasper src/appl doc)
 
-#include_directories(${CMAKE_CURRENT_BINARY_DIR}/src/libjasper/include)
-#include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/libjasper/include)
-#target_include_directories(libjasper PUBLIC 
-#"${CMAKE_CURRENT_BINARY_DIR}/src/libjasper/include"
-#"${CMAKE_CURRENT_SOURCE_DIR}/src/libjasper/include")
-
-set(ENV{JAS_ABS_TOP_BUILDDIR} "${CMAKE_CURRENT_BINARY_DIR}")
-set(ENV{JAS_ABS_TOP_SRCDIR} "${CMAKE_CURRENT_SOURCE_DIR}")
-set(ENV{JAS_TOP_BUILDDIR} "${CMAKE_CURRENT_BINARY_DIR}")
-set(ENV{JAS_TOP_SRCDIR} "${CMAKE_CURRENT_SOURCE_DIR}")
-#	"JAS_TOP_BUILDDIR=../../build"
-#	"JAS_TOP_SRCDIR=../.."
+#set(ENV{JAS_ABS_TOP_BUILDDIR} "${CMAKE_CURRENT_BINARY_DIR}")
+#set(ENV{JAS_ABS_TOP_SRCDIR} "${CMAKE_CURRENT_SOURCE_DIR}")
+#set(ENV{JAS_TOP_BUILDDIR} "${CMAKE_CURRENT_BINARY_DIR}")
+#set(ENV{JAS_TOP_SRCDIR} "${CMAKE_CURRENT_SOURCE_DIR}")
 
 if (BASH_PROGRAM)
 	add_test(run_test_1
@@ -257,18 +240,6 @@ if (BASH_PROGRAM)
 	  "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}"
 	  "${CMAKE_CURRENT_SOURCE_DIR}/test/bin/run_test_4")
 endif()
-
-#find_package(MakeDist)
-
-#set(EXTRA_DIST data)
-
-#add_makedist(
-#	${CMAKE_CURRENT_BINARY_DIR}/README
-#	${CMAKE_CURRENT_BINARY_DIR}/LICENSE
-#)
-
-#file(GENERATE OUTPUT ChangeLog2 CONTENT echo)
-execute_process(COMMAND git log OUTPUT_FILE ${CMAKE_CURRENT_BINARY_DIR}/ChangeLog2)
 
 # The package configuation (pc) file should be installed in
 # ${CMAKE_INSTALL_PREFIX}/lib/pkgconfig.
