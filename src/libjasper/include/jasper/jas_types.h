@@ -116,6 +116,10 @@
 #define	JAS_CAST(t, e) \
 	((t) (e))
 
+/* The number of bits in the integeral type uint_fast32_t. */
+/* NOTE: This could underestimate the size on some exotic architectures. */
+#define JAS_UINTFAST32_NUMBITS (8 * sizeof(uint_fast32_t))
+
 #ifdef __cplusplus
 extern "C" {
 #endif
