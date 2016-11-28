@@ -35,6 +35,14 @@ else
 
 	# Check building and installing with a static library.
 
+	echo "############################################################"
+	echo "############################################################"
+	echo "Static Library Case"
+
+	echo "########################################"
+	echo "cmake"
+	echo "########################################"
+
 	(cd "$source_dir" && \
 	  cmake \
 	  -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$install_prefix" \
@@ -43,14 +51,30 @@ else
 	  "$@" \
 	  ) || panic "cmake failed"
 
+	echo "########################################"
+	echo "build"
+	echo "########################################"
+
 	(cd "$build_dir" && make clean && make all) || \
 	  panic "make clean/all failed"
+
+	echo "########################################"
+	echo "install"
+	echo "########################################"
 
 	(cd "$build_dir" && make install) || panic "make install failed"
 
 	rm -rf "$build_dir" || panic "cannot remove build directory"
 
 	# Check building and installing with a shared library.
+
+	echo "############################################################"
+	echo "############################################################"
+	echo "Shared Library Case"
+
+	echo "########################################"
+	echo "cmake"
+	echo "########################################"
 
 	(cd "$source_dir" && \
 	  cmake \
@@ -60,12 +84,24 @@ else
 	  "$@" \
 	  ) || panic "cmake failed"
 
+	echo "########################################"
+	echo "build"
+	echo "########################################"
+
 	(cd "$build_dir" && make clean && make all) || \
 	  panic "make clean/all failed"
+
+	echo "########################################"
+	echo "install"
+	echo "########################################"
 
 	(cd "$build_dir" && make install) || panic "make install failed"
 
 	# Also, run the test suite.
+
+	echo "########################################"
+	echo "test"
+	echo "########################################"
 
 	(cd "$build_dir" && CTEST_OUTPUT_ON_FAILURE=TRUE make test ARGS="-V") || \
 	  panic "make test failed"
