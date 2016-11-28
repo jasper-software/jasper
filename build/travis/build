@@ -55,14 +55,14 @@ else
 	echo "build"
 	echo "########################################"
 
-	(cd "$build_dir" && make clean && make all) || \
+	(cd "$build_dir" && make clean && make all VERBOSE=1) || \
 	  panic "make clean/all failed"
 
 	echo "########################################"
 	echo "install"
 	echo "########################################"
 
-	(cd "$build_dir" && make install) || panic "make install failed"
+	(cd "$build_dir" && make install VERBOSE=1) || panic "make install failed"
 
 	rm -rf "$build_dir" || panic "cannot remove build directory"
 
@@ -88,14 +88,14 @@ else
 	echo "build"
 	echo "########################################"
 
-	(cd "$build_dir" && make clean && make all) || \
+	(cd "$build_dir" && make clean && make all VERBOSE=1) || \
 	  panic "make clean/all failed"
 
 	echo "########################################"
 	echo "install"
 	echo "########################################"
 
-	(cd "$build_dir" && make install) || panic "make install failed"
+	(cd "$build_dir" && make install VERBOSE=1) || panic "make install failed"
 
 	# Also, run the test suite.
 
