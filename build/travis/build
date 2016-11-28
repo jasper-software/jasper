@@ -33,9 +33,12 @@ else
 
 	echo "Out-of-source build"
 
+	# Check building and installing with a static library.
+
 	(cd "$source_dir" && \
 	  cmake \
 	  -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$install_prefix" \
+	  -DJAS_ENABLE_SHARED=false \
 	  -H. -B"$build_dir" \
 	  "$@" \
 	  ) || panic "cmake failed"
@@ -44,6 +47,25 @@ else
 	  panic "make clean/all failed"
 
 	(cd "$build_dir" && make install) || panic "make install failed"
+
+	rm -rf "$build_dir" || panic "cannot remove build directory"
+
+	# Check building and installing with a shared library.
+
+	(cd "$source_dir" && \
+	  cmake \
+	  -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$install_prefix" \
+	  -DJAS_ENABLE_SHARED=true \
+	  -H. -B"$build_dir" \
+	  "$@" \
+	  ) || panic "cmake failed"
+
+	(cd "$build_dir" && make clean && make all) || \
+	  panic "make clean/all failed"
+
+	(cd "$build_dir" && make install) || panic "make install failed"
+
+	# Also, run the test suite.
 
 	(cd "$build_dir" && CTEST_OUTPUT_ON_FAILURE=TRUE make test ARGS="-V") || \
 	  panic "make test failed"
