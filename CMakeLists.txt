@@ -193,6 +193,8 @@ endif()
 
 ################################################################################
 
+if (JAS_ENABLE_SHARED)
+
 # use, i.e. don't skip the full RPATH for the build tree
 SET(CMAKE_SKIP_BUILD_RPATH  FALSE)
 
@@ -212,6 +214,8 @@ LIST(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/lib"
 IF("${isSystemDir}" STREQUAL "-1")
    SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 ENDIF("${isSystemDir}" STREQUAL "-1")
+
+endif (JAS_ENABLE_SHARED)
 
 ################################################################################
 
