@@ -108,9 +108,13 @@ remove_list+=(appveyor.yml)
 remove_list+=(.travis.yml)
 remove_list+=(.gitignore)
 remove_list+=(.gitattributes)
+remove_list+=(data/test/bad/1_crash.jpg)
 for file in "${remove_list[@]}"; do
+	if [ ! -e "$source_dir/$file" ]; then
+		panic "missing file/directory $file"
+	fi
 	(cd "$source_dir" && rm -rf "$file") || \
-	  panic "cannot remove file "$file""
+	  panic "cannot remove file/directory $file""
 done
 
 (cd "$source_dir" && rm -rf .git) || \
