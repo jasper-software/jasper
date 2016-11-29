@@ -29,3 +29,4 @@ cmake -B"$build_dir" -H"$source_dir" -DCMAKE_INSTALL_PREFIX="$install_dir" \
   || panic "cmake failed"
 
 (cd "$build_dir" && make clean && make all) || panic "make failed"
+(cd "$build_dir" && make install) || panic "make failed"
