@@ -1,6 +1,10 @@
 #ifndef JAS_CONFIG_H
 #define JAS_CONFIG_H
 
+#cmakedefine JAS_DLL 1
+
+#include <jasper/jas_dll.h>
+
 #define JAS_CONFIGURE
 
 #if defined(_MSC_VER)

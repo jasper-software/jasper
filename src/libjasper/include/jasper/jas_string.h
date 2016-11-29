@@ -88,7 +88,7 @@ extern "C" {
 \******************************************************************************/
 
 /* Copy a string (a la strdup). */
-char *jas_strdup(const char *);
+JAS_DLLEXPORT char *jas_strdup(const char *);
 
 #ifdef __cplusplus
 }

@@ -147,6 +147,10 @@ set_target_properties(libjasper PROPERTIES
 )
 endif()
 
+if (JAS_ENABLE_SHARED)
+	set_target_properties(libjasper PROPERTIES DEFINE_SYMBOL "JAS_BUILDING_DLL" )
+endif()
+
 # I am not sure why the following line is needed for building a library, but
 # MacOSX does cannot build a shared library without this line.
 target_link_libraries(libjasper ${JPEG_LIBRARIES})

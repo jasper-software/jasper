@@ -123,7 +123,7 @@ extern int jas_opterr;
 \******************************************************************************/
 
 /* Get the next option. */
-int jas_getopt(int argc, char **argv, jas_opt_t *opts);
+JAS_DLLEXPORT int jas_getopt(int argc, char **argv, jas_opt_t *opts);
 
 #ifdef __cplusplus
 }

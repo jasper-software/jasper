@@ -192,18 +192,18 @@ typedef jas_matrix_t jas_seq_t;
 	(max((matrix)->numrows_, (matrix)->numcols_))
 
 /* Create a matrix with the specified dimensions. */
-jas_matrix_t *jas_matrix_create(jas_matind_t numrows, jas_matind_t numcols);
+JAS_DLLEXPORT jas_matrix_t *jas_matrix_create(jas_matind_t numrows, jas_matind_t numcols);
 
 /* Destroy a matrix. */
-void jas_matrix_destroy(jas_matrix_t *matrix);
+JAS_DLLEXPORT void jas_matrix_destroy(jas_matrix_t *matrix);
 
 /* Resize a matrix.  The previous contents of the matrix are lost. */
-int jas_matrix_resize(jas_matrix_t *matrix, jas_matind_t numrows, jas_matind_t numcols);
+JAS_DLLEXPORT int jas_matrix_resize(jas_matrix_t *matrix, jas_matind_t numrows, jas_matind_t numcols);
 
-int jas_matrix_output(jas_matrix_t *matrix, FILE *out);
+JAS_DLLEXPORT int jas_matrix_output(jas_matrix_t *matrix, FILE *out);
 
 /* Create a matrix that references part of another matrix. */
-void jas_matrix_bindsub(jas_matrix_t *mat0, jas_matrix_t *mat1, jas_matind_t r0,
+JAS_DLLEXPORT void jas_matrix_bindsub(jas_matrix_t *mat0, jas_matrix_t *mat1, jas_matind_t r0,
   jas_matind_t c0, jas_matind_t r1, jas_matind_t c1);
 
 /* Create a matrix that is a reference to a row of another matrix. */
@@ -215,20 +215,20 @@ void jas_matrix_bindsub(jas_matrix_t *mat0, jas_matrix_t *mat1, jas_matind_t r0,
   (jas_matrix_bindsub((mat0), (mat1), 0, (c), (mat1)->numrows_ - 1, (c)))
 
 /* Clip the values of matrix elements to the specified range. */
-void jas_matrix_clip(jas_matrix_t *matrix, jas_seqent_t minval,
+JAS_DLLEXPORT void jas_matrix_clip(jas_matrix_t *matrix, jas_seqent_t minval,
   jas_seqent_t maxval);
 
 /* Arithmetic shift left of all elements in a matrix. */
-void jas_matrix_asl(jas_matrix_t *matrix, int n);
+JAS_DLLEXPORT void jas_matrix_asl(jas_matrix_t *matrix, int n);
 
 /* Arithmetic shift right of all elements in a matrix. */
-void jas_matrix_asr(jas_matrix_t *matrix, int n);
+JAS_DLLEXPORT void jas_matrix_asr(jas_matrix_t *matrix, int n);
 
 /* Almost-but-not-quite arithmetic shift right of all elements in a matrix. */
-void jas_matrix_divpow2(jas_matrix_t *matrix, int n);
+JAS_DLLEXPORT void jas_matrix_divpow2(jas_matrix_t *matrix, int n);
 
 /* Set all elements of a matrix to the specified value. */
-void jas_matrix_setall(jas_matrix_t *matrix, jas_seqent_t val);
+JAS_DLLEXPORT void jas_matrix_setall(jas_matrix_t *matrix, jas_seqent_t val);
 
 /* The spacing between rows of a matrix. */
 #define	jas_matrix_rowstep(matrix) \
@@ -239,11 +239,11 @@ void jas_matrix_setall(jas_matrix_t *matrix, jas_seqent_t val);
 	(((matrix)->numrows_ > 1) ? (jas_matrix_rowstep(matrix)) : (1))
 
 /* Compare two matrices for equality. */
-int jas_matrix_cmp(jas_matrix_t *mat0, jas_matrix_t *mat1);
+JAS_DLLEXPORT int jas_matrix_cmp(jas_matrix_t *mat0, jas_matrix_t *mat1);
 
-jas_matrix_t *jas_matrix_copy(jas_matrix_t *x);
+JAS_DLLEXPORT jas_matrix_t *jas_matrix_copy(jas_matrix_t *x);
 
-jas_matrix_t *jas_matrix_input(FILE *);
+JAS_DLLEXPORT jas_matrix_t *jas_matrix_input(FILE *);
 
 #define jas_seqent_asl jas_fast32_asl
 #define jas_seqent_asr jas_fast32_asr
@@ -252,9 +252,9 @@ jas_matrix_t *jas_matrix_input(FILE *);
 * Functions/macros for 2-D sequence class.
 \******************************************************************************/
 
-jas_seq2d_t *jas_seq2d_copy(jas_seq2d_t *x);
+JAS_DLLEXPORT jas_seq2d_t *jas_seq2d_copy(jas_seq2d_t *x);
 
-jas_matrix_t *jas_seq2d_create(jas_matind_t xstart, jas_matind_t ystart,
+JAS_DLLEXPORT jas_matrix_t *jas_seq2d_create(jas_matind_t xstart, jas_matind_t ystart,
   jas_matind_t xend, jas_matind_t yend);
 
 #define	jas_seq2d_destroy(s) \
@@ -285,7 +285,7 @@ jas_matrix_t *jas_seq2d_create(jas_matind_t xstart, jas_matind_t ystart,
 #define jas_seq2d_size(s) \
 	(jas_seq2d_width(s) * jas_seq2d_height(s))
 
-void jas_seq2d_bindsub(jas_matrix_t *s, jas_matrix_t *s1, jas_matind_t xstart,
+JAS_DLLEXPORT void jas_seq2d_bindsub(jas_matrix_t *s, jas_matrix_t *s1, jas_matind_t xstart,
   jas_matind_t ystart, jas_matind_t xend, jas_matind_t yend);
 
 /******************************************************************************\
