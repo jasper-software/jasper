@@ -19,5 +19,3 @@ msbuild %build_dir%\INSTALL.vcxproj || exit /B 1
 dir %install_prefix%\include\jasper || exit /B 1
 dir %install_prefix%\bin || exit /B 1
 dir %install_prefix%\lib || exit /B 1
-
-rem msbuild INSTALL.vcxproj /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" || exit /B 1

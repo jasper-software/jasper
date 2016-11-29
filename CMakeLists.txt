@@ -83,16 +83,16 @@ else()
 endif()
 message("Platform ${JAS_PLATFORM}")
 
-if (WIN32)
-	if (JAS_ENABLE_SHARED)
-		message(WARNING
-		  "Disabling the building of shared libraries "
-		  "(since this does not currently work on this platform). "
-		  "Setting JAS_ENABLE_SHARED to false."
-		)
-		set(JAS_ENABLE_SHARED false)
-	endif()
-endif()
+#if (WIN32)
+#	if (JAS_ENABLE_SHARED)
+#		message(WARNING
+#		  "Disabling the building of shared libraries "
+#		  "(since this does not currently work on this platform). "
+#		  "Setting JAS_ENABLE_SHARED to false."
+#		)
+#		set(JAS_ENABLE_SHARED false)
+#	endif()
+#endif()
 
 if (JAS_ENABLE_SHARED AND MACOSX)
 	set(CMAKE_MACOSX_RPATH true)
