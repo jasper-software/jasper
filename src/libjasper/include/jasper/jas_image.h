@@ -505,7 +505,7 @@ int jas_image_readcmpt2(jas_image_t *image, int cmptno, jas_image_coord_t x,
   long *buf);
 
 #define	jas_image_setcmprof(image, cmprof) ((image)->cmprof_ = cmprof)
-jas_image_t *jas_image_chclrspc(jas_image_t *image, jas_cmprof_t *outprof,
+JAS_DLLEXPORT jas_image_t *jas_image_chclrspc(jas_image_t *image, jas_cmprof_t *outprof,
   int intent);
 void jas_image_dump(jas_image_t *image, FILE *out);
 
