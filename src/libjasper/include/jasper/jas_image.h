@@ -430,7 +430,7 @@ JAS_DLLEXPORT int jas_image_readcmpt(jas_image_t *image, int cmptno, jas_image_c
   jas_matrix_t *data);
 
 /* Write a rectangular region of an image component. */
-int jas_image_writecmpt(jas_image_t *image, int cmptno, jas_image_coord_t x,
+JAS_DLLEXPORT int jas_image_writecmpt(jas_image_t *image, int cmptno, jas_image_coord_t x,
   jas_image_coord_t y, jas_image_coord_t width, jas_image_coord_t height,
   jas_matrix_t *data);
 

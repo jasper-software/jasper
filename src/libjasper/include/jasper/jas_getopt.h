@@ -110,13 +110,13 @@ typedef struct {
 \******************************************************************************/
 
 /* The current option index. */
-extern int jas_optind;
+JAS_DLLEXPORT extern int jas_optind;
 
 /* The current option argument. */
-extern char *jas_optarg;
+JAS_DLLEXPORT extern char *jas_optarg;
 
 /* The debug level. */
-extern int jas_opterr;
+JAS_DLLEXPORT extern int jas_opterr;
 
 /******************************************************************************\
 * Prototypes.
