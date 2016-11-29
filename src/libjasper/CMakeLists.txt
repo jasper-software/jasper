@@ -153,7 +153,8 @@ endif()
 
 # I am not sure why the following line is needed for building a library, but
 # MacOSX does cannot build a shared library without this line.
-target_link_libraries(libjasper ${JPEG_LIBRARIES})
+# Also, try adding MATH_LIBRARY to fix a Gentoo problem.
+target_link_libraries(libjasper ${JPEG_LIBRARIES} ${MATH_LIBRARY})
 
 install(TARGETS libjasper DESTINATION lib)
 install(FILES ${libjasper_headers} DESTINATION include/jasper)
