@@ -82,7 +82,10 @@ else
 			cp "$source_dir/$file" "$test_dir" || \
 			  panic "cannot copy $file"
 		done
-		cmake -H"$test_dir" -B"$test_dir" || panic "cmake failed"
+		cmake -H"$test_dir" -B"$test_dir" \
+		  -DJASPER_LIBRARIES="-L$install_dir/lib -ljasper" \
+		  -DJASPER_INCLUDE_DIR="$install_dir/include" \
+		  || panic "cmake failed"
 		(cd "$test_dir" && make clean && make all VERBOSE=1) || \
 		  panic "make failed"
 
