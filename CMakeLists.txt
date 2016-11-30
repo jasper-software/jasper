@@ -66,6 +66,8 @@ option(JAS_ENABLE_OPENGL "Enable use of OpenGL Library" true)
 option(JAS_ENABLE_STRICT "Enable pedantic error checking" false)
 option(JAS_ENABLE_SHARED "Enable building of shared library" true)
 option(JAS_LOCAL "Enable local hacks for developers (do not enable)" false)
+set(CMAKE_INSTALL_LIBDIR lib CACHE PATH
+  "Name of the library directory for installation (e.g., lib or lib64)")
 
 if (APPLE AND ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 	set(MACOSX true)
@@ -234,7 +236,8 @@ if (JAS_ENABLE_SHARED)
 	LIST(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES
 	  "${CMAKE_INSTALL_PREFIX}/lib" isSystemDir)
 	IF("${isSystemDir}" STREQUAL "-1")
-	   SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+	   SET(CMAKE_INSTALL_RPATH
+		  "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 	ENDIF("${isSystemDir}" STREQUAL "-1")
 
 endif (JAS_ENABLE_SHARED)
@@ -250,7 +253,7 @@ add_subdirectory(doc)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/build/jasper.pc.in
   ${CMAKE_CURRENT_BINARY_DIR}/build/jasper.pc @ONLY)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/build/jasper.pc
-  DESTINATION lib/pkgconfig)
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/build/jasper.spec.in
   ${CMAKE_CURRENT_BINARY_DIR}/build/jasper.spec @ONLY)

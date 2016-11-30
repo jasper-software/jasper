@@ -34,4 +34,4 @@ endif()
 install(TARGETS ${programs} DESTINATION bin)
 
 # Install the manual pages for the programs that were built.
-install(FILES ${man_pages} DESTINATION man)
+install(FILES ${man_pages} DESTINATION share/man/man1)
