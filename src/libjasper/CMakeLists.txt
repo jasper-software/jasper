@@ -7,6 +7,7 @@ set(libjasper_headers
 	include/jasper/jas_cm.h
 	${CMAKE_CURRENT_BINARY_DIR}/include/jasper/jas_config.h
 	include/jasper/jas_debug.h
+	include/jasper/jas_dll.h
 	include/jasper/jas_fix.h
 	include/jasper/jas_getopt.h
 	include/jasper/jas_icc.h
