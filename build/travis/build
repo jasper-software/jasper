@@ -9,8 +9,6 @@ panic()
 in_source_build=0
 
 tmp_dir=/tmp/jasper
-install_dir="$tmp_dir/install"
-test_dir="$tmp_dir/test"
 source_dir=$(pwd) || panic
 
 if [ "$in_source_build" -ne 0 ]; then
@@ -35,89 +33,69 @@ else
 
 	echo "Out-of-source build"
 
-	# Check building and installing with a static library.
+	for lib_type in static shared; do
 
-	echo "############################################################"
-	echo "############################################################"
-	echo "Static Library Case"
+		install_dir="$tmp_dir/$lib_type/install"
+		test_dir="$tmp_dir/$lib_type/test"
+		if [ "$lib_type" = shared ]; then
+			enable_shared=true
+		else
+			enable_shared=false
+		fi
 
-	echo "########################################"
-	echo "cmake"
-	echo "########################################"
+		echo "############################################################"
+		echo "############################################################"
+		echo "Library type: $lib_type"
 
-	(cd "$source_dir" && \
-	  cmake \
-	  -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$install_dir" \
-	  -DJAS_ENABLE_SHARED=false \
-	  -H. -B"$build_dir" \
-	  "$@" \
-	  ) || panic "cmake failed"
+		echo "########################################"
+		echo "cmake"
+		echo "########################################"
 
-	echo "########################################"
-	echo "build"
-	echo "########################################"
+		(cd "$source_dir" && \
+		  cmake \
+		  -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$install_dir" \
+		  -DJAS_ENABLE_SHARED=$enable_shared \
+		  -H. -B"$build_dir" \
+		  "$@" \
+		  ) || panic "cmake failed"
 
-	(cd "$build_dir" && make clean && make all VERBOSE=1) || \
-	  panic "make clean/all failed"
+		echo "########################################"
+		echo "build"
+		echo "########################################"
 
-	echo "########################################"
-	echo "install"
-	echo "########################################"
+		(cd "$build_dir" && make clean && make all VERBOSE=1) || \
+		  panic "make clean/all failed"
 
-	(cd "$build_dir" && make install VERBOSE=1) || panic "make install failed"
+		echo "########################################"
+		echo "install"
+		echo "########################################"
 
-	echo "########################################"
-	echo "external test"
-	echo "########################################"
+		(cd "$build_dir" && make install VERBOSE=1) || \
+		  panic "make install failed"
 
-	mkdir -p "$test_dir" || panic "cannot make directory $test_dir"
-	for file in build/travis/CMakeLists.txt src/appl/jasper.c; do
-		cp "$source_dir/$file" "$test_dir" || \
-		  panic "cannot copy $file"
+		echo "########################################"
+		echo "external test"
+		echo "########################################"
+
+		mkdir -p "$test_dir" || panic "cannot make directory $test_dir"
+		for file in build/travis/CMakeLists.txt src/appl/jasper.c; do
+			cp "$source_dir/$file" "$test_dir" || \
+			  panic "cannot copy $file"
+		done
+		cmake -H"$test_dir" -B"$test_dir" || panic "cmake failed"
+		(cd "$test_dir" && make clean && make all VERBOSE=1) || \
+		  panic "make failed"
+
+		if [ "$lib_type" = shared ]; then
+			echo "########################################"
+			echo "test"
+			echo "########################################"
+
+			(cd "$build_dir" && \
+			  CTEST_OUTPUT_ON_FAILURE=TRUE make test ARGS="-V") || \
+			  panic "make test failed"
+		fi
+
 	done
-	cmake -H"$test_dir" -B"$test_dir" || panic "cmake failed"
-	(cd "$test_dir" && make clean && make all VERBOSE=1) || panic "make failed"
-
-	rm -rf "$build_dir" || panic "cannot remove build directory"
-
-	# Check building and installing with a shared library.
-
-	echo "############################################################"
-	echo "############################################################"
-	echo "Shared Library Case"
-
-	echo "########################################"
-	echo "cmake"
-	echo "########################################"
-
-	(cd "$source_dir" && \
-	  cmake \
-	  -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$install_dir" \
-	  -DJAS_ENABLE_SHARED=true \
-	  -H. -B"$build_dir" \
-	  "$@" \
-	  ) || panic "cmake failed"
-
-	echo "########################################"
-	echo "build"
-	echo "########################################"
-
-	(cd "$build_dir" && make clean && make all VERBOSE=1) || \
-	  panic "make clean/all failed"
-
-	echo "########################################"
-	echo "install"
-	echo "########################################"
-
-	(cd "$build_dir" && make install VERBOSE=1) || panic "make install failed"
-
-	# Also, run the test suite.
-
-	echo "########################################"
-	echo "test"
-	echo "########################################"
-
-	(cd "$build_dir" && CTEST_OUTPUT_ON_FAILURE=TRUE make test ARGS="-V") || \
-	  panic "make test failed"
 
 fi
