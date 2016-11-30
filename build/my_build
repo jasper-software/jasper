@@ -23,10 +23,11 @@ fi
 cmake -B"$build_dir" -H"$source_dir" -DCMAKE_INSTALL_PREFIX="$install_dir" \
   -DCMAKE_BUILD_TYPE=Debug \
   -DJAS_ENABLE_SHARED=false \
-  -DJAS_ENABLE_OPENGL=false \
   -DJAS_ENABLE_ASAN=true -DJAS_ENABLE_USAN=true -DJAS_ENABLE_STRICT=true \
+  -DJAS_LOCAL=true \
   "$@" \
   || panic "cmake failed"
+
 
 (cd "$build_dir" && make clean && make all) || panic "make failed"
 (cd "$build_dir" && make install) || panic "make failed"

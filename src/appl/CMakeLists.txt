@@ -20,9 +20,10 @@ set(programs "${programs}" imgcmp)
 set(man_pages "${man_pages}" imgcmp.1)
 
 # The jiv program (which requires GLUT)
-if(GLUT_FOUND)
+if(JAS_HAVE_OPENGL)
 	add_executable(jiv jiv.c)
-	target_link_libraries(jiv libjasper ${JPEG_LIBRARIES} ${GLUT_LIBRARIES} ${MATH_LIBRARY})
+	target_link_libraries(jiv libjasper ${JPEG_LIBRARIES} ${GLUT_LIBRARIES}
+	  ${OPENGL_LIBRARIES} ${MATH_LIBRARY})
 	set(programs "${programs}" jiv)
 	set(man_pages "${man_pages}" jiv.1)
 else()
