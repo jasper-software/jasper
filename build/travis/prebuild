@@ -1,0 +1,18 @@
+#! /bin/bash
+
+bash --version
+
+case "$TRAVIS_OS_NAME" in
+linux)
+	sudo apt-get install \
+	  freeglut3-dev freeglut3 libjpeg-turbo8 libjpeg-turbo8-dev
+	;;
+osx)
+	#brew update
+	#brew outdated bash || brew upgrade bash
+	;;
+*)
+	;;
+esac
+
+bash --version
