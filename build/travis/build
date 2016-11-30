@@ -9,7 +9,7 @@ panic()
 in_source_build=0
 
 tmp_dir=/tmp/jasper
-install_prefix="$tmp_dir/install"
+install_dir="$tmp_dir/install"
 test_dir="$tmp_dir/test"
 source_dir=$(pwd) || panic
 
@@ -18,7 +18,7 @@ if [ "$in_source_build" -ne 0 ]; then
 	echo "In-source build"
 
 	(cd "$source_dir" && \
-	  cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$install_prefix" \
+	  cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$install_dir" \
 	  -DALLOW_IN_SOURCE_BUILD=true .) || panic "cmake failed"
 
 	(cd "$source_dir" && make clean && make all) || \
@@ -47,7 +47,7 @@ else
 
 	(cd "$source_dir" && \
 	  cmake \
-	  -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$install_prefix" \
+	  -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$install_dir" \
 	  -DJAS_ENABLE_SHARED=false \
 	  -H. -B"$build_dir" \
 	  "$@" \
@@ -70,10 +70,11 @@ else
 	echo "external test"
 	echo "########################################"
 
-	cp "$source_dir/build/travis/CMakeLists.txt" "$test_dir" || \
-	  panic "cannot copy CMakeLists.txt"
-	cp "$source_dir/src/appl/jasper.c" "$test_dir" || \
-	  panic "cannot copy jasper.c"
+	mkdir -p "$test_dir" || panic "cannot make directory $test_dir"
+	for file in build/travis/CMakeLists.txt src/appl/jasper.c; do
+		cp "$source_dir/$file" "$test_dir" || \
+		  panic "cannot copy $file"
+	done
 	cmake -H"$test_dir" -B"$test_dir" || panic "cmake failed"
 	(cd "$test_dir" && make clean && make all VERBOSE=1) || panic "make failed"
 
@@ -91,7 +92,7 @@ else
 
 	(cd "$source_dir" && \
 	  cmake \
-	  -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$install_prefix" \
+	  -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$install_dir" \
 	  -DJAS_ENABLE_SHARED=true \
 	  -H. -B"$build_dir" \
 	  "$@" \
