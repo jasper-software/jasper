@@ -1,11 +1,12 @@
 language: c
 
-#dist: trusty
+dist: trusty
+sudo: required
 #sudo: false
 ##group: beta
 
-dist: precise
-sudo: required
+#dist: precise
+#sudo: required
 
 os:
     - linux
