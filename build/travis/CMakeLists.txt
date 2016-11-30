@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.6 FATAL_ERROR)
 project(demo LANGUAGES C)
 
+include(CheckIncludeFiles)
+
 option(ENABLE_LIBJPEG "Enable JPEG library" ON)
 
 if (NOT JASPER_INCLUDE_DIR)
