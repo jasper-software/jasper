@@ -8,7 +8,9 @@ panic()
 
 in_source_build=0
 
-install_prefix=/tmp/jasper/install
+tmp_dir=/tmp/jasper
+install_prefix="$tmp_dir/install"
+test_dir="$tmp_dir/test"
 source_dir=$(pwd) || panic
 
 if [ "$in_source_build" -ne 0 ]; then
@@ -63,6 +65,17 @@ else
 	echo "########################################"
 
 	(cd "$build_dir" && make install VERBOSE=1) || panic "make install failed"
+
+	echo "########################################"
+	echo "external test"
+	echo "########################################"
+
+	cp "$source_dir/build/travis/CMakeLists.txt" "$test_dir" || \
+	  panic "cannot copy CMakeLists.txt"
+	cp "$source_dir/src/appl/jasper.c" "$test_dir" || \
+	  panic "cannot copy jasper.c"
+	cmake -H"$test_dir" -B"$test_dir" || panic "cmake failed"
+	(cd "$test_dir && make clean && make all VERBOSE=1) || panic "make failed"
 
 	rm -rf "$build_dir" || panic "cannot remove build directory"
 

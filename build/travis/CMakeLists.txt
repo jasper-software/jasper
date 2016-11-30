@@ -1,0 +1,7 @@
+option(JASPER_INCLUDE_DIR "Include directory" "/tmp/jasper/install/include")
+option(JASPER_LIBRARIES "Libraries" "-ljasper")
+cmake_minimum_required(VERSION 2.6 FATAL_ERROR)
+project(demo LANGUAGES C)
+include_directories(${JASPER_INCLUDE_DIR})
+link_libraries(${JASPER_LIBRARIES} "-lm")
+add_executable(jasper jasper.cpp)
