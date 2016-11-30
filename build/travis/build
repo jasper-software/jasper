@@ -75,7 +75,7 @@ else
 	cp "$source_dir/src/appl/jasper.c" "$test_dir" || \
 	  panic "cannot copy jasper.c"
 	cmake -H"$test_dir" -B"$test_dir" || panic "cmake failed"
-	(cd "$test_dir && make clean && make all VERBOSE=1) || panic "make failed"
+	(cd "$test_dir" && make clean && make all VERBOSE=1) || panic "make failed"
 
 	rm -rf "$build_dir" || panic "cannot remove build directory"
 
