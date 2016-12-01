@@ -162,7 +162,7 @@ if (JAS_ENABLE_LIBJPEG AND JPEG_FOUND)
 	check_include_files(jpeglib.h JAS_HAVE_JPEGLIB_H)
 	# On some systems, the header file jpeglib.h fails to be detected.
 	# The following hack works around this:
-	if (true OR JAS_LOCAL)
+	if (TRUE OR JAS_LOCAL)
 		set(JAS_HAVE_JPEGLIB_H 1)
 	endif()
 	if(NOT JAS_HAVE_JPEGLIB_H)

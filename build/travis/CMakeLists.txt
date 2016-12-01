@@ -22,7 +22,7 @@ if (ENABLE_LIBJPEG AND JPEG_FOUND)
 	check_include_files(jpeglib.h HAVE_JPEGLIB_H)
 	message("HAVE_JPEGLIB_H: ${HAVE_JPEGLIB_H}")
 	# Note: This is a hack and should not be here, but things break without it.
-	if (true OR JAS_LOCAL)
+	if (TRUE OR JAS_LOCAL)
 		set(JAS_HAVE_JPEGLIB_H 1)
 	endif()
 	if(NOT HAVE_JPEGLIB_H)
