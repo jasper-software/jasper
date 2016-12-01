@@ -203,7 +203,7 @@ if (JAS_ENABLE_OPENGL AND OPENGL_FOUND)
 endif()
 
 if(UNIX)
-	set(MATH_LIBRARY m)
+	set(MATH_LIBRARY "-lm")
 else()
 	set(MATH_LIBRARY "")
 endif()
