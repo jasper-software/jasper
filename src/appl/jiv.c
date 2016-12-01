@@ -64,10 +64,14 @@
 \******************************************************************************/
 
 #include <jasper/jasper.h>
-#include <GL/glut.h>
 #include <stdlib.h>
 #include <math.h>
 #include <inttypes.h>
+#if defined(APPLE)
+#include <glut.h>
+#else
+#include <GL/glut.h>
+#endif
 
 /******************************************************************************\
 *
