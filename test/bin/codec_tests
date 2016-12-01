@@ -28,6 +28,8 @@
 #define KAKADU_ENC_BUG kakadu_enc
 #define KAKADU_DEC_BUG kakadu_dec
 #define OJ_BUG oj_cod
+#define OJ_ENC_BUG oj_enc
+#define OJ_DEC_BUG oj_dec
 #else
 #define JASPER_BUG
 #define JASPER_ENC_BUG
@@ -39,6 +41,8 @@
 #define KAKADU_ENC_BUG
 #define KAKADU_DEC_BUG
 #define OJ_BUG
+#define OJ_ENC_BUG
+#define OJ_DEC_BUG
 #endif
 
 #define	BEGIN FMT
@@ -52,9 +56,9 @@
 * Temporary tests.
 \******************************************************************************/
 
-BEGIN id=sgn_0 image=signed_8.pgx mode=int pae=0
-BEGIN id=sgn_1 image=signed_12.pgx mode=int pae=0
-BEGIN id=sgn_2 image=signed_16.pgx mode=int pae=0
+BEGIN id=sgn_0 image=signed_8.pgx mode=int pae=0 bug=OJ_DEC_BUG
+BEGIN id=sgn_1 image=signed_12.pgx mode=int pae=0 bug=OJ_DEC_BUG
+BEGIN id=sgn_2 image=signed_16.pgx mode=int pae=0 bug=OJ_DEC_BUG
 
 #if 0
 /* 16 bits/sample image */
