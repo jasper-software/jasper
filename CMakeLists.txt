@@ -158,18 +158,18 @@ message("JPEG library found: ${JPEG_FOUND}")
 if (JAS_ENABLE_LIBJPEG AND JPEG_FOUND)
 	message("JPEG include directory: ${JPEG_INCLUDE_DIR}")
 	message("JPEG libraries: ${JPEG_LIBRARIES}")
-	message("JAS_HAVE_JPEGLIB_H: ${JAS_HAVE_JPEGLIB_H}")
-	set(CMAKE_REQUIRED_INCLUDES ${JPEG_INCLUDE_DIR})
 	# In some versions of the JPEG library, the header file jpeglib.h
 	# does not include some of the header files upon which it depends
 	# (e.g., stdio.h and stdint.h).  So, we cannot reliably use
 	# check_include_file here.
+	set(CMAKE_REQUIRED_INCLUDES ${JPEG_INCLUDE_DIR})
 	check_c_source_compiles("
 		#include <stdio.h>
 		#include <stdint.h>
 		#include <jpeglib.h>
 		int main() {}
 	" JAS_HAVE_JPEGLIB_H)
+	message("JAS_HAVE_JPEGLIB_H: ${JAS_HAVE_JPEGLIB_H}")
 	if(JAS_HAVE_JPEGLIB_H)
 		include_directories("${JPEG_INCLUDE_DIR}")
 	else()
