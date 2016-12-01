@@ -1,10 +1,12 @@
 language: c
 
+# Trusty Tahr release date: April 17, 2014
 dist: trusty
 sudo: required
 #sudo: false
 ##group: beta
 
+# Precise Pangolin release date: April 26, 2012
 #dist: precise
 #sudo: required
 
