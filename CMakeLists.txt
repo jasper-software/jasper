@@ -209,7 +209,7 @@ if (JAS_ENABLE_OPENGL AND OPENGL_FOUND)
 	# On some systems (e.g., Fedora 21), there is a bug in the cmake code
 	# that detects GLUT libraries.  The following ugliness is a workaround for 
 	# this problem.
-	if (GLUT_Xmu_LIBRARY MATCHES NOTFOUND)
+	if (NOT GLUT_Xmu_LIBRARY)
 		set(GLUT_LIBRARIES "${GLUT_glut_LIBRARY}")
 		message(WARNING "Clearing bogus value for GLUT_Xmu_LIBRARY.")
 		message(WARNING "Your version of CMake may be buggy.")
