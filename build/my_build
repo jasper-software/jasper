@@ -9,6 +9,19 @@ panic()
 cmd_dir=$(dirname "$0") || exit 1
 abs_cmd_dir=$(readlink -f "$cmd_dir") || panic
 
+do_make_test=0
+
+while getopts t opt; do
+	case $opt in
+	t)
+		do_make_test=1;;
+	\?)
+		usage
+		break;;
+	esac
+done
+shift $((OPTIND - 1))
+
 source_dir="$abs_cmd_dir/.."
 tmp_dir="$source_dir/tmp_cmake"
 build_dir="$tmp_dir/build"
@@ -28,5 +41,10 @@ cmake -B"$build_dir" -H"$source_dir" -DCMAKE_INSTALL_PREFIX="$install_dir" \
   "$@" \
   || panic "cmake failed"
 
-(cd "$build_dir" && make clean && make all) || panic "make failed"
-(cd "$build_dir" && make install) || panic "make failed"
+(cd "$build_dir" && make clean && make all) || panic "make clean/all failed"
+(cd "$build_dir" && make install) || panic "make install failed"
+
+if [ "$do_make_test" -ne 0 ]; then
+	(cd "$build_dir" && make test ARGS="-V") || panic "make test failed"
+fi
+

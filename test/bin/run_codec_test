@@ -47,7 +47,7 @@ usage()
 image_path="$IMGPATH"
 show_image=0
 missing_image_fatal=1
-error_fatal=1
+failure_fatal=1
 distortion_violation_fatal=1
 rate_violation_fatal=1
 debug=0
@@ -72,13 +72,19 @@ while getopts d:e:i:vBE: opt; do
 	E)
 		case "$OPTARG" in
 		ignore)
-			error_fatal=0
+			failure_fatal=0
 			rate_violation_fatal=0
 			distortion_violation_fatal=0
 			missing_image_fatal=0
 			;;
+		allow_missing_images_only)
+			failure_fatal=1
+			rate_violation_fatal=1
+			distortion_violation_fatal=1
+			missing_image_fatal=0
+			;;
 		fatal|*)
-			error_fatal=1
+			failure_fatal=1
 			rate_violation_fatal=1
 			distortion_violation_fatal=1
 			missing_image_fatal=1
@@ -336,7 +342,7 @@ for test in "${tests[@]}"; do
 		echo "ERROR: ENCODER FAILURE"
 		error_count=$((error_count + 1))
 		failed_tests+=($test.encode)
-		if [ "$error_fatal" -ne 0 ]; then
+		if [ "$failure_fatal" -ne 0 ]; then
 			exit 1
 		else
 			continue
@@ -352,7 +358,7 @@ for test in "${tests[@]}"; do
 		echo "ERROR: DECODER FAILURE"
 		error_count=$((error_count + 1))
 		failed_tests+=($test.decode)
-		if [ "$error_fatal" -ne 0 ]; then
+		if [ "$failure_fatal" -ne 0 ]; then
 			exit 1
 		else
 			continue

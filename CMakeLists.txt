@@ -278,21 +278,20 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/build/jasper.pc
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/build/jasper.spec.in
   ${CMAKE_CURRENT_BINARY_DIR}/build/jasper.spec @ONLY)
 
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/test/bin/wrapper.in
+  ${CMAKE_CURRENT_BINARY_DIR}/test/bin/wrapper @ONLY)
+
 if (BASH_PROGRAM)
 	add_test(run_test_1
-	  "${BASH_PROGRAM}" "${CMAKE_CURRENT_SOURCE_DIR}/test/bin/wrapper"
-	  "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}"
+	  "${BASH_PROGRAM}" "${CMAKE_CURRENT_BINARY_DIR}/test/bin/wrapper"
 	  "${CMAKE_CURRENT_SOURCE_DIR}/test/bin/run_test_1")
 	add_test(run_test_2
-	  "${BASH_PROGRAM}" "${CMAKE_CURRENT_SOURCE_DIR}/test/bin/wrapper"
-	  "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}"
+	  "${BASH_PROGRAM}" "${CMAKE_CURRENT_BINARY_DIR}/test/bin/wrapper"
 	  "${CMAKE_CURRENT_SOURCE_DIR}/test/bin/run_test_2")
 	add_test(run_test_3
-	  "${BASH_PROGRAM}" "${CMAKE_CURRENT_SOURCE_DIR}/test/bin/wrapper"
-	  "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}"
+	  "${BASH_PROGRAM}" "${CMAKE_CURRENT_BINARY_DIR}/test/bin/wrapper"
 	  "${CMAKE_CURRENT_SOURCE_DIR}/test/bin/run_test_3")
 	add_test(run_test_4
-	  "${BASH_PROGRAM}" "${CMAKE_CURRENT_SOURCE_DIR}/test/bin/wrapper"
-	  "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}"
+	  "${BASH_PROGRAM}" "${CMAKE_CURRENT_BINARY_DIR}/test/bin/wrapper"
 	  "${CMAKE_CURRENT_SOURCE_DIR}/test/bin/run_test_4")
 endif()

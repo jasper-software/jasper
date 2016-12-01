@@ -67,7 +67,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <inttypes.h>
-#if defined(__APPLE__) && defined(__MACH__)
+#if 0 && defined(__APPLE__) && defined(__MACH__)
 #include <glut.h>
 #else
 #include <GL/glut.h>

@@ -2,9 +2,10 @@
 
 verbose=0
 
-abs_source_dir="$1"
-abs_build_dir="$2"
-command="$3"
+abs_source_dir="@CMAKE_SOURCE_DIR@"
+abs_build_dir="@CMAKE_BINARY_DIR@"
+command="$1"
+shift 1
 
 export JAS_ABS_TOP_BUILDDIR="$abs_build_dir"
 export JAS_TOP_BUILDDIR="$abs_build_dir"
@@ -15,5 +16,5 @@ if [ "$verbose" -gt 0 ]; then
 	printenv | fgrep JAS_
 	echo "Running command $command"
 fi
-"$command"
+"$command" "$@"
 
