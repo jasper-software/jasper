@@ -57,6 +57,7 @@ set(CMAKE_VERBOSE_MAKEFILE on)
 
 include(CheckIncludeFiles)
 include(CheckFunctionExists)
+include(CheckCSourceCompiles)
 include(CTest)
 include(Sanitizers)
 cmake_policy(SET CMP0012 NEW)
@@ -158,15 +159,22 @@ if (JAS_ENABLE_LIBJPEG AND JPEG_FOUND)
 	message("JPEG include directory: ${JPEG_INCLUDE_DIR}")
 	message("JPEG libraries: ${JPEG_LIBRARIES}")
 	message("JAS_HAVE_JPEGLIB_H: ${JAS_HAVE_JPEGLIB_H}")
-	include_directories("${JPEG_INCLUDE_DIR}")
-	check_include_files(jpeglib.h JAS_HAVE_JPEGLIB_H)
-	# On some systems, the header file jpeglib.h fails to be detected.
-	# The following hack works around this:
-	if (TRUE OR JAS_LOCAL)
-		set(JAS_HAVE_JPEGLIB_H 1)
-	endif()
-	if(NOT JAS_HAVE_JPEGLIB_H)
-		message(WARNING "disabling LIBJPEG")
+	set(CMAKE_REQUIRED_INCLUDES ${JPEG_INCLUDE_DIR})
+	# In some versions of the JPEG library, the header file jpeglib.h
+	# does not include some of the header files upon which it depends
+	# (e.g., stdio.h and stdint.h).  So, we cannot reliably use
+	# check_include_file here.
+	check_c_source_compiles("
+		#include <stdio.h>
+		#include <stdint.h>
+		#include <jpeglib.h>
+		int main() {}
+	" JAS_HAVE_JPEGLIB_H)
+	if(JAS_HAVE_JPEGLIB_H)
+		include_directories("${JPEG_INCLUDE_DIR}")
+	else()
+		message(WARNING "The header file jpeglib.h appears to be missing.")
+		message(WARNING "Disabling LIBJPEG.")
 		set(JPEG_FOUND false)
 		set(JPEG_LIBRARIES "")
 		set(JPEG_INCLUDE_DIR "")
@@ -193,8 +201,8 @@ if (JAS_ENABLE_OPENGL AND OPENGL_FOUND)
 			set(JAS_HAVE_OPENGL 1)
 			include_directories("${GLUT_INCLUDE_DIR} ${OPENGL_INCLUDE_DIR}")
 		else()
-			message(WARNING "GL/glut.h appears to be missing")
-			message(WARNING "Disabling OpenGL")
+			message(WARNING "The header file GL/glut.h appears to be missing.")
+			message(WARNING "Disabling OpenGL.")
 		endif()
 	endif()
 	# Note: This is a hack for Fedora 21.
