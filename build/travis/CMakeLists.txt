@@ -3,6 +3,7 @@ project(demo LANGUAGES C)
 cmake_policy(SET CMP0012 NEW)
 
 include(CheckIncludeFiles)
+include(CheckCSourceCompiles)
 
 option(ENABLE_LIBJPEG "Enable JPEG library" ON)
 
