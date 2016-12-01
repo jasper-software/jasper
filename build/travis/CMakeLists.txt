@@ -30,7 +30,7 @@ if (ENABLE_LIBJPEG AND JPEG_FOUND)
 		#include <stdint.h>
 		#include <jpeglib.h>
 		int main() {}
-	" JAS_HAVE_JPEGLIB_H)
+	" HAVE_JPEGLIB_H)
 	message("HAVE_JPEGLIB_H: ${HAVE_JPEGLIB_H}")
 	if(NOT HAVE_JPEGLIB_H)
 		message(WARNING "Disabling LIBJPEG.")
