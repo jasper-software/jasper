@@ -195,6 +195,7 @@ if (JAS_ENABLE_OPENGL AND OPENGL_FOUND)
 	if (GLUT_FOUND)
 		message("GLUT include directory: ${GLUT_INCLUDE_DIR}")
 		message("GLUT libraries: ${GLUT_LIBRARIES}")
+		set(CMAKE_REQUIRED_INCLUDES ${GLUT_INCLUDE_DIR})
 		check_include_files(GL/glut.h JAS_HAVE_GL_GLUT_H)
 		message("JAS_HAVE_GL_GLUT_H: ${JAS_HAVE_GL_GLUT_H}")
 		if (JAS_HAVE_GL_GLUT_H)
@@ -205,9 +206,13 @@ if (JAS_ENABLE_OPENGL AND OPENGL_FOUND)
 			message(WARNING "Disabling OpenGL.")
 		endif()
 	endif()
-	# Note: This is a hack for Fedora 21.
-	if (JAS_LOCAL)
-		set(GLUT_LIBRARIES "-lglut")
+	# On some systems (e.g., Fedora 21), there is a bug in the cmake code
+	# that detects GLUT libraries.  The following ugliness is a workaround for 
+	# this problem.
+	if (GLUT_Xmu_LIBRARY MATCHES NOTFOUND)
+		set(GLUT_LIBRARIES "${GLUT_glut_LIBRARY}")
+		message(WARNING "Clearing bogus value for GLUT_Xmu_LIBRARY.")
+		message(WARNING "Your version of CMake may be buggy.")
 	endif()
 endif()
 
