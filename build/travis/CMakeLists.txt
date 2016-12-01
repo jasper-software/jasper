@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 2.6 FATAL_ERROR)
 project(demo LANGUAGES C)
+cmake_policy(SET CMP0012 NEW)
 
 include(CheckIncludeFiles)
 
