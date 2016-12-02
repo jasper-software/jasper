@@ -9,12 +9,18 @@ panic()
 cmd_dir=$(dirname "$0") || exit 1
 abs_cmd_dir=$(readlink -f "$cmd_dir") || panic
 
+enable_debug=0
 do_make_test=0
+verbose=0
 
-while getopts t opt; do
+while getopts dtv opt; do
 	case $opt in
+	d)
+		enable_debug=1;;
 	t)
 		do_make_test=1;;
+	v)
+		verbose=1;;
 	\?)
 		usage
 		break;;
@@ -34,17 +40,48 @@ if [ -n "$CC" ]; then
 	echo "C compiler $CC"
 fi
 
-cmake -B"$build_dir" -H"$source_dir" -DCMAKE_INSTALL_PREFIX="$install_dir" \
-  -DCMAKE_BUILD_TYPE=Debug \
-  -DJAS_ENABLE_SHARED=false \
-  -DJAS_ENABLE_ASAN=true -DJAS_ENABLE_USAN=true -DJAS_ENABLE_STRICT=true \
-  "$@" \
-  || panic "cmake failed"
+SDE_TOP_DIR="$HOME/public/aurora_lab-gcc-6.2.0"
+SDE_GCC="$SDE_TOP_DIR/bin/gcc"
+SDE_SETUP="$SDE_TOP_DIR/bin/sde_make_setup"
+eval $("$SDE_SETUP") || panic "setup failed"
 
-(cd "$build_dir" && make clean && make all) || panic "make clean/all failed"
-(cd "$build_dir" && make install) || panic "make install failed"
-
-if [ "$do_make_test" -ne 0 ]; then
-	(cd "$build_dir" && make test ARGS="-V") || panic "make test failed"
+if [ -e "$tmp_dir" ]; then
+	echo "Removing $tmp_dir"
+	rm -rf "$tmp_dir" || panic "cannot remove directory $tmp_dir"
 fi
 
+opts=()
+opts+=(-B"$build_dir")
+opts+=(-H"$source_dir")
+opts+=("-DCMAKE_C_COMPILER=$SDE_GCC")
+opts+=("-DCMAKE_INSTALL_PREFIX=$install_dir")
+opts+=("-DJAS_ENABLE_STRICT=true")
+if [ "$enable_debug" -ne 0 ]; then
+	opts+=("-DCMAKE_BUILD_TYPE=Debug")
+	opts+=("-DJAS_ENABLE_SHARED=false")
+	opts+=("-DJAS_ENABLE_ASAN=true")
+	opts+=("-DJAS_ENABLE_USAN=true")
+else
+	opts+=("-DCMAKE_BUILD_TYPE=Release")
+fi
+opts+=("$@")
+echo "Running cmake ${opts[@]}"
+cmake "${opts[@]}" || panic "cmake failed"
+
+make_opts=()
+if [ "$verbose" -ne 0 ]; then
+	make_opts+=("VERBOSE=1")
+fi
+for target in clean all install; do
+	(cd "$build_dir" && make "$target" "${make_opts[@]}") || \
+	  panic "make $target failed"
+done
+
+make_opts=()
+if [ "$verbose" -ne 0 ]; then
+	make_opts+=("ARGS=-V")
+fi
+if [ "$do_make_test" -ne 0 ]; then
+	(cd "$build_dir" && make test "${make_opts[@]}") || \
+	  panic "make test failed"
+fi

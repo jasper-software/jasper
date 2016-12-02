@@ -5,7 +5,7 @@ configure_file(
 
 set(libjasper_headers
 	include/jasper/jas_cm.h
-	${CMAKE_CURRENT_BINARY_DIR}/include/jasper/jas_config.h
+	"${CMAKE_CURRENT_BINARY_DIR}/include/jasper/jas_config.h"
 	include/jasper/jas_debug.h
 	include/jasper/jas_dll.h
 	include/jasper/jas_fix.h
@@ -157,5 +157,5 @@ endif()
 # Also, try adding MATH_LIBRARY to fix a Gentoo problem.
 target_link_libraries(libjasper ${JPEG_LIBRARIES} ${MATH_LIBRARY})
 
-install(TARGETS libjasper DESTINATION ${CMAKE_INSTALL_LIBDIR})
+install(TARGETS libjasper DESTINATION "${CMAKE_INSTALL_LIBDIR}")
 install(FILES ${libjasper_headers} DESTINATION include/jasper)

@@ -53,7 +53,7 @@ set(JAS_SO_NAME "${JAS_SO_VERSION}.${JAS_SO_MINOR}.${JAS_SO_RELEASE}")
 ################################################################################
 
 set(CMAKE_C_STANDARD 11)
-set(CMAKE_VERBOSE_MAKEFILE on)
+#set(CMAKE_VERBOSE_MAKEFILE on)
 
 include(CheckIncludeFiles)
 include(CheckFunctionExists)
@@ -70,7 +70,7 @@ option(JAS_LOCAL "Enable local hacks for developers (do not enable)" false)
 set(CMAKE_INSTALL_LIBDIR lib CACHE PATH
   "Name of the library directory for installation (e.g., lib or lib64)")
 
-if (APPLE AND ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+if (APPLE AND CMAKE_SYSTEM_NAME MATCHES "Darwin")
 	set(MACOSX true)
 endif()
 
@@ -106,12 +106,14 @@ if (JAS_ENABLE_SHARED)
 	set(JAS_DLL 1)
 endif()
 
+message("JAS_LOCAL ${JAS_LOCAL}")
 message("CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE}")
 message("CMAKE_C_COMPILER_ID ${CMAKE_C_COMPILER_ID}")
 message("CMAKE_C_COMPILER ${CMAKE_C_COMPILER}")
 message("CMAKE_C_FLAGS ${CMAKE_C_FLAGS}")
-if (JAS_LOCAL AND (${CMAKE_BUILD_TYPE} MATCHES Debug))
-	if (${CMAKE_C_COMPILER_ID} MATCHES GNU OR ${CMAKE_C_COMPILER_ID} MATCHES Clang)
+if (JAS_LOCAL AND (CMAKE_BUILD_TYPE MATCHES "Debug"))
+	if (CMAKE_C_COMPILER_ID MATCHES "GNU" OR
+	  CMAKE_C_COMPILER_ID MATCHES "Clang")
 		add_definitions("-O0")
 	endif()
 endif()
@@ -171,7 +173,7 @@ if (JAS_ENABLE_LIBJPEG AND JPEG_FOUND)
 	" JAS_HAVE_JPEGLIB_H)
 	message("JAS_HAVE_JPEGLIB_H: ${JAS_HAVE_JPEGLIB_H}")
 	if(JAS_HAVE_JPEGLIB_H)
-		include_directories("${JPEG_INCLUDE_DIR}")
+		include_directories(${JPEG_INCLUDE_DIR})
 	else()
 		message(WARNING "The header file jpeglib.h appears to be missing.")
 		message(WARNING "Disabling LIBJPEG.")
@@ -200,7 +202,7 @@ if (JAS_ENABLE_OPENGL AND OPENGL_FOUND)
 		message("JAS_HAVE_GL_GLUT_H: ${JAS_HAVE_GL_GLUT_H}")
 		if (JAS_HAVE_GL_GLUT_H)
 			set(JAS_HAVE_OPENGL 1)
-			include_directories("${GLUT_INCLUDE_DIR} ${OPENGL_INCLUDE_DIR}")
+			include_directories(${GLUT_INCLUDE_DIR} ${OPENGL_INCLUDE_DIR})
 		else()
 			message(WARNING "The header file GL/glut.h appears to be missing.")
 			message(WARNING "Disabling OpenGL.")
@@ -231,7 +233,7 @@ else()
 endif()
 
 if (JAS_MEMORY_LIMIT)
-	add_definitions(-DJAS_MEMORY_LIMIT=${JAS_MEMORY_LIMIT})
+	add_definitions("-DJAS_MEMORY_LIMIT=${JAS_MEMORY_LIMIT}")
 endif()
 
 ################################################################################
@@ -239,28 +241,28 @@ endif()
 if (JAS_ENABLE_SHARED)
 
 	# use, i.e. don't skip the full RPATH for the build tree
-	SET(CMAKE_SKIP_BUILD_RPATH  FALSE)
+	set(CMAKE_SKIP_BUILD_RPATH FALSE)
 
 	# when building, don't use the install RPATH already
 	# (but later on when installing)
-	SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE) 
+	set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE) 
 
-	SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+	set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 
 	# add the automatically determined parts of the RPATH
 	# which point to directories outside the build tree to the install RPATH
-	SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+	set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 	# The RPATH to be used when installing, but only if it's not a
 	# system directory
-	LIST(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES
+	list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES
 	  "${CMAKE_INSTALL_PREFIX}/lib" isSystemDir)
-	IF("${isSystemDir}" STREQUAL "-1")
-	   SET(CMAKE_INSTALL_RPATH
+	if("${isSystemDir}" STREQUAL "-1")
+	   set(CMAKE_INSTALL_RPATH
 		  "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
-	ENDIF("${isSystemDir}" STREQUAL "-1")
+	endif("${isSystemDir}" STREQUAL "-1")
 
-endif (JAS_ENABLE_SHARED)
+endif()
 
 ################################################################################
 
@@ -270,16 +272,16 @@ add_subdirectory(doc)
 
 # The package configuation (pc) file should be installed in
 # ${CMAKE_INSTALL_PREFIX}/lib/pkgconfig.
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/build/jasper.pc.in
-  ${CMAKE_CURRENT_BINARY_DIR}/build/jasper.pc @ONLY)
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/build/jasper.pc
-  DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/build/jasper.pc.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/build/jasper.pc" @ONLY)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/build/jasper.pc"
+  DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/build/jasper.spec.in
-  ${CMAKE_CURRENT_BINARY_DIR}/build/jasper.spec @ONLY)
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/build/jasper.spec.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/build/jasper.spec" @ONLY)
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/test/bin/wrapper.in
-  ${CMAKE_CURRENT_BINARY_DIR}/test/bin/wrapper @ONLY)
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/test/bin/wrapper.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/test/bin/wrapper" @ONLY)
 
 if (BASH_PROGRAM)
 	add_test(run_test_1

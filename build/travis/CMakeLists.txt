@@ -19,7 +19,7 @@ message("JPEG library found: ${JPEG_FOUND}")
 if (ENABLE_LIBJPEG AND JPEG_FOUND)
 	message("JPEG include directory: ${JPEG_INCLUDE_DIR}")
 	message("JPEG libraries: ${JPEG_LIBRARIES}")
-	include_directories("${JPEG_INCLUDE_DIR}")
+	include_directories(${JPEG_INCLUDE_DIR})
 	# In some versions of the JPEG library, the header file jpeglib.h
 	# does not include some of the header files upon which it depends
 	# (e.g., stdio.h and stdint.h).  So, we cannot reliably use
@@ -48,8 +48,8 @@ else()
 	set(MATH_LIBRARY "")
 endif()
 
-message("${JASPER_INCLUDE_DIR}")
-message("${JASPER_LIBRARIES}")
+message("JASPER_INCLUDE_DIR ${JASPER_INCLUDE_DIR}")
+message("JASPER_LIBRARIES ${JASPER_LIBRARIES}")
 include_directories(${JASPER_INCLUDE_DIR})
 link_libraries(${JASPER_LIBRARIES} ${JPEG_LIBRARIES} ${MATH_LIBRARY})
 add_executable(jasper jasper.c)
