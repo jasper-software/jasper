@@ -73,6 +73,9 @@ else
 		(cd "$build_dir" && make install VERBOSE=1) || \
 		  panic "make install failed"
 
+		(cd "$install_dir" && ls -alR) || \
+		  panic "cannot list directory $install_dir"
+
 		echo "########################################"
 		echo "external test"
 		echo "########################################"
