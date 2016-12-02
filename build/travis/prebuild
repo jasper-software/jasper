@@ -1,6 +1,7 @@
 #! /bin/bash
 
 bash --version
+cmake --version
 
 case "$TRAVIS_OS_NAME" in
 linux)
@@ -16,3 +17,13 @@ osx)
 esac
 
 bash --version
+
+for dir in /usr/include /usr/include/GL; do
+	echo "Listing of directory $dir:"
+	ls -al "$dir"
+done
+
+echo "############################################################"
+echo "End of prebuild"
+echo "############################################################"
+
