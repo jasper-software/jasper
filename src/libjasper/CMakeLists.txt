@@ -142,14 +142,13 @@ endif()
 set_target_properties(libjasper PROPERTIES LINKER_LANGUAGE C)
 
 if (UNIX)
-set_target_properties(libjasper PROPERTIES
-	VERSION ${JAS_SO_NAME}
-	SOVERSION ${JAS_SO_VERSION}
-)
+	set_target_properties(libjasper PROPERTIES
+	  VERSION ${JAS_SO_NAME} SOVERSION ${JAS_SO_VERSION})
 endif()
 
 if (JAS_ENABLE_SHARED)
-	set_target_properties(libjasper PROPERTIES DEFINE_SYMBOL "JAS_BUILDING_DLL" )
+	set_target_properties(libjasper PROPERTIES
+	  DEFINE_SYMBOL "JAS_BUILDING_DLL")
 endif()
 
 # I am not sure why the following line is needed for building a library, but
