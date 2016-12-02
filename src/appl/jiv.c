@@ -67,10 +67,10 @@
 #include <stdlib.h>
 #include <math.h>
 #include <inttypes.h>
-#if 0 && defined(__APPLE__) && defined(__MACH__)
-#include <glut.h>
-#else
+#if defined(JAS_HAVE_GL_GLUT_H)
 #include <GL/glut.h>
+#else
+#include <glut.h>
 #endif
 
 /******************************************************************************\

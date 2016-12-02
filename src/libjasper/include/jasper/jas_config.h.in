@@ -26,6 +26,9 @@
 #cmakedefine JAS_HAVE_GETTIMEOFDAY 1
 #cmakedefine JAS_HAVE_GETRUSAGE 1
 
+#cmakedefine JAS_HAVE_GL_GLUT_H 1
+#cmakedefine JAS_HAVE_GLUT_H 1
+
 #define JAS_HAVE_SNPRINTF	1
 
 #else
