@@ -43,7 +43,9 @@ endif()
 message("ENABLE_LIBJPEG: ${ENABLE_LIBJPEG}")
 
 if (UNIX)
-	set(MATH_LIBRARY "-lm")
+	set(MATH_LIBRARY "m")
+else()
+	set(MATH_LIBRARY "")
 endif()
 
 message("${JASPER_INCLUDE_DIR}")
