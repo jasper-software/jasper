@@ -1,5 +1,8 @@
 cmake_minimum_required (VERSION 2.8.11)
 
+# Adhere to GNU filesystem layout conventions
+include(GNUInstallDirs)
+
 set(JAS_PROJECT_NAME "JasPer")
 
 project("${JAS_PROJECT_NAME}")
@@ -67,8 +70,6 @@ option(JAS_ENABLE_OPENGL "Enable use of OpenGL Library" true)
 option(JAS_ENABLE_STRICT "Enable pedantic error checking" false)
 option(JAS_ENABLE_SHARED "Enable building of shared library" true)
 option(JAS_LOCAL "Enable local hacks for developers (do not enable)" false)
-set(CMAKE_INSTALL_LIBDIR lib CACHE PATH
-  "Name of the library directory for installation (e.g., lib or lib64)")
 
 if (APPLE AND CMAKE_SYSTEM_NAME MATCHES "Darwin")
 	set(MACOSX true)
