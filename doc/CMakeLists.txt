@@ -13,3 +13,5 @@ if (DOXYGEN_FOUND)
 		COMMENT "Generating API documentation with Doxygen" VERBATIM
 	)
 endif()
+
+install(FILES "jasper.pdf" "jpeg2000.pdf" DESTINATION "${CMAKE_INSTALL_DOCDIR}")

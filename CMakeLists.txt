@@ -1,5 +1,8 @@
 cmake_minimum_required (VERSION 2.8.11)
 
+# Adhere to GNU filesystem layout conventions
+include(GNUInstallDirs)
+
 set(JAS_PROJECT_NAME "JasPer")
 
 project("${JAS_PROJECT_NAME}")
@@ -67,8 +70,6 @@ option(JAS_ENABLE_OPENGL "Enable use of OpenGL Library" true)
 option(JAS_ENABLE_STRICT "Enable pedantic error checking" false)
 option(JAS_ENABLE_SHARED "Enable building of shared library" true)
 option(JAS_LOCAL "Enable local hacks for developers (do not enable)" false)
-set(CMAKE_INSTALL_LIBDIR lib CACHE PATH
-  "Name of the library directory for installation (e.g., lib or lib64)")
 
 if (APPLE AND CMAKE_SYSTEM_NAME MATCHES "Darwin")
 	set(MACOSX true)
@@ -155,9 +156,9 @@ if (JAS_STRICT)
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -W -Wformat -Wmissing-prototypes -Wstrict-prototypes")
 endif()
 
-find_package(JPEG)
-message("JPEG library found: ${JPEG_FOUND}")
-if (JAS_ENABLE_LIBJPEG AND JPEG_FOUND)
+if (JAS_ENABLE_LIBJPEG)
+	find_package(JPEG REQUIRED)
+
 	message("JPEG include directory: ${JPEG_INCLUDE_DIR}")
 	message("JPEG libraries: ${JPEG_LIBRARIES}")
 	# In some versions of the JPEG library, the header file jpeglib.h
@@ -186,10 +187,9 @@ endif()
 message("JAS_ENABLE_LIBJPEG: ${JAS_ENABLE_LIBJPEG}")
 
 set(JAS_HAVE_OPENGL 0)
-find_package(OpenGL)
-message("JAS_ENABLE_OPENGL: ${JAS_ENABLE_OPENGL}")
-message("OpenGL library found: ${OPENGL_FOUND}")
-if (JAS_ENABLE_OPENGL AND OPENGL_FOUND)
+if (JAS_ENABLE_OPENGL)
+	find_package(OpenGL REQUIRED)
+
 	message("OpenGL include directory: ${OPENGL_INCLUDE_DIR}")
 	message("OpenGL libraries: ${OPENGL_LIBRARIES}")
 	find_package(GLUT)
@@ -227,6 +227,7 @@ if (JAS_ENABLE_OPENGL AND OPENGL_FOUND)
 		set(GLUT_LIBRARIES "${GLUT_glut_LIBRARY}")
 	endif()
 endif()
+message("JAS_ENABLE_OPENGL: ${JAS_ENABLE_OPENGL}")
 
 #if(UNIX)
 #	find_library(MATH_LIBRARY m)
@@ -282,6 +283,8 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/build/jasper.pc.in"
   "${CMAKE_CURRENT_BINARY_DIR}/build/jasper.pc" @ONLY)
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/build/jasper.pc"
   DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
+
+install(FILES "README" DESTINATION "${CMAKE_INSTALL_DOCDIR}")
 
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/build/jasper.spec.in"
   "${CMAKE_CURRENT_BINARY_DIR}/build/jasper.spec" @ONLY)
