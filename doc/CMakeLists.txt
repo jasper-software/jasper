@@ -18,11 +18,8 @@ endif()
 install(FILES "jasper.pdf" "jpeg2000.pdf" DESTINATION "${CMAKE_INSTALL_DOCDIR}")
 
 # Install manual.
-install(
-  FILES
-  "${CMAKE_CURRENT_BINARY_DIR}/html"
-  DESTINATION "${CMAKE_INSTALL_DOCDIR}"
-)
+install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/html"
+  DESTINATION "${CMAKE_INSTALL_DOCDIR}")
 
 # Note: Can only install refman.pdf is latex is installed.
 #  "${CMAKE_CURRENT_BINARY_DIR}/latex/refman.pdf"
