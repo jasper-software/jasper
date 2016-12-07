@@ -13,3 +13,16 @@ if (DOXYGEN_FOUND)
 		COMMENT "Generating API documentation with Doxygen" VERBATIM
 	)
 endif()
+
+# Install papers and technical reports.
+install(FILES "jasper.pdf" "jpeg2000.pdf" DESTINATION "${CMAKE_INSTALL_DOCDIR}")
+
+# Install manual.
+install(
+  FILES
+  "${CMAKE_CURRENT_BINARY_DIR}/html"
+  DESTINATION "${CMAKE_INSTALL_DOCDIR}"
+)
+
+# Note: Can only install refman.pdf is latex is installed.
+#  "${CMAKE_CURRENT_BINARY_DIR}/latex/refman.pdf"

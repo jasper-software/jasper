@@ -33,7 +33,7 @@ else()
 endif()
 
 # Install of the the programs that were built.
-install(TARGETS ${programs} DESTINATION bin)
+install(TARGETS ${programs} DESTINATION "${CMAKE_INSTALL_BINDIR}")
 
 # Install the manual pages for the programs that were built.
-install(FILES ${man_pages} DESTINATION share/man/man1)
+install(FILES ${man_pages} DESTINATION "${CMAKE_INSTALL_MANDIR}/man1")

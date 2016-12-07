@@ -79,7 +79,7 @@ set(libjasper_jpc_sources
 set(libjasper_jpg_sources
 	jpg/jpg_val.c
 )
-if(JPEG_FOUND)
+if(JAS_HAVE_LIBJPEG)
 	list(APPEND libjasper_jpg_sources
 		jpg/jpg_dec.c
 		jpg/jpg_enc.c
@@ -157,4 +157,4 @@ endif()
 target_link_libraries(libjasper ${JPEG_LIBRARIES} ${MATH_LIBRARY})
 
 install(TARGETS libjasper DESTINATION "${CMAKE_INSTALL_LIBDIR}")
-install(FILES ${libjasper_headers} DESTINATION include/jasper)
+install(FILES ${libjasper_headers} DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/jasper")

@@ -1,8 +1,6 @@
 cmake_minimum_required (VERSION 2.8.11)
 
-set(JAS_PROJECT_NAME "JasPer")
-
-project("${JAS_PROJECT_NAME}")
+project(JasPer)
 
 set(CMAKE_MODULE_PATH
   ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/build/cmake/modules/")
@@ -51,24 +49,46 @@ set(JAS_SO_RELEASE 0)
 set(JAS_SO_NAME "${JAS_SO_VERSION}.${JAS_SO_MINOR}.${JAS_SO_RELEASE}")
 
 ################################################################################
+# Include modules and set policies.
+################################################################################
 
-set(CMAKE_C_STANDARD 11)
-#set(CMAKE_VERBOSE_MAKEFILE on)
+# Adhere to GNU filesystem layout conventions.
+include(GNUInstallDirs)
 
 include(CheckIncludeFiles)
 include(CheckFunctionExists)
 include(CheckCSourceCompiles)
 include(CTest)
 include(Sanitizers)
+
 cmake_policy(SET CMP0012 NEW)
 
-option(JAS_ENABLE_LIBJPEG "Enable use of JPEG Library" true)
-option(JAS_ENABLE_OPENGL "Enable use of OpenGL Library" true)
-option(JAS_ENABLE_STRICT "Enable pedantic error checking" false)
+################################################################################
+# Define options.
+################################################################################
+
 option(JAS_ENABLE_SHARED "Enable building of shared library" true)
+option(JAS_ENABLE_LIBJPEG "Enable the use of the JPEG Library" true)
+option(JAS_ENABLE_OPENGL "Enable the use of the OpenGL/GLUT Library" true)
+option(JAS_ENABLE_STRICT "Enable pedantic error checking" false)
+option(JAS_ENABLE_AUTOMATIC_DEPENDENCIES "Enable automatic dependencies" true)
 option(JAS_LOCAL "Enable local hacks for developers (do not enable)" false)
-set(CMAKE_INSTALL_LIBDIR lib CACHE PATH
-  "Name of the library directory for installation (e.g., lib or lib64)")
+
+################################################################################
+#
+################################################################################
+
+#set(CMAKE_VERBOSE_MAKEFILE on)
+set(CMAKE_C_STANDARD 11)
+
+if (JAS_ENABLE_AUTOMATIC_DEPENDENCIES)
+	message(WARNING
+	  "If this software is being built as a package for a Linux distribution, "
+	  "you should probably set JAS_ENABLE_AUTOMATIC_DEPENDENCIES to false.")
+	set(JAS_REQUIRED "")
+else()
+	set(JAS_REQUIRED "REQUIRED")
+endif()
 
 if (APPLE AND CMAKE_SYSTEM_NAME MATCHES "Darwin")
 	set(MACOSX true)
@@ -86,17 +106,6 @@ else()
 	set(JAS_PLATFORM "Unknown")
 endif()
 message("Platform ${JAS_PLATFORM}")
-
-#if (WIN32)
-#	if (JAS_ENABLE_SHARED)
-#		message(WARNING
-#		  "Disabling the building of shared libraries "
-#		  "(since this does not currently work on this platform). "
-#		  "Setting JAS_ENABLE_SHARED to false."
-#		)
-#		set(JAS_ENABLE_SHARED false)
-#	endif()
-#endif()
 
 if (JAS_ENABLE_SHARED AND MACOSX)
 	set(CMAKE_MACOSX_RPATH true)
@@ -155,9 +164,14 @@ if (JAS_STRICT)
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -W -Wformat -Wmissing-prototypes -Wstrict-prototypes")
 endif()
 
-find_package(JPEG)
+################################################################################
+# Check for the JPEG library.
+################################################################################
+
+find_package(JPEG ${JAS_LIBJPEG_REQUIRED})
 message("JPEG library found: ${JPEG_FOUND}")
 if (JAS_ENABLE_LIBJPEG AND JPEG_FOUND)
+	set(JAS_HAVE_LIBJPEG 0)
 	message("JPEG include directory: ${JPEG_INCLUDE_DIR}")
 	message("JPEG libraries: ${JPEG_LIBRARIES}")
 	# In some versions of the JPEG library, the header file jpeglib.h
@@ -173,6 +187,7 @@ if (JAS_ENABLE_LIBJPEG AND JPEG_FOUND)
 	" JAS_HAVE_JPEGLIB_H)
 	message("JAS_HAVE_JPEGLIB_H: ${JAS_HAVE_JPEGLIB_H}")
 	if(JAS_HAVE_JPEGLIB_H)
+		set(JAS_HAVE_LIBJPEG 1)
 		include_directories(${JPEG_INCLUDE_DIR})
 	else()
 		message(WARNING "The header file jpeglib.h appears to be missing.")
@@ -182,17 +197,25 @@ if (JAS_ENABLE_LIBJPEG AND JPEG_FOUND)
 		set(JPEG_INCLUDE_DIR "")
 		set(JAS_ENABLE_LIBJPEG 0)
 	endif()
+else()
+	set(JAS_HAVE_LIBJPEG 0)
+	set(JPEG_INCLUDE_DIR "")
+	set(JPEG_LIBRARIES "")
 endif()
-message("JAS_ENABLE_LIBJPEG: ${JAS_ENABLE_LIBJPEG}")
+message("JAS_HAVE_LIBJPEG: ${JAS_HAVE_LIBJPEG}")
 
-set(JAS_HAVE_OPENGL 0)
-find_package(OpenGL)
+################################################################################
+# Check for the OpenGL and GLUT libraries.
+################################################################################
+
+find_package(OpenGL ${JAS_REQUIRED})
 message("JAS_ENABLE_OPENGL: ${JAS_ENABLE_OPENGL}")
 message("OpenGL library found: ${OPENGL_FOUND}")
 if (JAS_ENABLE_OPENGL AND OPENGL_FOUND)
+	set(JAS_HAVE_OPENGL 0)
 	message("OpenGL include directory: ${OPENGL_INCLUDE_DIR}")
 	message("OpenGL libraries: ${OPENGL_LIBRARIES}")
-	find_package(GLUT)
+	find_package(GLUT ${JAS_REQUIRED})
 	message("GLUT library found: ${GLUT_FOUND}")
 	if (GLUT_FOUND)
 		message("GLUT include directory: ${GLUT_INCLUDE_DIR}")
@@ -226,22 +249,34 @@ if (JAS_ENABLE_OPENGL AND OPENGL_FOUND)
 		endif()
 		set(GLUT_LIBRARIES "${GLUT_glut_LIBRARY}")
 	endif()
+else()
+	set(JAS_HAVE_OPENGL 0)
+	set(OPENGL_INCLUDE_DIR "")
+	set(OPENGL_LIBRARIES "")
+	set(GLUT_INCLUDE_DIR "")
+	set(GLUT_LIBRARIES "")
 endif()
+message("JAS_HAVE_OPENGL: ${JAS_HAVE_OPENGL}")
 
-#if(UNIX)
-#	find_library(MATH_LIBRARY m)
-#else()
-#	set(MATH_LIBRARY "")
-#endif()
+################################################################################
+# Check for the Math library.
+################################################################################
+
 find_library(MATH_LIBRARY m)
 if (NOT MATH_LIBRARY)
 	set(MATH_LIBRARY "")
 endif()
 
+################################################################################
+#
+################################################################################
+
 if (JAS_MEMORY_LIMIT)
 	add_definitions("-DJAS_MEMORY_LIMIT=${JAS_MEMORY_LIMIT}")
 endif()
 
+################################################################################
+#
 ################################################################################
 
 if (JAS_ENABLE_SHARED)
@@ -271,6 +306,8 @@ if (JAS_ENABLE_SHARED)
 endif()
 
 ################################################################################
+#
+################################################################################
 
 add_subdirectory(src/libjasper)
 add_subdirectory(src/appl)
@@ -283,8 +320,14 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/build/jasper.pc.in"
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/build/jasper.pc"
   DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
 
+install(FILES "README" DESTINATION "${CMAKE_INSTALL_DOCDIR}")
+
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/build/jasper.spec.in"
   "${CMAKE_CURRENT_BINARY_DIR}/build/jasper.spec" @ONLY)
+
+################################################################################
+# Test suite
+################################################################################
 
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/test/bin/wrapper.in"
   "${CMAKE_CURRENT_BINARY_DIR}/test/bin/wrapper" @ONLY)
