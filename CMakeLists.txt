@@ -144,9 +144,29 @@ set(CPACK_PACKAGE_FILE_NAME
 set(CPACK_GENERATOR "TGZ")
 include(CPack)
 
-find_package(Doxygen)
+if (JAS_STRICT)
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wno-unused")
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pedantic")
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -W -Wformat -Wmissing-prototypes -Wstrict-prototypes")
+endif()
 
+################################################################################
+# Perform plaform checks.
+################################################################################
+
+find_package(Doxygen)
+find_package(LATEX COMPONENTS PDFLATEX)
 find_program(BASH_PROGRAM bash)
+
+# On some (or maybe all?) systems, LATEX_FOUND is not set by FindLATEX.
+# So, instead, rely on LATEX_PDFLATEX_FOUND.
+message("PDFLATEX_COMPILER: ${PDFLATEX_COMPILER}")
+if ((NOT LATEX_FOUND) AND PDFLATEX_COMPILER)
+	message(WARNING "Setting LATEX_FOUND to true.")
+	message(WARNING "Your version of CMake may be buggy.")
+	set(LATEX_FOUND true)
+endif()
+message("LATEX_FOUND ${LATEX_FOUND}")
 
 check_include_files(fcntl.h JAS_HAVE_FCNTL_H)
 check_include_files(io.h JAS_HAVE_IO_H)
@@ -157,12 +177,6 @@ check_include_files(sys/types.h JAS_HAVE_SYS_TYPES_H)
 
 check_function_exists(gettimeofday JAS_HAVE_GETTIMEOFDAY)
 check_function_exists(getrusage JAS_HAVE_GETRUSAGE)
-
-if (JAS_STRICT)
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wno-unused")
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pedantic")
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -W -Wformat -Wmissing-prototypes -Wstrict-prototypes")
-endif()
 
 ################################################################################
 # Check for the JPEG library.

@@ -13,11 +13,26 @@ if (DOXYGEN_FOUND)
 		COMMENT "Generating API documentation with Doxygen" VERBATIM
 	)
 
-	# Install manual.
+	if (LATEX_FOUND)
+		add_custom_target(manual_pdf ALL
+		  "${PDFLATEX_COMPILER}" refman.tex
+		  COMMAND "${PDFLATEX_COMPILER}" refman.tex
+		  COMMAND "${PDFLATEX_COMPILER}" refman.tex
+		  COMMAND "${PDFLATEX_COMPILER}" refman.tex
+		  WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/latex"
+		  DEPENDS doc
+		)
+	endif()
+
+	# Install the HTML version of the manual.
 	install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/html"
 	  DESTINATION "${CMAKE_INSTALL_DOCDIR}")
-	# Note: Can only install refman.pdf is latex is installed.
-	#  "${CMAKE_CURRENT_BINARY_DIR}/latex/refman.pdf"
+
+	# Install the PDF version of the manual built from LaTeX.
+	if (LATEX_FOUND)
+		install(FILES "${CMAKE_CURRENT_BINARY_DIR}/latex/refman.pdf"
+		  DESTINATION "${CMAKE_INSTALL_DOCDIR}" RENAME manual.pdf)
+	endif()
 endif()
 
 # Install papers and technical reports.
