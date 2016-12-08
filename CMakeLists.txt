@@ -336,9 +336,6 @@ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/build/jasper.pc"
 
 install(FILES "README" DESTINATION "${CMAKE_INSTALL_DOCDIR}")
 
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/build/jasper.spec.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/build/jasper.spec" @ONLY)
-
 ################################################################################
 # Test suite
 ################################################################################
