@@ -9,12 +9,15 @@ panic()
 cmd_dir=$(dirname "$0") || exit 1
 abs_cmd_dir=$(readlink -f "$cmd_dir") || panic
 
+do_install=0
 enable_debug=0
 do_make_test=0
 verbose=0
 
-while getopts dtv opt; do
+while getopts ditv opt; do
 	case $opt in
+	i)
+		do_install=1;;
 	d)
 		enable_debug=1;;
 	t)
@@ -72,7 +75,13 @@ make_opts=()
 if [ "$verbose" -ne 0 ]; then
 	make_opts+=("VERBOSE=1")
 fi
-for target in clean all install; do
+targets=()
+targets+=(clean)
+targets+=(all)
+if [ "$do_install" -ne 0 ]; then
+	targets+=(install)
+fi
+for target in "${targets[@]}"; do
 	(cd "$build_dir" && make "$target" "${make_opts[@]}") || \
 	  panic "make $target failed"
 done
