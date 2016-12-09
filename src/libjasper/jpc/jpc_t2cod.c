@@ -351,9 +351,9 @@ static int jpc_pi_nextpcrl(register jpc_pi_t *pi)
 			for (rlvlno = 0, pirlvl = picomp->pirlvls; rlvlno <
 			  picomp->numrlvls; ++rlvlno, ++pirlvl) {
 				// Check for the potential for overflow problems.
-				if (pirlvl->prcwidthexpn + pi->picomp->numrlvls >
+				if (pirlvl->prcwidthexpn + picomp->numrlvls >
 				  JAS_UINTFAST32_NUMBITS - 2 ||
-				  pirlvl->prcheightexpn + pi->picomp->numrlvls >
+				  pirlvl->prcheightexpn + picomp->numrlvls >
 				  JAS_UINTFAST32_NUMBITS - 2) {
 					return -1;
 				}
