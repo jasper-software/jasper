@@ -13,9 +13,15 @@ do_install=0
 enable_debug=0
 do_make_test=0
 verbose=0
+enable_asan=0
+enable_usan=0
 
-while getopts ditv opt; do
+while getopts AUditv opt; do
 	case $opt in
+	A)
+		enable_asan=1;;
+	U)
+		enable_usan=1;;
 	i)
 		do_install=1;;
 	d)
@@ -30,6 +36,11 @@ while getopts ditv opt; do
 	esac
 done
 shift $((OPTIND - 1))
+
+if [ "$enable_debug" -ne 0 ]; then
+	enable_asan=1
+	enable_usan=1
+fi
 
 source_dir="$abs_cmd_dir/.."
 tmp_dir="$source_dir/tmp_cmake"
@@ -62,10 +73,14 @@ opts+=("-DJAS_ENABLE_STRICT=true")
 if [ "$enable_debug" -ne 0 ]; then
 	opts+=("-DCMAKE_BUILD_TYPE=Debug")
 	opts+=("-DJAS_ENABLE_SHARED=false")
-	opts+=("-DJAS_ENABLE_ASAN=true")
-	opts+=("-DJAS_ENABLE_USAN=true")
 else
 	opts+=("-DCMAKE_BUILD_TYPE=Release")
+fi
+if [ "$enable_asan" -ne 0 ]; then
+	opts+=("-DJAS_ENABLE_ASAN=true")
+fi
+if [ "$enable_usan" -ne 0 ]; then
+	opts+=("-DJAS_ENABLE_USAN=true")
 fi
 opts+=("$@")
 echo "Running cmake ${opts[@]}"
