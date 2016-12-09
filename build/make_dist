@@ -8,7 +8,11 @@ panic()
 
 usage()
 {
-	echo "usage: $0 [-n NAME] [-l COMMIT] [-r LOCAL_DIR]"
+	echo "usage: $0 [-n NAME] [-r COMMIT] [-l LOCAL_DIR]"
+	cat <<- EOF
+	Example:
+	    $0 -n jasper-2.0.0 -r version-2.0.0
+	EOF
 	exit 2
 }
 
@@ -114,7 +118,7 @@ for file in "${remove_list[@]}"; do
 		panic "missing file/directory $file"
 	fi
 	(cd "$source_dir" && rm -rf "$file") || \
-	  panic "cannot remove file/directory $file""
+	  panic "cannot remove file/directory $file"
 done
 
 (cd "$source_dir" && rm -rf .git) || \
@@ -122,3 +126,4 @@ done
 
 tar -C "$tmp_dir" -czf - "$name" > "$name.tar.gz" || \
   panic "cannot make archive"
+
