@@ -78,18 +78,15 @@ option(JAS_LOCAL "Enable local hacks for developers (do not enable)" false)
 #
 ################################################################################
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY .)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY .)
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY .)
-foreach (config ${CMAKE_CONFIGURATION_TYPES})
-	string(TOUPPER "${config}" config)
-	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_${config} .)
-	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_${config} .)
-	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${config} .)
-endforeach()
-
 #set(CMAKE_VERBOSE_MAKEFILE on)
 set(CMAKE_C_STANDARD 11)
+
+if (CMAKE_GENERATOR MATCHES Xcode)
+	set(JAS_MULTICONFIGURATION_GENERATOR 1)
+else()
+	set(JAS_MULTICONFIGURATION_GENERATOR 0)
+endif()
+message("JAS_MULTICONFIGURATION_GENERATOR ${JAS_MULTICONFIGURATION_GENERATOR}")
 
 if (JAS_ENABLE_AUTOMATIC_DEPENDENCIES)
 	message(WARNING
@@ -135,6 +132,18 @@ if (JAS_LOCAL AND (CMAKE_BUILD_TYPE MATCHES "Debug"))
 	  CMAKE_C_COMPILER_ID MATCHES "Clang")
 		add_definitions("-O0")
 	endif()
+endif()
+
+if (JAS_MULTICONFIGURATION_GENERATOR)
+	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY .)
+	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY .)
+	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY .)
+	foreach (config ${CMAKE_CONFIGURATION_TYPES})
+		string(TOUPPER "${config}" config)
+		set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_${config} .)
+		set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_${config} .)
+		set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${config} .)
+	endforeach()
 endif()
 
 include(InstallRequiredSystemLibraries)
