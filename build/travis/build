@@ -29,6 +29,17 @@ if [ "$in_source_build" -ne 0 ]; then
 
 else
 
+	case "$CC" in
+	*gcc*)
+		C_COMPILER=gcc;;
+	*clang*)
+		C_COMPILER=clang;;
+	*)
+		C_COMPILER=unknown;;
+	esac
+
+	echo "Compiler: $C_COMPILER"
+
 	build_dir=/tmp/jasper/build
 
 	echo "Out-of-source build"
@@ -47,11 +58,7 @@ else
 		echo "############################################################"
 		echo "Library type: $lib_type"
 
-		echo "########################################"
-		echo "cmake"
-		echo "########################################"
-
-		if [ "$TRAVIS_OS_NAME" = "osx" ]; then
+		if [ "$TRAVIS_OS_NAME" = "osx" -a "$C_COMPILER" = "clang" ]; then
 			build_tool="xcode"
 		else
 			build_tool="make"
@@ -70,6 +77,11 @@ else
 			;;
 		*)
 		esac
+
+		echo "########################################"
+		echo "cmake"
+		echo "build tool: $build_tool"
+		echo "########################################"
 
 		cmake_opts=()
 		cmake_opts+=(-G "$cmake_generator")
@@ -94,15 +106,15 @@ else
 			  panic "build of $target failed"
 		done
 
-		if [ 0 -ne 0 ]; then
-			for target in clean all install; do
-				echo "########################################"
-				echo "make $target"
-				echo "########################################"
-				(cd "$build_dir" && make "$target" VERBOSE=1) || \
-				  panic "make $target failed"
-			done
-		fi
+#		if [ 0 -ne 0 ]; then
+#			for target in clean all install; do
+#				echo "########################################"
+#				echo "make $target"
+#				echo "########################################"
+#				(cd "$build_dir" && make "$target" VERBOSE=1) || \
+#				  panic "make $target failed"
+#			done
+#		fi
 
 		(cd "$install_dir" && ls -alR) || \
 		  panic "cannot list directory $install_dir"
