@@ -51,15 +51,28 @@ else
 		echo "cmake"
 		echo "########################################"
 
-		build_targets=(clean all install)
 		if [ "$TRAVIS_OS_NAME" = "osx" ]; then
+			build_tool="xcode"
+		else
+			build_tool="make"
+		fi
+
+		case "$build_tool" in
+		make)
+			build_targets=(clean all install)
+			cmake_generator="Unix Makefiles"
+			build_opts=("VERBOSE=1")
+			;;
+		xcode)
 			build_targets=(install)
-		fi
+			cmake_generator="Xcode"
+			build_opts=()
+			;;
+		*)
+		esac
+
 		cmake_opts=()
-		if [ "$TRAVIS_OS_NAME" = "osx" ]; then
-			cmake_opts+=(-G Xcode)
-		fi
-		#cmake_opts+=(-G "Unix Makefiles")
+		cmake_opts+=(-G "$cmake_generator")
 		(cd "$source_dir" && \
 		  cmake "${cmake_opts[@]}" \
 		  -DCMAKE_INSTALL_PREFIX="$install_dir" \
@@ -72,15 +85,14 @@ else
 		echo "build"
 		echo "########################################"
 
-		if [ 1 -ne 0 ]; then
-			for target in "${build_targets[@]}"; do
-				echo "########################################"
-				echo "make $target"
-				echo "########################################"
-				(cmake --build "$build_dir" --target "$target") || \
-				  panic "build of $target failed"
-			done
-		fi
+		for target in "${build_targets[@]}"; do
+			echo "########################################"
+			echo "make $target"
+			echo "########################################"
+			(cmake --build "$build_dir" --target "$target" -- \
+			  "${build_opts[@]}") || \
+			  panic "build of $target failed"
+		done
 
 		if [ 0 -ne 0 ]; then
 			for target in clean all install; do
@@ -116,13 +128,13 @@ else
 			echo "test"
 			echo "########################################"
 
-			if [ 1 -ne 0 ]; then
+			if [ 0 -ne 0 ]; then
 				CTEST_OUTPUT_ON_FAILURE=TRUE \
 				  cmake --build "$build_dir" --target test || \
 				  panic "build of test failed"
 			fi
 
-			if [ 0 -ne 0 ]; then
+			if [ 1 -ne 0 ]; then
 				(cd "$build_dir" && \
 				  CTEST_OUTPUT_ON_FAILURE=TRUE make test ARGS="-V") || \
 				  panic "make test failed"
