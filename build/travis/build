@@ -141,8 +141,12 @@ else
 			echo "########################################"
 
 			if [ 1 -ne 0 ]; then
+				ctest_opts=()
+				#ctest_opts+=(--verbose)
+				ctest_opts+=(--extra-verbose)
+				ctest_opts+=(--output-on-failure)
 				(cd "$build_dir" && \
-				  CTEST_OUTPUT_ON_FAILURE=TRUE ctest) || \
+				  ctest "${ctest_opts[@]}") || \
 				  panic "ctest failed"
 			fi
 
