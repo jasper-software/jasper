@@ -29,6 +29,8 @@ if [ "$in_source_build" -ne 0 ]; then
 
 else
 
+	export JAS_TEST_WRAPPER_VERBOSE=1
+
 	case "$CC" in
 	*gcc*)
 		C_COMPILER=gcc;;
