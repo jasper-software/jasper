@@ -52,6 +52,9 @@ else
 		echo "########################################"
 
 		cmake_opts=()
+		if [ "$TRAVIS_OS_NAME" = "osx" ]; then
+			cmake_opts+=(-G Xcode)
+		fi
 		#cmake_opts+=(-G "Unix Makefiles")
 		(cd "$source_dir" && \
 		  cmake "${cmake_opts[@]}" \
