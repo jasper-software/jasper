@@ -51,9 +51,11 @@ else
 		echo "cmake"
 		echo "########################################"
 
+		cmake_opts=()
+		#cmake_opts+=(-G "Unix Makefiles")
 		(cd "$source_dir" && \
-		  cmake \
-		  -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$install_dir" \
+		  cmake "${cmake_opts[@]}" \
+		  -DCMAKE_INSTALL_PREFIX="$install_dir" \
 		  -DJAS_ENABLE_SHARED=$enable_shared \
 		  -H. -B"$build_dir" \
 		  "$@" \
@@ -63,15 +65,25 @@ else
 		echo "build"
 		echo "########################################"
 
-		(cd "$build_dir" && make clean && make all VERBOSE=1) || \
-		  panic "make clean/all failed"
+		if [ 1 -ne 0 ]; then
+			for target in all install; do
+				echo "########################################"
+				echo "make $target"
+				echo "########################################"
+				(cmake --build "$build_dir" --target "$target") || \
+				  panic "build of $target failed"
+			done
+		fi
 
-		echo "########################################"
-		echo "install"
-		echo "########################################"
-
-		(cd "$build_dir" && make install VERBOSE=1) || \
-		  panic "make install failed"
+		if [ 0 -ne 0 ]; then
+			for target in clean all install; do
+				echo "########################################"
+				echo "make $target"
+				echo "########################################"
+				(cd "$build_dir" && make "$target" VERBOSE=1) || \
+				  panic "make $target failed"
+			done
+		fi
 
 		(cd "$install_dir" && ls -alR) || \
 		  panic "cannot list directory $install_dir"
