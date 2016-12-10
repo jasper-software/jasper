@@ -112,16 +112,6 @@ else
 			done
 		done
 
-#		if [ 0 -ne 0 ]; then
-#			for target in clean all install; do
-#				echo "########################################"
-#				echo "make $target"
-#				echo "########################################"
-#				(cd "$build_dir" && make "$target" VERBOSE=1) || \
-#				  panic "make $target failed"
-#			done
-#		fi
-
 		(cd "$install_dir" && ls -alR) || \
 		  panic "cannot list directory $install_dir"
 
@@ -146,21 +136,25 @@ else
 			echo "test"
 			echo "########################################"
 
-			if [ 1 -ne 0 ]; then
-				ctest_opts=()
-				#ctest_opts+=(--verbose)
-				ctest_opts+=(--extra-verbose)
-				ctest_opts+=(--output-on-failure)
-				(cd "$build_dir" && \
-				  ctest "${ctest_opts[@]}") || \
-				  panic "ctest failed"
-			fi
+			#(cd "$build_dir" && \
+			#  CTEST_OUTPUT_ON_FAILURE=TRUE make test ARGS="-V") || \
+			#  panic "make test failed"
 
-#			if [ 1 -ne 0 ]; then
-#				(cd "$build_dir" && \
-#				  CTEST_OUTPUT_ON_FAILURE=TRUE make test ARGS="-V") || \
-#				  panic "make test failed"
-#			fi
+			case "$build_tool" in
+			xcode)
+				for file in imginfo jasper; do
+					(cd "$build_dir"/src/appl && ln -s Debug/"$file" .)
+				done
+				;;
+			esac
+
+			ctest_opts=()
+			#ctest_opts+=(--verbose)
+			ctest_opts+=(--extra-verbose)
+			ctest_opts+=(--output-on-failure)
+			(cd "$build_dir" && \
+			  ctest "${ctest_opts[@]}") || \
+			  panic "ctest failed"
 		fi
 
 	done
