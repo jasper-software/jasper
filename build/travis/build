@@ -140,17 +140,17 @@ else
 			echo "test"
 			echo "########################################"
 
-			if [ 0 -ne 0 ]; then
+			if [ 1 -ne 0 ]; then
 				CTEST_OUTPUT_ON_FAILURE=TRUE \
-				  cmake --build "$build_dir" --target test || \
-				  panic "build of test failed"
+				  (cd "$build_dir" && ctest) || \
+				  panic "ctest failed"
 			fi
 
-			if [ 1 -ne 0 ]; then
-				(cd "$build_dir" && \
-				  CTEST_OUTPUT_ON_FAILURE=TRUE make test ARGS="-V") || \
-				  panic "make test failed"
-			fi
+#			if [ 1 -ne 0 ]; then
+#				(cd "$build_dir" && \
+#				  CTEST_OUTPUT_ON_FAILURE=TRUE make test ARGS="-V") || \
+#				  panic "make test failed"
+#			fi
 		fi
 
 	done
