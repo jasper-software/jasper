@@ -13,7 +13,8 @@ set allow_in_source_build=
 @echo Static Library
 @echo ############################################################
 
-cmake -G "Visual Studio 12 2013 Win64" ^
+rem cmake -G "Visual Studio 12 2013 Win64" ^
+cmake ^
   -H%source_dir% -B%build_dir_static% %allow_in_source_build% ^
   -DCMAKE_INSTALL_PREFIX=%install_dir_static% ^
   -DJAS_ENABLE_SHARED=false || exit /B 1
@@ -29,7 +30,8 @@ dir %install_dir_static%\lib || exit /B 1
 @echo Shared Library
 @echo ############################################################
 
-cmake -G "Visual Studio 12 2013 Win64" ^
+rem cmake -G "Visual Studio 12 2013 Win64" ^
+cmake ^
   -H%source_dir% -B%build_dir_shared% %allow_in_source_build% ^
   -DCMAKE_INSTALL_PREFIX=%install_dir_shared% ^
   -DJAS_ENABLE_SHARED=true || exit /B 1
