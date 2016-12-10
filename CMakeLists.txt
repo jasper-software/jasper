@@ -81,7 +81,8 @@ option(JAS_LOCAL "Enable local hacks for developers (do not enable)" false)
 #set(CMAKE_VERBOSE_MAKEFILE on)
 set(CMAKE_C_STANDARD 11)
 
-if (CMAKE_GENERATOR MATCHES Xcode)
+if ((CMAKE_GENERATOR MATCHES Xcode) OR
+  (CMAKE_GENERATOR MATCHES "Visual Studio"))
 	set(JAS_MULTICONFIGURATION_GENERATOR 1)
 else()
 	set(JAS_MULTICONFIGURATION_GENERATOR 0)
@@ -134,6 +135,9 @@ if (JAS_LOCAL AND (CMAKE_BUILD_TYPE MATCHES "Debug"))
 	endif()
 endif()
 
+# If a multiconfiguration generator is used, ensure that various output
+# files are not placed in subdirectories (such as Debug and Release)
+# as this will cause the CTest test suite to fail.
 if (JAS_MULTICONFIGURATION_GENERATOR)
 	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY .)
 	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY .)

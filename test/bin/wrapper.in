@@ -17,9 +17,12 @@ export JAS_TOP_BUILDDIR="$abs_build_dir"
 export JAS_ABS_TOP_SRCDIR="$abs_source_dir"
 export JAS_TOP_SRCDIR="$abs_source_dir"
 
+export JAS_CMAKE_SOURCE_DIR="@CMAKE_SOURCE_DIR@"
+export JAS_CMAKE_BINARY_DIR="@CMAKE_BINARY_DIR@"
+export JAS_CMAKE_INSTALL_PREFIX="@CMAKE_INSTALL_PREFIX@"
+
 if [ "$verbose" -gt 0 ]; then
 	printenv | fgrep JAS_ 1>&2
 	eecho "Running command $command"
 fi
 "$command" "$@"
-
