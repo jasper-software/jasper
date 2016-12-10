@@ -108,7 +108,7 @@ else
 			  panic "build of $target failed"
 			for dir in src/appl src/libjasper test/bin; do
 				echo "Listing directory $build_dir/$dir"
-				(cd "$build_dir" && ls -al "$dir")
+				(cd "$build_dir" && ls -alR "$dir")
 			done
 		done
 
