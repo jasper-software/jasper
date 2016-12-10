@@ -140,13 +140,13 @@ else
 			#  CTEST_OUTPUT_ON_FAILURE=TRUE make test ARGS="-V") || \
 			#  panic "make test failed"
 
-			case "$build_tool" in
-			xcode)
-				for file in imginfo imgcmp jasper; do
-					(cd "$build_dir"/src/appl && ln -s Debug/"$file" .)
-				done
-				;;
-			esac
+#			case "$build_tool" in
+#			xcode)
+#				for file in imginfo imgcmp jasper; do
+#					(cd "$build_dir"/src/appl && ln -s Debug/"$file" .)
+#				done
+#				;;
+#			esac
 
 			ctest_opts=()
 			#ctest_opts+=(--verbose)
