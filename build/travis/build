@@ -87,13 +87,13 @@ else
 
 		cmake_opts=()
 		cmake_opts+=(-G "$cmake_generator")
+		cmake_opts+=(-DCMAKE_INSTALL_PREFIX="$install_dir")
+		cmake_opts+=(-DJAS_ENABLE_SHARED="$enable_shared")
+		cmake_opts+=(-H. -B"$build_dir")
+		cmake_opts+=("$@")
+		echo "Running cmake ${cmake_opts[@]}"
 		(cd "$source_dir" && \
-		  cmake "${cmake_opts[@]}" \
-		  -DCMAKE_INSTALL_PREFIX="$install_dir" \
-		  -DJAS_ENABLE_SHARED=$enable_shared \
-		  -H. -B"$build_dir" \
-		  "$@" \
-		  ) || panic "cmake failed"
+		  cmake "${cmake_opts[@]}") || panic "cmake failed"
 
 		echo "########################################"
 		echo "build"
@@ -103,9 +103,13 @@ else
 			echo "########################################"
 			echo "make $target"
 			echo "########################################"
-			(cmake --build "$build_dir" --target "$target" -- \
-			  "${build_opts[@]}") || \
-			  panic "build of $target failed"
+			cmake_opts=()
+			cmake_opts+=(--build "$build_dir")
+			cmake_opts+=(--target "$target")
+			cmake_opts+=(--)
+			cmake_opts+=("${build_opts[@]}")
+			echo "Running cmake ${cmake_opts[@]}"
+			(cmake "${cmake_opts[@]}") || panic "build of $target failed"
 			for dir in src/appl src/libjasper test/bin; do
 				echo "Listing directory $build_dir/$dir"
 				(cd "$build_dir" && ls -alR "$dir")
@@ -124,12 +128,16 @@ else
 			cp "$source_dir/$file" "$test_dir" || \
 			  panic "cannot copy $file"
 		done
-		cmake -H"$test_dir" -B"$test_dir" \
-		  -DJASPER_LIBRARIES="-L$install_dir/lib -ljasper" \
-		  -DJASPER_INCLUDE_DIR="$install_dir/include" \
-		  || panic "cmake failed"
-		(cd "$test_dir" && make clean && make all VERBOSE=1) || \
-		  panic "make failed"
+		cmake_opts=()
+		cmake_opts+=(-H"$test_dir" -B"$test_dir")
+		cmake_opts+=(-G "Unix Makefiles")
+		cmake_opts+=(-DJASPER_LIBRARIES="-L$install_dir/lib -ljasper")
+		cmake_opts+=(-DJASPER_INCLUDE_DIR="$install_dir/include")
+		cmake "${cmake_opts[@]}" || panic "cmake failed"
+		for target in clean all; do
+			(cd "$test_dir" && make "$target" VERBOSE=1) || \
+			  panic "make $target failed"
+		done
 
 		if [ "$lib_type" = shared ]; then
 			echo "########################################"
@@ -140,21 +148,13 @@ else
 			#  CTEST_OUTPUT_ON_FAILURE=TRUE make test ARGS="-V") || \
 			#  panic "make test failed"
 
-#			case "$build_tool" in
-#			xcode)
-#				for file in imginfo imgcmp jasper; do
-#					(cd "$build_dir"/src/appl && ln -s Debug/"$file" .)
-#				done
-#				;;
-#			esac
-
 			ctest_opts=()
 			#ctest_opts+=(--verbose)
 			ctest_opts+=(--extra-verbose)
 			ctest_opts+=(--output-on-failure)
+			echo "Running ctest ${ctest_opts[@]}"
 			(cd "$build_dir" && \
-			  ctest "${ctest_opts[@]}") || \
-			  panic "ctest failed"
+			  ctest "${ctest_opts[@]}") || panic "ctest failed"
 		fi
 
 	done
