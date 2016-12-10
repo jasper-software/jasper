@@ -141,8 +141,8 @@ else
 			echo "########################################"
 
 			if [ 1 -ne 0 ]; then
-				CTEST_OUTPUT_ON_FAILURE=TRUE \
-				  (cd "$build_dir" && ctest) || \
+				(cd "$build_dir" && \
+				  CTEST_OUTPUT_ON_FAILURE=TRUE ctest) || \
 				  panic "ctest failed"
 			fi
 
