@@ -106,6 +106,10 @@ else
 			(cmake --build "$build_dir" --target "$target" -- \
 			  "${build_opts[@]}") || \
 			  panic "build of $target failed"
+			for dir in src/appl src/libjasper test/bin; do
+				echo "Listing directory $build_dir/$dir"
+				(cd "$build_dir" && ls -al "$dir")
+			done
 		done
 
 #		if [ 0 -ne 0 ]; then
