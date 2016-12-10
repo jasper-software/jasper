@@ -51,6 +51,10 @@ else
 		echo "cmake"
 		echo "########################################"
 
+		build_targets=(clean all install)
+		if [ "$TRAVIS_OS_NAME" = "osx" ]; then
+			build_targets=(install)
+		fi
 		cmake_opts=()
 		if [ "$TRAVIS_OS_NAME" = "osx" ]; then
 			cmake_opts+=(-G Xcode)
@@ -69,7 +73,7 @@ else
 		echo "########################################"
 
 		if [ 1 -ne 0 ]; then
-			for target in all install; do
+			for target in "${build_targets[@]}"; do
 				echo "########################################"
 				echo "make $target"
 				echo "########################################"
