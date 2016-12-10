@@ -6,6 +6,8 @@ set build_dir_shared=c:\tmp\jasper\build\shared
 set build_dir_static=c:\tmp\jasper\build\static
 set install_dir_shared=c:\tmp\jasper\install\shared
 set install_dir_static=c:\tmp\jasper\install\static
+rem set allow_in_source_build=-DALLOW_IN_SOURCE_BUILD=true
+set allow_in_source_build=
 
 @echo ############################################################
 @echo Static Library
@@ -16,8 +18,8 @@ cmake -G "Visual Studio 12 2013 Win64" ^
   -DCMAKE_INSTALL_PREFIX=%install_dir_static% ^
   -DJAS_ENABLE_SHARED=false || exit /B 1
 
-cmake --build %build_dir_static% --target install || exit /B 1
 rem msbuild %build_dir_static%\INSTALL.vcxproj || exit /B 1
+cmake --build %build_dir_static% --target install --clean-first || exit /B 1
 
 dir %install_dir_static%\include\jasper || exit /B 1
 dir %install_dir_static%\bin || exit /B 1
@@ -32,8 +34,8 @@ cmake -G "Visual Studio 12 2013 Win64" ^
   -DCMAKE_INSTALL_PREFIX=%install_dir_shared% ^
   -DJAS_ENABLE_SHARED=true || exit /B 1
 
-cmake --build %build_dir_shared% --target install || exit /B 1
 rem msbuild %build_dir_shared%\INSTALL.vcxproj || exit /B 1
+cmake --build %build_dir_shared% --target install --clean-first || exit /B 1
 
 dir %install_dir_shared%\include\jasper || exit /B 1
 dir %install_dir_shared%\bin || exit /B 1
