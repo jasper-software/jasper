@@ -142,7 +142,7 @@ else
 
 			case "$build_tool" in
 			xcode)
-				for file in imginfo jasper; do
+				for file in imginfo imgcmp jasper; do
 					(cd "$build_dir"/src/appl && ln -s Debug/"$file" .)
 				done
 				;;
