@@ -78,6 +78,12 @@ option(JAS_LOCAL "Enable local hacks for developers (do not enable)" false)
 #
 ################################################################################
 
+foreach (config ${CMAKE_CONFIGURATION_TYPES})
+	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_${config} .)
+	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_${config} .)
+	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${config} .)
+endforeach()
+
 #set(CMAKE_VERBOSE_MAKEFILE on)
 set(CMAKE_C_STANDARD 11)
 
