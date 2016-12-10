@@ -16,7 +16,7 @@ cmake -G "Visual Studio 12 2013 Win64" ^
   -DCMAKE_INSTALL_PREFIX=%install_dir_static% ^
   -DJAS_ENABLE_SHARED=false || exit /B 1
 
-cmake --build %build_dir_static% || exit /B 1
+cmake --build %build_dir_static% --target install || exit /B 1
 rem msbuild %build_dir_static%\INSTALL.vcxproj || exit /B 1
 
 dir %install_dir_static%\include\jasper || exit /B 1
@@ -32,7 +32,7 @@ cmake -G "Visual Studio 12 2013 Win64" ^
   -DCMAKE_INSTALL_PREFIX=%install_dir_shared% ^
   -DJAS_ENABLE_SHARED=true || exit /B 1
 
-cmake --build %build_dir_shared% || exit /B 1
+cmake --build %build_dir_shared% --target install || exit /B 1
 rem msbuild %build_dir_shared%\INSTALL.vcxproj || exit /B 1
 
 dir %install_dir_shared%\include\jasper || exit /B 1
