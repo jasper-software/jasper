@@ -32,7 +32,10 @@ else()
 	message("GLUT library not found; skipping build of jiv program")
 endif()
 
-#set_property(TARGET ${programs} PROPERTY RUNTIME_OUTPUT_DIRECTORY .)
+set_property(TARGET ${programs}
+  PROPERTY RUNTIME_OUTPUT_DIRECTORY_Debug ${CMAKE_CURRENT_BINARY_DIR})
+set_property(TARGET ${programs}
+  PROPERTY RUNTIME_OUTPUT_DIRECTORY_Release ${CMAKE_CURRENT_BINARY_DIR})
 
 # Install of the the programs that were built.
 install(TARGETS ${programs} DESTINATION "${CMAKE_INSTALL_BINDIR}")
