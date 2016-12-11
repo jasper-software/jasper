@@ -73,7 +73,7 @@ else
 			build_opts=("VERBOSE=1")
 			;;
 		xcode)
-			build_targets=(install)
+			build_targets=(clean_all install)
 			cmake_generator="Xcode"
 			build_opts=()
 			;;
@@ -101,8 +101,8 @@ else
 			(cd "$build_dir" && xcodebuild -list)
 			;;
 		esac
-		echo "Running cmake with --target help"
-		cmake --build "$build_dir" --target help
+		#echo "Running cmake with --target help"
+		#cmake --build "$build_dir" --target help
 
 		echo "########################################"
 		echo "build"
@@ -114,7 +114,11 @@ else
 			echo "########################################"
 			cmake_opts=()
 			cmake_opts+=(--build "$build_dir")
-			cmake_opts+=(--target "$target")
+			if [ "$target" = "clean_all" ]; then
+				cmake_opts+=(--clean-first)
+			else
+				cmake_opts+=(--target "$target")
+			fi
 			cmake_opts+=(--)
 			cmake_opts+=("${build_opts[@]}")
 			echo "Running cmake ${cmake_opts[@]}"
