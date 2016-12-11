@@ -97,9 +97,12 @@ else
 
 		case "$build_tool" in
 		xcode)
+			echo "Running xcodebuild with -list"
 			(cd "$build_dir" && xcodebuild -list)
 			;;
 		esac
+		echo "Running cmake with --target help"
+		cmake --build "$build_dir" --target help
 
 		echo "########################################"
 		echo "build"
