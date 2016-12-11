@@ -95,6 +95,12 @@ else
 		(cd "$source_dir" && \
 		  cmake "${cmake_opts[@]}") || panic "cmake failed"
 
+		case "$build_tool" in
+		xcode)
+			xcodebuild -list
+			;;
+		esac
+
 		echo "########################################"
 		echo "build"
 		echo "########################################"
