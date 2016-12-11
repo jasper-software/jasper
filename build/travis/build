@@ -97,7 +97,7 @@ else
 
 		case "$build_tool" in
 		xcode)
-			xcodebuild -list
+			(cd "$build_dir" && xcodebuild -list)
 			;;
 		esac
 
