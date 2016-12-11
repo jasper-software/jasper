@@ -127,10 +127,12 @@ else
 				echo "Listing directory $build_dir/$dir"
 				(cd "$build_dir" && ls -alR "$dir")
 			done
+			for dir in "$install_dir"; do
+				echo "Listing directory $dir"
+				(cd "$dir" && ls -alR) || \
+				  panic "cannot list directory $dir"
+			done
 		done
-
-		(cd "$install_dir" && ls -alR) || \
-		  panic "cannot list directory $install_dir"
 
 		echo "########################################"
 		echo "external test"
