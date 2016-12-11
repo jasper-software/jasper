@@ -23,6 +23,7 @@ rem list targets
 rem pushd %build_dir_static% & msbuild /pp | find "<Target " & popd
 
 rem msbuild %build_dir_static%\INSTALL.vcxproj || exit /B 1
+cmake --build %build_dir_static% --clean-first || exit /B 1
 cmake --build %build_dir_static% --target install || exit /B 1
 
 dir %install_dir_static%\include\jasper || exit /B 1
@@ -40,6 +41,7 @@ cmake ^
   -DJAS_ENABLE_SHARED=true || exit /B 1
 
 rem msbuild %build_dir_shared%\INSTALL.vcxproj || exit /B 1
+cmake --build %build_dir_shared% --clean-first || exit /B 1
 cmake --build %build_dir_shared% --target install || exit /B 1
 
 dir %install_dir_shared%\include\jasper || exit /B 1
