@@ -20,7 +20,7 @@ cmake ^
   -DJAS_ENABLE_SHARED=false || exit /B 1
 
 rem list targets
-msbuild /pp | find "<Target "
+pushd %build_dir_static% & msbuild /pp | find "<Target " & popd
 
 rem msbuild %build_dir_static%\INSTALL.vcxproj || exit /B 1
 cmake --build %build_dir_static% --target install || exit /B 1
@@ -40,7 +40,7 @@ cmake ^
   -DJAS_ENABLE_SHARED=true || exit /B 1
 
 rem list targets
-msbuild /pp | find "<Target "
+rem msbuild /pp | find "<Target "
 
 rem msbuild %build_dir_shared%\INSTALL.vcxproj || exit /B 1
 cmake --build %build_dir_shared% --target install || exit /B 1
