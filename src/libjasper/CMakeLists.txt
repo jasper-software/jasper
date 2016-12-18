@@ -131,7 +131,7 @@ add_library(libjasper ${libjasper_type}
 	${libjasper_ras_sources}
 )
 
-target_include_directories(libjasper PUBLIC 
+target_include_directories(libjasper BEFORE PUBLIC
 	"${CMAKE_CURRENT_BINARY_DIR}/include"
 	"${CMAKE_CURRENT_SOURCE_DIR}/include"
 )
