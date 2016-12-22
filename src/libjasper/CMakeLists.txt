@@ -131,7 +131,13 @@ add_library(libjasper ${libjasper_type}
 	${libjasper_ras_sources}
 )
 
-target_include_directories(libjasper PUBLIC 
+# The JasPer include directories in the source and build tree must be included
+# before any other directories that may contain the include directory for an
+# already installed version of the JasPer library.
+# The PRIVATE specifier has been used here to force the library user to have
+# to explicitly specify the include directories from the source and build tree
+# so that the BEFORE specifier can also be employed by the library user.
+target_include_directories(libjasper BEFORE PRIVATE
 	"${CMAKE_CURRENT_BINARY_DIR}/include"
 	"${CMAKE_CURRENT_SOURCE_DIR}/include"
 )

@@ -32,6 +32,14 @@ else()
 	message("GLUT library not found; skipping build of jiv program")
 endif()
 
+# The JasPer include directories in the source and build tree must be included
+# before any other directories that may contain the include directory for an
+# already installed version of the JasPer library.
+include_directories(BEFORE
+	"${CMAKE_CURRENT_BINARY_DIR}/../libjasper/include"
+	"${CMAKE_CURRENT_SOURCE_DIR}/../libjasper/include"
+)
+
 # Install of the the programs that were built.
 install(TARGETS ${programs} DESTINATION "${CMAKE_INSTALL_BINDIR}")
 
