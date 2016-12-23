@@ -1,8 +1,10 @@
 Installation
+============
 
 The process required to install JasPer is described below.
 
 Installation on Systems Running Unix
+------------------------------------
 
 In what follows, let $SOURCE_DIR denote the top-level directory of the
 JasPer software source tree and let $INSTALL_DIR denote the target
@@ -43,7 +45,19 @@ assist in diagnosing a problem), instead use the command:
 
     make install
 
+Additional Remarks:
+
+When building the JasPer software under Mac OSX, only the use of the
+native framework for OpenGL is officially supported.  If the Freeglut
+library is installed on your system, you will need to ensure that the
+native GLUT library (as opposed to the Freeglut library) is used by the
+build process.  This can be accomplished by adding an extra option to
+the cmake command line that resembles the following:
+
+    -DGLUT_glut_LIBRARY=/System/Library/Frameworks/GLUT.framework
+
 Installation on Systems Running Microsoft Windows
+-------------------------------------------------
 
 In what follows, let %SOURCE_DIR% denote the top-level directory of the
 JasPer software source tree and let %INSTALL_DIR% denote the target
@@ -67,6 +81,7 @@ above denotes line continuation.)
     msbuild %build_dir%\INSTALL.vcxproj
 
 Cmake Options
+-------------
 
 The option OPTION can be set to the value VALUE with a command-line option
 of the form -DOPTION=VALUE
