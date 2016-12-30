@@ -15,8 +15,10 @@ do_make_test=0
 verbose=0
 enable_asan=0
 enable_usan=0
+sde_top_dir="$HOME/public/aurora_lab-gcc-6.2.0"
+#sde_top_dir=""
 
-while getopts AUditv opt; do
+while getopts E:AUditv opt; do
 	case $opt in
 	A)
 		enable_asan=1;;
@@ -30,6 +32,8 @@ while getopts AUditv opt; do
 		do_make_test=1;;
 	v)
 		verbose=1;;
+	E)
+		sde_top_dir="$OPTARG";;
 	\?)
 		usage
 		break;;
@@ -54,10 +58,9 @@ if [ -n "$CC" ]; then
 	echo "C compiler $CC"
 fi
 
-SDE_TOP_DIR="$HOME/public/aurora_lab-gcc-6.2.0"
-SDE_GCC="$SDE_TOP_DIR/bin/gcc"
-SDE_SETUP="$SDE_TOP_DIR/bin/sde_make_setup"
-eval $("$SDE_SETUP") || panic "setup failed"
+sde_gcc="$sde_top_dir/bin/gcc"
+sde_setup="$sde_top_dir/bin/sde_make_setup"
+eval $("$sde_setup") || panic "setup failed"
 
 if [ -e "$tmp_dir" ]; then
 	echo "Removing $tmp_dir"
@@ -67,7 +70,9 @@ fi
 opts=()
 opts+=(-B"$build_dir")
 opts+=(-H"$source_dir")
-opts+=("-DCMAKE_C_COMPILER=$SDE_GCC")
+if [ -n "$sde_top_dir" ]; then
+	opts+=("-DCMAKE_C_COMPILER=$sde_gcc")
+fi
 opts+=("-DCMAKE_INSTALL_PREFIX=$install_dir")
 opts+=("-DJAS_ENABLE_STRICT=true")
 if [ "$enable_debug" -ne 0 ]; then
