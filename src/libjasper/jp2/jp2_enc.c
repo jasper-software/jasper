@@ -112,6 +112,8 @@ int jp2_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 
 	box = 0;
 	tmpstream = 0;
+	iccstream = 0;
+	iccprof = 0;
 
 	allcmptssame = 1;
 	sgnd = jas_image_cmptsgnd(image, 0);
@@ -225,22 +227,36 @@ int jp2_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 		colr->method = JP2_COLR_ICC;
 		colr->pri = JP2_COLR_PRI;
 		colr->approx = 0;
-		iccprof = jas_iccprof_createfromcmprof(jas_image_cmprof(image));
-		assert(iccprof);
-		iccstream = jas_stream_memopen(0, 0);
-		assert(iccstream);
-		if (jas_iccprof_save(iccprof, iccstream))
-			abort();
-		if ((pos = jas_stream_tell(iccstream)) < 0)
-			abort();
+		/* Ensure that cmprof_ is not null. */
+		if (!jas_image_cmprof(image)) {
+			goto error;
+		}
+		if (!(iccprof = jas_iccprof_createfromcmprof(
+		  jas_image_cmprof(image)))) {
+			goto error;
+		}
+		if (!(iccstream = jas_stream_memopen(0, 0))) {
+			goto error;
+		}
+		if (jas_iccprof_save(iccprof, iccstream)) {
+			goto error;
+		}
+		if ((pos = jas_stream_tell(iccstream)) < 0) {
+			goto error;
+		}
 		colr->iccplen = pos;
-		colr->iccp = jas_malloc(pos);
-		assert(colr->iccp);
+		if (!(colr->iccp = jas_malloc(pos))) {
+			goto error;
+		}
 		jas_stream_rewind(iccstream);
-		if (jas_stream_read(iccstream, colr->iccp, colr->iccplen) != colr->iccplen)
-			abort();
+		if (jas_stream_read(iccstream, colr->iccp, colr->iccplen) !=
+		  colr->iccplen) {
+			goto error;
+		}
 		jas_stream_close(iccstream);
+		iccstream = 0;
 		jas_iccprof_destroy(iccprof);
+		iccprof = 0;
 		break;
 	}
 	if (jp2_box_put(box, tmpstream)) {
@@ -354,6 +370,12 @@ int jp2_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 
 error:
 
+	if (iccprof) {
+		jas_iccprof_destroy(iccprof);
+	}
+	if (iccstream) {
+		jas_stream_close(iccstream);
+	}
 	if (box) {
 		jp2_box_destroy(box);
 	}
