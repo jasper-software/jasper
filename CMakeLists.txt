@@ -23,9 +23,6 @@ set(JAS_VERSION
 
 message("Software version: ${JAS_VERSION}")
 
-# The RPM version information.
-set(JAS_RPM_RELEASE 1)
-
 # The shared library versioning information, which is specified by the
 # following variables: JAS_SO_VERSION, JAS_SO_MINOR, and JAS_SO_RELEASE.
 # Each new software release should update the values of these variables.
