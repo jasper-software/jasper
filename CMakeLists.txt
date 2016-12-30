@@ -21,6 +21,8 @@ set(JAS_VERSION_PATCH 9)
 set(JAS_VERSION
 	"${JAS_VERSION_MAJOR}.${JAS_VERSION_MINOR}.${JAS_VERSION_PATCH}")
 
+message("Software version: ${JAS_VERSION}")
+
 # The RPM version information.
 set(JAS_RPM_RELEASE 1)
 
@@ -43,10 +45,27 @@ set(JAS_RPM_RELEASE 1)
 # History of shared library versioning information:
 # JasPer 2.0.0: 4.0.0
 
+if (APPLE AND CMAKE_SYSTEM_NAME MATCHES "Darwin")
+	set(MACOSX true)
+else()
+	set(MACOSX false)
+endif()
+
+# To fix a problem with OSX, increase JAS_SO_VERSION to 6 (instead of 5)
+# when it is next increased.
 set(JAS_SO_VERSION 4)
 set(JAS_SO_MINOR 0)
 set(JAS_SO_RELEASE 0)
+# This is a temporary hack for OSX that should be removed when JAS_SO_VERSION
+# is next incremented.
+if (MACOSX)
+set(JAS_SO_NAME "5.${JAS_SO_MINOR}.${JAS_SO_RELEASE}")
+else()
 set(JAS_SO_NAME "${JAS_SO_VERSION}.${JAS_SO_MINOR}.${JAS_SO_RELEASE}")
+endif()
+
+message("Shared library ABI version: ${JAS_SO_VERSION}")
+message("Shared library build version: ${JAS_SO_NAME}")
 
 ################################################################################
 # Include modules and set policies.
@@ -99,9 +118,12 @@ else()
 	set(JAS_REQUIRED "REQUIRED")
 endif()
 
-if (APPLE AND CMAKE_SYSTEM_NAME MATCHES "Darwin")
-	set(MACOSX true)
-endif()
+# The following lines have been temporarily moved above:
+#if (APPLE AND CMAKE_SYSTEM_NAME MATCHES "Darwin")
+#	set(MACOSX true)
+#else()
+#	set(MACOSX false)
+#endif()
 
 if (UNIX)
 	if (MACOSX)
