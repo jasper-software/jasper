@@ -21,11 +21,19 @@ top_dir="$cmd_dir/../.."
 data_dir="$top_dir/data"
 
 imginfo="$abs_top_builddir/src/appl/imginfo"
+jasper="$abs_top_builddir/src/appl/jasper"
 
 ################################################################################
 
-good_list=($data_dir/test/good/*.*)
-bad_list=($data_dir/test/bad/*.*)
+# Decoder tests for valid data.
+good_list=("$data_dir"/test/good/*.*)
+
+# Decoder tests for invalid data.
+bad_list=("$data_dir"/test/bad/*.*)
+
+# Encoder tests that should fail.
+enc_list=()
+enc_list+=("$data_dir"/test/good/109-PoC.jp2)
 
 error_count=0
 
@@ -40,7 +48,7 @@ fi
 echo "JPEG Turbo Library version: $jpeg_turbo_lib_version"
 
 echo "############################################################"
-echo "Testing valid data sets"
+echo "PART 1: Decoder tests --- valid data sets"
 echo "############################################################"
 
 for in_file in "${good_list[@]}"; do
@@ -60,7 +68,7 @@ done
 echo "############################################################"
 
 echo "############################################################"
-echo "Testing invalid data sets"
+echo "PART 2: Decoder tests --- invalid data sets"
 echo "############################################################"
 
 for in_file in "${bad_list[@]}"; do
@@ -128,6 +136,31 @@ for in_file in "${bad_list[@]}"; do
 		error_count=$((error_count + 1))
 	fi
 done
+echo "############################################################"
+
+echo "############################################################"
+echo "PART 3: Encoder tests"
+echo "############################################################"
+
+for in_file in "${enc_list[@]}"; do
+	echo "############################################################"
+	echo "Input file: $in_file"
+	special_asan_options=()
+	special_asan_options+=(exitcode=10)
+	special_asan_options+=(allocator_may_return_null=true)
+	special_asan_options+=(detect_leaks=false)
+	expected_status=1
+	ASAN_OPTIONS="${special_asan_options[*]}" \
+	  "$jasper" -f "$in_file" -T jp2 -F - > /dev/null
+	status=$?
+	if [ "$status" -ne "$expected_status" ]; then
+		echo "ERROR: imginfo command had unexpected exit status " \
+		  "(expected $expected_status got $status)"
+		error_count=$((error_count + 1))
+	fi
+done
+echo "############################################################"
+
 echo "############################################################"
 
 echo "error count: $error_count"
