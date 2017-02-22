@@ -15,7 +15,7 @@ do_make_test=0
 verbose=0
 enable_asan=0
 enable_usan=0
-sde_top_dir="$HOME/public/aurora_lab-gcc-6.2.0"
+sde_top_dir="$HOME/public/sde"
 #sde_top_dir=""
 
 while getopts E:AUditv opt; do
