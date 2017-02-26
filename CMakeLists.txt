@@ -90,6 +90,7 @@ option(JAS_ENABLE_OPENGL "Enable the use of the OpenGL/GLUT Library" true)
 option(JAS_ENABLE_STRICT "Enable pedantic error checking" false)
 option(JAS_ENABLE_AUTOMATIC_DEPENDENCIES "Enable automatic dependencies" true)
 option(JAS_LOCAL "Enable local hacks for developers (do not enable)" false)
+option(JAS_ENABLE_DOC "Enable building of the documentation" true)
 
 ################################################################################
 #
@@ -368,7 +369,9 @@ endif()
 
 add_subdirectory(src/libjasper)
 add_subdirectory(src/appl)
-add_subdirectory(doc)
+if (JAS_ENABLE_DOC)
+	add_subdirectory(doc)
+endif ()
 
 # The package configuation (pc) file should be installed in
 # ${CMAKE_INSTALL_PREFIX}/lib/pkgconfig.
