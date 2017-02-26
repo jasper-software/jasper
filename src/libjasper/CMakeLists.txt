@@ -142,9 +142,7 @@ target_include_directories(libjasper BEFORE PRIVATE
 	"${CMAKE_CURRENT_SOURCE_DIR}/include"
 )
 
-if (UNIX)
-	set_target_properties(libjasper PROPERTIES OUTPUT_NAME jasper)
-endif()
+set_target_properties(libjasper PROPERTIES OUTPUT_NAME jasper)
 set_target_properties(libjasper PROPERTIES LINKER_LANGUAGE C)
 
 if (UNIX)
