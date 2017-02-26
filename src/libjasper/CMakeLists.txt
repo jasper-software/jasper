@@ -131,6 +131,9 @@ add_library(libjasper ${libjasper_type}
 	${libjasper_ras_sources}
 )
 
+# avoid duplicate "lib" prefix
+set_target_properties(libjasper PROPERTIES OUTPUT_NAME "jasper")
+
 # The JasPer include directories in the source and build tree must be included
 # before any other directories that may contain the include directory for an
 # already installed version of the JasPer library.
