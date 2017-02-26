@@ -160,5 +160,8 @@ endif()
 # Also, try adding MATH_LIBRARY to fix a Gentoo problem.
 target_link_libraries(libjasper ${JPEG_LIBRARIES} ${MATH_LIBRARY})
 
-install(TARGETS libjasper DESTINATION "${CMAKE_INSTALL_LIBDIR}")
+install(TARGETS libjasper
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
 install(FILES ${libjasper_headers} DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/jasper")
