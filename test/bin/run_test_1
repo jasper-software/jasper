@@ -25,6 +25,13 @@ jasper="$abs_top_builddir/src/appl/jasper"
 
 ################################################################################
 
+verbose=0
+if [ $# -ge 1 ]; then
+	verbose=1
+fi
+
+################################################################################
+
 # Decoder tests for valid data.
 good_list=("$data_dir"/test/good/*.*)
 
@@ -150,6 +157,9 @@ for in_file in "${enc_list[@]}"; do
 	special_asan_options+=(allocator_may_return_null=true)
 	special_asan_options+=(detect_leaks=false)
 	expected_status=1
+	if [ "$verbose" -ge 1 ]; then
+		echo "Running ASAN_OPTIONS=${special_asan_options[*]} $jasper -f $in_file -T jp2 -F - > /dev/null"
+	fi
 	ASAN_OPTIONS="${special_asan_options[*]}" \
 	  "$jasper" -f "$in_file" -T jp2 -F - > /dev/null
 	status=$?

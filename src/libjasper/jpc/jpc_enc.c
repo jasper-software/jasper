@@ -293,32 +293,37 @@ int jpc_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 	}
 
 	if (!(enc = jpc_enc_create(cp, out, image))) {
+		jas_eprintf("jpc_enc_create failed\n");
 		goto error;
 	}
 	cp = 0;
 
 	/* Encode the main header. */
 	if (jpc_enc_encodemainhdr(enc)) {
+		jas_eprintf("cannot encode main header\n");
 		goto error;
 	}
 
 	/* Encode the main body.  This constitutes most of the encoding work. */
 	if (jpc_enc_encodemainbody(enc)) {
+		jas_eprintf("cannot encode main body\n");
 		goto error;
 	}
 
 	/* Write EOC marker segment. */
 	if (!(enc->mrk = jpc_ms_create(JPC_MS_EOC))) {
+		jas_eprintf("cannot create EOC marker\n");
 		goto error;
 	}
 	if (jpc_putms(enc->out, enc->cstate, enc->mrk)) {
-		jas_eprintf("cannot write EOI marker\n");
+		jas_eprintf("cannot write EOC marker\n");
 		goto error;
 	}
 	jpc_ms_destroy(enc->mrk);
 	enc->mrk = 0;
 
 	if (jas_stream_flush(enc->out)) {
+		jas_eprintf("stream flush failed\n");
 		goto error;
 	}
 
@@ -333,6 +338,7 @@ error:
 	if (enc) {
 		jpc_enc_destroy(enc);
 	}
+	jas_eprintf("jpc_encode failed\n");
 	return -1;
 }
 
@@ -915,6 +921,7 @@ startoff = jas_stream_getrwcount(enc->out);
 
 	/* Write SOC marker segment. */
 	if (!(enc->mrk = jpc_ms_create(JPC_MS_SOC))) {
+		jas_eprintf("cannot create SOC marker\n");
 		return -1;
 	}
 	if (jpc_putms(enc->out, enc->cstate, enc->mrk)) {
@@ -926,6 +933,7 @@ startoff = jas_stream_getrwcount(enc->out);
 
 	/* Write SIZ marker segment. */
 	if (!(enc->mrk = jpc_ms_create(JPC_MS_SIZ))) {
+		jas_eprintf("cannot create SIZ marker\n");
 		return -1;
 	}
 	siz = &enc->mrk->parms.siz;
@@ -955,6 +963,7 @@ startoff = jas_stream_getrwcount(enc->out);
 	enc->mrk = 0;
 
 	if (!(enc->mrk = jpc_ms_create(JPC_MS_COM))) {
+		jas_eprintf("cannot create COM marker\n");
 		return -1;
 	}
 	sprintf(buf, "Creator: JasPer Version %s", jas_getversion());
@@ -1013,6 +1022,7 @@ startoff = jas_stream_getrwcount(enc->out);
 	}
 
 	if (!(enc->mrk = jpc_ms_create(JPC_MS_COD))) {
+		jas_eprintf("cannot create COD marker\n");
 		return -1;
 	}
 	cod = &enc->mrk->parms.cod;
@@ -1041,6 +1051,7 @@ startoff = jas_stream_getrwcount(enc->out);
 	enc->mrk = 0;
 
 	if (!(enc->mrk = jpc_ms_create(JPC_MS_QCD))) {
+		jas_eprintf("cannot create QCD marker\n");
 		return -1;
 	}
 	qcd = &enc->mrk->parms.qcd;
@@ -1050,6 +1061,7 @@ startoff = jas_stream_getrwcount(enc->out);
 	qcd->compparms.numguard = cp->tccp.numgbits;
 	qcd->compparms.stepsizes = cp->ccps[0].stepsizes;
 	if (jpc_putms(enc->out, enc->cstate, enc->mrk)) {
+		jas_eprintf("cannot write marker\n");
 		return -1;
 	}
 	/* We do not want the step size array to be freed! */
@@ -1060,6 +1072,7 @@ startoff = jas_stream_getrwcount(enc->out);
 	tccp = &cp->tccp;
 	for (cmptno = 1; cmptno < cp->numcmpts; ++cmptno) {
 		if (!(enc->mrk = jpc_ms_create(JPC_MS_QCC))) {
+			jas_eprintf("cannot create QCC marker\n");
 			return -1;
 		}
 		qcc = &enc->mrk->parms.qcc;
@@ -1070,6 +1083,7 @@ startoff = jas_stream_getrwcount(enc->out);
 		qcc->compparms.numguard = cp->tccp.numgbits;
 		qcc->compparms.stepsizes = cp->ccps[cmptno].stepsizes;
 		if (jpc_putms(enc->out, enc->cstate, enc->mrk)) {
+			jas_eprintf("cannot write marker\n");
 			return -1;
 		}
 		/* We do not want the step size array to be freed! */
@@ -1142,6 +1156,7 @@ static int jpc_enc_encodemainbody(jpc_enc_t *enc)
 
 		if (!(enc->curtile = jpc_enc_tile_create(enc->cp, enc->image,
 		  tileno))) {
+			jas_eprintf("cannot create tile\n");
 			return -1;
 		}
 
