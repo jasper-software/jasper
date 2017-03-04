@@ -664,6 +664,7 @@ int jas_stream_ungetc(jas_stream_t *stream, int c)
 	return 0;
 }
 
+/* FIXME integral type */
 int jas_stream_read(jas_stream_t *stream, void *buf, int cnt)
 {
 	int n;
@@ -690,6 +691,7 @@ int jas_stream_read(jas_stream_t *stream, void *buf, int cnt)
 	return n;
 }
 
+/* FIXME integral type */
 int jas_stream_write(jas_stream_t *stream, const void *buf, int cnt)
 {
 	int n;
@@ -742,6 +744,7 @@ int jas_stream_puts(jas_stream_t *stream, const char *s)
 	return 0;
 }
 
+/* FIXME integral type */
 char *jas_stream_gets(jas_stream_t *stream, char *buf, int bufsize)
 {
 	int c;
@@ -765,6 +768,7 @@ char *jas_stream_gets(jas_stream_t *stream, char *buf, int bufsize)
 	return buf;
 }
 
+/* FIXME integral type */
 int jas_stream_gobble(jas_stream_t *stream, int n)
 {
 	int m;
@@ -783,6 +787,7 @@ int jas_stream_gobble(jas_stream_t *stream, int n)
 	return n;
 }
 
+/* FIXME integral type */
 int jas_stream_pad(jas_stream_t *stream, int n, int c)
 {
 	int m;
@@ -885,6 +890,7 @@ long jas_stream_tell(jas_stream_t *stream)
 * Buffer initialization code.
 \******************************************************************************/
 
+/* FIXME integral type */
 static void jas_stream_initbuf(jas_stream_t *stream, int bufmode, char *buf,
   int bufsize)
 {
@@ -1060,6 +1066,7 @@ static int jas_strtoopenmode(const char *s)
 	return openmode;
 }
 
+/* FIXME integral type */
 int jas_stream_copy(jas_stream_t *out, jas_stream_t *in, int n)
 {
 	int all;
@@ -1085,6 +1092,7 @@ int jas_stream_copy(jas_stream_t *out, jas_stream_t *in, int n)
 	return 0;
 }
 
+/* FIXME integral type */
 long jas_stream_setrwcount(jas_stream_t *stream, long rwcnt)
 {
 	int old;
@@ -1094,6 +1102,7 @@ long jas_stream_setrwcount(jas_stream_t *stream, long rwcnt)
 	return old;
 }
 
+/* FIXME integral type */
 int jas_stream_display(jas_stream_t *stream, FILE *fp, int n)
 {
 	unsigned char buf[16];
@@ -1168,6 +1177,7 @@ long jas_stream_length(jas_stream_t *stream)
 * Memory stream object.
 \******************************************************************************/
 
+/* FIXME integral type */
 static int mem_read(jas_stream_obj_t *obj, char *buf, int cnt)
 {
 	ssize_t n;
@@ -1209,6 +1219,7 @@ static int mem_resize(jas_stream_memobj_t *m, size_t bufsize)
 	return 0;
 }
 
+/* FIXME integral type */
 static int mem_write(jas_stream_obj_t *obj, char *buf, int cnt)
 {
 	size_t n;
@@ -1264,6 +1275,7 @@ static int mem_write(jas_stream_obj_t *obj, char *buf, int cnt)
 	return ret;
 }
 
+/* FIXME integral type */
 static long mem_seek(jas_stream_obj_t *obj, long offset, int origin)
 {
 	jas_stream_memobj_t *m = (jas_stream_memobj_t *)obj;
@@ -1310,6 +1322,7 @@ static int mem_close(jas_stream_obj_t *obj)
 * File stream object.
 \******************************************************************************/
 
+/* FIXME integral type */
 static int file_read(jas_stream_obj_t *obj, char *buf, int cnt)
 {
 	jas_stream_fileobj_t *fileobj;
@@ -1318,6 +1331,7 @@ static int file_read(jas_stream_obj_t *obj, char *buf, int cnt)
 	return read(fileobj->fd, buf, cnt);
 }
 
+/* FIXME integral type */
 static int file_write(jas_stream_obj_t *obj, char *buf, int cnt)
 {
 	jas_stream_fileobj_t *fileobj;
@@ -1326,6 +1340,7 @@ static int file_write(jas_stream_obj_t *obj, char *buf, int cnt)
 	return write(fileobj->fd, buf, cnt);
 }
 
+/* FIXME integral type */
 static long file_seek(jas_stream_obj_t *obj, long offset, int origin)
 {
 	jas_stream_fileobj_t *fileobj;
@@ -1352,6 +1367,7 @@ static int file_close(jas_stream_obj_t *obj)
 * Stdio file stream object.
 \******************************************************************************/
 
+/* FIXME integral type */
 static int sfile_read(jas_stream_obj_t *obj, char *buf, int cnt)
 {
 	FILE *fp;
@@ -1367,6 +1383,7 @@ static int sfile_read(jas_stream_obj_t *obj, char *buf, int cnt)
 	return result;
 }
 
+/* FIXME integral type */
 static int sfile_write(jas_stream_obj_t *obj, char *buf, int cnt)
 {
 	FILE *fp;
@@ -1377,6 +1394,7 @@ static int sfile_write(jas_stream_obj_t *obj, char *buf, int cnt)
 	return (n != JAS_CAST(size_t, cnt)) ? (-1) : cnt;
 }
 
+/* FIXME integral type */
 static long sfile_seek(jas_stream_obj_t *obj, long offset, int origin)
 {
 	FILE *fp;
