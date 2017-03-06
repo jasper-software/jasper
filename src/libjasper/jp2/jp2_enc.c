@@ -115,6 +115,11 @@ int jp2_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 	iccstream = 0;
 	iccprof = 0;
 
+	if (jas_image_numcmpts(image) < 1) {
+		jas_eprintf("image must have at least one component\n");
+		goto error;
+	}
+
 	allcmptssame = 1;
 	sgnd = jas_image_cmptsgnd(image, 0);
 	prec = jas_image_cmptprec(image, 0);

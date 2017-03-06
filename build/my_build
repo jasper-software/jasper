@@ -58,7 +58,7 @@ if [ -n "$CC" ]; then
 	echo "C compiler $CC"
 fi
 
-sde_gcc="$sde_top_dir/bin/gcc"
+#sde_gcc="$sde_top_dir/bin/gcc"
 sde_setup="$sde_top_dir/bin/sde_make_setup"
 eval $("$sde_setup") || panic "setup failed"
 
@@ -70,9 +70,9 @@ fi
 opts=()
 opts+=(-B"$build_dir")
 opts+=(-H"$source_dir")
-if [ -n "$sde_top_dir" ]; then
-	opts+=("-DCMAKE_C_COMPILER=$sde_gcc")
-fi
+#if [ -n "$sde_top_dir" ]; then
+#	opts+=("-DCMAKE_C_COMPILER=$sde_gcc")
+#fi
 opts+=("-DCMAKE_INSTALL_PREFIX=$install_dir")
 opts+=("-DJAS_ENABLE_STRICT=true")
 if [ "$enable_debug" -ne 0 ]; then
