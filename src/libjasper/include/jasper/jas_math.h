@@ -192,6 +192,7 @@ inline static bool jas_safe_size_mul(size_t x, size_t y, size_t *result)
 	return true;
 }
 
+/* Compute the product of three size_t integers with overflow checking. */
 inline static bool jas_safe_size_mul3(size_t a, size_t b, size_t c,
   size_t *result)
 {
@@ -206,7 +207,7 @@ inline static bool jas_safe_size_mul3(size_t a, size_t b, size_t c,
 	return true;
 }
 
-/* Compute the sum of two size_t integer with overflow checking. */
+/* Compute the sum of two size_t integers with overflow checking. */
 inline static bool jas_safe_size_add(size_t x, size_t y, size_t *result)
 {
 	if (y > SIZE_MAX - x) {
@@ -218,7 +219,7 @@ inline static bool jas_safe_size_add(size_t x, size_t y, size_t *result)
 	return true;
 }
 
-/* Compute the difference of two size_t integer with overflow checking. */
+/* Compute the difference of two size_t integers with overflow checking. */
 inline static bool jas_safe_size_sub(size_t x, size_t y, size_t *result)
 {
 	if (y > x) {
@@ -230,7 +231,7 @@ inline static bool jas_safe_size_sub(size_t x, size_t y, size_t *result)
 	return true;
 }
 
-/* Compute the sum of two size_t integer with overflow checking. */
+/* Compute the product of two int_fast32_t integers with overflow checking. */
 inline static bool jas_safe_intfast32_mul(int_fast32_t x, int_fast32_t y,
   int_fast32_t *result)
 {
@@ -267,6 +268,7 @@ inline static bool jas_safe_intfast32_mul(int_fast32_t x, int_fast32_t y,
 	return true;
 }
 
+/* Compute the product of three int_fast32_t integers with overflow checking. */
 inline static bool jas_safe_intfast32_mul3(int_fast32_t a, int_fast32_t b,
   int_fast32_t c, int_fast32_t *result)
 {
@@ -281,7 +283,7 @@ inline static bool jas_safe_intfast32_mul3(int_fast32_t a, int_fast32_t b,
 	return true;
 }
 
-/* Compute the sum of two size_t integer with overflow checking. */
+/* Compute the sum of two int_fast32_t integers with overflow checking. */
 inline static bool jas_safe_intfast32_add(int_fast32_t x, int_fast32_t y,
   int_fast32_t *result)
 {
