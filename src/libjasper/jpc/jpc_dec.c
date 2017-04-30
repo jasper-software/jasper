@@ -72,7 +72,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
-#include <inttypes.h>
 
 #include "jasper/jas_types.h"
 #include "jasper/jas_math.h"

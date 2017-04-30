@@ -73,7 +73,6 @@
 
 #include <assert.h>
 #include <stdlib.h>
-#include <inttypes.h>
 
 #include "jasper/jas_stream.h"
 #include "jasper/jas_malloc.h"

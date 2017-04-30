@@ -74,7 +74,6 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <ctype.h>
-#include <inttypes.h>
 
 #include "jasper/jas_malloc.h"
 #include "jasper/jas_debug.h"

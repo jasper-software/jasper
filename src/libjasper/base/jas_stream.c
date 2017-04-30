@@ -1181,11 +1181,12 @@ long jas_stream_length(jas_stream_t *stream)
 static int mem_read(jas_stream_obj_t *obj, char *buf, int cnt)
 {
 	ssize_t n;
+	jas_stream_memobj_t *m;
 	assert(cnt >= 0);
 	assert(buf);
 
 	JAS_DBGLOG(100, ("mem_read(%p, %p, %d)\n", obj, buf, cnt));
-	jas_stream_memobj_t *m = (jas_stream_memobj_t *)obj;
+	m = (jas_stream_memobj_t *)obj;
 	n = m->len_ - m->pos_;
 	cnt = JAS_MIN(n, cnt);
 	memcpy(buf, &m->buf_[m->pos_], cnt);
@@ -1306,8 +1307,10 @@ static long mem_seek(jas_stream_obj_t *obj, long offset, int origin)
 
 static int mem_close(jas_stream_obj_t *obj)
 {
+	jas_stream_memobj_t *m;
+
 	JAS_DBGLOG(100, ("mem_close(%p)\n", obj));
-	jas_stream_memobj_t *m = (jas_stream_memobj_t *)obj;
+	m = (jas_stream_memobj_t *)obj;
 	JAS_DBGLOG(100, ("mem_close myalloc=%d\n", m->myalloc_));
 	if (m->myalloc_ && m->buf_) {
 		JAS_DBGLOG(100, ("mem_close freeing buffer %p\n", m->buf_));
@@ -1351,10 +1354,10 @@ static long file_seek(jas_stream_obj_t *obj, long offset, int origin)
 
 static int file_close(jas_stream_obj_t *obj)
 {
+	int ret;
 	jas_stream_fileobj_t *fileobj;
 	JAS_DBGLOG(100, ("file_close(%p)\n", obj));
 	fileobj = JAS_CAST(jas_stream_fileobj_t *, obj);
-	int ret;
 	ret = close(fileobj->fd);
 	if (fileobj->flags & JAS_STREAM_FILEOBJ_DELONCLOSE) {
 		unlink(fileobj->pathname);
