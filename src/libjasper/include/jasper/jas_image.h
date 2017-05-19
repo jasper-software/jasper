@@ -310,7 +310,7 @@ JAS_DLLEXPORT jas_image_t *jas_image_create(int numcmpts,
   jas_image_cmptparm_t *cmptparms, jas_clrspc_t clrspc);
 
 /* Create an "empty" image. */
-jas_image_t *jas_image_create0(void);
+JAS_DLLEXPORT jas_image_t *jas_image_create0(void);
 
 /* Clone an image. */
 JAS_DLLEXPORT jas_image_t *jas_image_copy(jas_image_t *image);

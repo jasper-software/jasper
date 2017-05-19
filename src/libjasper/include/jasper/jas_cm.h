@@ -256,7 +256,7 @@ JAS_DLLEXPORT jas_cmprof_t *jas_cmprof_createfromclrspc(int clrspc);
 JAS_DLLEXPORT void jas_cmprof_destroy(jas_cmprof_t *prof);
 
 int jas_clrspc_numchans(int clrspc);
-jas_iccprof_t *jas_iccprof_createfromcmprof(jas_cmprof_t *prof);
+JAS_DLLEXPORT jas_iccprof_t *jas_iccprof_createfromcmprof(jas_cmprof_t *prof);
 
 #define	jas_cmprof_clrspc(prof) ((prof)->clrspc)
 JAS_DLLEXPORT jas_cmprof_t *jas_cmprof_copy(jas_cmprof_t *prof);
