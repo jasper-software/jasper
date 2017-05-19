@@ -76,8 +76,6 @@
 #include <string.h>
 #include <assert.h>
 #include <ctype.h>
-#include <inttypes.h>
-#include <stdbool.h>
 #include <limits.h>
 
 #include "jasper/jas_math.h"

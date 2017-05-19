@@ -81,7 +81,6 @@
 #include <jasper/jas_seq.h>
 #include <jasper/jas_cm.h>
 #include <stdio.h>
-#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
