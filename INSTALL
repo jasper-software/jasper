@@ -89,47 +89,50 @@ The following options are supported:
 
 CMAKE_INSTALL_PREFIX
     Specify the installation directory.
-	Value: A directory name.
+    Value: A directory name.
 
 CMAKE_BUILD_TYPE
     Specify the build type (i.e., release or debug).
     Valid values: Debug or Release
+
+JAS_ENABLE_DOC
+    Enable the building of the documentation (which requires LaTeX).
+    Valid values: true and false
 
 JAS_ENABLE_LIBJPEG
     Enable the use of the JPEG library
     Valid values: true and false
 
 JAS_ENABLE_OPENGL
-	Enable the use of the OpenGL and GLUT libraries.
-	Valid values: true and false
+    Enable the use of the OpenGL and GLUT libraries.
+    Valid values: true and false
 
 JAS_ENABLE_STRICT
-	Enable pedantic errors for building the code.
-	Valid values: true or false
+    Enable pedantic errors for building the code.
+    Valid values: true or false
 
 JAS_ENABLE_SHARED
-	Enable the building of shared libraries.
-	Valid values: true or false
+    Enable the building of shared libraries.
+    Valid values: true or false
 
 JAS_ENABLE_ASAN
-	Enable the Address Sanitizer.
-	Valid values: true or false
+    Enable the Address Sanitizer.
+    Valid values: true or false
 
 JAS_ENABLE_USAN
-	Enable the Undefined-Behavior Sanitizer.
-	Valid values: true or false
+    Enable the Undefined-Behavior Sanitizer.
+    Valid values: true or false
 
 JAS_ENABLE_LSAN
-	Enable the Leak Sanitizer.
-	Valid values: true or false
+    Enable the Leak Sanitizer.
+    Valid values: true or false
 
 JAS_ENABLE_MSAN
-	Enable the Memory Sanitizer.
-	Valid values: true or false
+    Enable the Memory Sanitizer.
+    Valid values: true or false
 
 JAS_MEMORY_LIMIT
-	DO NOT RELY ON THIS OPTION, AS IT IS LIKELY TO BE REMOVED IN THE FUTURE.
-	Set the maximum amount of memory that can be allocated with jas_malloc
-	and friends.
-	Value: a value of unsigned integral type (e.g., 10000000 or SIZE_MAX).
-
+    DO NOT RELY ON THIS OPTION, AS IT IS LIKELY TO BE REMOVED IN THE FUTURE.
+    Set the maximum amount of memory that can be allocated with jas_malloc
+    and friends.
+    Value: a value of unsigned integral type (e.g., 10000000 or SIZE_MAX).
