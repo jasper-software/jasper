@@ -77,6 +77,7 @@
 #include "jasper/jas_stream.h"
 #include "jasper/jas_cm.h"
 #include "jasper/jas_icc.h"
+#include "jasper/jas_debug.h"
 #include "jp2_cod.h"
 
 static uint_fast32_t jp2_gettypeasoc(int colorspace, int ctype);
