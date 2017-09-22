@@ -71,6 +71,7 @@
 #include "jasper/jas_image.h"
 #include "jasper/jas_string.h"
 #include "jasper/jas_debug.h"
+#include "jasper/jas_math.h"
 
 #include "jpg_jpeglib.h"
 #include "jpg_cod.h"

@@ -77,6 +77,7 @@
 #include "jasper/jas_stream.h"
 #include "jasper/jas_image.h"
 #include "jasper/jas_malloc.h"
+#include "jasper/jas_math.h"
 #include "jasper/jas_debug.h"
 #include "jasper/jas_tvp.h"
 

@@ -78,6 +78,7 @@
 #include "jasper/jas_image.h"
 #include "jasper/jas_debug.h"
 #include "jasper/jas_tvp.h"
+#include "jasper/jas_math.h"
 
 #include "ras_cod.h"
 
