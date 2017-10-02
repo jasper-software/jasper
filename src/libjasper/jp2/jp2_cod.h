@@ -237,8 +237,8 @@ typedef struct {
 struct jp2_boxops_s;
 typedef struct {
 
-	struct jp2_boxops_s *ops;
-	struct jp2_boxinfo_s *info;
+	const struct jp2_boxops_s *ops;
+	const struct jp2_boxinfo_s *info;
 
 	uint_fast32_t type;
 
@@ -275,7 +275,7 @@ typedef struct jp2_boxops_s {
 
 typedef struct jp2_boxinfo_s {
 	int type;
-	char *name;
+	const char *name;
 	int flags;
 	jp2_boxops_t ops;
 } jp2_boxinfo_t;
@@ -298,7 +298,7 @@ int jp2_box_put(jp2_box_t *box, jas_stream_t *out);
 #define ICC_CS_YCBCR	0x59436272
 #define ICC_CS_GRAY	0x47524159
 
-jp2_cdefchan_t *jp2_cdef_lookup(jp2_cdef_t *cdef, int channo);
+const jp2_cdefchan_t *jp2_cdef_lookup(jp2_cdef_t *cdef, int channo);
 
 
 #endif

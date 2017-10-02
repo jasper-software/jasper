@@ -87,7 +87,7 @@
 /* Marker segment table entry. */
 typedef struct {
 	int id;
-	char *name;
+	const char *name;
 	jpc_msops_t ops;
 } jpc_mstabent_t;
 
@@ -95,7 +95,7 @@ typedef struct {
 * Local prototypes.
 \******************************************************************************/
 
-static jpc_mstabent_t *jpc_mstab_lookup(int id);
+static const jpc_mstabent_t *jpc_mstab_lookup(int id);
 
 static int jpc_poc_dumpparms(jpc_ms_t *ms, FILE *out);
 static int jpc_poc_putparms(jpc_ms_t *ms, jpc_cstate_t *cstate, jas_stream_t *out);
@@ -170,7 +170,7 @@ static int jpc_cox_putcompparms(jpc_ms_t *ms, jpc_cstate_t *cstate,
 * Global data.
 \******************************************************************************/
 
-static jpc_mstabent_t jpc_mstab[] = {
+static const jpc_mstabent_t jpc_mstab[] = {
 	{JPC_MS_SOC, "SOC", {0, 0, 0, 0}},
 	{JPC_MS_SOT, "SOT", {0, jpc_sot_getparms, jpc_sot_putparms,
 	  jpc_sot_dumpparms}},
@@ -232,7 +232,7 @@ void jpc_cstate_destroy(jpc_cstate_t *cstate)
 jpc_ms_t *jpc_getms(jas_stream_t *in, jpc_cstate_t *cstate)
 {
 	jpc_ms_t *ms;
-	jpc_mstabent_t *mstabent;
+	const jpc_mstabent_t *mstabent;
 	jas_stream_t *tmpstream;
 
 	if (!(ms = jpc_ms_create(0))) {
@@ -378,7 +378,7 @@ int jpc_putms(jas_stream_t *out, jpc_cstate_t *cstate, jpc_ms_t *ms)
 jpc_ms_t *jpc_ms_create(int type)
 {
 	jpc_ms_t *ms;
-	jpc_mstabent_t *mstabent;
+	const jpc_mstabent_t *mstabent;
 
 	if (!(ms = jas_malloc(sizeof(jpc_ms_t)))) {
 		return 0;
@@ -403,7 +403,7 @@ void jpc_ms_destroy(jpc_ms_t *ms)
 /* Dump a marker segment to a stream for debugging. */
 void jpc_ms_dump(jpc_ms_t *ms, FILE *out)
 {
-	jpc_mstabent_t *mstabent;
+	const jpc_mstabent_t *mstabent;
 	mstabent = jpc_mstab_lookup(ms->id);
 	fprintf(out, "type = 0x%04"PRIxFAST16" (%s);", ms->id, mstabent->name);
 	if (JPC_MS_HASPARMS(ms->id)) {
@@ -1684,9 +1684,9 @@ int jpc_putuint32(jas_stream_t *out, uint_fast32_t val)
 * Miscellany
 \******************************************************************************/
 
-static jpc_mstabent_t *jpc_mstab_lookup(int id)
+static const jpc_mstabent_t *jpc_mstab_lookup(int id)
 {
-	jpc_mstabent_t *mstabent;
+	const jpc_mstabent_t *mstabent;
 	for (mstabent = jpc_mstab;; ++mstabent) {
 		if (mstabent->id == id || mstabent->id < 0) {
 			return mstabent;

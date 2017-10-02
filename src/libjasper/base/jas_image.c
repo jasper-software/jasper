@@ -623,7 +623,7 @@ void jas_image_clearfmts()
 	jas_image_numfmts = 0;
 }
 
-int jas_image_addfmt(int id, char *name, char *ext, char *desc,
+int jas_image_addfmt(int id, const char *name, const char *ext, const char *desc,
   jas_image_fmtops_t *ops)
 {
 	jas_image_fmtinfo_t *fmtinfo;

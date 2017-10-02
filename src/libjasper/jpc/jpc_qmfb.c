@@ -141,7 +141,7 @@ void jpc_qmfb_join_colgrp(jpc_fix_t *a, int numrows, int stride, int parity);
 void jpc_qmfb_join_colres(jpc_fix_t *a, int numrows, int numcols, int stride,
   int parity);
 
-double jpc_ft_lpenergywts[32] = {
+static const double jpc_ft_lpenergywts[32] = {
 	1.2247448713915889,
 	1.6583123951776999,
 	2.3184046238739260,
@@ -177,7 +177,7 @@ double jpc_ft_lpenergywts[32] = {
 	836.0924988714708661
 };
 
-double jpc_ft_hpenergywts[32] = {
+static const double jpc_ft_hpenergywts[32] = {
 	0.8477912478906585,
 	0.9601432184835760,
 	1.2593401049756179,
@@ -213,7 +213,7 @@ double jpc_ft_hpenergywts[32] = {
 	443.4050067351659550
 };
 
-double jpc_ns_lpenergywts[32] = {
+static const double jpc_ns_lpenergywts[32] = {
 	1.4021081679297411,
 	2.0303718560817923,
 	2.9011625562785555,
@@ -249,7 +249,7 @@ double jpc_ns_lpenergywts[32] = {
 	1054.6323278917823245
 };
 
-double jpc_ns_hpenergywts[32] = {
+static const double jpc_ns_hpenergywts[32] = {
 	1.4425227650161456,
 	1.9669426082455688,
 	2.8839248082788891,
@@ -284,14 +284,14 @@ double jpc_ns_hpenergywts[32] = {
 	1068.9114718353569060
 };
 
-jpc_qmfb2d_t jpc_ft_qmfb2d = {
+const jpc_qmfb2d_t jpc_ft_qmfb2d = {
 	jpc_ft_analyze,
 	jpc_ft_synthesize,
 	jpc_ft_lpenergywts,
 	jpc_ft_hpenergywts
 };
 
-jpc_qmfb2d_t jpc_ns_qmfb2d = {
+const jpc_qmfb2d_t jpc_ns_qmfb2d = {
 	jpc_ns_analyze,
 	jpc_ns_synthesize,
 	jpc_ns_lpenergywts,

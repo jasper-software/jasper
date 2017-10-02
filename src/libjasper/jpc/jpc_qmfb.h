@@ -104,11 +104,11 @@ any particular platform.  Hopefully, it is not too unreasonable, however. */
 typedef struct {
 	int (*analyze)(jpc_fix_t *, int, int, int, int, int);
 	int (*synthesize)(jpc_fix_t *, int, int, int, int, int);
-	double *lpenergywts;
-	double *hpenergywts;
+	const double *lpenergywts;
+	const double *hpenergywts;
 } jpc_qmfb2d_t;
 
-extern jpc_qmfb2d_t jpc_ft_qmfb2d;
-extern jpc_qmfb2d_t jpc_ns_qmfb2d;
+extern const jpc_qmfb2d_t jpc_ft_qmfb2d;
+extern const jpc_qmfb2d_t jpc_ns_qmfb2d;
 
 #endif

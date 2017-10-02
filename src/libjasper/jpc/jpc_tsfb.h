@@ -111,7 +111,7 @@ typedef struct {
 
 typedef struct {
 	int numlvls;
-	jpc_qmfb2d_t *qmfb;
+	const jpc_qmfb2d_t *qmfb;
 } jpc_tsfb_t;
 
 /******************************************************************************\

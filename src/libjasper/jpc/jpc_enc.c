@@ -137,7 +137,7 @@ static void prc_destroy(jpc_enc_prc_t *prcs);
 static jpc_enc_cblk_t *cblk_create(jpc_enc_cblk_t *cblk, jpc_enc_cp_t *cp,
   jpc_enc_prc_t *prc);
 static void cblk_destroy(jpc_enc_cblk_t *cblks);
-int ratestrtosize(char *s, uint_fast32_t rawsize, uint_fast32_t *size);
+int ratestrtosize(const char *s, uint_fast32_t rawsize, uint_fast32_t *size);
 static void pass_destroy(jpc_enc_pass_t *pass);
 void jpc_enc_dump(jpc_enc_t *enc);
 
@@ -785,7 +785,7 @@ void jpc_enc_cp_destroy(jpc_enc_cp_t *cp)
 	jas_free(cp);
 }
 
-int ratestrtosize(char *s, uint_fast32_t rawsize, uint_fast32_t *size)
+int ratestrtosize(const char *s, uint_fast32_t rawsize, uint_fast32_t *size)
 {
 	jpc_flt_t f;
 
