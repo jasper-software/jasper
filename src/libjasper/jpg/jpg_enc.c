@@ -367,7 +367,7 @@ static J_COLOR_SPACE tojpgcs(int colorspace)
 static int jpg_parseencopts(const char *optstr, jpg_encopts_t *encopts)
 {
 	jas_tvparser_t *tvp;
-	char *qual_str;
+	const char *qual_str;
 	int ret;
 
 	tvp = 0;

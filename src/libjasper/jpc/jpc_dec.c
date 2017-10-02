@@ -201,13 +201,13 @@ static int jpc_dec_process_crg(jpc_dec_t *dec, jpc_ms_t *ms);
 static jpc_dec_importopts_t *jpc_dec_opts_create(const char *optstr);
 static void jpc_dec_opts_destroy(jpc_dec_importopts_t *opts);
 
-static jpc_dec_mstabent_t *jpc_dec_mstab_lookup(uint_fast16_t id);
+static const jpc_dec_mstabent_t *jpc_dec_mstab_lookup(uint_fast16_t id);
 
 /******************************************************************************\
 * Global data.
 \******************************************************************************/
 
-jpc_dec_mstabent_t jpc_dec_mstab[] = {
+static const jpc_dec_mstabent_t jpc_dec_mstab[] = {
 	{JPC_MS_SOC, JPC_MHSOC, jpc_dec_process_soc},
 	{JPC_MS_SOT, JPC_MH | JPC_TPHSOT, jpc_dec_process_sot},
 	{JPC_MS_SOD, JPC_TPH, jpc_dec_process_sod},
@@ -374,9 +374,9 @@ static void jpc_dec_opts_destroy(jpc_dec_importopts_t *opts)
 * Code for table-driven code stream decoder.
 \******************************************************************************/
 
-static jpc_dec_mstabent_t *jpc_dec_mstab_lookup(uint_fast16_t id)
+static const jpc_dec_mstabent_t *jpc_dec_mstab_lookup(uint_fast16_t id)
 {
-	jpc_dec_mstabent_t *mstabent;
+	const jpc_dec_mstabent_t *mstabent;
 	for (mstabent = jpc_dec_mstab; mstabent->id != 0; ++mstabent) {
 		if (mstabent->id == id) {
 			break;
@@ -388,7 +388,7 @@ static jpc_dec_mstabent_t *jpc_dec_mstab_lookup(uint_fast16_t id)
 static int jpc_dec_decode(jpc_dec_t *dec)
 {
 	jpc_ms_t *ms;
-	jpc_dec_mstabent_t *mstabent;
+	const jpc_dec_mstabent_t *mstabent;
 	int ret;
 	jpc_cstate_t *cstate;
 

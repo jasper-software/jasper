@@ -469,7 +469,7 @@ JAS_DLLEXPORT int jas_image_getcmptbytype(jas_image_t *image, int ctype);
 JAS_DLLEXPORT void jas_image_clearfmts(void);
 
 /* Add entry to table of image formats. */
-JAS_DLLEXPORT int jas_image_addfmt(int id, char *name, char *ext, char *desc,
+JAS_DLLEXPORT int jas_image_addfmt(int id, const char *name, const char *ext, const char *desc,
   jas_image_fmtops_t *ops);
 
 /* Get the ID for the image format with the specified name. */
