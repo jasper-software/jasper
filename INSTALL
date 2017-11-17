@@ -7,7 +7,8 @@ Installation on Systems Running Unix
 ------------------------------------
 
 In what follows, let $SOURCE_DIR denote the top-level directory of the
-JasPer software source tree and let $INSTALL_DIR denote the target
+JasPer software source tree (i.e., the directory containing the files
+named LICENSE and INSTALL) and let $INSTALL_DIR denote the target
 directory for installation.
 
 1) Select an empty directory to use for building the software.
@@ -60,7 +61,8 @@ Installation on Systems Running Microsoft Windows
 -------------------------------------------------
 
 In what follows, let %SOURCE_DIR% denote the top-level directory of the
-JasPer software source tree and let %INSTALL_DIR% denote the target
+JasPer software source tree (i.e., the directory containing the files
+named LICENSE and INSTALL) and let %INSTALL_DIR% denote the target
 directory for installation.
 
 1) Select an empty directory to use for building the software.
