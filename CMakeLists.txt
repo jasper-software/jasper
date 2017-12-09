@@ -1,6 +1,10 @@
 cmake_minimum_required (VERSION 2.8.11)
 
-project(JasPer LANGUAGES C)
+if (CMAKE_MAJOR_VERSION LESS 3)
+    project(JasPer C)
+else()
+    project(JasPer LANGUAGES C)
+endif()
 
 set(CMAKE_MODULE_PATH
   ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/build/cmake/modules/")
