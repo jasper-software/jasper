@@ -145,6 +145,12 @@ target_include_directories(libjasper BEFORE PRIVATE
 set_target_properties(libjasper PROPERTIES OUTPUT_NAME jasper)
 set_target_properties(libjasper PROPERTIES LINKER_LANGUAGE C)
 
+if (MSVC)
+	target_compile_definitions(libjasper PRIVATE "-D_CRT_SECURE_NO_WARNINGS")
+	target_compile_definitions(libjasper PRIVATE "-D_CRT_SECURE_NO_DEPRECATE")
+	target_compile_definitions(libjasper PRIVATE "-D_CRT_NONSTDC_NO_DEPRECATE")
+endif()
+
 if (UNIX)
 	set_target_properties(libjasper PROPERTIES
 	  VERSION ${JAS_SO_NAME} SOVERSION ${JAS_SO_VERSION})
