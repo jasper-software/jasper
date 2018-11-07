@@ -92,6 +92,7 @@ option(JAS_ENABLE_AUTOMATIC_DEPENDENCIES "Enable automatic dependencies" true)
 option(JAS_LOCAL "Enable local hacks for developers (do not enable)" false)
 option(JAS_ENABLE_DOC "Enable building of the documentation" true)
 option(JAS_ENABLE_PROGRAMS "Enable building of the programs" true)
+option(JAS_ENABLE_LIBTOOL "Enable generating libjasper.la" false)
 
 ################################################################################
 #

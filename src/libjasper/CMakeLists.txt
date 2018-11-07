@@ -131,6 +131,19 @@ add_library(libjasper ${libjasper_type}
 	${libjasper_ras_sources}
 )
 
+include(LibtoolFile)
+if (JAS_ENABLE_LIBTOOL)
+	if (JAS_ENABLE_SHARED)
+		set_target_properties(libjasper PROPERTIES LT_SHARED true)
+	else()
+		set_target_properties(libjasper PROPERTIES LT_SHARED false)
+	endif()
+	set_target_properties(libjasper PROPERTIES LT_VERSION_CURRENT ${JAS_SO_VERSION})
+	set_target_properties(libjasper PROPERTIES LT_VERSION_AGE ${JAS_SO_MINOR})
+	set_target_properties(libjasper PROPERTIES LT_VERSION_REVISION ${JAS_SO_RELEASE})
+	create_libtool_file(libjasper)
+endif()
+
 # The JasPer include directories in the source and build tree must be included
 # before any other directories that may contain the include directory for an
 # already installed version of the JasPer library.
