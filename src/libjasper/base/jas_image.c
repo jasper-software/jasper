@@ -491,6 +491,10 @@ int jas_image_readcmpt(jas_image_t *image, int cmptno, jas_image_coord_t x,
 	  image, cmptno, JAS_CAST(long, x), JAS_CAST(long, y),
 	  JAS_CAST(long, width), JAS_CAST(long, height), data));
 
+	if(data == NULL) {
+		return -1;
+	}
+
 	if (cmptno < 0 || cmptno >= image->numcmpts_) {
 		return -1;
 	}
