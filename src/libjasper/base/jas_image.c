@@ -979,6 +979,10 @@ int jas_image_depalettize(jas_image_t *image, int cmptno, int numlutents,
 	cmptparms.prec = JAS_IMAGE_CDT_GETPREC(dtype);
 	cmptparms.sgnd = JAS_IMAGE_CDT_GETSGND(dtype);
 
+	if (numlutents < 1) {
+		return -1;
+	}
+
 	if (jas_image_addcmpt(image, newcmptno, &cmptparms)) {
 		return -1;
 	}
