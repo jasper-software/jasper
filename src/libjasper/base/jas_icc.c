@@ -1104,6 +1104,8 @@ static int jas_icctxtdesc_input(jas_iccattrval_t *attrval, jas_stream_t *in,
 	if (jas_stream_read(in, txtdesc->ascdata, txtdesc->asclen) !=
 	  JAS_CAST(int, txtdesc->asclen))
 		goto error;
+	if (txtdesc->asclen < 1)
+		goto error;
 	txtdesc->ascdata[txtdesc->asclen - 1] = '\0';
 	if (jas_iccgetuint32(in, &txtdesc->uclangcode) ||
 	  jas_iccgetuint32(in, &txtdesc->uclen))
