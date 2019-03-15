@@ -414,8 +414,12 @@ jas_image_t *jp2_decode(jas_stream_t *in, const char *optstr)
 		}
 	} else {
 		for (i = 0; i < dec->numchans; ++i) {
+			if(jp2_getct(jas_image_clrspc(dec->image), 0, i + 1) == NULL) {
+				jas_eprintf("error: invalid CT\n");
+				goto error;
+			}
 			jas_image_setcmpttype(dec->image, dec->chantocmptlut[i],
-			  jp2_getct(jas_image_clrspc(dec->image), 0, i + 1));
+			jp2_getct(jas_image_clrspc(dec->image), 0, i + 1));
 		}
 	}
 
