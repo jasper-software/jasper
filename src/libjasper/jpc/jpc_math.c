@@ -86,7 +86,7 @@
 
 /* Calculate the integer quantity floor(log2(x)), where x is a positive
   integer. */
-int jpc_floorlog2(int x)
+int jpc_floorlog2(int_fast32_t x)
 {
 	int y;
 
@@ -105,7 +105,7 @@ int jpc_floorlog2(int x)
   integer. */
 /* This function is the basically the same as ceillog2(x), except that the
   allowable range for x is slightly different. */
-int jpc_firstone(int x)
+int jpc_firstone(int_fast32_t x)
 {
 	int n;
 
