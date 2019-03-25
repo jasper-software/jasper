@@ -1,0 +1,8 @@
+2.0.14 to 2.0.16 (released Mar 12 2019):
+
+- Fix assertion failure JPC_NOMINALGAIN (CVE-2016-9396) (#50)
+- Fix build on Windows 10 (#162)
+- Improve README
+- Fix build with CMake 2.x
+- Add missing dereference operators (#178, #157)
+- Check data in jas_image (CVE-2018-19539) (#196)
