@@ -855,6 +855,12 @@ static int jp2_pclr_getdata(jp2_box_t *box, jas_stream_t *in)
 	  jp2_getuint8(in, &pclr->numchans)) {
 		return -1;
 	}
+
+	// verify in range data as per I.5.3.4 - Palette box
+	if (pclr->numchans < 1 || pclr->numlutents < 1 || pclr->numlutents > 1024) {
+		return -1;
+	}
+
 	lutsize = pclr->numlutents * pclr->numchans;
 	if (!(pclr->lutdata = jas_alloc2(lutsize, sizeof(int_fast32_t)))) {
 		return -1;
