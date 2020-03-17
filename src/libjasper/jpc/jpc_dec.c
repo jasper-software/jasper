@@ -485,7 +485,7 @@ static int jpc_dec_process_sot(jpc_dec_t *dec, jpc_ms_t *ms)
 
 		if (!(compinfos = jas_alloc2(dec->numcomps,
 		  sizeof(jas_image_cmptparm_t)))) {
-			abort();
+			return -1;
 		}
 		for (cmptno = 0, cmpt = dec->cmpts, compinfo = compinfos;
 		  cmptno < dec->numcomps; ++cmptno, ++cmpt, ++compinfo) {
@@ -512,7 +512,7 @@ static int jpc_dec_process_sot(jpc_dec_t *dec, jpc_ms_t *ms)
 			/* Convert the PPM marker segment data into a collection of streams
 			  (one stream per tile-part). */
 			if (!(dec->pkthdrstreams = jpc_ppmstabtostreams(dec->ppmstab))) {
-				abort();
+				return -1;
 			}
 			jpc_ppxstab_destroy(dec->ppmstab);
 			dec->ppmstab = 0;
