@@ -237,13 +237,13 @@ int jas_cm_prof_setattr(jas_cm_prof_t *prof, jas_cm_attrname_t name, void *val);
 void *jas_cm_prof_getattr(jas_cm_prof_t *prof, jas_cm_attrname_t name);
 #endif
 
-jas_cmxform_t *jas_cmxform_create(jas_cmprof_t *inprof, jas_cmprof_t *outprof,
+JAS_DLLEXPORT jas_cmxform_t *jas_cmxform_create(jas_cmprof_t *inprof, jas_cmprof_t *outprof,
   jas_cmprof_t *proofprof, int op, int intent, int optimize);
 
-void jas_cmxform_destroy(jas_cmxform_t *xform);
+JAS_DLLEXPORT void jas_cmxform_destroy(jas_cmxform_t *xform);
 
 /* Apply a transform to data. */
-int jas_cmxform_apply(jas_cmxform_t *xform, jas_cmpixmap_t *in,
+JAS_DLLEXPORT int jas_cmxform_apply(jas_cmxform_t *xform, jas_cmpixmap_t *in,
   jas_cmpixmap_t *out);
 
 int jas_cxform_optimize(jas_cmxform_t *xform, int optimize);
