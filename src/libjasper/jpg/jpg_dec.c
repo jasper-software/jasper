@@ -358,6 +358,16 @@ error:
 *
 \******************************************************************************/
 
+#ifdef __clang__
+/* suppress clang warning "result of comparison of constant
+   9223372036854775807 with expression of type 'JDIMENSION' (aka
+   'unsigned int') is always false" which happens on 64 bit targets
+   where int_fast32_t (64 bit) is larger than JDIMENSION (= unsigned
+   int, 32 bit) */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wtautological-constant-out-of-range-compare"
+#endif
+
 static jas_image_t *jpg_mkimage(j_decompress_ptr cinfo)
 {
 	jas_image_t *image;
@@ -412,6 +422,10 @@ error:
 	}
 	return 0;
 }
+
+#ifdef __clang__
+#pragma GCC diagnostic pop
+#endif
 
 /******************************************************************************\
 * Data source code.
