@@ -20,15 +20,20 @@ where to find additional information about the software.
 The official web site for the JasPer software has the following URL:
 
     http://www.ece.uvic.ca/~mdadams/jasper
-
-The official Git repository for the JasPer software is hosted
-by GitHub.  The URL for the GitHub site is as follows:
-
     https://github.com/mdadams/jasper
 
-The Git repository can be accessed via the URL:
+This project is a fork of above mentioned repository.
+And is located at:
 
-    https://github.com/mdadams/jasper.git
+    https://github.com/jasper-maint/jasper/
+
+Several attempts were made to continue with maintenance and revive
+development of JasPer in its original repository.
+
+After several months we assumed the project was dead and decided to
+fork it.
+
+See state of jasper: https://github.com/mdadams/jasper/issues/208
 
 Information on how to install this software can be found in the
 file INSTALL.
@@ -45,7 +50,7 @@ All bug reports should be submitted via the issue-tracking system
 provided by GitHub.  To submit a bug report, go the the following
 URL and click on the "New issue" button:
 
-    https://github.com/mdadams/jasper/issues
+    https://github.com/jasper-maint/jasper/issues
 
 Please do not submit bug reports directly to the author via email,
 as bug reports that are not submitted via the above issue-tracking
