@@ -299,7 +299,7 @@ int jpc_enc_encpkt(jpc_enc_t *enc, jas_stream_t *out, int compno, int lvlno, int
 			for (pass = startpass; pass != endpass; ++pass) {
 				if (pass->term || pass == lastpass) {
 					datalen = pass->end - n;
-					t1 = jpc_firstone(datalen) + 1;
+					t1 = jpc_int_firstone(datalen) + 1;
 					t2 = cblk->numlenbits + jpc_floorlog2(passcount);
 					adjust = JAS_MAX(t1 - t2, 0);
 					maxadjust = JAS_MAX(adjust, maxadjust);
@@ -320,7 +320,7 @@ int jpc_enc_encpkt(jpc_enc_t *enc, jas_stream_t *out, int compno, int lvlno, int
 			for (pass = startpass; pass != endpass; ++pass) {
 				if (pass->term || pass == lastpass) {
 					datalen = pass->end - n;
-					assert(jpc_firstone(datalen) < cblk->numlenbits +
+					assert(jpc_int_firstone(datalen) < cblk->numlenbits +
 					  jpc_floorlog2(passcount));
 					if (jpc_bitstream_putbits(outb, cblk->numlenbits +
 					  jpc_floorlog2(passcount), datalen) == EOF) {

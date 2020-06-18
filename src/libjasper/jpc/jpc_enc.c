@@ -176,8 +176,8 @@ static uint_fast32_t jpc_abstorelstepsize(jpc_fix_t absdelta, int scaleexpn)
 		abort();
 	}
 
-	p = jpc_firstone(absdelta) - JPC_FIX_FRACBITS;
-	n = 11 - jpc_firstone(absdelta);
+	p = jpc_fix_firstone(absdelta) - JPC_FIX_FRACBITS;
+	n = 11 - jpc_fix_firstone(absdelta);
 	mant = ((n < 0) ? (absdelta >> (-n)) : (absdelta << n)) & 0x7ff;
 	expn = scaleexpn - p;
 	if (scaleexpn < p) {
@@ -875,7 +875,7 @@ static int jpc_calcssmant(jpc_fix_t stepsize)
 	int e;
 	int m;
 
-	n = jpc_firstone(stepsize);
+	n = jpc_fix_firstone(stepsize);
 	e = n - JPC_FIX_FRACBITS;
 	if (n >= 11) {
 		m = (stepsize >> (n - 11)) & 0x7ff;
@@ -887,7 +887,7 @@ static int jpc_calcssmant(jpc_fix_t stepsize)
 
 static int jpc_calcssexp(jpc_fix_t stepsize)
 {
-	return jpc_firstone(stepsize) - JPC_FIX_FRACBITS;
+	return jpc_fix_firstone(stepsize) - JPC_FIX_FRACBITS;
 }
 
 static int jpc_enc_encodemainhdr(jpc_enc_t *enc)
@@ -1238,9 +1238,9 @@ assert(jas_image_numcmpts(enc->image) == 3);
 						}
 					}
 					if (tile->intmode) {
-						actualnumbps = jpc_firstone(mxmag) + 1;
+						actualnumbps = jpc_fix_firstone(mxmag) + 1;
 					} else {
-						actualnumbps = jpc_firstone(mxmag) + 1 - JPC_FIX_FRACBITS;
+						actualnumbps = jpc_fix_firstone(mxmag) + 1 - JPC_FIX_FRACBITS;
 					}
 					numgbits = actualnumbps - (cp->ccps[cmptno].prec - 1 +
 					  band->analgain);

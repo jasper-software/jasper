@@ -157,7 +157,7 @@ int jpc_enc_enccblks(jpc_enc_t *enc)
 						if (mx > bmx) {
 							bmx = mx;
 						}
-						cblk->numbps = JAS_MAX(jpc_firstone(mx) + 1 - JPC_NUMEXTRABITS, 0);
+						cblk->numbps = JAS_MAX(jpc_fix_firstone(mx) + 1 - JPC_NUMEXTRABITS, 0);
 					}
 
 					for (cblk = prc->cblks; cblk != endcblks; ++cblk) {
