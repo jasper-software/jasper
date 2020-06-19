@@ -181,7 +181,7 @@ static const jp2_boxinfo_t jp2_boxinfo_unk = {
 * Box constructor.
 \******************************************************************************/
 
-static jp2_box_t *jp2_box_create0()
+static jp2_box_t *jp2_box_create0(void)
 {
 	jp2_box_t *box;
 	if (!(box = jas_malloc(sizeof(jp2_box_t)))) {
