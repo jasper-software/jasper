@@ -1367,8 +1367,6 @@ static int putint(jas_stream_t *out, int sgnd, int prec, long val)
 {
 	int n;
 	int c;
-	bool s;
-	jas_ulong tmp;
 	assert((!sgnd && prec >= 1) || (sgnd && prec >= 2));
 	if (sgnd) {
 		val = encode_twos_comp(val, prec);
