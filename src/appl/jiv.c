@@ -175,7 +175,6 @@ static int jas_image_render(jas_image_t *image, float vtlx, float vtly,
 
 static void dumpstate(void);
 static int pixmap_resize(pixmap_t *p, int w, int h);
-static void pixmap_clear(pixmap_t *p);
 static void cmdinfo(void);
 
 static void cleanupandexit(int);
@@ -353,8 +352,6 @@ static void displayfunc()
 	int regbotlefty;
 	int regtoprightx;
 	int regtoprighty;
-	int regtoprightwidth;
-	int regtoprightheight;
 	int regwidth;
 	int regheight;
 	float x;
@@ -711,10 +708,7 @@ static void previmage()
 
 static int loadimage()
 {
-	int reshapeflag;
 	jas_stream_t *in;
-	int scrnwidth;
-	int scrnheight;
 	int vh;
 	int vw;
 	char *pathname;
@@ -842,11 +836,6 @@ static void unloadimage()
 /******************************************************************************\
 *
 \******************************************************************************/
-
-static void pixmap_clear(pixmap_t *p)
-{
-	memset(p->data, 0, 4 * p->width * p->height * sizeof(GLshort));
-}
 
 static int pixmap_resize(pixmap_t *p, int w, int h)
 {
