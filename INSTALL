@@ -117,6 +117,10 @@ JAS_ENABLE_SHARED
     Enable the building of shared libraries.
     Valid values: true or false
 
+JAS_ENABLE_HIDDEN
+    Hide internal symbols?  Enabling this results in a smaller binary.
+    Valid values: true or false
+
 JAS_ENABLE_ASAN
     Enable the Address Sanitizer.
     Valid values: true or false

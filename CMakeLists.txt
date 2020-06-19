@@ -8,6 +8,8 @@ set(CMAKE_MODULE_PATH
 # This include should be placed as early as possible.
 include(InSourceBuild)
 
+include(CheckCCompilerFlag)
+
 ################################################################################
 # Version information.
 ################################################################################
@@ -85,6 +87,7 @@ cmake_policy(SET CMP0012 NEW)
 ################################################################################
 
 option(JAS_ENABLE_SHARED "Enable building of shared library" true)
+option(JAS_ENABLE_HIDDEN "Hide internal symbols" false)
 option(JAS_ENABLE_LIBJPEG "Enable the use of the JPEG Library" true)
 option(JAS_ENABLE_OPENGL "Enable the use of the OpenGL/GLUT Library" true)
 option(JAS_ENABLE_STRICT "Enable pedantic error checking" false)
@@ -193,6 +196,14 @@ if (JAS_STRICT)
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wno-unused")
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pedantic")
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -W -Wformat -Wmissing-prototypes -Wstrict-prototypes")
+endif()
+
+if (JAS_ENABLE_HIDDEN AND NOT WIN32)
+	# don't export internal symbols
+	check_c_compiler_flag("-fvisibility=hidden" JAS_HAVE_VISIBILITY)
+	if (JAS_HAVE_VISIBILITY)
+		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fvisibility=hidden -DJAS_HAVE_VISIBILITY")
+	endif()
 endif()
 
 ################################################################################
