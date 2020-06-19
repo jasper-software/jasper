@@ -1720,7 +1720,7 @@ static long jas_iccpowi(int x, int n)
 }
 
 
-jas_iccprof_t *jas_iccprof_createfrombuf(jas_uchar *buf, int len)
+jas_iccprof_t *jas_iccprof_createfrombuf(const jas_uchar *buf, int len)
 {
 	jas_stream_t *in;
 	jas_iccprof_t *prof;
