@@ -306,8 +306,7 @@ int main(int argc, char **argv)
 
 cmdopts_t *cmdopts_parse(int argc, char **argv)
 {
-
-	typedef enum {
+	enum {
 		CMDOPT_HELP = 0,
 		CMDOPT_VERBOSE,
 		CMDOPT_INFILE,
@@ -321,7 +320,7 @@ cmdopts_t *cmdopts_parse(int argc, char **argv)
 		CMDOPT_CMPTNO,
 		CMDOPT_SRGB,
 		CMDOPT_MAXMEM
-	} cmdoptid_t;
+	};
 
 	static const jas_opt_t cmdoptions[] = {
 		{CMDOPT_HELP, "help", 0},
