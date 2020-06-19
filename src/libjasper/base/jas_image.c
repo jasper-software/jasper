@@ -1419,14 +1419,11 @@ jas_image_t *jas_image_chclrspc(jas_image_t *image, jas_cmprof_t *outprof,
 	int n;
 	int hstep;
 	int vstep;
-	int numinauxchans;
-	int numoutauxchans;
 	int numinclrchans;
 	int numoutclrchans;
 	int prec;
 	jas_image_t *outimage;
 	int cmpttype;
-	int numoutchans;
 	jas_cmprof_t *inprof;
 	jas_cmprof_t *tmpprof;
 	jas_image_cmptparm_t cmptparm;
@@ -1483,10 +1480,7 @@ jas_image_dump(image, stderr);
 		abort();
 	}
 	numinclrchans = jas_clrspc_numchans(jas_cmprof_clrspc(inprof));
-	numinauxchans = jas_image_numcmpts(inimage) - numinclrchans;
 	numoutclrchans = jas_clrspc_numchans(jas_cmprof_clrspc(outprof));
-	numoutauxchans = 0;
-	numoutchans = numoutclrchans + numoutauxchans;
 	prec = 8;
 
 	if (!(outimage = jas_image_create0())) {
