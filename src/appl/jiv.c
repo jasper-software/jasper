@@ -317,7 +317,7 @@ static void cmdinfo()
 	fprintf(stderr, "%s\n", JAS_NOTES);
 }
 
-static char *helpinfo[] = {
+static const char *const helpinfo[] = {
 "The following options are supported:\n",
 "    --help                  Print this help information and exit.\n",
 "    --version               Print version information and exit.\n",
@@ -328,7 +328,7 @@ static char *helpinfo[] = {
 
 static void usage()
 {
-	char *s;
+	const char *s;
 	int i;
 	cmdinfo();
 	fprintf(stderr, "usage: %s [options] [file1 file2 ...]\n", cmdname);
