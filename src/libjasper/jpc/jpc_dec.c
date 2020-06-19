@@ -153,7 +153,6 @@ static int jpc_streamlist_insert(jpc_streamlist_t *streamlist, int streamno,
   jas_stream_t *stream);
 static jas_stream_t *jpc_streamlist_remove(jpc_streamlist_t *streamlist, int streamno);
 static void jpc_streamlist_destroy(jpc_streamlist_t *streamlist);
-static jas_stream_t *jpc_streamlist_get(jpc_streamlist_t *streamlist, int streamno);
 
 static void jpc_dec_cp_resetflags(jpc_dec_cp_t *cp);
 static jpc_dec_cp_t *jpc_dec_cp_create(uint_fast16_t numcomps);
@@ -2255,12 +2254,6 @@ static void jpc_streamlist_destroy(jpc_streamlist_t *streamlist)
 		jas_free(streamlist->streams);
 	}
 	jas_free(streamlist);
-}
-
-static jas_stream_t *jpc_streamlist_get(jpc_streamlist_t *streamlist, int streamno)
-{
-	assert(streamno < streamlist->numstreams);
-	return streamlist->streams[streamno];
 }
 
 static int jpc_streamlist_numstreams(jpc_streamlist_t *streamlist)
