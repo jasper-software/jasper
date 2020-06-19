@@ -71,8 +71,11 @@
 * Includes.
 \******************************************************************************/
 
-/* The configuration header file should be included first. */
-#include "jasper/jas_config.h"
+#include "jasper/jas_stream.h"
+#include "jasper/jas_debug.h"
+#include "jasper/jas_types.h"
+#include "jasper/jas_malloc.h"
+#include "jasper/jas_math.h"
 
 #include <assert.h>
 #if defined(JAS_HAVE_FCNTL_H)
@@ -88,12 +91,6 @@
 #if defined(WIN32) || defined(JAS_HAVE_IO_H)
 #include <io.h>
 #endif
-
-#include "jasper/jas_debug.h"
-#include "jasper/jas_types.h"
-#include "jasper/jas_stream.h"
-#include "jasper/jas_malloc.h"
-#include "jasper/jas_math.h"
 
 /******************************************************************************\
 * Local function prototypes.

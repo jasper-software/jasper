@@ -71,19 +71,19 @@
 * Includes.
 \******************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <assert.h>
-
-#include "jasper/jas_fix.h"
-#include "jasper/jas_malloc.h"
-#include "jasper/jas_math.h"
-
 #include "jpc_t1enc.h"
 #include "jpc_t1cod.h"
 #include "jpc_enc.h"
 #include "jpc_cod.h"
 #include "jpc_math.h"
+
+#include "jasper/jas_fix.h"
+#include "jasper/jas_malloc.h"
+#include "jasper/jas_math.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <assert.h>
 
 static int jpc_encsigpass(jpc_mqenc_t *mqenc, int bitpos, int orient, int,
   jas_matrix_t *flags, jas_matrix_t *data, int term, long *nmsedec);

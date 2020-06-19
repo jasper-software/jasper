@@ -71,15 +71,15 @@
 * Includes.
 \******************************************************************************/
 
-#include <assert.h>
-#include <stdlib.h>
+#include "jpc_mqenc.h"
 
 #include "jasper/jas_stream.h"
 #include "jasper/jas_malloc.h"
 #include "jasper/jas_math.h"
 #include "jasper/jas_debug.h"
 
-#include "jpc_mqenc.h"
+#include <assert.h>
+#include <stdlib.h>
 
 /******************************************************************************\
 * Macros

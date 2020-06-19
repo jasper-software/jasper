@@ -71,20 +71,20 @@
 * Includes.
 \******************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <assert.h>
+#include "jpc_t1dec.h"
+#include "jpc_bs.h"
+#include "jpc_mqdec.h"
+#include "jpc_t1cod.h"
+#include "jpc_dec.h"
 
 #include "jasper/jas_fix.h"
 #include "jasper/jas_stream.h"
 #include "jasper/jas_math.h"
 #include "jasper/jas_debug.h"
 
-#include "jpc_bs.h"
-#include "jpc_mqdec.h"
-#include "jpc_t1dec.h"
-#include "jpc_t1cod.h"
-#include "jpc_dec.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <assert.h>
 
 /******************************************************************************\
 *

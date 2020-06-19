@@ -71,14 +71,16 @@
 * Includes.
 \******************************************************************************/
 
-#include <assert.h>
-#include "jasper/jas_malloc.h"
 #include "jasper/jas_image.h"
+#include "jasper/jas_malloc.h"
 #include "jasper/jas_stream.h"
 #include "jasper/jas_cm.h"
 #include "jasper/jas_icc.h"
 #include "jasper/jas_debug.h"
+
 #include "jp2_cod.h"
+
+#include <assert.h>
 
 static uint_fast32_t jp2_gettypeasoc(int colorspace, int ctype);
 static int clrspctojp2(jas_clrspc_t clrspc);

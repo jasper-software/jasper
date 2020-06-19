@@ -71,15 +71,15 @@
 * Includes.
 \******************************************************************************/
 
-#include <assert.h>
+#include "bmp_enc.h"
+#include "bmp_cod.h"
 
 #include "jasper/jas_types.h"
 #include "jasper/jas_stream.h"
 #include "jasper/jas_image.h"
 #include "jasper/jas_debug.h"
 
-#include "bmp_enc.h"
-#include "bmp_cod.h"
+#include <assert.h>
 
 /******************************************************************************\
 * Local prototypes.

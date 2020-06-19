@@ -71,18 +71,18 @@
 * Includes.
 \******************************************************************************/
 
+#include "jasper/jas_image.h"
+#include "jasper/jas_math.h"
+#include "jasper/jas_malloc.h"
+#include "jasper/jas_string.h"
+#include "jasper/jas_debug.h"
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
 #include <ctype.h>
 #include <limits.h>
-
-#include "jasper/jas_math.h"
-#include "jasper/jas_image.h"
-#include "jasper/jas_malloc.h"
-#include "jasper/jas_string.h"
-#include "jasper/jas_debug.h"
 
 /******************************************************************************\
 * Types.

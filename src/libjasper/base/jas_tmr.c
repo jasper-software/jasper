@@ -69,14 +69,11 @@
 * Includes.
 \******************************************************************************/
 
-/* The configuration header file should be included first. */
-#include "jasper/jas_config.h"
+#include "jasper/jas_tmr.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-
-#include "jasper/jas_tmr.h"
 
 /******************************************************************************\
 * Code.

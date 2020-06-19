@@ -63,9 +63,8 @@
 * Includes.
 \******************************************************************************/
 
-#include <stdio.h>
-#include <assert.h>
-#include <ctype.h>
+#include "jpg_jpeglib.h"
+#include "jpg_cod.h"
 
 #include "jasper/jas_tvp.h"
 #include "jasper/jas_stream.h"
@@ -74,8 +73,9 @@
 #include "jasper/jas_debug.h"
 #include "jasper/jas_math.h"
 
-#include "jpg_jpeglib.h"
-#include "jpg_cod.h"
+#include <stdio.h>
+#include <assert.h>
+#include <ctype.h>
 
 /******************************************************************************\
 * Types.

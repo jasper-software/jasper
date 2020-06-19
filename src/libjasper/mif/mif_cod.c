@@ -63,7 +63,7 @@
 * Includes.
 \******************************************************************************/
 
-#include <assert.h>
+#include "mif_cod.h"
 
 #include "jasper/jas_tvp.h"
 #include "jasper/jas_stream.h"
@@ -72,7 +72,7 @@
 #include "jasper/jas_malloc.h"
 #include "jasper/jas_debug.h"
 
-#include "mif_cod.h"
+#include <assert.h>
 
 /******************************************************************************\
 * Local types.

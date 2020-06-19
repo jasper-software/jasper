@@ -69,14 +69,14 @@
 * Includes.
 \******************************************************************************/
 
+#include "jasper/jas_tvp.h"
+#include "jasper/jas_malloc.h"
+#include "jasper/jas_string.h"
+
 #include <assert.h>
 #include <stdio.h>
 #include <ctype.h>
 #include <stdlib.h>
-
-#include "jasper/jas_malloc.h"
-#include "jasper/jas_string.h"
-#include "jasper/jas_tvp.h"
 
 /******************************************************************************\
 * Macros.

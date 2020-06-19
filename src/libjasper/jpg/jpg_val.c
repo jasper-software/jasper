@@ -63,13 +63,13 @@
 * Includes.
 \******************************************************************************/
 
-#include <stdio.h>
-#include <assert.h>
+#include "jpg_cod.h"
 
 #include "jasper/jas_stream.h"
 #include "jasper/jas_image.h"
 
-#include "jpg_cod.h"
+#include <stdio.h>
+#include <assert.h>
 
 /******************************************************************************\
 * Code for validate operation.

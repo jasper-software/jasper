@@ -71,6 +71,9 @@
 * Includes.
 \******************************************************************************/
 
+#include "jp2_dec.h"
+#include "jp2_cod.h"
+
 #include "jasper/jas_image.h"
 #include "jasper/jas_stream.h"
 #include "jasper/jas_math.h"
@@ -78,9 +81,6 @@
 #include "jasper/jas_malloc.h"
 #include "jasper/jas_version.h"
 #include "jasper/jas_types.h"
-
-#include "jp2_cod.h"
-#include "jp2_dec.h"
 
 #define	JP2_VALIDATELEN	(JAS_MIN(JP2_JP_LEN + 16, JAS_STREAM_MAXPUTBACK))
 

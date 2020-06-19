@@ -69,9 +69,13 @@
 * Includes.
 \******************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <assert.h>
+#include "jpc_dec.h"
+#include "jpc_fix.h"
+#include "jpc_cs.h"
+#include "jpc_mct.h"
+#include "jpc_t2dec.h"
+#include "jpc_t1dec.h"
+#include "jpc_math.h"
 
 #include "jasper/jas_types.h"
 #include "jasper/jas_math.h"
@@ -79,13 +83,9 @@
 #include "jasper/jas_malloc.h"
 #include "jasper/jas_debug.h"
 
-#include "jpc_fix.h"
-#include "jpc_dec.h"
-#include "jpc_cs.h"
-#include "jpc_mct.h"
-#include "jpc_t2dec.h"
-#include "jpc_t1dec.h"
-#include "jpc_math.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <assert.h>
 
 /******************************************************************************\
 *

@@ -71,15 +71,15 @@
 * Includes.
 \******************************************************************************/
 
-#include <assert.h>
-#include <stdlib.h>
+#include "ras_enc.h"
+#include "ras_cod.h"
 
 #include "jasper/jas_image.h"
 #include "jasper/jas_stream.h"
 #include "jasper/jas_debug.h"
 
-#include "ras_cod.h"
-#include "ras_enc.h"
+#include <assert.h>
+#include <stdlib.h>
 
 /******************************************************************************\
 * Prototypes.

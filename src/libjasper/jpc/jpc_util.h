@@ -62,6 +62,8 @@
 #ifndef JPC_UTIL_H
 #define JPC_UTIL_H
 
+#include "jpc_fix.h"
+
 #include "jasper/jas_seq.h"
 
 /* Parse a comma separated list of real numbers into an array of doubles. */

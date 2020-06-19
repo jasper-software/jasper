@@ -71,14 +71,13 @@
 * Includes.
 \******************************************************************************/
 
-#include <assert.h>
-#include <stdlib.h>
+#include "jp2_cod.h"
 
-#include "jasper/jas_stream.h"
 #include "jasper/jas_malloc.h"
 #include "jasper/jas_debug.h"
 
-#include "jp2_cod.h"
+#include <assert.h>
+#include <stdlib.h>
 
 /******************************************************************************\
 * Function prototypes.

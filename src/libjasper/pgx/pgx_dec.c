@@ -63,8 +63,7 @@
 * Includes.
 \******************************************************************************/
 
-#include <assert.h>
-#include <ctype.h>
+#include "pgx_cod.h"
 
 #include "jasper/jas_tvp.h"
 #include "jasper/jas_stream.h"
@@ -73,7 +72,8 @@
 #include "jasper/jas_debug.h"
 #include "jasper/jas_math.h"
 
-#include "pgx_cod.h"
+#include <assert.h>
+#include <ctype.h>
 
 /******************************************************************************\
 * Local types.

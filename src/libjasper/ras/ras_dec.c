@@ -71,8 +71,7 @@
 * Includes.
 \******************************************************************************/
 
-#include <assert.h>
-#include <stdlib.h>
+#include "ras_cod.h"
 
 #include "jasper/jas_stream.h"
 #include "jasper/jas_image.h"
@@ -80,7 +79,8 @@
 #include "jasper/jas_tvp.h"
 #include "jasper/jas_math.h"
 
-#include "ras_cod.h"
+#include <assert.h>
+#include <stdlib.h>
 
 /******************************************************************************\
 * Local types.
