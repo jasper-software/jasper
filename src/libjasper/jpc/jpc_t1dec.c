@@ -780,7 +780,6 @@ static int dec_clnpass(jpc_dec_t *dec, register jpc_mqdec_t *mqdec, int bitpos, 
 	int j;
 	int k;
 	int vscanlen;
-	int v;
 	int half;
 	int runlen;
 	int f;
@@ -832,6 +831,7 @@ static int dec_clnpass(jpc_dec_t *dec, register jpc_mqdec_t *mqdec, int bitpos, 
 			  !((*fp) & (JPC_SIG | JPC_VISIT | JPC_OTHSIGMSK)))) {
 
 				jpc_mqdec_setcurctx(mqdec, JPC_AGGCTXNO);
+				int v;
 				JPC_T1D_GETBIT(mqdec, v, "CLN", "AGG");
 				if (!v) {
 					continue;
@@ -906,6 +906,7 @@ static int dec_clnpass(jpc_dec_t *dec, register jpc_mqdec_t *mqdec, int bitpos, 
 		int segsymval;
 		segsymval = 0;
 		jpc_mqdec_setcurctx(mqdec, JPC_UCTXNO);
+		int v;
 		JPC_T1D_GETBITNOSKEW(mqdec, v, "CLN", "SEGSYM");
 		segsymval = (segsymval << 1) | (v & 1);
 		JPC_T1D_GETBITNOSKEW(mqdec, v, "CLN", "SEGSYM");
