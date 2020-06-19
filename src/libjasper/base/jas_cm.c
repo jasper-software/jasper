@@ -378,7 +378,7 @@ jas_cmxform_t *jas_cmxform_create(jas_cmprof_t *inprof, jas_cmprof_t *outprof,
 	int prfintent;
 
 	/* Avoid compiler warnings about unused parameters. */
-	optimize = 0;
+	(void)optimize;
 
 	prfintent = intent;
 
@@ -653,7 +653,7 @@ static int jas_cmpxformseq_appendcnvt(jas_cmpxformseq_t *pxformseq,
 		return 0;
 	abort();
 	/* Avoid compiler warnings about unused parameters. */
-	pxformseq = 0;
+	(void)pxformseq;
 	return -1;
 }
 
