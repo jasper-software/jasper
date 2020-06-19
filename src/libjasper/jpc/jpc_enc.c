@@ -131,10 +131,10 @@ static void rlvl_destroy(jpc_enc_rlvl_t *rlvl);
 static jpc_enc_band_t *band_create(jpc_enc_band_t *band, jpc_enc_cp_t *cp,
   jpc_enc_rlvl_t *rlvl, jpc_tsfb_band_t *bandinfos);
 static void band_destroy(jpc_enc_band_t *bands);
-static jpc_enc_prc_t *prc_create(jpc_enc_prc_t *prc, jpc_enc_cp_t *cp,
+static jpc_enc_prc_t *prc_create(jpc_enc_prc_t *prc,
   jpc_enc_band_t *band);
 static void prc_destroy(jpc_enc_prc_t *prcs);
-static jpc_enc_cblk_t *cblk_create(jpc_enc_cblk_t *cblk, jpc_enc_cp_t *cp,
+static jpc_enc_cblk_t *cblk_create(jpc_enc_cblk_t *cblk,
   jpc_enc_prc_t *prc);
 static void cblk_destroy(jpc_enc_cblk_t *cblks);
 int ratestrtosize(const char *s, uint_fast32_t rawsize, uint_fast32_t *size);
@@ -2359,7 +2359,7 @@ if (band->data) {
 	}
 	for (prcno = 0, prc = band->prcs; prcno < rlvl->numprcs; ++prcno,
 	  ++prc) {
-		if (!prc_create(prc, cp, band)) {
+		if (!prc_create(prc, band)) {
 			goto error;
 		}
 	}
@@ -2398,7 +2398,7 @@ static void band_destroy(jpc_enc_band_t *band)
 }
 
 /* Note: This constructor creates the object in place. */
-static jpc_enc_prc_t *prc_create(jpc_enc_prc_t *prc, jpc_enc_cp_t *cp, jpc_enc_band_t *band)
+static jpc_enc_prc_t *prc_create(jpc_enc_prc_t *prc, jpc_enc_band_t *band)
 {
 	uint_fast32_t prcno;
 	uint_fast32_t prcxind;
@@ -2498,7 +2498,7 @@ static jpc_enc_prc_t *prc_create(jpc_enc_prc_t *prc, jpc_enc_cp_t *cp, jpc_enc_b
 		}
 		for (cblkno = 0, cblk = prc->cblks; cblkno < prc->numcblks;
 		  ++cblkno, ++cblk) {
-			if (!cblk_create(cblk, cp, prc)) {
+			if (!cblk_create(cblk, prc)) {
 				goto error;
 			}
 		}
@@ -2559,7 +2559,7 @@ static void prc_destroy(jpc_enc_prc_t *prc)
 }
 
 /* Note: This constructor creates the object in place. */
-static jpc_enc_cblk_t *cblk_create(jpc_enc_cblk_t *cblk, jpc_enc_cp_t *cp,
+static jpc_enc_cblk_t *cblk_create(jpc_enc_cblk_t *cblk,
   jpc_enc_prc_t *prc)
 {
 	jpc_enc_band_t *band;
@@ -2655,6 +2655,7 @@ static void cblk_destroy(jpc_enc_cblk_t *cblk)
 static void pass_destroy(jpc_enc_pass_t *pass)
 {
 	/* XXX - need to free resources here */
+	(void)pass;
 }
 
 void jpc_enc_dump(jpc_enc_t *enc)
