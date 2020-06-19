@@ -124,21 +124,21 @@ static int file_close(jas_stream_obj_t *obj);
 * Local data.
 \******************************************************************************/
 
-static jas_stream_ops_t jas_stream_fileops = {
+static const jas_stream_ops_t jas_stream_fileops = {
 	file_read,
 	file_write,
 	file_seek,
 	file_close
 };
 
-static jas_stream_ops_t jas_stream_sfileops = {
+static const jas_stream_ops_t jas_stream_sfileops = {
 	sfile_read,
 	sfile_write,
 	sfile_seek,
 	sfile_close
 };
 
-static jas_stream_ops_t jas_stream_memops = {
+static const jas_stream_ops_t jas_stream_memops = {
 	mem_read,
 	mem_write,
 	mem_seek,
