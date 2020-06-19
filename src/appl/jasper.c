@@ -141,7 +141,7 @@ int addopt(char *optstr, int maxlen, const char *s);
 * Global data.
 \******************************************************************************/
 
-char *cmdname = "";
+static const char *cmdname = "";
 
 /******************************************************************************\
 * Code.
@@ -487,7 +487,7 @@ void cmdinfo()
 	fprintf(stderr, "%s\n", JAS_NOTES);
 }
 
-static char *helpinfo[] = {
+static const char *const helpinfo[] = {
 "The following options are supported:\n",
 "    --help                  Print this help information and exit.\n",
 "    --version               Print version information and exit.\n",
@@ -514,7 +514,7 @@ void cmdusage()
 {
 	int fmtid;
 	const jas_image_fmtinfo_t *fmtinfo;
-	char *s;
+	const char *s;
 	int i;
 	cmdinfo();
 	fprintf(stderr, "usage: %s [options]\n", cmdname);
