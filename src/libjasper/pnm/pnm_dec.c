@@ -121,7 +121,7 @@ static int pnm_getint16(jas_stream_t *in, int *val);
 * Option parsing.
 \******************************************************************************/
 
-static jas_taginfo_t pnm_decopts[] = {
+static const jas_taginfo_t pnm_decopts[] = {
 	{OPT_ALLOWTRUNC, "allow_trunc"},
 	{OPT_MAXSIZE, "max_samples"},
 	{-1, 0}

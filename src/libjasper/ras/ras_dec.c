@@ -113,7 +113,7 @@ static int ras_getcmap(jas_stream_t *in, ras_hdr_t *hdr, ras_cmap_t *cmap);
 * Option parsing.
 \******************************************************************************/
 
-static jas_taginfo_t ras_decopts[] = {
+static const jas_taginfo_t ras_decopts[] = {
 	// Not yet supported
 	// {OPT_ALLOWTRUNC, "allow_trunc"},
 	{OPT_MAXSIZE, "max_samples"},

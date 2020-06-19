@@ -110,7 +110,7 @@ static int bmp_gobble(jas_stream_t *in, long n);
 * Option parsing.
 \******************************************************************************/
 
-static jas_taginfo_t decopts[] = {
+static const jas_taginfo_t decopts[] = {
 	{OPT_MAXSIZE, "max_samples"},
 	{-1, 0}
 };

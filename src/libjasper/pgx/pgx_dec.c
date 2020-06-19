@@ -106,7 +106,7 @@ static jas_seqent_t pgx_wordtoint(uint_fast32_t word, int prec, bool sgnd);
 * Option parsing.
 \******************************************************************************/
 
-static jas_taginfo_t pgx_decopts[] = {
+static const jas_taginfo_t pgx_decopts[] = {
 	// Not yet supported
 	// {OPT_ALLOWTRUNC, "allow_trunc"},
 	{OPT_MAXSIZE, "max_samples"},

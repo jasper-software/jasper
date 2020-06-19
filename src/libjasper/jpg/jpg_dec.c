@@ -152,7 +152,7 @@ static const char jas_libjpeg_turbo_version[] = JAS_LIBJPEG_TURBO_VERSION;
 * Option parsing.
 \******************************************************************************/
 
-static jas_taginfo_t decopts[] = {
+static const jas_taginfo_t decopts[] = {
 	{OPT_VERSION, "version"},
 	{OPT_MAXSIZE, "max_samples"},
 	{-1, 0}
