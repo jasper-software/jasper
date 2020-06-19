@@ -107,8 +107,6 @@ static uint_fast32_t inttobits(jas_seqent_t v, int prec, bool sgnd);
 static jas_seqent_t bitstoint(uint_fast32_t v, int prec, bool sgnd);
 static int putint(jas_stream_t *out, int sgnd, int prec, long val);
 static int getint(jas_stream_t *in, int sgnd, int prec, long *val);
-static void jas_image_calcbbox2(jas_image_t *image, jas_image_coord_t *tlx,
-  jas_image_coord_t *tly, jas_image_coord_t *brx, jas_image_coord_t *bry);
 static long uptomult(long x, long y);
 static long downtomult(long x, long y);
 static long convert(long val, int oldsgnd, int oldprec, int newsgnd,
