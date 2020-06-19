@@ -88,7 +88,7 @@
 static int jpc_encsigpass(jpc_mqenc_t *mqenc, int bitpos, int orient, int,
   jas_matrix_t *flags, jas_matrix_t *data, int term, long *nmsedec);
 
-static int jpc_encrefpass(jpc_mqenc_t *mqenc, int bitpos, int, jas_matrix_t *flags,
+static int jpc_encrefpass(jpc_mqenc_t *mqenc, int bitpos, jas_matrix_t *flags,
   jas_matrix_t *data, int term, long *nmsedec);
 
 static int jpc_encclnpass(jpc_mqenc_t *mqenc, int bitpos, int orient, int,
@@ -97,7 +97,7 @@ static int jpc_encclnpass(jpc_mqenc_t *mqenc, int bitpos, int orient, int,
 static int jpc_encrawsigpass(jpc_bitstream_t *out, int bitpos, int,
   jas_matrix_t *flags, jas_matrix_t *data, int term, long *nmsedec);
 
-static int jpc_encrawrefpass(jpc_bitstream_t *out, int bitpos, int,
+static int jpc_encrawrefpass(jpc_bitstream_t *out, int bitpos,
   jas_matrix_t *flags, jas_matrix_t *data, int term, long *nmsedec);
 
 /******************************************************************************\
@@ -166,7 +166,7 @@ int jpc_enc_enccblks(jpc_enc_t *enc)
 					}
 
 					for (cblk = prc->cblks; cblk != endcblks; ++cblk) {
-						if (jpc_enc_enccblk(enc, cblk->stream, tcmpt, band, cblk)) {
+						if (jpc_enc_enccblk(tcmpt, band, cblk)) {
 							return -1;
 						}
 					}
@@ -190,7 +190,7 @@ static int getthebyte(jas_stream_t *in, long off)
 }
 
 /* Encode a single code block. */
-int jpc_enc_enccblk(jpc_enc_t *enc, jas_stream_t *out, jpc_enc_tcmpt_t *tcmpt, jpc_enc_band_t *band, jpc_enc_cblk_t *cblk)
+int jpc_enc_enccblk(jpc_enc_tcmpt_t *tcmpt, jpc_enc_band_t *band, jpc_enc_cblk_t *cblk)
 {
 	jpc_enc_pass_t *pass;
 	jpc_enc_pass_t *endpasses;
@@ -285,9 +285,9 @@ assert(jas_stream_tell(cblk->stream) == jas_stream_getrwcount(cblk->stream));
 			break;
 		case JPC_REFPASS:
 			ret = (pass->type == JPC_SEG_MQ) ? jpc_encrefpass(cblk->mqenc,
-			  bitpos, vcausal, cblk->flags, cblk->data, termmode,
+			  bitpos, cblk->flags, cblk->data, termmode,
 			  &pass->nmsedec) : jpc_encrawrefpass(bout, bitpos,
-			  vcausal, cblk->flags, cblk->data, termmode,
+			  cblk->flags, cblk->data, termmode,
 			  &pass->nmsedec);
 			break;
 		case JPC_CLNPASS:
@@ -627,7 +627,7 @@ static int jpc_encrawsigpass(jpc_bitstream_t *out, int bitpos, int vcausalflag, 
 	} \
 }
 
-static int jpc_encrefpass(jpc_mqenc_t *mqenc, int bitpos, int vcausalflag, jas_matrix_t *flags, jas_matrix_t *data,
+static int jpc_encrefpass(jpc_mqenc_t *mqenc, int bitpos, jas_matrix_t *flags, jas_matrix_t *data,
   int term, long *nmsedec)
 {
 	int i;
@@ -720,7 +720,7 @@ int k;
 	} \
 }
 
-static int jpc_encrawrefpass(jpc_bitstream_t *out, int bitpos, int vcausalflag, jas_matrix_t *flags,
+static int jpc_encrawrefpass(jpc_bitstream_t *out, int bitpos, jas_matrix_t *flags,
   jas_matrix_t *data, int term, long *nmsedec)
 {
 	int i;
