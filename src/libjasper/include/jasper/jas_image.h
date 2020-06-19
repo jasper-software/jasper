@@ -473,19 +473,19 @@ JAS_DLLEXPORT int jas_image_addfmt(int id, const char *name, const char *ext, co
   jas_image_fmtops_t *ops);
 
 /* Get the ID for the image format with the specified name. */
-JAS_DLLEXPORT int jas_image_strtofmt(char *s);
+JAS_DLLEXPORT int jas_image_strtofmt(const char *s);
 
 /* Get the name of the image format with the specified ID. */
-JAS_DLLEXPORT char *jas_image_fmttostr(int fmt);
+JAS_DLLEXPORT const char *jas_image_fmttostr(int fmt);
 
 /* Lookup image format information by the format ID. */
-JAS_DLLEXPORT jas_image_fmtinfo_t *jas_image_lookupfmtbyid(int id);
+JAS_DLLEXPORT const jas_image_fmtinfo_t *jas_image_lookupfmtbyid(int id);
 
 /* Lookup image format information by the format name. */
-JAS_DLLEXPORT jas_image_fmtinfo_t *jas_image_lookupfmtbyname(const char *name);
+JAS_DLLEXPORT const jas_image_fmtinfo_t *jas_image_lookupfmtbyname(const char *name);
 
 /* Guess the format of an image file based on its name. */
-JAS_DLLEXPORT int jas_image_fmtfromname(char *filename);
+JAS_DLLEXPORT int jas_image_fmtfromname(const char *filename);
 
 /* Get the format of image data in a stream. */
 JAS_DLLEXPORT int jas_image_getfmt(jas_stream_t *in);

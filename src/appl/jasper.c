@@ -513,7 +513,7 @@ static char *helpinfo[] = {
 void cmdusage()
 {
 	int fmtid;
-	jas_image_fmtinfo_t *fmtinfo;
+	const jas_image_fmtinfo_t *fmtinfo;
 	char *s;
 	int i;
 	cmdinfo();

@@ -421,7 +421,7 @@ static void jas_image_cmpt_destroy(jas_image_cmpt_t *cmpt)
 
 jas_image_t *jas_image_decode(jas_stream_t *in, int fmt, const char *optstr)
 {
-	jas_image_fmtinfo_t *fmtinfo;
+	const jas_image_fmtinfo_t *fmtinfo;
 	jas_image_t *image;
 
 	image = 0;
@@ -460,7 +460,7 @@ error:
 int jas_image_encode(jas_image_t *image, jas_stream_t *out, int fmt,
   const char *optstr)
 {
-	jas_image_fmtinfo_t *fmtinfo;
+	const jas_image_fmtinfo_t *fmtinfo;
 	if (!(fmtinfo = jas_image_lookupfmtbyid(fmt))) {
 		jas_eprintf("format lookup failed\n");
 		return -1;
@@ -654,18 +654,18 @@ int jas_image_addfmt(int id, const char *name, const char *ext, const char *desc
 	return 0;
 }
 
-int jas_image_strtofmt(char *name)
+int jas_image_strtofmt(const char *name)
 {
-	jas_image_fmtinfo_t *fmtinfo;
+	const jas_image_fmtinfo_t *fmtinfo;
 	if (!(fmtinfo = jas_image_lookupfmtbyname(name))) {
 		return -1;
 	}
 	return fmtinfo->id;
 }
 
-char *jas_image_fmttostr(int fmt)
+const char *jas_image_fmttostr(int fmt)
 {
-	jas_image_fmtinfo_t *fmtinfo;
+	const jas_image_fmtinfo_t *fmtinfo;
 	if (!(fmtinfo = jas_image_lookupfmtbyid(fmt))) {
 		return 0;
 	}
@@ -696,11 +696,11 @@ int jas_image_getfmt(jas_stream_t *in)
 	return found ? fmtinfo->id : (-1);
 }
 
-int jas_image_fmtfromname(char *name)
+int jas_image_fmtfromname(const char *name)
 {
 	int i;
-	char *ext;
-	jas_image_fmtinfo_t *fmtinfo;
+	const char *ext;
+	const jas_image_fmtinfo_t *fmtinfo;
 	/* Get the file name extension. */
 	if (!(ext = strrchr(name, '.'))) {
 		return -1;
@@ -800,10 +800,10 @@ int jas_image_addcmpt(jas_image_t *image, int cmptno,
 	return 0;
 }
 
-jas_image_fmtinfo_t *jas_image_lookupfmtbyid(int id)
+const jas_image_fmtinfo_t *jas_image_lookupfmtbyid(int id)
 {
 	int i;
-	jas_image_fmtinfo_t *fmtinfo;
+	const jas_image_fmtinfo_t *fmtinfo;
 
 	for (i = 0, fmtinfo = jas_image_fmtinfos; i < jas_image_numfmts; ++i, ++fmtinfo) {
 		if (fmtinfo->id == id) {
@@ -813,10 +813,10 @@ jas_image_fmtinfo_t *jas_image_lookupfmtbyid(int id)
 	return 0;
 }
 
-jas_image_fmtinfo_t *jas_image_lookupfmtbyname(const char *name)
+const jas_image_fmtinfo_t *jas_image_lookupfmtbyname(const char *name)
 {
 	int i;
-	jas_image_fmtinfo_t *fmtinfo;
+	const jas_image_fmtinfo_t *fmtinfo;
 
 	for (i = 0, fmtinfo = jas_image_fmtinfos; i < jas_image_numfmts; ++i, ++fmtinfo) {
 		if (!strcmp(fmtinfo->name, name)) {
