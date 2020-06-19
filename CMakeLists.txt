@@ -204,6 +204,17 @@ if (JAS_ENABLE_HIDDEN AND NOT WIN32)
 	if (JAS_HAVE_VISIBILITY)
 		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fvisibility=hidden -DJAS_HAVE_VISIBILITY")
 	endif()
+
+	if (NOT (CMAKE_BUILD_TYPE MATCHES "Debug"))
+		# remove unused internal symbols
+		check_c_compiler_flag("-ffunction-sections" HAVE_FUNCTION_SECTIONS)
+		check_c_compiler_flag("-fdata-sections" HAVE_DATA_SECTIONS)
+		check_c_compiler_flag("-Wl,--gc-sections" HAVE_GC_SECTIONS)
+
+		if (HAVE_FUNCTION_SECTIONS AND HAVE_DATA_SECTIONS AND HAVE_GC_SECTIONS)
+			set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -ffunction-sections -fdata-sections -Wl,--gc-sections")
+		endif()
+	endif()
 endif()
 
 ################################################################################
