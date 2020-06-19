@@ -148,8 +148,6 @@ void jpc_enc_dump(jpc_enc_t *enc);
 int dump_passes(jpc_enc_pass_t *passes, int numpasses, jpc_enc_cblk_t *cblk);
 void calcrdslopes(jpc_enc_cblk_t *cblk);
 void dump_layeringinfo(jpc_enc_t *enc);
-static int jpc_calcssexp(jpc_fix_t stepsize);
-static int jpc_calcssmant(jpc_fix_t stepsize);
 void jpc_quantize(jas_matrix_t *data, jpc_fix_t stepsize);
 static int jpc_enc_encodemainhdr(jpc_enc_t *enc);
 static int jpc_enc_encodemainbody(jpc_enc_t *enc);
@@ -868,27 +866,6 @@ void jpc_enc_destroy(jpc_enc_t *enc)
 /******************************************************************************\
 * Code.
 \******************************************************************************/
-
-static int jpc_calcssmant(jpc_fix_t stepsize)
-{
-	int n;
-	int e;
-	int m;
-
-	n = jpc_fix_firstone(stepsize);
-	e = n - JPC_FIX_FRACBITS;
-	if (n >= 11) {
-		m = (stepsize >> (n - 11)) & 0x7ff;
-	} else {
-		m = (stepsize & ((1 << n) - 1)) << (11 - n);
-	}
-	return m;
-}
-
-static int jpc_calcssexp(jpc_fix_t stepsize)
-{
-	return jpc_fix_firstone(stepsize) - JPC_FIX_FRACBITS;
-}
 
 static int jpc_enc_encodemainhdr(jpc_enc_t *enc)
 {
