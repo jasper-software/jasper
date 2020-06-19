@@ -845,8 +845,8 @@ static int jp2_cmap_getdata(jp2_box_t *box, jas_stream_t *in)
 static int jp2_cmap_putdata(jp2_box_t *box, jas_stream_t *out)
 {
 	/* Eliminate compiler warning about unused variables. */
-	box = 0;
-	out = 0;
+	(void)box;
+	(void)out;
 
 	return -1;
 }
@@ -925,8 +925,8 @@ static int jp2_pclr_putdata(jp2_box_t *box, jas_stream_t *out)
 	jp2_pclr_t *pclr = &box->data.pclr;
 #endif
 	/* Eliminate warning about unused variable. */
-	box = 0;
-	out = 0;
+	(void)box;
+	(void)out;
 	return -1;
 }
 
