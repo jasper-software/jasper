@@ -949,7 +949,7 @@ static int jas_iccxyz_output(jas_iccattrval_t *attrval, jas_stream_t *out)
 static int jas_iccxyz_getsize(jas_iccattrval_t *attrval)
 {
 	/* Avoid compiler warnings about unused parameters. */
-	attrval = 0;
+	(void)attrval;
 
 	return 12;
 }
@@ -977,8 +977,8 @@ static int jas_icccurv_copy(jas_iccattrval_t *attrval,
   jas_iccattrval_t *othattrval)
 {
 	/* Avoid compiler warnings about unused parameters. */
-	attrval = 0;
-	othattrval = 0;
+	(void)attrval;
+	(void)othattrval;
 
 	/* Not yet implemented. */
 	abort();
@@ -1073,9 +1073,9 @@ static int jas_icctxtdesc_copy(jas_iccattrval_t *attrval,
 	jas_icctxtdesc_t *txtdesc = &attrval->data.txtdesc;
 
 	/* Avoid compiler warnings about unused parameters. */
-	attrval = 0;
-	othattrval = 0;
-	txtdesc = 0;
+	(void)attrval;
+	(void)othattrval;
+	(void)txtdesc;
 
 	/* Not yet implemented. */
 	abort();
@@ -1271,11 +1271,9 @@ static void jas_icclut8_destroy(jas_iccattrval_t *attrval)
 static int jas_icclut8_copy(jas_iccattrval_t *attrval,
   jas_iccattrval_t *othattrval)
 {
-	jas_icclut8_t *lut8 = &attrval->data.lut8;
 	/* Avoid compiler warnings about unused parameters. */
-	attrval = 0;
-	othattrval = 0;
-	lut8 = 0;
+	(void)attrval;
+	(void)othattrval;
 	abort();
 	return -1;
 }
@@ -1452,8 +1450,8 @@ static int jas_icclut16_copy(jas_iccattrval_t *attrval,
   jas_iccattrval_t *othattrval)
 {
 	/* Avoid compiler warnings about unused parameters. */
-	attrval = 0;
-	othattrval = 0;
+	(void)attrval;
+	(void)othattrval;
 	/* Not yet implemented. */
 	abort();
 	return -1;
