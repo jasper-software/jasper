@@ -97,7 +97,7 @@ typedef struct {
 	int id;
 	/* The unique identifier for this option. */
 
-	char *name;
+	const char *name;
 	/* The name of this option. */
 
 	int flags;
@@ -113,7 +113,7 @@ typedef struct {
 JAS_DLLEXPORT extern int jas_optind;
 
 /* The current option argument. */
-JAS_DLLEXPORT extern char *jas_optarg;
+JAS_DLLEXPORT extern const char *jas_optarg;
 
 /* The debug level. */
 JAS_DLLEXPORT extern int jas_opterr;
@@ -123,7 +123,7 @@ JAS_DLLEXPORT extern int jas_opterr;
 \******************************************************************************/
 
 /* Get the next option. */
-JAS_DLLEXPORT int jas_getopt(int argc, char **argv, jas_opt_t *opts);
+JAS_DLLEXPORT int jas_getopt(int argc, char **argv, const jas_opt_t *opts);
 
 #ifdef __cplusplus
 }

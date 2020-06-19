@@ -95,7 +95,7 @@ typedef struct {
 	char **filenames;
 
 	/* The title for the window. */
-	char *title;
+	const char *title;
 
 	/* The time to wait before advancing to the next image (in ms). */
 	int tmout;
@@ -190,7 +190,7 @@ static void render(void);
 *
 \******************************************************************************/
 
-jas_opt_t opts[] = {
+static const jas_opt_t opts[] = {
 	{'V', "version", 0},
 	{'v', "v", 0},
 	{'h', "help", 0},

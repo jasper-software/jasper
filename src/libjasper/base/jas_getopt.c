@@ -84,15 +84,15 @@
 
 int jas_optind = 0;
 int jas_opterr = 1;
-char *jas_optarg = 0;
+const char *jas_optarg = 0;
 
 /******************************************************************************\
 * Code.
 \******************************************************************************/
 
-static jas_opt_t *jas_optlookup(jas_opt_t *opts, char *name)
+static const jas_opt_t *jas_optlookup(const jas_opt_t *opts, const char *name)
 {
-	jas_opt_t *opt;
+	const jas_opt_t *opt;
 
 	for (opt = opts; opt->id >= 0 && opt->name; ++opt) {
 		if (!strcmp(opt->name, name)) {
@@ -102,13 +102,13 @@ static jas_opt_t *jas_optlookup(jas_opt_t *opts, char *name)
 	return 0;
 }
 
-int jas_getopt(int argc, char **argv, jas_opt_t *opts)
+int jas_getopt(int argc, char **argv, const jas_opt_t *opts)
 {
-	char *cp;
+	const char *cp;
 	int id;
 	int hasarg;
-	jas_opt_t *opt;
-	char *s;
+	const jas_opt_t *opt;
+	const char *s;
 
 	if (!jas_optind) {
 		jas_optind = JAS_MIN(1, argc);

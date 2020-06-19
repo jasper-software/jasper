@@ -104,7 +104,7 @@ static void cmdinfo(void);
 *
 \******************************************************************************/
 
-static jas_opt_t opts[] = {
+static const jas_opt_t opts[] = {
 	{OPT_HELP, "help", 0},
 	{OPT_VERSION, "version", 0},
 	{OPT_VERBOSE, "verbose", 0},
@@ -129,7 +129,7 @@ int main(int argc, char **argv)
 {
 	int fmtid;
 	int id;
-	char *infile;
+	const char *infile;
 	jas_stream_t *instream;
 	jas_image_t *image;
 	int width;
@@ -137,7 +137,7 @@ int main(int argc, char **argv)
 	int depth;
 	int numcmpts;
 	int verbose;
-	char *fmtname;
+	const char *fmtname;
 	int debug;
 	size_t max_mem;
 	size_t max_samples;

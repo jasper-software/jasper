@@ -94,7 +94,7 @@
 
 typedef struct {
 
-	char *infile;
+	const char *infile;
 	/* The input image file. */
 
 	int infmt;
@@ -103,7 +103,7 @@ typedef struct {
 	char *inopts;
 	char inoptsbuf[OPTSMAX + 1];
 
-	char *outfile;
+	const char *outfile;
 	/* The output image file. */
 
 	int outfmt;
@@ -135,7 +135,7 @@ void cmdopts_destroy(cmdopts_t *cmdopts);
 void cmdusage(void);
 void badusage(void);
 void cmdinfo(void);
-int addopt(char *optstr, int maxlen, char *s);
+int addopt(char *optstr, int maxlen, const char *s);
 
 /******************************************************************************\
 * Global data.
@@ -323,7 +323,7 @@ cmdopts_t *cmdopts_parse(int argc, char **argv)
 		CMDOPT_MAXMEM
 	} cmdoptid_t;
 
-	static jas_opt_t cmdoptions[] = {
+	static const jas_opt_t cmdoptions[] = {
 		{CMDOPT_HELP, "help", 0},
 		{CMDOPT_VERBOSE, "verbose", 0},
 		{CMDOPT_INFILE, "input", JAS_OPT_HASARG},
@@ -462,7 +462,7 @@ void cmdopts_destroy(cmdopts_t *cmdopts)
 	free(cmdopts);
 }
 
-int addopt(char *optstr, int maxlen, char *s)
+int addopt(char *optstr, int maxlen, const char *s)
 {
 	size_t n;
 	size_t m;

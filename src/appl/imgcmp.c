@@ -130,7 +130,7 @@ static jas_taginfo_t metrictab[] = {
 	{-1, 0}
 };
 
-static jas_opt_t opts[] = {
+static const jas_opt_t opts[] = {
 	{OPT_HELP, "help", 0},
 	{OPT_VERSION, "version", 0},
 	{OPT_VERBOSE, "verbose", 0},
@@ -154,10 +154,10 @@ static char *cmdname = 0;
 
 int main(int argc, char **argv)
 {
-	char *origpath;
-	char *reconpath;
+	const char *origpath;
+	const char *reconpath;
 	int verbose;
-	char *metricname;
+	const char *metricname;
 	int metric;
 
 	int id;
@@ -177,7 +177,7 @@ int main(int argc, char **argv)
 	int compno;
 	jas_stream_t *origstream;
 	jas_stream_t *reconstream;
-	char *diffpath;
+	const char *diffpath;
 	int maxonly;
 	int minonly;
 	int fmtid;
