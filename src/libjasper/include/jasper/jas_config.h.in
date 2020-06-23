@@ -16,6 +16,8 @@
 /* This preprocessor symbol identifies the version of JasPer. */
 #define	JAS_VERSION "@JAS_VERSION@"
 
+#cmakedefine JAS_ENABLE_32BIT 1
+
 #cmakedefine JAS_HAVE_FCNTL_H 1
 #cmakedefine JAS_HAVE_IO_H 1
 #cmakedefine JAS_HAVE_UNISTD_H 1

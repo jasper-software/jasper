@@ -121,6 +121,13 @@ JAS_ENABLE_HIDDEN
     Hide internal symbols?  Enabling this results in a smaller binary.
     Valid values: true or false
 
+JAS_ENABLE_32BIT
+    Force the use of 32 bit integers?  On 64 bit CPUs, JasPer
+    historically used 64 bit integers which consumes more memory, is
+    slower and has no advantages.  This produces a different ABI, so
+    the resulting library is not compatible with other builds.
+    Valid values: true or false
+
 JAS_ENABLE_ASAN
     Enable the Address Sanitizer.
     Valid values: true or false
