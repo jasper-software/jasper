@@ -107,11 +107,11 @@ jas_matrix_t *jas_matrix_create(jas_matind_t numrows, jas_matind_t numcols)
 	matrix = 0;
 
 	if (numrows < 0 || numcols < 0) {
-		goto error;
+		return NULL;
 	}
 
 	if (!(matrix = jas_malloc(sizeof(jas_matrix_t)))) {
-		goto error;
+		return NULL;
 	}
 	matrix->flags_ = 0;
 	matrix->numrows_ = numrows;
@@ -156,9 +156,7 @@ jas_matrix_t *jas_matrix_create(jas_matind_t numrows, jas_matind_t numcols)
 	return matrix;
 
 error:
-	if (matrix) {
-		jas_matrix_destroy(matrix);
-	}
+	jas_matrix_destroy(matrix);
 	return 0;
 }
 
