@@ -110,6 +110,11 @@ jas_matrix_t *jas_matrix_create(jas_matind_t numrows, jas_matind_t numcols)
 		return NULL;
 	}
 
+	// matrix->datasize_ = numrows * numcols;
+	if (!jas_safe_size_mul(numrows, numcols, &size)) {
+		return NULL;
+	}
+
 	if (!(matrix = jas_malloc(sizeof(jas_matrix_t)))) {
 		return NULL;
 	}
@@ -119,12 +124,6 @@ jas_matrix_t *jas_matrix_create(jas_matind_t numrows, jas_matind_t numcols)
 	matrix->rows_ = 0;
 	matrix->maxrows_ = numrows;
 	matrix->data_ = 0;
-	matrix->datasize_ = 0;
-
-	// matrix->datasize_ = numrows * numcols;
-	if (!jas_safe_size_mul(numrows, numcols, &size)) {
-		goto error;
-	}
 	matrix->datasize_ = size;
 
 	if (matrix->maxrows_ > 0) {
