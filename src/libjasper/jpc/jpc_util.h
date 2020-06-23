@@ -76,6 +76,7 @@ jas_seq_t *jpc_seq_upsample(jas_seq_t *seq, int n);
 jas_seq_t *jpc_seq_conv(jas_seq_t *seq0, jas_seq_t *seq1);
 
 /* Compute the norm of a sequence. */
+JAS_ATTRIBUTE_PURE
 jpc_fix_t jpc_seq_norm(const jas_seq_t *x);
 
 #endif

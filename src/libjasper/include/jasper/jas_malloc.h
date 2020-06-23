@@ -112,6 +112,7 @@ JAS_DLLEXPORT void *jas_realloc2(void *ptr, size_t num_elements, size_t element_
 
 JAS_DLLEXPORT void jas_set_max_mem_usage(size_t max_mem);
 
+JAS_ATTRIBUTE_PURE
 JAS_DLLEXPORT size_t jas_get_mem_usage();
 
 #endif

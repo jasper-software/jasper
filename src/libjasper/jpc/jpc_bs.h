@@ -186,9 +186,11 @@ int jpc_bitstream_inalign(jpc_bitstream_t *bitstream, int fillmask,
 int jpc_bitstream_outalign(jpc_bitstream_t *bitstream, int filldata);
 
 /* Check if a bit stream needs alignment. */
+JAS_ATTRIBUTE_PURE
 int jpc_bitstream_needalign(const jpc_bitstream_t *bitstream);
 
 /* How many additional bytes would be output if the bit stream was aligned? */
+JAS_ATTRIBUTE_PURE
 int jpc_bitstream_pending(const jpc_bitstream_t *bitstream);
 
 /******************************************************************************\

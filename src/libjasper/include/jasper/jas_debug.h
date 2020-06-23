@@ -95,6 +95,7 @@ extern "C" {
 #endif
 
 /* Get the library debug level. */
+JAS_ATTRIBUTE_CONST
 JAS_DLLEXPORT int jas_getdbglevel(void);
 
 /* Set the library debug level. */
