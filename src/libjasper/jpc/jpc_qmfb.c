@@ -95,51 +95,51 @@
 #define QMFB_SPLITBUFSIZE	4096
 #define	QMFB_JOINBUFSIZE	4096
 
-int jpc_ft_analyze(jpc_fix_t *a, int xstart, int ystart, int width, int height,
+static int jpc_ft_analyze(jpc_fix_t *a, int xstart, int ystart, int width, int height,
   int stride);
-int jpc_ft_synthesize(jpc_fix_t *a, int xstart, int ystart, int width, int height,
+static int jpc_ft_synthesize(jpc_fix_t *a, int xstart, int ystart, int width, int height,
   int stride);
 
-int jpc_ns_analyze(jpc_fix_t *a, int xstart, int ystart, int width, int height,
+static int jpc_ns_analyze(jpc_fix_t *a, int xstart, int ystart, int width, int height,
   int stride);
-int jpc_ns_synthesize(jpc_fix_t *a, int xstart, int ystart, int width,
+static int jpc_ns_synthesize(jpc_fix_t *a, int xstart, int ystart, int width,
   int height, int stride);
 
-void jpc_ft_fwdlift_row(jpc_fix_t *a, int numcols, int parity);
-void jpc_ft_fwdlift_col(jpc_fix_t *a, int numrows, int stride,
+static void jpc_ft_fwdlift_row(jpc_fix_t *a, int numcols, int parity);
+static void jpc_ft_fwdlift_col(jpc_fix_t *a, int numrows, int stride,
   int parity);
-void jpc_ft_fwdlift_colgrp(jpc_fix_t *a, int numrows, int stride,
+static void jpc_ft_fwdlift_colgrp(jpc_fix_t *a, int numrows, int stride,
   int parity);
-void jpc_ft_fwdlift_colres(jpc_fix_t *a, int numrows, int numcols,
+static void jpc_ft_fwdlift_colres(jpc_fix_t *a, int numrows, int numcols,
   int stride, int parity);
 
-void jpc_ft_invlift_row(jpc_fix_t *a, int numcols, int parity);
-void jpc_ft_invlift_col(jpc_fix_t *a, int numrows, int stride,
+static void jpc_ft_invlift_row(jpc_fix_t *a, int numcols, int parity);
+static void jpc_ft_invlift_col(jpc_fix_t *a, int numrows, int stride,
   int parity);
-void jpc_ft_invlift_colgrp(jpc_fix_t *a, int numrows, int stride,
+static void jpc_ft_invlift_colgrp(jpc_fix_t *a, int numrows, int stride,
   int parity);
-void jpc_ft_invlift_colres(jpc_fix_t *a, int numrows, int numcols,
+static void jpc_ft_invlift_colres(jpc_fix_t *a, int numrows, int numcols,
   int stride, int parity);
 
-void jpc_ns_fwdlift_row(jpc_fix_t *a, int numcols, int parity);
-void jpc_ns_fwdlift_colgrp(jpc_fix_t *a, int numrows, int stride, int parity);
-void jpc_ns_fwdlift_colres(jpc_fix_t *a, int numrows, int numcols, int stride,
+static void jpc_ns_fwdlift_row(jpc_fix_t *a, int numcols, int parity);
+static void jpc_ns_fwdlift_colgrp(jpc_fix_t *a, int numrows, int stride, int parity);
+static void jpc_ns_fwdlift_colres(jpc_fix_t *a, int numrows, int numcols, int stride,
   int parity);
-void jpc_ns_invlift_row(jpc_fix_t *a, int numcols, int parity);
-void jpc_ns_invlift_colgrp(jpc_fix_t *a, int numrows, int stride, int parity);
-void jpc_ns_invlift_colres(jpc_fix_t *a, int numrows, int numcols, int stride,
-  int parity);
-
-void jpc_qmfb_split_row(jpc_fix_t *a, int numcols, int parity);
-void jpc_qmfb_split_col(jpc_fix_t *a, int numrows, int stride, int parity);
-void jpc_qmfb_split_colgrp(jpc_fix_t *a, int numrows, int stride, int parity);
-void jpc_qmfb_split_colres(jpc_fix_t *a, int numrows, int numcols, int stride,
+static void jpc_ns_invlift_row(jpc_fix_t *a, int numcols, int parity);
+static void jpc_ns_invlift_colgrp(jpc_fix_t *a, int numrows, int stride, int parity);
+static void jpc_ns_invlift_colres(jpc_fix_t *a, int numrows, int numcols, int stride,
   int parity);
 
-void jpc_qmfb_join_row(jpc_fix_t *a, int numcols, int parity);
-void jpc_qmfb_join_col(jpc_fix_t *a, int numrows, int stride, int parity);
-void jpc_qmfb_join_colgrp(jpc_fix_t *a, int numrows, int stride, int parity);
-void jpc_qmfb_join_colres(jpc_fix_t *a, int numrows, int numcols, int stride,
+static void jpc_qmfb_split_row(jpc_fix_t *a, int numcols, int parity);
+static void jpc_qmfb_split_col(jpc_fix_t *a, int numrows, int stride, int parity);
+static void jpc_qmfb_split_colgrp(jpc_fix_t *a, int numrows, int stride, int parity);
+static void jpc_qmfb_split_colres(jpc_fix_t *a, int numrows, int numcols, int stride,
+  int parity);
+
+static void jpc_qmfb_join_row(jpc_fix_t *a, int numcols, int parity);
+static void jpc_qmfb_join_col(jpc_fix_t *a, int numrows, int stride, int parity);
+static void jpc_qmfb_join_colgrp(jpc_fix_t *a, int numrows, int stride, int parity);
+static void jpc_qmfb_join_colres(jpc_fix_t *a, int numrows, int numcols, int stride,
   int parity);
 
 static const double jpc_ft_lpenergywts[32] = {

@@ -137,30 +137,30 @@ static void prc_destroy(jpc_enc_prc_t *prcs);
 static jpc_enc_cblk_t *cblk_create(jpc_enc_cblk_t *cblk,
   jpc_enc_prc_t *prc);
 static void cblk_destroy(jpc_enc_cblk_t *cblks);
-int ratestrtosize(const char *s, uint_fast32_t rawsize, uint_fast32_t *size);
+static int ratestrtosize(const char *s, uint_fast32_t rawsize, uint_fast32_t *size);
 static void pass_destroy(jpc_enc_pass_t *pass);
-void jpc_enc_dump(jpc_enc_t *enc);
+static void jpc_enc_dump(jpc_enc_t *enc);
 
 /******************************************************************************\
 * Local prototypes.
 \******************************************************************************/
 
-int dump_passes(jpc_enc_pass_t *passes, int numpasses, jpc_enc_cblk_t *cblk);
-void calcrdslopes(jpc_enc_cblk_t *cblk);
-void dump_layeringinfo(jpc_enc_t *enc);
-void jpc_quantize(jas_matrix_t *data, jpc_fix_t stepsize);
+static int dump_passes(jpc_enc_pass_t *passes, int numpasses, jpc_enc_cblk_t *cblk);
+static void calcrdslopes(jpc_enc_cblk_t *cblk);
+static void dump_layeringinfo(jpc_enc_t *enc);
+static void jpc_quantize(jas_matrix_t *data, jpc_fix_t stepsize);
 static int jpc_enc_encodemainhdr(jpc_enc_t *enc);
 static int jpc_enc_encodemainbody(jpc_enc_t *enc);
-int jpc_enc_encodetiledata(jpc_enc_t *enc);
-jpc_enc_t *jpc_enc_create(jpc_enc_cp_t *cp, jas_stream_t *out, jas_image_t *image);
-void jpc_enc_destroy(jpc_enc_t *enc);
+static int jpc_enc_encodetiledata(jpc_enc_t *enc);
+static jpc_enc_t *jpc_enc_create(jpc_enc_cp_t *cp, jas_stream_t *out, jas_image_t *image);
+static void jpc_enc_destroy(jpc_enc_t *enc);
 static int jpc_enc_encodemainhdr(jpc_enc_t *enc);
 static int jpc_enc_encodemainbody(jpc_enc_t *enc);
-int jpc_enc_encodetiledata(jpc_enc_t *enc);
-int rateallocate(jpc_enc_t *enc, int numlyrs, uint_fast32_t *cumlens);
-int setins(int numvalues, jpc_flt_t *values, jpc_flt_t value);
+static int jpc_enc_encodetiledata(jpc_enc_t *enc);
+static int rateallocate(jpc_enc_t *enc, int numlyrs, uint_fast32_t *cumlens);
+static int setins(int numvalues, jpc_flt_t *values, jpc_flt_t value);
 static jpc_enc_cp_t *cp_create(const char *optstr, jas_image_t *image);
-void jpc_enc_cp_destroy(jpc_enc_cp_t *cp);
+static void jpc_enc_cp_destroy(jpc_enc_cp_t *cp);
 static uint_fast32_t jpc_abstorelstepsize(jpc_fix_t absdelta, int scaleexpn);
 
 static uint_fast32_t jpc_abstorelstepsize(jpc_fix_t absdelta, int scaleexpn)
