@@ -196,6 +196,12 @@ inline static int jas_fast32_asl(int_fast32_t x, int n)
 /* Compute the product of two size_t integers with overflow checking. */
 inline static bool jas_safe_size_mul(size_t x, size_t y, size_t *result)
 {
+#ifdef __GNUC__
+	size_t result_buffer;
+	if (!result)
+		result = &result_buffer;
+	return !__builtin_mul_overflow(x, y, result);
+#else
 	/* Check if overflow would occur */
 	if (x && y > SIZE_MAX / x) {
 		/* Overflow would occur. */
@@ -205,6 +211,7 @@ inline static bool jas_safe_size_mul(size_t x, size_t y, size_t *result)
 		*result = x * y;
 	}
 	return true;
+#endif
 }
 
 /* Compute the product of three size_t integers with overflow checking. */
@@ -225,6 +232,12 @@ inline static bool jas_safe_size_mul3(size_t a, size_t b, size_t c,
 /* Compute the sum of two size_t integers with overflow checking. */
 inline static bool jas_safe_size_add(size_t x, size_t y, size_t *result)
 {
+#ifdef __GNUC__
+	size_t result_buffer;
+	if (!result)
+		result = &result_buffer;
+	return !__builtin_add_overflow(x, y, result);
+#else
 	if (y > SIZE_MAX - x) {
 		return false;
 	}
@@ -232,11 +245,18 @@ inline static bool jas_safe_size_add(size_t x, size_t y, size_t *result)
 		*result = x + y;
 	}
 	return true;
+#endif
 }
 
 /* Compute the difference of two size_t integers with overflow checking. */
 inline static bool jas_safe_size_sub(size_t x, size_t y, size_t *result)
 {
+#ifdef __GNUC__
+	size_t result_buffer;
+	if (!result)
+		result = &result_buffer;
+	return !__builtin_sub_overflow(x, y, result);
+#else
 	if (y > x) {
 		return false;
 	}
@@ -244,12 +264,19 @@ inline static bool jas_safe_size_sub(size_t x, size_t y, size_t *result)
 		*result = x - y;
 	}
 	return true;
+#endif
 }
 
 /* Compute the product of two int_fast32_t integers with overflow checking. */
 inline static bool jas_safe_intfast32_mul(int_fast32_t x, int_fast32_t y,
   int_fast32_t *result)
 {
+#ifdef __GNUC__
+	int_fast32_t result_buffer;
+	if (!result)
+		result = &result_buffer;
+	return !__builtin_mul_overflow(x, y, result);
+#else
 	if (x > 0) {
 		/* x is positive */
 		if (y > 0) {
@@ -281,6 +308,7 @@ inline static bool jas_safe_intfast32_mul(int_fast32_t x, int_fast32_t y,
 		*result = x * y;
 	}
 	return true;
+#endif
 }
 
 /* Compute the product of three int_fast32_t integers with overflow checking. */
@@ -302,6 +330,12 @@ inline static bool jas_safe_intfast32_mul3(int_fast32_t a, int_fast32_t b,
 inline static bool jas_safe_intfast32_add(int_fast32_t x, int_fast32_t y,
   int_fast32_t *result)
 {
+#ifdef __GNUC__
+	int_fast32_t result_buffer;
+	if (!result)
+		result = &result_buffer;
+	return !__builtin_add_overflow(x, y, result);
+#else
 	if ((y > 0 && x > INT_FAST32_MAX - y) ||
 	  (y < 0 && x < INT_FAST32_MIN - y)) {
 		return false;
@@ -310,6 +344,7 @@ inline static bool jas_safe_intfast32_add(int_fast32_t x, int_fast32_t y,
 		*result = x + y;
 	}
 	return true;
+#endif
 }
 
 #ifdef __cplusplus
