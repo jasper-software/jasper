@@ -151,7 +151,7 @@ jas_seq_t *jpc_seq_upsample(jas_seq_t *x, int m)
 	return z;
 }
 
-jpc_fix_t jpc_seq_norm(jas_seq_t *x)
+jpc_fix_t jpc_seq_norm(const jas_seq_t *x)
 {
 	jpc_fix_t s;
 	int i;
