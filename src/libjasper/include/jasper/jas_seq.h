@@ -202,7 +202,7 @@ JAS_DLLEXPORT int jas_matrix_resize(jas_matrix_t *matrix, jas_matind_t numrows, 
 JAS_DLLEXPORT int jas_matrix_output(jas_matrix_t *matrix, FILE *out);
 
 /* Create a matrix that references part of another matrix. */
-JAS_DLLEXPORT void jas_matrix_bindsub(jas_matrix_t *mat0, jas_matrix_t *mat1, jas_matind_t r0,
+JAS_DLLEXPORT int jas_matrix_bindsub(jas_matrix_t *mat0, jas_matrix_t *mat1, jas_matind_t r0,
   jas_matind_t c0, jas_matind_t r1, jas_matind_t c1);
 
 /* Create a matrix that is a reference to a row of another matrix. */
