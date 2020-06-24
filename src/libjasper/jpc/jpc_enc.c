@@ -163,6 +163,9 @@ static jpc_enc_cp_t *cp_create(const char *optstr, jas_image_t *image);
 static void jpc_enc_cp_destroy(jpc_enc_cp_t *cp);
 static uint_fast32_t jpc_abstorelstepsize(jpc_fix_t absdelta, int scaleexpn);
 
+/**
+ * @return UINT_FAST32_MAX on error
+ */
 static uint_fast32_t jpc_abstorelstepsize(jpc_fix_t absdelta, int scaleexpn)
 {
 	int p;
@@ -171,7 +174,7 @@ static uint_fast32_t jpc_abstorelstepsize(jpc_fix_t absdelta, int scaleexpn)
 	int n;
 
 	if (absdelta < 0) {
-		abort();
+		return UINT_FAST32_MAX;
 	}
 
 	p = jpc_fix_firstone(absdelta) - JPC_FIX_FRACBITS;
@@ -179,8 +182,10 @@ static uint_fast32_t jpc_abstorelstepsize(jpc_fix_t absdelta, int scaleexpn)
 	mant = ((n < 0) ? (absdelta >> (-n)) : (absdelta << n)) & 0x7ff;
 	expn = scaleexpn - p;
 	if (scaleexpn < p) {
-		abort();
+		return UINT_FAST32_MAX;
 	}
+	if (expn >= 0x1f)
+		return UINT_FAST32_MAX;
 	return JPC_QCX_EXPN(expn) | JPC_QCX_MANT(mant);
 }
 
@@ -991,9 +996,12 @@ startoff = jas_stream_getrwcount(enc->out);
 			} else {
 				absstepsize = jpc_inttofix(1);
 			}	
-			cp->ccps[cmptno].stepsizes[bandno] =
+			const uint_fast32_t stepsize =
 			  jpc_abstorelstepsize(absstepsize,
 			  cp->ccps[cmptno].prec + analgain);
+			if (stepsize == UINT_FAST32_MAX)
+				return -1;
+			cp->ccps[cmptno].stepsizes[bandno] = stepsize;
 		}
 		cp->ccps[cmptno].numstepsizes = numbands;
 	}
@@ -1234,9 +1242,12 @@ jas_eprintf("%d %d mag=%d actual=%d numgbits=%d\n", cp->ccps[cmptno].prec, band-
 					} else {
 						band->absstepsize = jpc_inttofix(1);
 					}
-					band->stepsize = jpc_abstorelstepsize(
+					const uint_fast32_t stepsize = jpc_abstorelstepsize(
 					  band->absstepsize, cp->ccps[cmptno].prec +
 					  band->analgain);
+					if (stepsize == UINT_FAST32_MAX)
+						return -1;
+					band->stepsize = stepsize;
 					band->numbps = cp->tccp.numgbits +
 					  JPC_QCX_GETEXPN(band->stepsize) - 1;
 
