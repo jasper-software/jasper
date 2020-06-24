@@ -1248,6 +1248,13 @@ static int jpc_dec_process_siz(jpc_dec_t *dec, jpc_ms_t *ms)
 	size_t num_samples;
 	size_t num_samples_delta;
 
+	size_t tile_samples;
+	if (!jas_safe_size_mul(siz->tilewidth, siz->tileheight, &tile_samples) ||
+	    (dec->max_samples > 0 && tile_samples > dec->max_samples)) {
+		jas_eprintf("tile too large\n");
+		return -1;
+	}
+
 	dec->xstart = siz->xoff;
 	dec->ystart = siz->yoff;
 	dec->xend = siz->width;
