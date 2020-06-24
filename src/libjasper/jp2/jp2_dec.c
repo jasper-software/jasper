@@ -368,6 +368,9 @@ jas_image_t *jp2_decode(jas_stream_t *in, const char *optstr)
 				dec->chantocmptlut[channo] = channo;
 			} else if (cmapent->map == JP2_CMAP_PALETTE) {
 				lutents = jas_alloc2(pclrd->numlutents, sizeof(int_fast32_t));
+				if (!lutents) {
+					goto error;
+				}
 				for (i = 0; i < pclrd->numlutents; ++i) {
 					lutents[i] = pclrd->lutdata[cmapent->pcol + i * pclrd->numchans];
 				}
