@@ -175,8 +175,8 @@ error:
 static jas_cmprof_t *jas_cmprof_createsycc()
 {
 	jas_cmprof_t *prof;
-	jas_cmpxform_t *fwdpxform;
-	jas_cmpxform_t *revpxform;
+	jas_cmpxform_t *fwdpxform = NULL;
+	jas_cmpxform_t *revpxform = NULL;
 	jas_cmshapmat_t *fwdshapmat;
 	jas_cmshapmat_t *revshapmat;
 	int i;
@@ -238,6 +238,10 @@ static jas_cmprof_t *jas_cmprof_createsycc()
 	jas_cmpxform_destroy(revpxform);
 	return prof;
 error:
+	if (fwdpxform)
+		jas_cmpxform_destroy(fwdpxform);
+	if (revpxform)
+		jas_cmpxform_destroy(revpxform);
 	return 0;
 }
 
