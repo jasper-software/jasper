@@ -2020,6 +2020,9 @@ static void jpc_dec_destroy(jpc_dec_t *dec)
 	if (dec->pkthdrstreams) {
 		jpc_streamlist_destroy(dec->pkthdrstreams);
 	}
+	if (dec->ppmstab) {
+		jpc_ppxstab_destroy(dec->ppmstab);
+	}
 	if (dec->image) {
 		jas_image_destroy(dec->image);
 	}
