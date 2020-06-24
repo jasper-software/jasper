@@ -333,6 +333,9 @@ int jp2_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 		cdef = &box->data.cdef;
 		cdef->numchans = jas_image_numcmpts(image);
 		cdef->ents = jas_alloc2(cdef->numchans, sizeof(jp2_cdefchan_t));
+		if (!cdef->ents) {
+			goto error;
+		}
 		for (i = 0; i < jas_image_numcmpts(image); ++i) {
 			cdefchanent = &cdef->ents[i];
 			cdefchanent->channo = i;
