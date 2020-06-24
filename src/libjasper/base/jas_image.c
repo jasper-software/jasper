@@ -1440,6 +1440,12 @@ jas_eprintf("IMAGE\n");
 jas_image_dump(image, stderr);
 #endif
 
+	if (image->numcmpts_ == 0)
+		/* can't work with a file with no components;
+		   continuing would crash because we'd attempt to
+		   obtain information about the first component */
+		return NULL;
+
 	outimage = 0;
 	xform = 0;
 	if (!(inimage = jas_image_copy(image)))
