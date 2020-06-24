@@ -833,8 +833,10 @@ static int jpc_dec_tileinit(jpc_dec_t *dec, jpc_dec_tile_t *tile)
 				if (!(band->data = jas_seq2d_create(0, 0, 0, 0))) {
 					return -1;
 				}
-				jas_seq2d_bindsub(band->data, tcomp->data, bnd->locxstart,
-				  bnd->locystart, bnd->locxend, bnd->locyend);
+				if (jas_seq2d_bindsub(band->data, tcomp->data, bnd->locxstart,
+						      bnd->locystart, bnd->locxend, bnd->locyend)) {
+					return -1;
+				}
 				jas_seq2d_setshift(band->data, bnd->xstart, bnd->ystart);
 
 				assert(rlvl->numprcs);
@@ -914,8 +916,10 @@ static int jpc_dec_tileinit(jpc_dec_t *dec, jpc_dec_tile_t *tile)
 								  0))) {
 									return -1;
 								}
-								jas_seq2d_bindsub(cblk->data, band->data,
-								  tmpxstart, tmpystart, tmpxend, tmpyend);
+								if (jas_seq2d_bindsub(cblk->data, band->data,
+										      tmpxstart, tmpystart, tmpxend, tmpyend)) {
+									return -1;
+								}
 								++cblk;
 								--cblkcnt;
 							}

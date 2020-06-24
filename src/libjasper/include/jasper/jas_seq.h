@@ -284,7 +284,7 @@ JAS_DLLEXPORT jas_matrix_t *jas_seq2d_create(jas_matind_t xstart, jas_matind_t y
 #define jas_seq2d_size(s) \
 	(jas_seq2d_width(s) * jas_seq2d_height(s))
 
-JAS_DLLEXPORT void jas_seq2d_bindsub(jas_matrix_t *s, jas_matrix_t *s1, jas_matind_t xstart,
+JAS_DLLEXPORT int jas_seq2d_bindsub(jas_matrix_t *s, jas_matrix_t *s1, jas_matind_t xstart,
   jas_matind_t ystart, jas_matind_t xend, jas_matind_t yend);
 
 /******************************************************************************\

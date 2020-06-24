@@ -203,11 +203,16 @@ jas_matrix_t *jas_matrix_copy(jas_matrix_t *x)
 * Bind operations.
 \******************************************************************************/
 
-void jas_seq2d_bindsub(jas_matrix_t *s, jas_matrix_t *s1, jas_matind_t xstart,
+int jas_seq2d_bindsub(jas_matrix_t *s, jas_matrix_t *s1, jas_matind_t xstart,
   jas_matind_t ystart, jas_matind_t xend, jas_matind_t yend)
 {
+	if (xstart < s1->xstart_ || ystart < s1->ystart_ ||
+	    xend > s1->xend_ || yend > s1->yend_)
+		return -1;
+
 	jas_matrix_bindsub(s, s1, ystart - s1->ystart_, xstart - s1->xstart_,
-	  yend - s1->ystart_ - 1, xend - s1->xstart_ - 1);
+			   yend - s1->ystart_ - 1, xend - s1->xstart_ - 1);
+	return 0;
 }
 
 void jas_matrix_bindsub(jas_matrix_t *mat0, jas_matrix_t *mat1,

@@ -2309,8 +2309,10 @@ if (bandinfo->xstart != bandinfo->xend && bandinfo->ystart != bandinfo->yend) {
 	if (!(band->data = jas_seq2d_create(0, 0, 0, 0))) {
 		goto error;
 	}
-	jas_seq2d_bindsub(band->data, tcmpt->data, bandinfo->locxstart,
-	  bandinfo->locystart, bandinfo->locxend, bandinfo->locyend);
+	if (jas_seq2d_bindsub(band->data, tcmpt->data, bandinfo->locxstart,
+			      bandinfo->locystart, bandinfo->locxend, bandinfo->locyend)) {
+		goto error;
+	}
 	jas_seq2d_setshift(band->data, bandinfo->xstart, bandinfo->ystart);
 }
 	band->orient = bandinfo->orient;
@@ -2586,7 +2588,9 @@ static jpc_enc_cblk_t *cblk_create(jpc_enc_cblk_t *cblk,
 	if (!(cblk->data = jas_seq2d_create(0, 0, 0, 0))) {
 		goto error;
 	}
-	jas_seq2d_bindsub(cblk->data, band->data, cblktlx, cblktly, cblkbrx, cblkbry);
+	if (jas_seq2d_bindsub(cblk->data, band->data, cblktlx, cblktly, cblkbrx, cblkbry)) {
+		goto error;
+	}
 
 	return cblk;
 
