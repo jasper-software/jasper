@@ -292,6 +292,20 @@ hdroffstart = jas_stream_getrwcount(pkthdrstream);
 				savenumnewpasses = numnewpasses;
 				mycounter = 0;
 				if (numnewpasses > 0) {
+					if (cblk->firstpassno > 10000) {
+						/* workaround for
+						   CVE-2016-9398: this
+						   large value would
+						   make
+						   JPC_SEGPASSCNT()
+						   return a negative
+						   value, causing an
+						   assertion failure
+						   in
+						   jpc_floorlog2() */
+						jpc_bitstream_close(inb);
+						return -1;
+					}
 					if ((m = jpc_getcommacode(inb)) < 0) {
 						jpc_bitstream_close(inb);
 						return -1;
