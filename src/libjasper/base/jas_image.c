@@ -719,7 +719,7 @@ int jas_image_fmtfromname(const char *name)
 * Miscellaneous operations.
 \******************************************************************************/
 
-bool jas_image_cmpt_domains_same(jas_image_t *image)
+bool jas_image_cmpt_domains_same(const jas_image_t *image)
 {
 	int cmptno;
 	jas_image_cmpt_t *cmpt;
@@ -737,7 +737,7 @@ bool jas_image_cmpt_domains_same(jas_image_t *image)
 	return 1;
 }
 
-uint_fast32_t jas_image_rawsize(jas_image_t *image)
+uint_fast32_t jas_image_rawsize(const jas_image_t *image)
 {
 	uint_fast32_t rawsize;
 	int cmptno;
@@ -1047,7 +1047,7 @@ void jas_image_writecmptsample(jas_image_t *image, int cmptno, int x, int y,
 	}
 }
 
-int jas_image_getcmptbytype(jas_image_t *image, int ctype)
+int jas_image_getcmptbytype(const jas_image_t *image, int ctype)
 {
 	int cmptno;
 
@@ -1252,7 +1252,7 @@ error:
 	return -1;
 }
 
-int jas_image_ishomosamp(jas_image_t *image)
+int jas_image_ishomosamp(const jas_image_t *image)
 {
 	jas_image_coord_t hstep;
 	jas_image_coord_t vstep;
