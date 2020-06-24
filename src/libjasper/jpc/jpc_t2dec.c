@@ -225,6 +225,7 @@ hdroffstart = jas_stream_getrwcount(pkthdrstream);
 	}
 
 	if ((present = jpc_bitstream_getbit(inb)) < 0) {
+		jpc_bitstream_close(inb);
 		return 1;
 	}
 	JAS_DBGLOG(10, ("\n", present));
@@ -252,10 +253,12 @@ hdroffstart = jas_stream_getrwcount(pkthdrstream);
 				if (!cblk->numpasses) {
 					leaf = jpc_tagtree_getleaf(prc->incltagtree, usedcblkcnt - 1);
 					if ((included = jpc_tagtree_decode(prc->incltagtree, leaf, lyrno + 1, inb)) < 0) {
+						jpc_bitstream_close(inb);
 						return -1;
 					}
 				} else {
 					if ((included = jpc_bitstream_getbit(inb)) < 0) {
+						jpc_bitstream_close(inb);
 						return -1;
 					}
 				}
@@ -269,6 +272,7 @@ hdroffstart = jas_stream_getrwcount(pkthdrstream);
 					leaf = jpc_tagtree_getleaf(prc->numimsbstagtree, usedcblkcnt - 1);
 					for (;;) {
 						if ((ret = jpc_tagtree_decode(prc->numimsbstagtree, leaf, i, inb)) < 0) {
+							jpc_bitstream_close(inb);
 							return -1;
 						}
 						if (ret) {
@@ -280,6 +284,7 @@ hdroffstart = jas_stream_getrwcount(pkthdrstream);
 					cblk->firstpassno = cblk->numimsbs * 3;
 				}
 				if ((numnewpasses = jpc_getnumnewpasses(inb)) < 0) {
+					jpc_bitstream_close(inb);
 					return -1;
 				}
 				JAS_DBGLOG(10, ("numnewpasses=%d ", numnewpasses));
@@ -288,6 +293,7 @@ hdroffstart = jas_stream_getrwcount(pkthdrstream);
 				mycounter = 0;
 				if (numnewpasses > 0) {
 					if ((m = jpc_getcommacode(inb)) < 0) {
+						jpc_bitstream_close(inb);
 						return -1;
 					}
 					cblk->numlenbits += m;
@@ -298,6 +304,7 @@ hdroffstart = jas_stream_getrwcount(pkthdrstream);
 						maxpasses = JPC_SEGPASSCNT(passno, cblk->firstpassno, 10000, (ccp->cblkctx & JPC_COX_LAZY) != 0, (ccp->cblkctx & JPC_COX_TERMALL) != 0);
 						if (!discard && !seg) {
 							if (!(seg = jpc_seg_alloc())) {
+								jpc_bitstream_close(inb);
 								return -1;
 							}
 							jpc_seglist_insert(&cblk->segs, cblk->segs.tail, seg);
@@ -312,6 +319,7 @@ hdroffstart = jas_stream_getrwcount(pkthdrstream);
 						mycounter += n;
 						numnewpasses -= n;
 						if ((len = jpc_bitstream_getbits(inb, cblk->numlenbits + jpc_floorlog2(n))) < 0) {
+							jpc_bitstream_close(inb);
 							return -1;
 						}
 						JAS_DBGLOG(10, ("len=%d ", len));
@@ -333,6 +341,7 @@ hdroffstart = jas_stream_getrwcount(pkthdrstream);
 	} else {
 		if (jpc_bitstream_inalign(inb, 0x7f, 0)) {
 			jas_eprintf("alignment failed\n");
+			jpc_bitstream_close(inb);
 			return -1;
 		}
 	}
