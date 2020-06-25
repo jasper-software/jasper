@@ -312,9 +312,7 @@ jas_iccprof_t *jas_iccprof_load(jas_stream_t *in)
 				goto error;
 			curoff += reloff;
 		} else if (reloff < 0) {
-			/* This should never happen since we read the tagged
-			element data in a single pass. */
-			abort();
+			goto error;
 		}
 		prevoff = curoff;
 		if (jas_iccgetuint32(in, &type)) {
