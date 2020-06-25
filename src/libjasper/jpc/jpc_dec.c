@@ -1321,6 +1321,12 @@ static int jpc_dec_process_siz(jpc_dec_t *dec, jpc_ms_t *ms)
 		   tiles */
 		return -1;
 	}
+	if (dec->max_samples > 0 && size > dec->max_samples / dec->numcomps / 16) {
+		/* another DoS check: since each tile allocates an
+		   array of components, this check attempts to catch
+		   excessive tile*component numbers */
+		return -1;
+	}
 	dec->numtiles = size;
 	JAS_DBGLOG(10, ("numtiles = %d; numhtiles = %d; numvtiles = %d;\n",
 	  dec->numtiles, dec->numhtiles, dec->numvtiles));
