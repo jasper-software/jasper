@@ -32,6 +32,14 @@ else()
 	message("GLUT library not found; skipping build of jiv program")
 endif()
 
+if (JAS_ENABLE_FUZZER)
+	add_executable(fuzz fuzz.c)
+	target_link_libraries(fuzz libjasper ${JPEG_LIBRARIES} ${MATH_LIBRARY})
+	set(programs "${programs}" fuzz)
+	set_target_properties(fuzz PROPERTIES COMPILE_FLAGS "-fsanitize=fuzzer")
+	set_target_properties(fuzz PROPERTIES LINK_FLAGS "-fsanitize=fuzzer")
+endif()
+
 # The JasPer include directories in the source and build tree must be included
 # before any other directories that may contain the include directory for an
 # already installed version of the JasPer library.

@@ -161,6 +161,11 @@ if (JAS_ENABLE_SHARED)
 	  DEFINE_SYMBOL "JAS_BUILDING_DLL")
 endif()
 
+if (JAS_ENABLE_FUZZER)
+	message("Enabling libFuzzer")
+	set_target_properties(libjasper PROPERTIES COMPILE_FLAGS "-fsanitize=fuzzer")
+endif()
+
 # I am not sure why the following line is needed for building a library, but
 # MacOSX does cannot build a shared library without this line.
 # Also, try adding MATH_LIBRARY to fix a Gentoo problem.

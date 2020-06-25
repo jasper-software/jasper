@@ -2,6 +2,7 @@ option(JAS_ENABLE_ASAN "Enable Address Sanitizer" false)
 option(JAS_ENABLE_USAN "Enable Undefined-Behavior Sanitizer" false)
 option(JAS_ENABLE_LSAN "Enable Leak Sanitizer" false)
 option(JAS_ENABLE_MSAN "Enable Memory Sanitizer" false)
+option(JAS_ENABLE_FUZZER "Enable libFuzzer" false)
 
 macro(jas_enable_sanitizer name)
 	if ("${name}" MATCHES "asan")
