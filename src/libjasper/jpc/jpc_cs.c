@@ -1070,11 +1070,13 @@ static int jpc_qcx_getcompparms(jpc_qcxcp_t *compparms, jpc_cstate_t *cstate,
 		for (i = 0; i < compparms->numstepsizes; ++i) {
 			if (compparms->qntsty == JPC_QCX_NOQNT) {
 				if (jpc_getuint8(in, &tmp)) {
+					jpc_qcx_destroycompparms(compparms);
 					return -1;
 				}
 				compparms->stepsizes[i] = JPC_QCX_EXPN(tmp >> 3);
 			} else {
 				if (jpc_getuint16(in, &compparms->stepsizes[i])) {
+					jpc_qcx_destroycompparms(compparms);
 					return -1;
 				}
 			}
