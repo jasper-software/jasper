@@ -192,6 +192,10 @@ jas_image_t *pnm_decode(jas_stream_t *in, const char *optstr)
 	  hdr.sgnd)
 	  );
 
+	if (hdr.width <= 0 || hdr.height <= 0) {
+		goto error;
+	}
+
 	if (!jas_safe_size_mul3(hdr.width, hdr.height, hdr.numcmpts,
 	  &num_samples)) {
 		jas_eprintf("image too large\n");
