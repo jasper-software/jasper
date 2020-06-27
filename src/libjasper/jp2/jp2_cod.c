@@ -272,6 +272,7 @@ jp2_box_t *jp2_box_get(jas_stream_t *in)
 	  "type=%c%s%c (0x%08x); length=%"PRIuFAST32"\n",
 	  '"', boxinfo->name, '"', box->type, box->len
 	  ));
+	size_t hdrlen;
 	if (box->len == 1) {
 		JAS_DBGLOG(10, ("big length\n"));
 		if (jp2_getuint64(in, &extlen)) {
@@ -282,9 +283,9 @@ jp2_box_t *jp2_box_get(jas_stream_t *in)
 			extlen = 0xffffffffUL;
 		}
 		box->len = extlen;
-		box->datalen = extlen - JP2_BOX_HDRLEN(true);
+		hdrlen = JP2_BOX_HDRLEN(true);
 	} else {
-		box->datalen = box->len - JP2_BOX_HDRLEN(false);
+		hdrlen = JP2_BOX_HDRLEN(false);
 	}
 	if (box->len != 0 && box->len < 8) {
 		goto error;
@@ -293,6 +294,10 @@ jp2_box_t *jp2_box_get(jas_stream_t *in)
 	dataflag = !(box->info->flags & (JP2_BOX_SUPER | JP2_BOX_NODATA));
 
 	if (dataflag) {
+		if (box->len < hdrlen)
+			goto error;
+		box->datalen = box->len - hdrlen;
+
 		if (!(tmpstream = jas_stream_memopen(0, 0))) {
 			goto error;
 		}
@@ -356,6 +361,9 @@ static int jp2_jp_getdata(jp2_box_t *box, jas_stream_t *in)
 
 static int jp2_ftyp_getdata(jp2_box_t *box, jas_stream_t *in)
 {
+	if (box->datalen < 8)
+		return -1;
+
 	jp2_ftyp_t *ftyp = &box->data.ftyp;
 	unsigned int i;
 	if (jp2_getuint32(in, &ftyp->majver) || jp2_getuint32(in, &ftyp->minver)) {
@@ -418,6 +426,9 @@ static void jp2_colr_dumpdata(jp2_box_t *box, FILE *out)
 
 static int jp2_colr_getdata(jp2_box_t *box, jas_stream_t *in)
 {
+	if (box->datalen < 3)
+		return -1;
+
 	jp2_colr_t *colr = &box->data.colr;
 	colr->csid = 0;
 	colr->iccp = 0;
