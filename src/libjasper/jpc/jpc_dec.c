@@ -735,6 +735,10 @@ static int jpc_dec_tileinit(jpc_dec_t *dec, jpc_dec_tile_t *tile)
 		  sizeof(jpc_dec_rlvl_t)))) {
 			return -1;
 		}
+		for (rlvlno = 0, rlvl = tcomp->rlvls; rlvlno < tcomp->numrlvls;
+		  ++rlvlno, ++rlvl) {
+			rlvl->bands = NULL;
+		}
 		if (!(tcomp->data = jas_seq2d_create(JPC_CEILDIV(tile->xstart,
 		  cmpt->hstep), JPC_CEILDIV(tile->ystart, cmpt->vstep),
 		  JPC_CEILDIV(tile->xend, cmpt->hstep), JPC_CEILDIV(tile->yend,
