@@ -777,6 +777,14 @@ static int jpc_dec_tileinit(jpc_dec_t *dec, jpc_dec_tile_t *tile)
 			  rlvl->prcheightexpn;
 			rlvl->numprcs = rlvl->numhprcs * rlvl->numvprcs;
 
+			if (rlvl->numprcs >= 64 * 1024) {
+				/* avoid out-of-memory due to
+				   malicious file; this limit is
+				   rather arbitrary; "good" files I
+				   have seen have values 1..12 */
+				return -1;
+			}
+
 			if (rlvl->xstart >= rlvl->xend || rlvl->ystart >= rlvl->yend) {
 				rlvl->bands = 0;
 				rlvl->numprcs = 0;
