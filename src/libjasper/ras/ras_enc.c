@@ -232,6 +232,11 @@ static int ras_putdatastd(jas_stream_t *out, ras_hdr_t *hdr, jas_image_t *image,
 
 	assert(numcmpts <= 3);
 
+	if (RAS_ISRGB(hdr) && numcmpts < 3) {
+		/* need 3 components for RGB */
+		return -1;
+	}
+
 	for (i = 0; i < 3; ++i) {
 		data[i] = 0;
 	}
