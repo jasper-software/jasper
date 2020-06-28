@@ -461,7 +461,7 @@ error:
 
 int jp2_validate(jas_stream_t *in)
 {
-	char buf[JP2_VALIDATELEN];
+	unsigned char buf[JP2_VALIDATELEN];
 	int i;
 	int n;
 #if 0
@@ -491,7 +491,7 @@ int jp2_validate(jas_stream_t *in)
 	}
 
 	/* Is the box type correct? */
-	if (((buf[4] << 24) | (buf[5] << 16) | (buf[6] << 8) | buf[7]) !=
+	if ((((uint_least32_t)buf[4] << 24) | ((uint_least32_t)buf[5] << 16) | ((uint_least32_t)buf[6] << 8) | (uint_least32_t)buf[7]) !=
 	  JP2_BOX_JP)
 	{
 		return -1;
