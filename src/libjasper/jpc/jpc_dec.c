@@ -810,6 +810,11 @@ static int jpc_dec_tileinit(jpc_dec_t *dec, jpc_dec_tile_t *tile)
 				brcbgyend = JPC_CEILDIVPOW2(brprcyend, 1);
 				rlvl->cbgwidthexpn = rlvl->prcwidthexpn - 1;
 				rlvl->cbgheightexpn = rlvl->prcheightexpn - 1;
+				if (rlvl->cbgwidthexpn < 0 || rlvl->cbgheightexpn < 0) {
+					/* the control block width/height offset
+					   exponent must not be negative */
+					return -1;
+				}
 			}
 			rlvl->cblkwidthexpn = JAS_MIN(ccp->cblkwidthexpn,
 			  rlvl->cbgwidthexpn);
