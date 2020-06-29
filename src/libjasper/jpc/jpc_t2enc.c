@@ -156,7 +156,7 @@ int jpc_enc_encpkts(jpc_enc_t *enc, jas_stream_t *out)
 	return 0;
 }
 
-int jpc_enc_encpkt(jpc_enc_t *enc, jas_stream_t *out, int compno, int lvlno, int prcno, int lyrno)
+int jpc_enc_encpkt(jpc_enc_t *enc, jas_stream_t *out, int compno, int lvlno, int prcno, unsigned lyrno)
 {
 	jpc_enc_tcmpt_t *comp;
 	jpc_enc_rlvl_t *lvl;
@@ -408,7 +408,7 @@ void jpc_save_t2state(jpc_enc_t *enc)
 	jpc_enc_cblk_t *cblk;
 	jpc_enc_cblk_t *endcblks;
 	jpc_enc_tile_t *tile;
-	int prcno;
+	unsigned prcno;
 	jpc_enc_prc_t *prc;
 
 	tile = enc->curtile;
@@ -456,7 +456,7 @@ void jpc_restore_t2state(jpc_enc_t *enc)
 	jpc_enc_cblk_t *cblk;
 	jpc_enc_cblk_t *endcblks;
 	jpc_enc_tile_t *tile;
-	int prcno;
+	unsigned prcno;
 	jpc_enc_prc_t *prc;
 
 	tile = enc->curtile;
@@ -507,7 +507,7 @@ void jpc_init_t2state(jpc_enc_t *enc, int raflag)
 	jpc_enc_pass_t *endpasses;
 	jpc_tagtreenode_t *leaf;
 	jpc_enc_tile_t *tile;
-	int prcno;
+	unsigned prcno;
 	jpc_enc_prc_t *prc;
 
 	tile = enc->curtile;
@@ -561,14 +561,14 @@ void jpc_init_t2state(jpc_enc_t *enc, int raflag)
 jpc_pi_t *jpc_enc_pi_create(jpc_enc_cp_t *cp, jpc_enc_tile_t *tile)
 {
 	jpc_pi_t *pi;
-	int compno;
+	unsigned compno;
 	jpc_picomp_t *picomp;
 	jpc_pirlvl_t *pirlvl;
 	jpc_enc_tcmpt_t *tcomp;
-	int rlvlno;
+	unsigned rlvlno;
 	jpc_enc_rlvl_t *rlvl;
-	int prcno;
-	int *prclyrno;
+	unsigned prcno;
+	unsigned *prclyrno;
 
 	if (!(pi = jpc_pi_create0())) {
 		return 0;

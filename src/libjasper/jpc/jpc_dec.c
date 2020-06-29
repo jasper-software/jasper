@@ -678,7 +678,7 @@ static int jpc_dec_tileinit(jpc_dec_t *dec, jpc_dec_tile_t *tile)
 {
 	jpc_dec_tcomp_t *tcomp;
 	int compno;
-	int rlvlno;
+	unsigned rlvlno;
 	jpc_dec_rlvl_t *rlvl;
 	jpc_dec_band_t *band;
 	jpc_dec_prc_t *prc;
@@ -985,7 +985,7 @@ static int jpc_dec_tilefini(jpc_dec_t *dec, jpc_dec_tile_t *tile)
 	jpc_dec_tcomp_t *tcomp;
 	int compno;
 	int bandno;
-	int rlvlno;
+	unsigned rlvlno;
 	jpc_dec_band_t *band;
 	jpc_dec_rlvl_t *rlvl;
 	int prcno;
@@ -1098,7 +1098,7 @@ static int jpc_dec_tiledecode(jpc_dec_t *dec, jpc_dec_tile_t *tile)
 	jpc_dec_rlvl_t *rlvl;
 	jpc_dec_band_t *band;
 	int compno;
-	int rlvlno;
+	unsigned rlvlno;
 	int bandno;
 	int adjust;
 	int v;
@@ -2174,7 +2174,7 @@ static int jpc_dec_dump(jpc_dec_t *dec, FILE *out)
 	jpc_dec_tcomp_t *tcomp;
 	int compno;
 	jpc_dec_rlvl_t *rlvl;
-	int rlvlno;
+	unsigned rlvlno;
 	jpc_dec_band_t *band;
 	int bandno;
 	jpc_dec_prc_t *prc;

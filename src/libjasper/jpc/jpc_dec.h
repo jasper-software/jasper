@@ -463,7 +463,7 @@ typedef struct {
 	jas_matrix_t *data;
 
 	/* The number of resolution levels. */
-	int numrlvls;
+	unsigned numrlvls;
 
 	/* The per resolution level information. */
 	jpc_dec_rlvl_t *rlvls;
