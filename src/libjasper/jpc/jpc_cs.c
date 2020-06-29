@@ -437,8 +437,7 @@ static int jpc_sot_getparms(jpc_ms_t *ms, jpc_cstate_t *cstate, jas_stream_t *in
 	  jpc_getuint8(in, &sot->numparts)) {
 		return -1;
 	}
-	if (sot->tileno > 65534 || sot->len < 12 || sot->partno > 254 ||
-	  sot->numparts > 255) {
+	if (sot->tileno > 65534 || sot->len < 12 || sot->partno > 254) {
 		return -1;
 	}
 	if (jas_stream_eof(in)) {
@@ -546,11 +545,11 @@ static int jpc_siz_getparms(jpc_ms_t *ms, jpc_cstate_t *cstate,
 		  jpc_getuint8(in, &siz->comps[i].vsamp)) {
 			goto error;
 		}
-		if (siz->comps[i].hsamp == 0 || siz->comps[i].hsamp > 255) {
+		if (siz->comps[i].hsamp == 0) {
 			jas_eprintf("invalid XRsiz value %d\n", siz->comps[i].hsamp);
 			goto error;
 		}
-		if (siz->comps[i].vsamp == 0 || siz->comps[i].vsamp > 255) {
+		if (siz->comps[i].vsamp == 0) {
 			jas_eprintf("invalid YRsiz value %d\n", siz->comps[i].vsamp);
 			goto error;
 		}
