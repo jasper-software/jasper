@@ -395,6 +395,12 @@ static int jp2_ihdr_getdata(jp2_box_t *box, jas_stream_t *in)
 
 static int jp2_bpcc_getdata(jp2_box_t *box, jas_stream_t *in)
 {
+	if (box->datalen > 0xffff)
+		/* excessive number of components - this is a
+		   pessimistic limit, because in jp2_ihdr_getdata(),
+		   it's a 16 bit integer */
+		return -1;
+
 	jp2_bpcc_t *bpcc = &box->data.bpcc;
 	unsigned int i;
 	bpcc->bpcs = 0;
@@ -446,6 +452,13 @@ static int jp2_colr_getdata(jp2_box_t *box, jas_stream_t *in)
 		break;
 	case JP2_COLR_ICC:
 		colr->iccplen = box->datalen - 3;
+		if (colr->iccplen > 1024 * 1024)
+			/* refuse to read ICC profiles larger than 1
+			   MB (I have no idea how large ICC profiles
+			   can get, but I believe this limit might be
+			   very pessimistic and should be lowered
+			   further) */
+			return -1;
 		if (!(colr->iccp = jas_alloc2(colr->iccplen, sizeof(uint_fast8_t)))) {
 			return -1;
 		}
@@ -802,6 +815,12 @@ static int jp2_cmap_getdata(jp2_box_t *box, jas_stream_t *in)
 	cmap->ents = 0;
 
 	cmap->numchans = (box->datalen) / 4;
+	if (cmap->numchans > 0xff)
+		/* excessive number of channels - this is a
+		   pessimistic limit, because in jp2_pclr_getdata(),
+		   it's a 8 bit integer */
+		return -1;
+
 	if (!(cmap->ents = jas_alloc2(cmap->numchans, sizeof(jp2_cmapent_t)))) {
 		return -1;
 	}
