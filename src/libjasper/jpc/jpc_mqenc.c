@@ -221,9 +221,7 @@ error:
 
 void jpc_mqenc_destroy(jpc_mqenc_t *mqenc)
 {
-	if (mqenc->ctxs) {
-		jas_free(mqenc->ctxs);
-	}
+	jas_free(mqenc->ctxs);
 	jas_free(mqenc);
 }
 

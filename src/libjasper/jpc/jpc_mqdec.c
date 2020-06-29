@@ -143,9 +143,7 @@ error:
 /* Destroy a MQ decoder. */
 void jpc_mqdec_destroy(jpc_mqdec_t *mqdec)
 {
-	if (mqdec->ctxs) {
-		jas_free(mqdec->ctxs);
-	}
+	jas_free(mqdec->ctxs);
 	jas_free(mqdec);
 }
 
