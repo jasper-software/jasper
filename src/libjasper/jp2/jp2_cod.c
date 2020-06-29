@@ -280,7 +280,7 @@ jp2_box_t *jp2_box_get(jas_stream_t *in)
 		}
 		if (extlen > 0xffffffffUL) {
 			jas_eprintf("warning: cannot handle large 64-bit box length\n");
-			extlen = 0xffffffffUL;
+			goto error;
 		}
 		box->len = extlen;
 		hdrlen = JP2_BOX_HDRLEN(true);
