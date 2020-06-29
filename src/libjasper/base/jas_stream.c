@@ -103,18 +103,18 @@ static jas_stream_t *jas_stream_create(void);
 static void jas_stream_initbuf(jas_stream_t *stream, int bufmode, char *buf,
   int bufsize);
 
-static int mem_read(jas_stream_obj_t *obj, char *buf, int cnt);
-static int mem_write(jas_stream_obj_t *obj, char *buf, int cnt);
+static int mem_read(jas_stream_obj_t *obj, char *buf, unsigned cnt);
+static int mem_write(jas_stream_obj_t *obj, char *buf, unsigned cnt);
 static long mem_seek(jas_stream_obj_t *obj, long offset, int origin);
 static int mem_close(jas_stream_obj_t *obj);
 
-static int sfile_read(jas_stream_obj_t *obj, char *buf, int cnt);
-static int sfile_write(jas_stream_obj_t *obj, char *buf, int cnt);
+static int sfile_read(jas_stream_obj_t *obj, char *buf, unsigned cnt);
+static int sfile_write(jas_stream_obj_t *obj, char *buf, unsigned cnt);
 static long sfile_seek(jas_stream_obj_t *obj, long offset, int origin);
 static int sfile_close(jas_stream_obj_t *obj);
 
-static int file_read(jas_stream_obj_t *obj, char *buf, int cnt);
-static int file_write(jas_stream_obj_t *obj, char *buf, int cnt);
+static int file_read(jas_stream_obj_t *obj, char *buf, unsigned cnt);
+static int file_write(jas_stream_obj_t *obj, char *buf, unsigned cnt);
 static long file_seek(jas_stream_obj_t *obj, long offset, int origin);
 static int file_close(jas_stream_obj_t *obj);
 
@@ -663,21 +663,16 @@ int jas_stream_ungetc(jas_stream_t *stream, int c)
 }
 
 /* FIXME integral type */
-int jas_stream_read(jas_stream_t *stream, void *buf, int cnt)
+int jas_stream_read(jas_stream_t *stream, void *buf, unsigned cnt)
 {
-	int n;
 	int c;
 	char *bufptr;
 
-	JAS_DBGLOG(100, ("jas_stream_read(%p, %p, %d)\n", stream, buf, cnt));
-
-	if (cnt < 0) {
-		jas_deprecated("negative count for jas_stream_read");
-	}
+	JAS_DBGLOG(100, ("jas_stream_read(%p, %p, %u)\n", stream, buf, cnt));
 
 	bufptr = buf;
 
-	n = 0;
+	unsigned n = 0;
 	while (n < cnt) {
 		if ((c = jas_stream_getc(stream)) == EOF) {
 			return n;
@@ -690,20 +685,15 @@ int jas_stream_read(jas_stream_t *stream, void *buf, int cnt)
 }
 
 /* FIXME integral type */
-int jas_stream_write(jas_stream_t *stream, const void *buf, int cnt)
+int jas_stream_write(jas_stream_t *stream, const void *buf, unsigned cnt)
 {
-	int n;
 	const char *bufptr;
 
 	JAS_DBGLOG(100, ("jas_stream_write(%p, %p, %d)\n", stream, buf, cnt));
 
-	if (cnt < 0) {
-		jas_deprecated("negative count for jas_stream_write");
-	}
-
 	bufptr = buf;
 
-	n = 0;
+	unsigned n = 0;
 	while (n < cnt) {
 		if (jas_stream_putc(stream, *bufptr) == EOF) {
 			return n;
@@ -1176,14 +1166,13 @@ long jas_stream_length(jas_stream_t *stream)
 \******************************************************************************/
 
 /* FIXME integral type */
-static int mem_read(jas_stream_obj_t *obj, char *buf, int cnt)
+static int mem_read(jas_stream_obj_t *obj, char *buf, unsigned cnt)
 {
 	ssize_t n;
 	jas_stream_memobj_t *m;
-	assert(cnt >= 0);
 	assert(buf);
 
-	JAS_DBGLOG(100, ("mem_read(%p, %p, %d)\n", obj, buf, cnt));
+	JAS_DBGLOG(100, ("mem_read(%p, %p, %u)\n", obj, buf, cnt));
 	m = (jas_stream_memobj_t *)obj;
 	n = m->len_ - m->pos_;
 	cnt = JAS_MIN(n, cnt);
@@ -1197,7 +1186,6 @@ static int mem_resize(jas_stream_memobj_t *m, size_t bufsize)
 	unsigned char *buf;
 
 	//assert(m->buf_);
-	//assert(bufsize >= 0);
 
 	JAS_DBGLOG(100, ("mem_resize(%p, %zu)\n", m, bufsize));
 	if (!bufsize) {
@@ -1219,18 +1207,16 @@ static int mem_resize(jas_stream_memobj_t *m, size_t bufsize)
 }
 
 /* FIXME integral type */
-static int mem_write(jas_stream_obj_t *obj, char *buf, int cnt)
+static int mem_write(jas_stream_obj_t *obj, char *buf, unsigned cnt)
 {
 	size_t n;
-	int ret;
 	jas_stream_memobj_t *m = (jas_stream_memobj_t *)obj;
 	size_t newbufsize;
 	size_t newpos;
 
 	assert(buf);
-	assert(cnt >= 0);
 
-	JAS_DBGLOG(100, ("mem_write(%p, %p, %d)\n", obj, buf, cnt));
+	JAS_DBGLOG(100, ("mem_write(%p, %p, %u)\n", obj, buf, cnt));
 	newpos = m->pos_ + cnt;
 	if (newpos > m->bufsize_ && m->growable_) {
 		newbufsize = m->bufsize_;
@@ -1262,7 +1248,7 @@ static int mem_write(jas_stream_obj_t *obj, char *buf, int cnt)
 		}
 	}
 	n = m->bufsize_ - m->pos_;
-	ret = JAS_MIN(n, cnt);
+	unsigned ret = JAS_MIN(n, cnt);
 	if (ret > 0) {
 		memcpy(&m->buf_[m->pos_], buf, ret);
 		m->pos_ += ret;
@@ -1324,19 +1310,19 @@ static int mem_close(jas_stream_obj_t *obj)
 \******************************************************************************/
 
 /* FIXME integral type */
-static int file_read(jas_stream_obj_t *obj, char *buf, int cnt)
+static int file_read(jas_stream_obj_t *obj, char *buf, unsigned cnt)
 {
 	jas_stream_fileobj_t *fileobj;
-	JAS_DBGLOG(100, ("file_read(%p, %p, %d)\n", obj, buf, cnt));
+	JAS_DBGLOG(100, ("file_read(%p, %p, %u)\n", obj, buf, cnt));
 	fileobj = JAS_CAST(jas_stream_fileobj_t *, obj);
 	return read(fileobj->fd, buf, cnt);
 }
 
 /* FIXME integral type */
-static int file_write(jas_stream_obj_t *obj, char *buf, int cnt)
+static int file_write(jas_stream_obj_t *obj, char *buf, unsigned cnt)
 {
 	jas_stream_fileobj_t *fileobj;
-	JAS_DBGLOG(100, ("file_write(%p, %p, %d)\n", obj, buf, cnt));
+	JAS_DBGLOG(100, ("file_write(%p, %p, %u)\n", obj, buf, cnt));
 	fileobj = JAS_CAST(jas_stream_fileobj_t *, obj);
 	return write(fileobj->fd, buf, cnt);
 }
@@ -1369,12 +1355,12 @@ static int file_close(jas_stream_obj_t *obj)
 \******************************************************************************/
 
 /* FIXME integral type */
-static int sfile_read(jas_stream_obj_t *obj, char *buf, int cnt)
+static int sfile_read(jas_stream_obj_t *obj, char *buf, unsigned cnt)
 {
 	FILE *fp;
 	size_t n;
 	int result;
-	JAS_DBGLOG(100, ("sfile_read(%p, %p, %d)\n", obj, buf, cnt));
+	JAS_DBGLOG(100, ("sfile_read(%p, %p, %u)\n", obj, buf, cnt));
 	fp = JAS_CAST(FILE *, obj);
 	n = fread(buf, 1, cnt, fp);
 	if (n != cnt) {
@@ -1385,14 +1371,14 @@ static int sfile_read(jas_stream_obj_t *obj, char *buf, int cnt)
 }
 
 /* FIXME integral type */
-static int sfile_write(jas_stream_obj_t *obj, char *buf, int cnt)
+static int sfile_write(jas_stream_obj_t *obj, char *buf, unsigned cnt)
 {
 	FILE *fp;
 	size_t n;
 	JAS_DBGLOG(100, ("sfile_write(%p, %p, %d)\n", obj, buf, cnt));
 	fp = JAS_CAST(FILE *, obj);
 	n = fwrite(buf, 1, cnt, fp);
-	return (n != JAS_CAST(size_t, cnt)) ? (-1) : cnt;
+	return (n != cnt) ? (-1) : (int)cnt;
 }
 
 /* FIXME integral type */

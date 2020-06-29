@@ -176,10 +176,10 @@ typedef void jas_stream_obj_t;
 typedef struct {
 
 	/* Read characters from a file object. */
-	int (*read_)(jas_stream_obj_t *obj, char *buf, int cnt);
+	int (*read_)(jas_stream_obj_t *obj, char *buf, unsigned cnt);
 
 	/* Write characters to a file object. */
-	int (*write_)(jas_stream_obj_t *obj, char *buf, int cnt);
+	int (*write_)(jas_stream_obj_t *obj, char *buf, unsigned cnt);
 
 	/* Set the position for a file object. */
 	long (*seek_)(jas_stream_obj_t *obj, long offset, int origin);
@@ -355,10 +355,10 @@ JAS_DLLEXPORT long jas_stream_setrwcount(jas_stream_t *stream, long rwcnt);
 #endif
 
 /* Read characters from a stream into a buffer. */
-JAS_DLLEXPORT int jas_stream_read(jas_stream_t *stream, void *buf, int cnt);
+JAS_DLLEXPORT int jas_stream_read(jas_stream_t *stream, void *buf, unsigned cnt);
 
 /* Write characters from a buffer to a stream. */
-JAS_DLLEXPORT int jas_stream_write(jas_stream_t *stream, const void *buf, int cnt);
+JAS_DLLEXPORT int jas_stream_write(jas_stream_t *stream, const void *buf, unsigned cnt);
 
 /* Write formatted output to a stream. */
 JAS_DLLEXPORT int jas_stream_printf(jas_stream_t *stream, const char *fmt, ...);
