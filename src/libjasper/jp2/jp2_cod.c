@@ -278,7 +278,10 @@ jp2_box_t *jp2_box_get(jas_stream_t *in)
 		if (jp2_getuint64(in, &extlen)) {
 			goto error;
 		}
-		if (extlen > 0xffffffffUL) {
+		if (extlen > 0x7fffffffUL) {
+			/* this limit is the largest value which can
+			   be passed to jas_stream_copy() without
+			   overflowing */
 			jas_eprintf("warning: cannot handle large 64-bit box length\n");
 			goto error;
 		}
