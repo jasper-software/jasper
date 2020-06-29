@@ -121,13 +121,13 @@ static mif_hdr_t *mif_makehdrfromimage(jas_image_t *image);
 * Local data.
 \******************************************************************************/
 
-jas_taginfo_t mif_tags2[] = {
+static const jas_taginfo_t mif_tags2[] = {
 	{MIF_CMPT, "component"},
 	{MIF_END, "end"},
 	{-1, 0}
 };
 
-jas_taginfo_t mif_tags[] = {
+static const jas_taginfo_t mif_tags[] = {
 	{MIF_TLX, "tlx"},
 	{MIF_TLY, "tly"},
 	{MIF_WIDTH, "width"},
