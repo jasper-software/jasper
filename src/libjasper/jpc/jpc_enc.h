@@ -72,13 +72,15 @@
 * Includes.
 \******************************************************************************/
 
+#include "jasper/jas_image.h"
 #include "jasper/jas_seq.h"
+#include "jasper/jas_stream.h"
 
 #include "jpc_t2cod.h"
 #include "jpc_mqenc.h"
-#include "jpc_cod.h"
 #include "jpc_tagtree.h"
 #include "jpc_cs.h"
+#include "jpc_fix.h"
 #include "jpc_flt.h"
 #include "jpc_tsfb.h"
 

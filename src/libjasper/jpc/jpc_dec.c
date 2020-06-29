@@ -74,6 +74,7 @@
 #include "jpc_cs.h"
 #include "jpc_mct.h"
 #include "jpc_t2dec.h"
+#include "jpc_t1cod.h"
 #include "jpc_t1dec.h"
 #include "jpc_math.h"
 

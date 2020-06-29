@@ -72,13 +72,11 @@
 \******************************************************************************/
 
 #include "jpc_t2enc.h"
-#include "jpc_flt.h"
 #include "jpc_t2cod.h"
 #include "jpc_tagtree.h"
 #include "jpc_enc.h"
 #include "jpc_math.h"
 
-#include "jasper/jas_fix.h"
 #include "jasper/jas_malloc.h"
 #include "jasper/jas_math.h"
 #include "jasper/jas_debug.h"

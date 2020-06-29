@@ -74,10 +74,9 @@
 * Includes.
 \******************************************************************************/
 
-#include "jasper/jas_image.h"
 #include "jasper/jas_stream.h"
 
-#include "jpc_cod.h"
+#include <stdio.h>
 
 /******************************************************************************\
 * Constants and Types.

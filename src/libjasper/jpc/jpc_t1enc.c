@@ -74,10 +74,8 @@
 #include "jpc_t1enc.h"
 #include "jpc_t1cod.h"
 #include "jpc_enc.h"
-#include "jpc_cod.h"
 #include "jpc_math.h"
 
-#include "jasper/jas_fix.h"
 #include "jasper/jas_malloc.h"
 #include "jasper/jas_math.h"
 

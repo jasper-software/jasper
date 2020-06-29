@@ -66,13 +66,9 @@
 #include "pgx_enc.h"
 #include "pgx_cod.h"
 
-#include "jasper/jas_tvp.h"
 #include "jasper/jas_stream.h"
 #include "jasper/jas_image.h"
-#include "jasper/jas_string.h"
 #include "jasper/jas_debug.h"
-
-#include <assert.h>
 
 /******************************************************************************\
 * Local functions.

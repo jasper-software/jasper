@@ -76,10 +76,9 @@
 #include "jpc_cs.h"
 #include "jpc_mct.h"
 #include "jpc_tsfb.h"
-#include "jpc_qmfb.h"
+#include "jpc_t1cod.h"
 #include "jpc_t1enc.h"
 #include "jpc_t2enc.h"
-#include "jpc_cod.h"
 #include "jpc_math.h"
 #include "jpc_util.h"
 
@@ -87,7 +86,6 @@
 #include "jasper/jas_string.h"
 #include "jasper/jas_malloc.h"
 #include "jasper/jas_image.h"
-#include "jasper/jas_fix.h"
 #include "jasper/jas_tvp.h"
 #include "jasper/jas_version.h"
 #include "jasper/jas_math.h"
@@ -95,6 +93,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <assert.h>
 #include <math.h>
 #include <float.h>

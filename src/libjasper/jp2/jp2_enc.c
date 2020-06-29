@@ -80,7 +80,8 @@
 
 #include "jp2_cod.h"
 
-#include <assert.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 static uint_fast32_t jp2_gettypeasoc(int colorspace, int ctype);
 static int clrspctojp2(jas_clrspc_t clrspc);

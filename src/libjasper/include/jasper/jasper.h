@@ -62,6 +62,8 @@
 #ifndef JAS_JASPER_H
 #define JAS_JASPER_H
 
+// IWYU pragma: begin_exports
+
 /* The configuration header file should be included first. */
 #include <jasper/jas_config.h>
 
@@ -75,7 +77,6 @@
 #include <jasper/jas_debug.h>
 #include <jasper/jas_getopt.h>
 #include <jasper/jas_image.h>
-#include <jasper/jas_icc.h>
 #include <jasper/jas_math.h>
 #include <jasper/jas_malloc.h>
 #include <jasper/jas_seq.h>
@@ -91,5 +92,7 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
+
+// IWYU pragma: end_exports
 
 #endif

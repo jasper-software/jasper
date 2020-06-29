@@ -74,11 +74,10 @@
 * Includes.
 \******************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <assert.h>
+#include "jasper/jas_stream.h"
 
 #include "jpc_enc.h"
+#include "jpc_t2cod.h"
 
 /******************************************************************************\
 * Functions.

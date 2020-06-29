@@ -95,12 +95,11 @@
 #endif
 
 /* Note: The immediately following header files should eventually be removed. */
-#include <stdlib.h>
-#include <stddef.h>
-#include <stdint.h>
+#include <stddef.h> /* IWYU pragma: export */
+#include <stdint.h> /* IWYU pragma: export */
 
 #if defined(JAS_HAVE_SYS_TYPES_H)
-#include <sys/types.h>
+#include <sys/types.h> /* IWYU pragma: export */
 #endif
 
 #define jas_uchar unsigned char
@@ -134,8 +133,8 @@
 #define strtoull _strtoui64
 
 #else
-#include <stdbool.h>
-#include <inttypes.h>
+#include <stdbool.h> /* IWYU pragma: export */
+#include <inttypes.h> /* IWYU pragma: export */
 #endif
 
 /* The below macro is intended to be used for type casts.  By using this

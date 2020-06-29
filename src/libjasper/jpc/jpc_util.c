@@ -71,18 +71,14 @@
 
 #include "jpc_util.h"
 #include "jpc_fix.h"
-#include "jpc_cs.h"
-#include "jpc_flt.h"
 
 #include "jasper/jas_math.h"
 #include "jasper/jas_malloc.h"
 
 #include <assert.h>
-#include <stdio.h>
 #include <string.h>
 #include <math.h>
 #include <stdlib.h>
-#include <stdarg.h>
 
 /******************************************************************************\
 * Miscellaneous Functions

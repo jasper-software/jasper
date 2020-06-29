@@ -75,15 +75,11 @@
 \******************************************************************************/
 
 /* The configuration header file should be included first. */
-#include <jasper/jas_config.h>
+#include <jasper/jas_config.h> /* IWYU pragma: export */
 
 #include <stdio.h>
 #if defined(JAS_HAVE_FCNTL_H)
 #include <fcntl.h>
-#endif
-#include <string.h>
-#if defined(JAS_HAVE_UNISTD_H)
-#include <unistd.h>
 #endif
 #include <jasper/jas_types.h>
 

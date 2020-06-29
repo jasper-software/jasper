@@ -69,6 +69,7 @@
 
 #include <assert.h>
 #include <stdlib.h>
+#include <string.h>
 #include <ctype.h>
 
 #define	jas_iccputuint8(out, val)	jas_iccputuint(out, 1, val)

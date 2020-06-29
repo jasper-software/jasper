@@ -73,7 +73,6 @@
 #include <stdio.h>
 #include <math.h>
 #include <float.h>
-#include <assert.h>
 
 #include <jasper/jasper.h>
 

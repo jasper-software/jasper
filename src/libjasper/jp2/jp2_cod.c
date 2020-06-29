@@ -77,7 +77,7 @@
 #include "jasper/jas_debug.h"
 
 #include <assert.h>
-#include <stdlib.h>
+#include <string.h>
 
 /******************************************************************************\
 * Function prototypes.

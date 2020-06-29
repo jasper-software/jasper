@@ -65,14 +65,19 @@
 
 #include "mif_cod.h"
 
+#include "jasper/jas_cm.h"
 #include "jasper/jas_tvp.h"
 #include "jasper/jas_stream.h"
 #include "jasper/jas_image.h"
+#include "jasper/jas_seq.h"
 #include "jasper/jas_string.h"
 #include "jasper/jas_malloc.h"
 #include "jasper/jas_debug.h"
 
 #include <assert.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 /******************************************************************************\
 * Local types.

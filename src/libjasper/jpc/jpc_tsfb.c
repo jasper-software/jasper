@@ -72,16 +72,13 @@
 \******************************************************************************/
 
 #include "jpc_tsfb.h"
-#include "jpc_cod.h"
 #include "jpc_cs.h"
-#include "jpc_util.h"
 #include "jpc_math.h"
 #include "jpc_fix.h"
 
-#include "jasper/jas_malloc.h"
 #include "jasper/jas_seq.h"
 
-#include <assert.h>
+#include <stdlib.h>
 
 static int jpc_tsfb_synthesize2(jpc_tsfb_t *tsfb, jpc_fix_t *a, int xstart, int ystart,
   int width, int height, int stride, int numlvls);

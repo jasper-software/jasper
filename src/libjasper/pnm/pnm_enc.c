@@ -80,10 +80,7 @@
 #include "jasper/jas_stream.h"
 #include "jasper/jas_debug.h"
 
-#include <ctype.h>
-#include <math.h>
-#include <stdlib.h>
-#include <assert.h>
+#include <stdio.h>
 
 /******************************************************************************\
 * Local types.

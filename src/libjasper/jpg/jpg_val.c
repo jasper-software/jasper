@@ -66,6 +66,7 @@
 #include "jpg_cod.h"
 
 #include "jasper/jas_stream.h"
+#include "jasper/jas_types.h"
 #include "jasper/jas_image.h"
 
 #include <stdio.h>

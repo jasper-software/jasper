@@ -65,7 +65,6 @@
 #define JP2_DEC_H
 
 #include "jasper/jas_image.h"
-#include "jasper/jas_stream.h"
 #include "jp2_cod.h"
 
 typedef struct {

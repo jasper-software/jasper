@@ -74,7 +74,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
-#include <time.h>
 #include <stdint.h>
 
 #include <jasper/jasper.h>

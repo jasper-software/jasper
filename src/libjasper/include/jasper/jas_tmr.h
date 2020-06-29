@@ -65,9 +65,10 @@
 /* The configuration header file should be included first. */
 #include <jasper/jas_config.h>
 
-#include<time.h>
 #if defined(JAS_HAVE_SYS_TIME_H)
 #include <sys/time.h>
+#else
+#include <time.h>
 #endif
 
 #ifdef __cplusplus

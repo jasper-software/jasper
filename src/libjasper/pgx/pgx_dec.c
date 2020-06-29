@@ -68,12 +68,12 @@
 #include "jasper/jas_tvp.h"
 #include "jasper/jas_stream.h"
 #include "jasper/jas_image.h"
-#include "jasper/jas_string.h"
 #include "jasper/jas_debug.h"
 #include "jasper/jas_math.h"
 
 #include <assert.h>
 #include <ctype.h>
+#include <stdlib.h>
 
 /******************************************************************************\
 * Local types.

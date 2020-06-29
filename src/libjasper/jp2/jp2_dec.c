@@ -79,8 +79,10 @@
 #include "jasper/jas_math.h"
 #include "jasper/jas_debug.h"
 #include "jasper/jas_malloc.h"
-#include "jasper/jas_version.h"
 #include "jasper/jas_types.h"
+
+#include <assert.h>
+#include <stdio.h>
 
 #define	JP2_VALIDATELEN	(JAS_MIN(JP2_JP_LEN + 16, JAS_STREAM_MAXPUTBACK))
 

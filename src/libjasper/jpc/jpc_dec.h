@@ -75,12 +75,12 @@
 \******************************************************************************/
 
 #include "jasper/jas_stream.h"
+#include "jasper/jas_image.h"
 
 #include "jpc_tsfb.h"
 #include "jpc_bs.h"
 #include "jpc_tagtree.h"
 #include "jpc_cs.h"
-#include "jpc_cod.h"
 #include "jpc_mqdec.h"
 #include "jpc_t2cod.h"
 

@@ -59,7 +59,7 @@
  * __END_OF_JASPER_LICENSE__
  */
 
-#include <jasper/jas_config.h>
+#include <jasper/jas_config.h> /* IWYU pragma: keep */
 #include <jasper/jas_types.h>
 
 const jas_uchar jas_iccprofdata_srgb[] =

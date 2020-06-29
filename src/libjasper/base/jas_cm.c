@@ -67,14 +67,12 @@
 
 #include "jasper/jas_cm.h"
 #include "jasper/jas_icc.h"
-#include "jasper/jas_init.h"
-#include "jasper/jas_stream.h"
 #include "jasper/jas_malloc.h"
 #include "jasper/jas_math.h"
-#include "jasper/jas_debug.h"
 
 #include <math.h>
 #include <stdlib.h>
+#include <string.h>
 #include <assert.h>
 
 static jas_cmprof_t *jas_cmprof_create(void);

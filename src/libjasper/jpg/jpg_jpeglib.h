@@ -71,6 +71,6 @@
 
 /* Note: The jpeglib.h header file does not include definitions of
   FILE, size_t, etc. */
-#include <jpeglib.h>
+#include <jpeglib.h> /* IWYU pragma: export */
 
 #endif

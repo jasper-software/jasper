@@ -75,10 +75,12 @@
 
 #include "jasper/jas_malloc.h"
 #include "jasper/jas_debug.h"
+#include "jasper/jas_image.h"
 
-#include <stdlib.h>
 #include <assert.h>
 #include <ctype.h>
+#include <stdlib.h>
+#include <string.h>
 
 /******************************************************************************\
 * Types.
