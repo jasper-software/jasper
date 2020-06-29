@@ -390,11 +390,11 @@ static bmp_info_t *bmp_getinfo(jas_stream_t *in)
 	}
 
 	/* Check for a palette whose size is unreasonably large. */
-	if (info->numcolors > 256 && info->numcolors > num_pixels) {
+	if ((uint_fast32_t)info->numcolors > 256 && (uint_fast32_t)info->numcolors > num_pixels) {
 		jas_eprintf("palette size is greater than 256 and "
 		  "greater than the number of pixels "
 		  "(%zu > %zu)\n",
-		  info->numcolors > num_pixels);
+		  (uint_fast32_t)info->numcolors > num_pixels);
 		goto error;
 	}
 
