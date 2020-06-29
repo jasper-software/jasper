@@ -428,6 +428,10 @@ static jpc_enc_cp_t *cp_create(const char *optstr, jas_image_t *image)
 	}
 
 	cp->rawsize = jas_image_rawsize(image);
+	if (cp->rawsize == 0) {
+		/* prevent division by zero in cp_create() */
+		goto error;
+	}
 	cp->totalsize = UINT_FAST32_MAX;
 
 	tcp = &cp->tcp;
