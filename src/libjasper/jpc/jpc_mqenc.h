@@ -199,13 +199,6 @@ int jpc_mqenc_flush(jpc_mqenc_t *enc, int termmode);
 * Functions/macros for encoding bits.
 \******************************************************************************/
 
-/* Encode a bit. */
-#if !defined(DEBUG)
-#define	jpc_mqenc_putbit(enc, bit)	jpc_mqenc_putbit_macro(enc, bit)
-#else
-#define	jpc_mqenc_putbit(enc, bit)	jpc_mqenc_putbit_func(enc, bit)
-#endif
-
 /******************************************************************************\
 * Functions/macros for debugging.
 \******************************************************************************/
@@ -216,23 +209,12 @@ int jpc_mqenc_dump(jpc_mqenc_t *mqenc, FILE *out);
 * Implementation-specific details.
 \******************************************************************************/
 
-/* Note: This macro is included only to satisfy the needs of
-  the mqenc_putbit macro. */
-#define	jpc_mqenc_putbit_macro(enc, bit) \
-	(((*((enc)->curctx))->mps == (bit)) ? \
-	  (((enc)->areg -= (*(enc)->curctx)->qeval), \
-	  ((!((enc)->areg & 0x8000)) ? (jpc_mqenc_codemps2(enc)) : \
-	  ((enc)->creg += (*(enc)->curctx)->qeval))) : \
-	  jpc_mqenc_codelps(enc))
-
 /* Note: These function prototypes are included only to satisfy the
   needs of the mqenc_putbit_macro macro.  Do not call any of these
   functions directly. */
 int jpc_mqenc_codemps2(jpc_mqenc_t *enc);
 int jpc_mqenc_codelps(jpc_mqenc_t *enc);
 
-/* Note: This function prototype is included only to satisfy the needs of
-  the mqenc_putbit macro. */
-int jpc_mqenc_putbit_func(jpc_mqenc_t *enc, int bit);
+int jpc_mqenc_putbit(jpc_mqenc_t *enc, int bit);
 
 #endif

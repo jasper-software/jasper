@@ -279,7 +279,7 @@ void jpc_mqenc_getstate(const jpc_mqenc_t *mqenc, jpc_mqencstate_t *state)
 
 /* Encode a bit. */
 
-int jpc_mqenc_putbit_func(jpc_mqenc_t *mqenc, int bit)
+int jpc_mqenc_putbit(jpc_mqenc_t *mqenc, int bit)
 {
 	const jpc_mqstate_t *state;
 	JAS_DBGLOG(100, ("jpc_mqenc_putbit(%p, %d)\n", mqenc, bit));
