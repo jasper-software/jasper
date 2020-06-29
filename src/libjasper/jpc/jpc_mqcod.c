@@ -79,7 +79,7 @@
 
 /* MQ coder per-state information. */
 
-jpc_mqstate_t jpc_mqstates[47 * 2] = {
+const jpc_mqstate_t jpc_mqstates[47 * 2] = {
 	{0x5601, 0, &jpc_mqstates[ 2], &jpc_mqstates[ 3]},
 	{0x5601, 1, &jpc_mqstates[ 3], &jpc_mqstates[ 2]},
 	{0x3401, 0, &jpc_mqstates[ 4], &jpc_mqstates[12]},

@@ -113,10 +113,10 @@ typedef struct {
 	int maxctxs;
 
 	/* The per-context information. */
-	jpc_mqstate_t **ctxs;
+	const jpc_mqstate_t **ctxs;
 
 	/* The current context. */
-	jpc_mqstate_t **curctx;
+	const jpc_mqstate_t **curctx;
 
 	/* The stream for encoder output. */
 	jas_stream_t *out;
@@ -190,7 +190,7 @@ void jpc_mqenc_setctxs(jpc_mqenc_t *enc, int numctxs, jpc_mqctx_t *ctxs);
 	((enc)->err)
 
 /* Get the current encoder state. */
-void jpc_mqenc_getstate(jpc_mqenc_t *enc, jpc_mqencstate_t *state);
+void jpc_mqenc_getstate(const jpc_mqenc_t *enc, jpc_mqencstate_t *state);
 
 /* Terminate the code. */
 int jpc_mqenc_flush(jpc_mqenc_t *enc, int termmode);

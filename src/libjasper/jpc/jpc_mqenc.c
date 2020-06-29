@@ -93,7 +93,7 @@
 
 #define	jpc_mqenc_codemps9(areg, creg, ctreg, curctx, enc) \
 { \
-	jpc_mqstate_t *state = *(curctx); \
+	const jpc_mqstate_t *state = *(curctx); \
 	(areg) -= state->qeval; \
 	if (!((areg) & 0x8000)) { \
 		if ((areg) < state->qeval) { \
@@ -110,7 +110,7 @@
 
 #define	jpc_mqenc_codelps2(areg, creg, ctreg, curctx, enc) \
 { \
-	jpc_mqstate_t *state = *(curctx); \
+	const jpc_mqstate_t *state = *(curctx); \
 	(areg) -= state->qeval; \
 	if ((areg) < state->qeval) { \
 		(creg) += state->qeval; \
@@ -247,7 +247,7 @@ void jpc_mqenc_init(jpc_mqenc_t *mqenc)
 
 void jpc_mqenc_setctxs(jpc_mqenc_t *mqenc, int numctxs, jpc_mqctx_t *ctxs)
 {
-	jpc_mqstate_t **ctx;
+	const jpc_mqstate_t **ctx;
 	int n;
 
 	ctx = mqenc->ctxs;
@@ -267,7 +267,7 @@ void jpc_mqenc_setctxs(jpc_mqenc_t *mqenc, int numctxs, jpc_mqctx_t *ctxs)
 
 /* Get the coding state for a MQ encoder. */
 
-void jpc_mqenc_getstate(jpc_mqenc_t *mqenc, jpc_mqencstate_t *state)
+void jpc_mqenc_getstate(const jpc_mqenc_t *mqenc, jpc_mqencstate_t *state)
 {
 	state->areg = mqenc->areg;
 	state->creg = mqenc->creg;
@@ -311,7 +311,7 @@ int jpc_mqenc_codemps2(jpc_mqenc_t *mqenc)
 	the CODEMPS algorithm from the standard.  Some of the work is also
 	performed by the caller. */
 
-	jpc_mqstate_t *state = *(mqenc->curctx);
+	const jpc_mqstate_t *state = *(mqenc->curctx);
 	if (mqenc->areg < state->qeval) {
 		mqenc->areg = state->qeval;
 	} else {
