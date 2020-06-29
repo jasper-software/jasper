@@ -267,10 +267,10 @@ typedef struct {
 	size_t bufsize_;
 
 	/* The length of the file. */
-	int_fast32_t len_;
+	uint_fast32_t len_;
 
 	/* The seek position. */
-	int_fast32_t pos_;
+	uint_fast32_t pos_;
 
 	/* Is the buffer growable? */
 	int growable_;
