@@ -156,7 +156,7 @@ static void jpc_enc_destroy(jpc_enc_t *enc);
 static int jpc_enc_encodemainhdr(jpc_enc_t *enc);
 static int jpc_enc_encodemainbody(jpc_enc_t *enc);
 static int jpc_enc_encodetiledata(jpc_enc_t *enc);
-static int rateallocate(jpc_enc_t *enc, int numlyrs, uint_fast32_t *cumlens);
+static int rateallocate(jpc_enc_t *enc, unsigned numlyrs, uint_fast32_t *cumlens);
 static int setins(int numvalues, jpc_flt_t *values, jpc_flt_t value);
 static jpc_enc_cp_t *cp_create(const char *optstr, jas_image_t *image);
 static void jpc_enc_cp_destroy(jpc_enc_cp_t *cp);
@@ -1096,14 +1096,13 @@ static int jpc_enc_encodemainbody(jpc_enc_t *enc)
 	int tileno;
 	int tilex;
 	int tiley;
-	int i;
 	jpc_sot_t *sot;
 	jpc_enc_tcmpt_t *comp;
 	jpc_enc_tcmpt_t *endcomps;
 	jpc_enc_band_t *band;
 	jpc_enc_band_t *endbands;
 	jpc_enc_rlvl_t *lvl;
-	int rlvlno;
+	unsigned rlvlno;
 	jpc_qcc_t *qcc;
 	jpc_cod_t *cod;
 	int adjust;
@@ -1115,8 +1114,7 @@ static int jpc_enc_encodemainbody(jpc_enc_t *enc)
 	jpc_enc_tile_t *tile;
 	jpc_enc_cp_t *cp;
 	double rho;
-	int lyrno;
-	int cmptno;
+	unsigned cmptno;
 	int samestepsizes;
 	jpc_enc_ccp_t *ccps;
 	jpc_enc_tccp_t *tccp;
@@ -1154,7 +1152,7 @@ static int jpc_enc_encodemainbody(jpc_enc_t *enc)
 		for (cmptno = 0, comp = tile->tcmpts; cmptno < tile->numtcmpts; ++cmptno, ++comp) {
 			if (!cp->ccps[cmptno].sgnd) {
 				adjust = 1 << (cp->ccps[cmptno].prec - 1);
-				for (i = 0; i < jas_matrix_numrows(comp->data); ++i) {
+				for (unsigned i = 0; i < jas_matrix_numrows(comp->data); ++i) {
 					for (j = 0; j < jas_matrix_numcols(comp->data); ++j) {
 						*jas_matrix_getref(comp->data, i, j) -= adjust;
 					}
@@ -1184,7 +1182,7 @@ assert(jas_image_numcmpts(enc->image) == 3);
 			break;
 		}
 
-		for (i = 0; i < jas_image_numcmpts(enc->image); ++i) {
+		for (int i = 0; i < jas_image_numcmpts(enc->image); ++i) {
 			comp = &tile->tcmpts[i];
 			jpc_tsfb_analyze(comp->tsfb, comp->data);
 
@@ -1302,7 +1300,7 @@ jas_eprintf("mingbits %d\n", mingbits);
 /************************************************************************/
 
 		tccp = &cp->tccp;
-		for (cmptno = 0; cmptno < JAS_CAST(int, cp->numcmpts); ++cmptno) {
+		for (cmptno = 0; cmptno < cp->numcmpts; ++cmptno) {
 			comp = &tile->tcmpts[cmptno];
 			if (comp->numrlvls != tccp->maxrlvls) {
 				if (!(enc->mrk = jpc_ms_create(JPC_MS_COD))) {
@@ -1321,7 +1319,7 @@ and other characteristics */
 				cod->compparms.cblksty = comp->cblksty;
 				cod->compparms.qmfbid = comp->qmfbid;
 				cod->mctrans = (tile->mctid != JPC_MCT_NONE);
-				for (i = 0; i < comp->numrlvls; ++i) {
+				for (unsigned i = 0; i < comp->numrlvls; ++i) {
 					cod->compparms.rlvls[i].parwidthval = comp->rlvls[i].prcwidthexpn;
 					cod->compparms.rlvls[i].parheightval = comp->rlvls[i].prcheightexpn;
 				}
@@ -1333,8 +1331,7 @@ and other characteristics */
 			}
 		}
 
-		for (cmptno = 0, comp = tile->tcmpts; cmptno < JAS_CAST(int,
-		  cp->numcmpts); ++cmptno, ++comp) {
+		for (cmptno = 0, comp = tile->tcmpts; cmptno < cp->numcmpts; ++cmptno, ++comp) {
 			ccps = &cp->ccps[cmptno];
 			if (JAS_CAST(int, ccps->numstepsizes) == comp->numstepsizes) {
 				samestepsizes = 1;
@@ -1396,7 +1393,7 @@ and other characteristics */
 		  cp->imgareatly));
 		tile->rawsize = cp->rawsize * rho;
 
-		for (lyrno = 0; lyrno < tile->numlyrs - 1; ++lyrno) {
+		for (unsigned lyrno = 0; lyrno < tile->numlyrs - 1; ++lyrno) {
 			tile->lyrsizes[lyrno] = tile->rawsize * jpc_fixtodbl(
 			  cp->tcp.ilyrrates[lyrno]);
 		}
@@ -1415,7 +1412,7 @@ and other characteristics */
 		}
 #endif
 //jas_eprintf("TESTING %ld %ld\n", cp->totalsize != UINT_FAST32_MAX, tile->lyrsizes[0]);
-		for (lyrno = 0; lyrno < tile->numlyrs; ++lyrno) {
+		for (unsigned lyrno = 0; lyrno < tile->numlyrs; ++lyrno) {
 			if (tile->lyrsizes[lyrno] != UINT_FAST32_MAX) {
 				if (JAS_CAST(uint_fast32_t, tilehdrlen) <= tile->lyrsizes[lyrno]) {
 					tile->lyrsizes[lyrno] -= tilehdrlen;
@@ -1594,24 +1591,23 @@ void dump_layeringinfo(jpc_enc_t *enc)
 {
 
 	jpc_enc_tcmpt_t *tcmpt;
-	int tcmptno;
+	unsigned tcmptno;
 	jpc_enc_rlvl_t *rlvl;
-	int rlvlno;
+	unsigned rlvlno;
 	jpc_enc_band_t *band;
-	int bandno;
+	unsigned bandno;
 	jpc_enc_prc_t *prc;
-	int prcno;
+	unsigned prcno;
 	jpc_enc_cblk_t *cblk;
-	int cblkno;
+	unsigned cblkno;
 	jpc_enc_pass_t *pass;
-	int passno;
-	int lyrno;
+	unsigned passno;
 	jpc_enc_tile_t *tile;
 
 	tile = enc->curtile;
 
-	for (lyrno = 0; lyrno < tile->numlyrs; ++lyrno) {
-		jas_eprintf("lyrno = %02d\n", lyrno);
+	for (unsigned lyrno = 0; lyrno < tile->numlyrs; ++lyrno) {
+		jas_eprintf("lyrno = %02u\n", lyrno);
 		for (tcmptno = 0, tcmpt = tile->tcmpts; tcmptno < tile->numtcmpts;
 		  ++tcmptno, ++tcmpt) {
 			for (rlvlno = 0, rlvl = tcmpt->rlvls; rlvlno < tcmpt->numrlvls;
@@ -1644,13 +1640,12 @@ void dump_layeringinfo(jpc_enc_t *enc)
 	}
 }
 
-int rateallocate(jpc_enc_t *enc, int numlyrs, uint_fast32_t *cumlens)
+int rateallocate(jpc_enc_t *enc, unsigned numlyrs, uint_fast32_t *cumlens)
 {
 	jpc_flt_t lo;
 	jpc_flt_t hi;
 	jas_stream_t *out;
 	uint_fast32_t cumlen;
-	int lyrno;
 	jpc_flt_t thresh;
 	jpc_flt_t goodthresh;
 	int success;
@@ -1673,13 +1668,13 @@ int rateallocate(jpc_enc_t *enc, int numlyrs, uint_fast32_t *cumlens)
 	jpc_flt_t mnrdslope;
 	jpc_enc_tile_t *tile;
 	jpc_enc_prc_t *prc;
-	int prcno;
+	unsigned prcno;
 
 	JAS_DBGLOG(10, ("starting rate allocation\n"));
 
 	tile = enc->curtile;
 
-	for (lyrno = 1; lyrno < numlyrs - 1; ++lyrno) {
+	for (unsigned lyrno = 1; lyrno < numlyrs - 1; ++lyrno) {
 		if (cumlens[lyrno - 1] > cumlens[lyrno]) {
 			abort();
 		}
@@ -1734,7 +1729,7 @@ int rateallocate(jpc_enc_t *enc, int numlyrs, uint_fast32_t *cumlens)
 
 	jpc_init_t2state(enc, 1);
 
-	for (lyrno = 0; lyrno < numlyrs; ++lyrno) {
+	for (unsigned lyrno = 0; lyrno < numlyrs; ++lyrno) {
 
 		lo = mnrdslope;
 		hi = mxrdslope;
@@ -1827,10 +1822,10 @@ int rateallocate(jpc_enc_t *enc, int numlyrs, uint_fast32_t *cumlens)
 
 			/* Check the rate constraint. */
 			assert(pos >= 0);
-			if (pos > cumlen) {
+			if ((uint_fast32_t)pos > cumlen) {
 				/* The rate is too high. */
 				lo = thresh;
-			} else if (pos <= cumlen) {
+			} else if ((uint_fast32_t)pos <= cumlen) {
 				/* The rate is low enough, so try higher. */
 				hi = thresh;
 				if (!success || thresh < goodthresh) {
@@ -2436,12 +2431,12 @@ static jpc_enc_prc_t *prc_create(jpc_enc_prc_t *prc, jpc_enc_band_t *band)
 	  corners of the precinct. */
 	cbgtlx = tlcbgtlx + (prcxind << rlvl->cbgwidthexpn);
 	cbgtly = tlcbgtly + (prcyind << rlvl->cbgheightexpn);
-	prc->tlx = JAS_MAX(jas_seq2d_xstart(band->data), cbgtlx);
-	prc->tly = JAS_MAX(jas_seq2d_ystart(band->data), cbgtly);
-	prc->brx = JAS_MIN(jas_seq2d_xend(band->data), cbgtlx +
-	  (1 << rlvl->cbgwidthexpn));
-	prc->bry = JAS_MIN(jas_seq2d_yend(band->data), cbgtly +
-	  (1 << rlvl->cbgheightexpn));
+	prc->tlx = JAS_MAX(jas_seq2d_xstart(band->data), (jas_matind_t)cbgtlx);
+	prc->tly = JAS_MAX(jas_seq2d_ystart(band->data), (jas_matind_t)cbgtly);
+	prc->brx = JAS_MIN(jas_seq2d_xend(band->data), (jas_matind_t)(cbgtlx +
+	  (1 << rlvl->cbgwidthexpn)));
+	prc->bry = JAS_MIN(jas_seq2d_yend(band->data), (jas_matind_t)(cbgtly +
+	  (1 << rlvl->cbgheightexpn)));
 
 	if (prc->tlx < prc->brx && prc->tly < prc->bry) {
 		/* The precinct contains at least one code block. */
