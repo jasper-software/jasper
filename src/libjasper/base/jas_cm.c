@@ -1078,10 +1078,10 @@ static int icctoclrspc(int iccclrspc, int refflag)
 
 static int mono(jas_iccprof_t *iccprof, int op, jas_cmpxformseq_t **retpxformseq)
 {
-	jas_iccattrval_t *graytrc;
+	jas_iccattrval_t *graytrc = NULL;
 	jas_cmshapmat_t *shapmat;
-	jas_cmpxform_t *pxform;
-	jas_cmpxformseq_t *pxformseq;
+	jas_cmpxform_t *pxform = NULL;
+	jas_cmpxformseq_t *pxformseq = NULL;
 	jas_cmshapmatlut_t lut;
 
 	jas_cmshapmatlut_init(&lut);
@@ -1126,6 +1126,12 @@ static int mono(jas_iccprof_t *iccprof, int op, jas_cmpxformseq_t **retpxformseq
 	*retpxformseq = pxformseq;
 	return 0;
 error:
+	if (graytrc)
+		jas_iccattrval_destroy(graytrc);
+	if (pxform)
+		jas_cmpxform_destroy(pxform);
+	if (pxformseq)
+		jas_cmpxformseq_destroy(pxformseq);
 	return -1;
 }
 
