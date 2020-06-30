@@ -211,7 +211,7 @@ int jpg_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 	output_file = 0;
 
 	if (jpg_parseencopts(optstr, &encopts)) {
-		goto error;
+		return -1;
 	}
 
 	switch (jas_clrspc_fam(jas_image_clrspc(image))) {
@@ -226,7 +226,7 @@ int jpg_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 		  (enc->cmpts[2] = jas_image_getcmptbytype(image,
 		  JAS_IMAGE_CT_COLOR(JAS_CLRSPC_CHANIND_RGB_B))) < 0) {
 			jas_eprintf("error: missing color component\n");
-			goto error;
+			return -1;
 		}
 		break;
 	case JAS_CLRSPC_FAM_YCBCR:
@@ -240,7 +240,7 @@ int jpg_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 		  (enc->cmpts[2] = jas_image_getcmptbytype(image,
 		  JAS_IMAGE_CT_COLOR(JAS_CLRSPC_CHANIND_YCBCR_CR))) < 0) {
 			jas_eprintf("error: missing color component\n");
-			goto error;
+			return -1;
 		}
 		break;
 	case JAS_CLRSPC_FAM_GRAY:
@@ -250,13 +250,12 @@ int jpg_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 		if ((enc->cmpts[0] = jas_image_getcmptbytype(image,
 		  JAS_IMAGE_CT_COLOR(JAS_CLRSPC_CHANIND_GRAY_Y))) < 0) {
 			jas_eprintf("error: missing color component\n");
-			goto error;
+			return -1;
 		}
 		break;
 	default:
 		jas_eprintf("error: JPG format does not support color space\n");
-		goto error;
-		break;
+		return -1;
 	}
 
 	width = jas_image_width(image);
@@ -272,12 +271,12 @@ int jpg_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 		  jas_image_cmptprec(image, enc->cmpts[cmptno]) != 8 ||
 		  jas_image_cmptsgnd(image, enc->cmpts[cmptno]) != false) {
 			jas_eprintf("error: The JPG encoder cannot handle an image with this geometry.\n");
-			goto error;
+			return -1;
 		}
 	}
 
 	if (!(output_file = tmpfile())) {
-		goto error;
+		return -1;
 	}
 
 	/* Create a JPEG compression object. */
@@ -336,12 +335,6 @@ int jpg_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 	output_file = 0;
 
 	return 0;
-
-error:
-	if (output_file) {
-		fclose(output_file);
-	}
-	return -1;
 }
 
 static J_COLOR_SPACE tojpgcs(int colorspace)
