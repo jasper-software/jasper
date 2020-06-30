@@ -249,8 +249,12 @@ check_function_exists(getrusage JAS_HAVE_GETRUSAGE)
 # Check for the JPEG library.
 ################################################################################
 
-find_package(JPEG ${JAS_LIBJPEG_REQUIRED})
-message("JPEG library found: ${JPEG_FOUND}")
+if (JAS_ENABLE_LIBJPEG)
+	find_package(JPEG ${JAS_LIBJPEG_REQUIRED})
+	message("JPEG library found: ${JPEG_FOUND}")
+else()
+	set(JPEG_FOUND false)
+endif()
 if (JAS_ENABLE_LIBJPEG AND JPEG_FOUND)
 	set(JAS_HAVE_LIBJPEG 0)
 	message("JPEG include directory: ${JPEG_INCLUDE_DIR}")
@@ -289,9 +293,13 @@ message("JAS_HAVE_LIBJPEG: ${JAS_HAVE_LIBJPEG}")
 # Check for the OpenGL and GLUT libraries.
 ################################################################################
 
-find_package(OpenGL ${JAS_REQUIRED})
 message("JAS_ENABLE_OPENGL: ${JAS_ENABLE_OPENGL}")
-message("OpenGL library found: ${OPENGL_FOUND}")
+if (JAS_ENABLE_OPENGL)
+	find_package(OpenGL ${JAS_REQUIRED})
+	message("OpenGL library found: ${OPENGL_FOUND}")
+else()
+	set(OPENGL_FOUND false)
+endif()
 if (JAS_ENABLE_OPENGL AND OPENGL_FOUND)
 	set(JAS_HAVE_OPENGL 0)
 	message("OpenGL include directory: ${OPENGL_INCLUDE_DIR}")
