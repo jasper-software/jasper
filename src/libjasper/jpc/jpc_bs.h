@@ -186,10 +186,10 @@ int jpc_bitstream_inalign(jpc_bitstream_t *bitstream, int fillmask,
 int jpc_bitstream_outalign(jpc_bitstream_t *bitstream, int filldata);
 
 /* Check if a bit stream needs alignment. */
-int jpc_bitstream_needalign(jpc_bitstream_t *bitstream);
+int jpc_bitstream_needalign(const jpc_bitstream_t *bitstream);
 
 /* How many additional bytes would be output if the bit stream was aligned? */
-int jpc_bitstream_pending(jpc_bitstream_t *bitstream);
+int jpc_bitstream_pending(const jpc_bitstream_t *bitstream);
 
 /******************************************************************************\
 * Functions/macros for querying state information for bit streams.
