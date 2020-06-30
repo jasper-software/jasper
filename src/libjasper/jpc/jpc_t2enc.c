@@ -365,7 +365,7 @@ int jpc_enc_encpkt(jpc_enc_t *enc, jas_stream_t *out, int compno, int lvlno, int
 				continue;
 			}
 			if (pass->lyrno != lyrno) {
-				assert(pass->lyrno < 0 || pass->lyrno > lyrno);
+				assert(pass->lyrno > lyrno);
 				continue;
 			}
 
