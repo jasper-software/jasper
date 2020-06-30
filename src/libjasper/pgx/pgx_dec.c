@@ -299,6 +299,10 @@ static int pgx_gethdr(jas_stream_t *in, pgx_hdr_t *hdr)
 		jas_eprintf("cannot get precision\n");
 		goto error;
 	}
+	if (hdr->prec > 32) {
+		jas_eprintf("unsupported precision\n");
+		goto error;
+	}
 	if (pgx_getuint32(in, &hdr->width)) {
 		jas_eprintf("cannot get width\n");
 		goto error;
@@ -352,6 +356,8 @@ error:
 
 static int_fast32_t pgx_getword(jas_stream_t *in, bool bigendian, int prec)
 {
+	assert(prec <= 32);
+
 	uint_fast32_t val;
 	int i;
 	int j;
@@ -359,10 +365,6 @@ static int_fast32_t pgx_getword(jas_stream_t *in, bool bigendian, int prec)
 	int wordsize;
 
 	wordsize = (prec + 7) / 8;
-
-	if (prec > 32) {
-		goto error;
-	}
 
 	val = 0;
 	for (i = 0; i < wordsize; ++i) {
