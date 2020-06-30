@@ -78,7 +78,6 @@ include(CheckFunctionExists)
 include(CheckCSourceCompiles)
 include(CTest)
 include(Sanitizers)
-include(EnableAssertions)
 
 cmake_policy(SET CMP0012 NEW)
 
