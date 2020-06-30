@@ -644,10 +644,11 @@ static int mif_hdr_put(mif_hdr_t *hdr, jas_stream_t *out)
 	mif_cmpt_t *cmpt;
 
 	/* Output signature. */
-	jas_stream_putc(out, (MIF_MAGIC >> 24) & 0xff);
-	jas_stream_putc(out, (MIF_MAGIC >> 16) & 0xff);
-	jas_stream_putc(out, (MIF_MAGIC >> 8) & 0xff);
-	jas_stream_putc(out, MIF_MAGIC & 0xff);
+	if (jas_stream_putc(out, (MIF_MAGIC >> 24) & 0xff) == EOF ||
+	    jas_stream_putc(out, (MIF_MAGIC >> 16) & 0xff) == EOF ||
+	    jas_stream_putc(out, (MIF_MAGIC >> 8) & 0xff) == EOF ||
+	    jas_stream_putc(out, MIF_MAGIC & 0xff) == EOF)
+		return -1;
 
 	/* Output component information. */
 	for (cmptno = 0; cmptno < hdr->numcmpts; ++cmptno) {
