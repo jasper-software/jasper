@@ -546,7 +546,6 @@ void jpc_init_t2state(jpc_enc_t *enc, int raflag)
 						if (raflag) {
 							endpasses = &cblk->passes[cblk->numpasses];
 							for (pass = cblk->passes; pass != endpasses; ++pass) {
-								pass->lyrno = -1;
 								pass->lyrno = 0;
 							}
 						}
