@@ -98,17 +98,17 @@ static void jas_image_cmpt_destroy(jas_image_cmpt_t *cmpt);
 static jas_image_cmpt_t *jas_image_cmpt_create(int_fast32_t tlx,
   int_fast32_t tly, int_fast32_t hstep, int_fast32_t vstep,
   int_fast32_t width, int_fast32_t height, uint_fast16_t depth, bool sgnd,
-  uint_fast32_t inmem);
+  bool inmem);
 static void jas_image_setbbox(jas_image_t *image);
 static jas_image_cmpt_t *jas_image_cmpt_copy(jas_image_cmpt_t *cmpt);
 static int jas_image_growcmpts(jas_image_t *image, int maxcmpts);
 static uint_fast32_t inttobits(jas_seqent_t v, int prec, bool sgnd);
 static jas_seqent_t bitstoint(uint_fast32_t v, int prec, bool sgnd);
-static int putint(jas_stream_t *out, int sgnd, int prec, long val);
-static int getint(jas_stream_t *in, int sgnd, int prec, long *val);
+static int putint(jas_stream_t *out, bool sgnd, int prec, long val);
+static int getint(jas_stream_t *in, bool sgnd, int prec, long *val);
 static long uptomult(long x, long y);
 static long downtomult(long x, long y);
-static long convert(long val, int oldsgnd, int oldprec, int newsgnd,
+static long convert(long val, bool oldsgnd, int oldprec, bool newsgnd,
   int newprec);
 static void jas_image_calcbbox2(jas_image_t *image, jas_image_coord_t *tlx,
   jas_image_coord_t *tly, jas_image_coord_t *brx, jas_image_coord_t *bry);
@@ -129,7 +129,6 @@ jas_image_t *jas_image_create(int numcmpts, jas_image_cmptparm_t *cmptparms,
 {
 	jas_image_t *image;
 	size_t rawsize;
-	uint_fast32_t inmem;
 	int cmptno;
 	jas_image_cmptparm_t *cmptparm;
 
@@ -177,7 +176,7 @@ jas_image_t *jas_image_create(int numcmpts, jas_image_cmptparm_t *cmptparms,
 			goto error;
 		}
 		rawsize /= 8;
-		inmem = (rawsize < JAS_IMAGE_INMEMTHRESH);
+		const bool inmem = (rawsize < JAS_IMAGE_INMEMTHRESH);
 		if (!(image->cmpts_[cmptno] = jas_image_cmpt_create(cmptparm->tlx,
 		  cmptparm->tly, cmptparm->hstep, cmptparm->vstep,
 		  cmptparm->width, cmptparm->height, cmptparm->prec,
@@ -323,7 +322,7 @@ void jas_image_destroy(jas_image_t *image)
 static jas_image_cmpt_t *jas_image_cmpt_create(int_fast32_t tlx,
   int_fast32_t tly, int_fast32_t hstep, int_fast32_t vstep,
   int_fast32_t width, int_fast32_t height, uint_fast16_t depth, bool sgnd,
-  uint_fast32_t inmem)
+  bool inmem)
 {
 	jas_image_cmpt_t *cmpt;
 	size_t size;
@@ -779,7 +778,7 @@ int jas_image_addcmpt(jas_image_t *image, int cmptno,
 	if (!(newcmpt = jas_image_cmpt_create(cmptparm->tlx,
 	  cmptparm->tly, cmptparm->hstep, cmptparm->vstep,
 	  cmptparm->width, cmptparm->height, cmptparm->prec,
-	  cmptparm->sgnd, 1))) {
+	  cmptparm->sgnd, true))) {
 		return -1;
 	}
 	if (cmptno < image->numcmpts_) {
@@ -1337,7 +1336,7 @@ static inline jas_ulong encode_twos_comp(long n, int prec)
 	return result;
 }
 
-static int getint(jas_stream_t *in, int sgnd, int prec, long *val)
+static int getint(jas_stream_t *in, bool sgnd, int prec, long *val)
 {
 	long v;
 	int n;
@@ -1359,7 +1358,7 @@ static int getint(jas_stream_t *in, int sgnd, int prec, long *val)
 	return 0;
 }
 
-static int putint(jas_stream_t *out, int sgnd, int prec, long val)
+static int putint(jas_stream_t *out, bool sgnd, int prec, long val)
 {
 	int n;
 	int c;
@@ -1378,7 +1377,7 @@ static int putint(jas_stream_t *out, int sgnd, int prec, long val)
 	return 0;
 }
 
-static long convert(long val, int oldsgnd, int oldprec, int newsgnd,
+static long convert(long val, bool oldsgnd, int oldprec, bool newsgnd,
   int newprec)
 {
 	if (newsgnd != oldsgnd) {
