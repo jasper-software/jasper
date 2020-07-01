@@ -205,10 +205,10 @@ typedef struct {
 	/* The y-coordinate of the bottom-right corner of the image bounding
 	  box (plus one). */
 
-	int numcmpts_;
+	unsigned numcmpts_;
 	/* The number of components. */
 
-	int maxcmpts_;
+	unsigned maxcmpts_;
 	/* The maximum number of components that this image can have (i.e., the
 	  allocated size of the components array). */
 
@@ -307,7 +307,7 @@ typedef struct {
 \******************************************************************************/
 
 /* Create an image. */
-JAS_DLLEXPORT jas_image_t *jas_image_create(int numcmpts,
+JAS_DLLEXPORT jas_image_t *jas_image_create(unsigned numcmpts,
   jas_image_cmptparm_t *cmptparms, jas_clrspc_t clrspc);
 
 /* Create an "empty" image. */
@@ -427,25 +427,25 @@ JAS_DLLEXPORT int jas_image_encode(jas_image_t *image, jas_stream_t *out, int fm
 /* Read a rectangular region of an image component. */
 /* The position and size of the rectangular region to be read is specified
 relative to the component's coordinate system. */
-JAS_DLLEXPORT int jas_image_readcmpt(jas_image_t *image, int cmptno, jas_image_coord_t x,
+JAS_DLLEXPORT int jas_image_readcmpt(jas_image_t *image, unsigned cmptno, jas_image_coord_t x,
   jas_image_coord_t y, jas_image_coord_t width, jas_image_coord_t height,
   jas_matrix_t *data);
 
 /* Write a rectangular region of an image component. */
-JAS_DLLEXPORT int jas_image_writecmpt(jas_image_t *image, int cmptno, jas_image_coord_t x,
+JAS_DLLEXPORT int jas_image_writecmpt(jas_image_t *image, unsigned cmptno, jas_image_coord_t x,
   jas_image_coord_t y, jas_image_coord_t width, jas_image_coord_t height,
   jas_matrix_t *data);
 
 /* Delete a component from an image. */
-JAS_DLLEXPORT void jas_image_delcmpt(jas_image_t *image, int cmptno);
+JAS_DLLEXPORT void jas_image_delcmpt(jas_image_t *image, unsigned cmptno);
 
 /* Add a component to an image. */
 JAS_DLLEXPORT int jas_image_addcmpt(jas_image_t *image, int cmptno,
   jas_image_cmptparm_t *cmptparm);
 
 /* Copy a component from one image to another. */
-JAS_DLLEXPORT int jas_image_copycmpt(jas_image_t *dstimage, int dstcmptno,
-  jas_image_t *srcimage, int srccmptno);
+JAS_DLLEXPORT int jas_image_copycmpt(jas_image_t *dstimage, unsigned dstcmptno,
+  jas_image_t *srcimage, unsigned srccmptno);
 
 #define	JAS_IMAGE_CDT_GETSGND(dtype) (((dtype) >> 7) & 1)
 #define	JAS_IMAGE_CDT_SETSGND(dtype) (((dtype) & 1) << 7)
@@ -455,11 +455,11 @@ JAS_DLLEXPORT int jas_image_copycmpt(jas_image_t *dstimage, int dstcmptno,
 #define	jas_image_cmptdtype(image, cmptno) \
 	(JAS_IMAGE_CDT_SETSGND((image)->cmpts_[cmptno]->sgnd_) | JAS_IMAGE_CDT_SETPREC((image)->cmpts_[cmptno]->prec_))
 
-JAS_DLLEXPORT int jas_image_depalettize(jas_image_t *image, int cmptno, int numlutents,
-  int_fast32_t *lutents, int dtype, int newcmptno);
+JAS_DLLEXPORT int jas_image_depalettize(jas_image_t *image, unsigned cmptno, unsigned numlutents,
+  int_fast32_t *lutents, int dtype, unsigned newcmptno);
 
-JAS_DLLEXPORT int jas_image_readcmptsample(jas_image_t *image, int cmptno, int x, int y);
-JAS_DLLEXPORT void jas_image_writecmptsample(jas_image_t *image, int cmptno, int x, int y,
+JAS_DLLEXPORT int jas_image_readcmptsample(jas_image_t *image, unsigned cmptno, int x, int y);
+JAS_DLLEXPORT void jas_image_writecmptsample(jas_image_t *image, unsigned cmptno, int x, int y,
   int_fast32_t v);
 
 JAS_ATTRIBUTE_PURE
@@ -504,13 +504,13 @@ JAS_DLLEXPORT int jas_image_getfmt(jas_stream_t *in);
 #define	jas_image_cmprof(image)	((image)->cmprof_)
 JAS_ATTRIBUTE_PURE
 int jas_image_ishomosamp(const jas_image_t *image);
-int jas_image_sampcmpt(jas_image_t *image, int cmptno, int newcmptno,
+int jas_image_sampcmpt(jas_image_t *image, unsigned cmptno, unsigned newcmptno,
   jas_image_coord_t ho, jas_image_coord_t vo, jas_image_coord_t hs,
   jas_image_coord_t vs, int sgnd, int prec);
-int jas_image_writecmpt2(jas_image_t *image, int cmptno, jas_image_coord_t x,
+int jas_image_writecmpt2(jas_image_t *image, unsigned cmptno, jas_image_coord_t x,
   jas_image_coord_t y, jas_image_coord_t width, jas_image_coord_t height,
   long *buf);
-int jas_image_readcmpt2(jas_image_t *image, int cmptno, jas_image_coord_t x,
+int jas_image_readcmpt2(jas_image_t *image, unsigned cmptno, jas_image_coord_t x,
   jas_image_coord_t y, jas_image_coord_t width, jas_image_coord_t height,
   long *buf);
 

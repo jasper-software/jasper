@@ -147,7 +147,7 @@ typedef struct {
 
 	int monomode;
 
-	int cmptno;
+	unsigned cmptno;
 
 } gs_t;
 
@@ -168,7 +168,7 @@ static void nextcmpt(void);
 static void prevcmpt(void);
 static int loadimage(void);
 static void unloadimage(void);
-static int jas_image_render2(jas_image_t *image, int cmptno, float vtlx, float vtly,
+static int jas_image_render2(jas_image_t *image, unsigned cmptno, float vtlx, float vtly,
   float vsx, float vsy, int vw, int vh, GLshort *vdata);
 static int jas_image_render(jas_image_t *image, float vtlx, float vtly,
   float vsx, float vsy, int vw, int vh, GLshort *vdata);
@@ -924,7 +924,7 @@ error:
 	return -1;
 }
 
-static int jas_image_render2(jas_image_t *image, int cmptno, float vtlx,
+static int jas_image_render2(jas_image_t *image, unsigned cmptno, float vtlx,
   float vtly, float vsx, float vsy, int vw, int vh, GLshort *vdata)
 {
 	int i;
@@ -934,7 +934,7 @@ static int jas_image_render2(jas_image_t *image, int cmptno, float vtlx,
 	int v;
 	GLshort *vdatap;
 
-	if (cmptno < 0 || cmptno >= image->numcmpts_) {
+	if (cmptno >= image->numcmpts_) {
 		fprintf(stderr, "bad parameter\n");
 		goto error;
 	}

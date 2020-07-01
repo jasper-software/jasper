@@ -169,11 +169,9 @@ int main(int argc, char **argv)
 	int width;
 	int height;
 	int depth;
-	int numcomps;
 	double d;
 	double maxdist;
 	double mindist;
-	int compno;
 	jas_stream_t *origstream;
 	jas_stream_t *reconstream;
 	const char *diffpath;
@@ -291,7 +289,7 @@ int main(int argc, char **argv)
 	jas_stream_close(reconstream);
 
 	/* Ensure that both images have the same number of components. */
-	numcomps = jas_image_numcmpts(origimage);
+	const unsigned numcomps = jas_image_numcmpts(origimage);
 	if (jas_image_numcmpts(reconimage) != numcomps) {
 		fprintf(stderr, "number of components differ (%d != %d)\n",
 		  numcomps, jas_image_numcmpts(reconimage));
@@ -301,7 +299,7 @@ int main(int argc, char **argv)
 	/* Compute the difference for each component. */
 	maxdist = 0;
 	mindist = FLT_MAX;
-	for (compno = 0; compno < numcomps; ++compno) {
+	for (unsigned compno = 0; compno < numcomps; ++compno) {
 		width = jas_image_cmptwidth(origimage, compno);
 		height = jas_image_cmptheight(origimage, compno);
 		depth = jas_image_cmptprec(origimage, compno);

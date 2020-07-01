@@ -105,7 +105,6 @@ int jp2_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 	uint_fast32_t overhead;
 	jp2_cdefchan_t *cdefchanent;
 	jp2_cdef_t *cdef;
-	int i;
 	uint_fast32_t typeasoc;
 	jas_iccprof_t *iccprof;
 	jas_stream_t *iccstream;
@@ -127,7 +126,7 @@ int jp2_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 	allcmptssame = 1;
 	sgnd = jas_image_cmptsgnd(image, 0);
 	prec = jas_image_cmptprec(image, 0);
-	for (i = 1; i < jas_image_numcmpts(image); ++i) {
+	for (unsigned i = 1; i < jas_image_numcmpts(image); ++i) {
 		if (jas_image_cmptsgnd(image, i) != sgnd ||
 		  jas_image_cmptprec(image, i) != prec) {
 			allcmptssame = 0;
@@ -337,7 +336,7 @@ int jp2_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 		if (!cdef->ents) {
 			goto error;
 		}
-		for (i = 0; i < jas_image_numcmpts(image); ++i) {
+		for (unsigned i = 0; i < jas_image_numcmpts(image); ++i) {
 			cdefchanent = &cdef->ents[i];
 			cdefchanent->channo = i;
 			typeasoc = jp2_gettypeasoc(jas_image_clrspc(image), jas_image_cmpttype(image, i));

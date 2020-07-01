@@ -473,7 +473,7 @@ static void jpg_put_pixel_rows(j_decompress_ptr cinfo, jpg_dest_t *dinfo,
 		return;
 	}
 
-	assert(cinfo->output_components == jas_image_numcmpts(dinfo->image));
+	assert(cinfo->output_components == (int)jas_image_numcmpts(dinfo->image));
 
 	for (cmptno = 0; cmptno < cinfo->output_components; ++cmptno) {
 		width = jas_image_cmptwidth(dinfo->image, cmptno);

@@ -334,7 +334,6 @@ static int ras_getdatastd(jas_stream_t *in, ras_hdr_t *hdr, ras_cmap_t *cmap,
 	int y;
 	int x;
 	int v;
-	int i;
 	jas_matrix_t *data[3];
 
 /* Note: This function does not properly handle images with a colormap. */
@@ -343,11 +342,11 @@ static int ras_getdatastd(jas_stream_t *in, ras_hdr_t *hdr, ras_cmap_t *cmap,
 
 	assert(jas_image_numcmpts(image) <= 3);
 
-	for (i = 0; i < 3; ++i) {
+	for (unsigned i = 0; i < 3; ++i) {
 		data[i] = 0;
 	}
 
-	for (i = 0; i < jas_image_numcmpts(image); ++i) {
+	for (unsigned i = 0; i < jas_image_numcmpts(image); ++i) {
 		if (!(data[i] = jas_matrix_create(1, jas_image_width(image)))) {
 			goto error;
 		}
@@ -384,7 +383,7 @@ static int ras_getdatastd(jas_stream_t *in, ras_hdr_t *hdr, ras_cmap_t *cmap,
 				goto error;
 			}
 		}
-		for (i = 0; i < jas_image_numcmpts(image); ++i) {
+		for (unsigned i = 0; i < jas_image_numcmpts(image); ++i) {
 			if (jas_image_writecmpt(image, i, 0, y, hdr->width, 1,
 			  data[i])) {
 				goto error;
@@ -392,7 +391,7 @@ static int ras_getdatastd(jas_stream_t *in, ras_hdr_t *hdr, ras_cmap_t *cmap,
 		}
 	}
 
-	for (i = 0; i < jas_image_numcmpts(image); ++i) {
+	for (unsigned i = 0; i < jas_image_numcmpts(image); ++i) {
 		jas_matrix_destroy(data[i]);
 		data[i] = 0;
 	}
@@ -400,7 +399,7 @@ static int ras_getdatastd(jas_stream_t *in, ras_hdr_t *hdr, ras_cmap_t *cmap,
 	return 0;
 
 error:
-	for (i = 0; i < 3; ++i) {
+	for (unsigned i = 0; i < 3; ++i) {
 		if (data[i]) {
 			jas_matrix_destroy(data[i]);
 		}

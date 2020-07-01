@@ -358,7 +358,6 @@ static jpc_enc_cp_t *cp_create(const char *optstr, jas_image_t *image)
 	jpc_enc_tcp_t *tcp;
 	jpc_enc_tccp_t *tccp;
 	jpc_enc_ccp_t *ccp;
-	int cmptno;
 	uint_fast16_t rlvlno;
 	uint_fast16_t prcwidthexpn;
 	uint_fast16_t prcheightexpn;
@@ -397,7 +396,7 @@ static jpc_enc_cp_t *cp_create(const char *optstr, jas_image_t *image)
 
 	hsteplcm = 1;
 	vsteplcm = 1;
-	for (cmptno = 0; cmptno < jas_image_numcmpts(image); ++cmptno) {
+	for (unsigned cmptno = 0; cmptno < jas_image_numcmpts(image); ++cmptno) {
 		if (jas_image_cmptbrx(image, cmptno) + jas_image_cmpthstep(image, cmptno) <=
 		  jas_image_brx(image) || jas_image_cmptbry(image, cmptno) +
 		  jas_image_cmptvstep(image, cmptno) <= jas_image_bry(image)) {
@@ -412,7 +411,8 @@ static jpc_enc_cp_t *cp_create(const char *optstr, jas_image_t *image)
 	if (!(cp->ccps = jas_alloc2(cp->numcmpts, sizeof(jpc_enc_ccp_t)))) {
 		goto error;
 	}
-	for (cmptno = 0, ccp = cp->ccps; cmptno < JAS_CAST(int, cp->numcmpts); ++cmptno,
+	unsigned cmptno;
+	for (cmptno = 0, ccp = cp->ccps; cmptno < cp->numcmpts; ++cmptno,
 	  ++ccp) {
 		ccp->sampgrdstepx = jas_image_cmpthstep(image, cmptno);
 		ccp->sampgrdstepy = jas_image_cmptvstep(image, cmptno);
@@ -1173,7 +1173,7 @@ assert(jas_image_numcmpts(enc->image) == 3);
 			break;
 		}
 
-		for (int i = 0; i < jas_image_numcmpts(enc->image); ++i) {
+		for (unsigned  i = 0; i < jas_image_numcmpts(enc->image); ++i) {
 			comp = &tile->tcmpts[i];
 			jpc_tsfb_analyze(comp->tsfb, comp->data);
 
