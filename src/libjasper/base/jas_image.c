@@ -341,20 +341,19 @@ static jas_image_cmpt_t *jas_image_cmpt_create(int_fast32_t tlx,
 	  inmem
 	  ));
 
-	cmpt = 0;
 	if (width < 0 || height < 0 || hstep <= 0 || vstep <= 0) {
-		goto error;
+		return NULL;
 	}
 	if (!jas_safe_intfast32_add(tlx, width, 0) ||
 	  !jas_safe_intfast32_add(tly, height, 0)) {
-		goto error;
+		return NULL;
 	}
 	if (!jas_safe_intfast32_mul3(width, height, depth, 0)) {
-		goto error;
+		return NULL;
 	}
 
 	if (!(cmpt = jas_malloc(sizeof(jas_image_cmpt_t)))) {
-		goto error;
+		return NULL;
 	}
 
 	cmpt->type_ = JAS_IMAGE_CT_UNKNOWN;
@@ -398,9 +397,7 @@ static jas_image_cmpt_t *jas_image_cmpt_create(int_fast32_t tlx,
 	return cmpt;
 
 error:
-	if (cmpt) {
-		jas_image_cmpt_destroy(cmpt);
-	}
+	jas_image_cmpt_destroy(cmpt);
 	return 0;
 }
 
