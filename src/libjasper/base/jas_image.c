@@ -297,9 +297,7 @@ static jas_image_cmpt_t *jas_image_cmpt_copy(jas_image_cmpt_t *cmpt)
 	}
 	return newcmpt;
 error:
-	if (newcmpt) {
-		jas_image_cmpt_destroy(newcmpt);
-	}
+	jas_image_cmpt_destroy(newcmpt);
 	return 0;
 }
 
