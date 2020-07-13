@@ -297,6 +297,13 @@ assert(jas_stream_tell(cblk->stream) == jas_stream_getrwcount(cblk->stream));
 			break;
 		}
 
+		if (ret) {
+			if (bout) {
+				jpc_bitstream_close(bout);
+			}
+			return -1;
+		}
+
 		if (pass->type == JPC_SEG_MQ) {
 			if (pass->term) {
 				jpc_mqenc_init(cblk->mqenc);
