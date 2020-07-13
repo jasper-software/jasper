@@ -429,7 +429,7 @@ static int jpc_sot_getparms(jpc_ms_t *ms, jpc_cstate_t *cstate, jas_stream_t *in
 	jpc_sot_t *sot = &ms->parms.sot;
 
 	/* Eliminate compiler warning about unused variables. */
-	cstate = 0;
+	(void)cstate;
 
 	if (jpc_getuint16(in, &sot->tileno) ||
 	  jpc_getuint32(in, &sot->len) ||
@@ -451,7 +451,7 @@ static int jpc_sot_putparms(jpc_ms_t *ms, jpc_cstate_t *cstate, jas_stream_t *ou
 	jpc_sot_t *sot = &ms->parms.sot;
 
 	/* Eliminate compiler warning about unused variables. */
-	cstate = 0;
+	(void)cstate;
 
 	if (jpc_putuint16(out, sot->tileno) ||
 	  jpc_putuint32(out, sot->len) ||
@@ -493,7 +493,7 @@ static int jpc_siz_getparms(jpc_ms_t *ms, jpc_cstate_t *cstate,
 	siz->comps = 0;
 
 	/* Eliminate compiler warning about unused variables. */
-	cstate = 0;
+	(void)cstate;
 
 	if (jpc_getuint16(in, &siz->caps) ||
 	  jpc_getuint32(in, &siz->width) ||
@@ -578,7 +578,7 @@ static int jpc_siz_putparms(jpc_ms_t *ms, jpc_cstate_t *cstate, jas_stream_t *ou
 	unsigned int i;
 
 	/* Eliminate compiler warning about unused variables. */
-	cstate = 0;
+	(void)cstate;
 
 	assert(siz->width && siz->height && siz->tilewidth &&
 	  siz->tileheight && siz->numcomps);
@@ -777,7 +777,7 @@ static int jpc_coc_dumpparms(jpc_ms_t *ms, FILE *out)
 static void jpc_cox_destroycompparms(jpc_coxcp_t *compparms)
 {
 	/* Eliminate compiler warning about unused variables. */
-	compparms = 0;
+	(void)compparms;
 }
 
 static int jpc_cox_getcompparms(jpc_ms_t *ms, jpc_cstate_t *cstate,
@@ -787,8 +787,8 @@ static int jpc_cox_getcompparms(jpc_ms_t *ms, jpc_cstate_t *cstate,
 	int i;
 
 	/* Eliminate compiler warning about unused variables. */
-	ms = 0;
-	cstate = 0;
+	(void)ms;
+	(void)cstate;
 
 	if (jpc_getuint8(in, &compparms->numdlvls) ||
 	  jpc_getuint8(in, &compparms->cblkwidthval) ||
@@ -835,8 +835,8 @@ static int jpc_cox_putcompparms(jpc_ms_t *ms, jpc_cstate_t *cstate,
 	assert(compparms->numdlvls <= 32);
 
 	/* Eliminate compiler warning about unused variables. */
-	ms = 0;
-	cstate = 0;
+	(void)ms;
+	(void)cstate;
 
 	if (jpc_putuint8(out, compparms->numdlvls) ||
 	  jpc_putuint8(out, compparms->cblkwidthval) ||
@@ -1035,7 +1035,7 @@ static int jpc_qcx_getcompparms(jpc_qcxcp_t *compparms, jpc_cstate_t *cstate,
 	int i;
 
 	/* Eliminate compiler warning about unused variables. */
-	cstate = 0;
+	(void)cstate;
 
 	n = 0;
 	if (jpc_getuint8(in, &tmp)) {
@@ -1096,7 +1096,7 @@ static int jpc_qcx_putcompparms(jpc_qcxcp_t *compparms, jpc_cstate_t *cstate,
 	int i;
 
 	/* Eliminate compiler warning about unused variables. */
-	cstate = 0;
+	(void)cstate;
 
 	if (jpc_putuint8(out, ((compparms->numguard & 7) << 5) | compparms->qntsty)) {
 		return -1;
@@ -1125,7 +1125,7 @@ static int jpc_sop_getparms(jpc_ms_t *ms, jpc_cstate_t *cstate, jas_stream_t *in
 	jpc_sop_t *sop = &ms->parms.sop;
 
 	/* Eliminate compiler warning about unused variable. */
-	cstate = 0;
+	(void)cstate;
 
 	if (jpc_getuint16(in, &sop->seqno)) {
 		return -1;
@@ -1138,7 +1138,7 @@ static int jpc_sop_putparms(jpc_ms_t *ms, jpc_cstate_t *cstate, jas_stream_t *ou
 	jpc_sop_t *sop = &ms->parms.sop;
 
 	/* Eliminate compiler warning about unused variable. */
-	cstate = 0;
+	(void)cstate;
 
 	if (jpc_putuint16(out, sop->seqno)) {
 		return -1;
@@ -1170,7 +1170,7 @@ static int jpc_ppm_getparms(jpc_ms_t *ms, jpc_cstate_t *cstate, jas_stream_t *in
 	jpc_ppm_t *ppm = &ms->parms.ppm;
 
 	/* Eliminate compiler warning about unused variables. */
-	cstate = 0;
+	(void)cstate;
 
 	ppm->data = 0;
 
@@ -1204,7 +1204,7 @@ static int jpc_ppm_putparms(jpc_ms_t *ms, jpc_cstate_t *cstate, jas_stream_t *ou
 	jpc_ppm_t *ppm = &ms->parms.ppm;
 
 	/* Eliminate compiler warning about unused variables. */
-	cstate = 0;
+	(void)cstate;
 
 	if (JAS_CAST(jas_uint, jas_stream_write(out, (char *) ppm->data, ppm->len)) != ppm->len) {
 		return -1;
@@ -1240,7 +1240,7 @@ static int jpc_ppt_getparms(jpc_ms_t *ms, jpc_cstate_t *cstate, jas_stream_t *in
 	jpc_ppt_t *ppt = &ms->parms.ppt;
 
 	/* Eliminate compiler warning about unused variables. */
-	cstate = 0;
+	(void)cstate;
 
 	ppt->data = 0;
 
@@ -1273,7 +1273,7 @@ static int jpc_ppt_putparms(jpc_ms_t *ms, jpc_cstate_t *cstate, jas_stream_t *ou
 	jpc_ppt_t *ppt = &ms->parms.ppt;
 
 	/* Eliminate compiler warning about unused variable. */
-	cstate = 0;
+	(void)cstate;
 
 	if (jpc_putuint8(out, ppt->ind)) {
 		return -1;
@@ -1441,7 +1441,7 @@ static int jpc_crg_putparms(jpc_ms_t *ms, jpc_cstate_t *cstate, jas_stream_t *ou
 	jpc_crgcomp_t *comp;
 
 	/* Eliminate compiler warning about unused variables. */
-	cstate = 0;
+	(void)cstate;
 
 	for (compno = 0, comp = crg->comps; compno < crg->numcomps; ++compno,
 	  ++comp) {
@@ -1483,7 +1483,7 @@ static int jpc_com_getparms(jpc_ms_t *ms, jpc_cstate_t *cstate, jas_stream_t *in
 	jpc_com_t *com = &ms->parms.com;
 
 	/* Eliminate compiler warning about unused variables. */
-	cstate = 0;
+	(void)cstate;
 
 	if (jpc_getuint16(in, &com->regid)) {
 		return -1;
@@ -1507,7 +1507,7 @@ static int jpc_com_putparms(jpc_ms_t *ms, jpc_cstate_t *cstate, jas_stream_t *ou
 	jpc_com_t *com = &ms->parms.com;
 
 	/* Eliminate compiler warning about unused variables. */
-	cstate = 0;
+	(void)cstate;
 
 	if (jpc_putuint16(out, com->regid)) {
 		return -1;
@@ -1558,7 +1558,7 @@ static int jpc_unk_getparms(jpc_ms_t *ms, jpc_cstate_t *cstate, jas_stream_t *in
 	unk->data = 0;
 
 	/* Eliminate compiler warning about unused variables. */
-	cstate = 0;
+	(void)cstate;
 
 	if (ms->len > 0) {
 		if (!(unk->data = jas_alloc2(ms->len, sizeof(unsigned char)))) {
@@ -1580,9 +1580,9 @@ static int jpc_unk_getparms(jpc_ms_t *ms, jpc_cstate_t *cstate, jas_stream_t *in
 static int jpc_unk_putparms(jpc_ms_t *ms, jpc_cstate_t *cstate, jas_stream_t *out)
 {
 	/* Eliminate compiler warning about unused variables. */
-	cstate = 0;
-	ms = 0;
-	out = 0;
+	(void)cstate;
+	(void)ms;
+	(void)out;
 
 	/* If this function is called, we are trying to write an unsupported
 	  type of marker segment.  Return with an error indication.  */
