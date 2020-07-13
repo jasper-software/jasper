@@ -249,7 +249,8 @@ assert(pass->term == 1);
 			assert(pass->type == JPC_SEG_RAW);
 			if (!bout) {
 				bout = jpc_bitstream_sopen(cblk->stream, "w");
-				assert(bout);
+				if (!bout)
+					return -1;
 			}
 		}
 
