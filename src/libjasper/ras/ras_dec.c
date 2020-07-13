@@ -339,7 +339,7 @@ static int ras_getdatastd(jas_stream_t *in, ras_hdr_t *hdr, ras_cmap_t *cmap,
 
 /* Note: This function does not properly handle images with a colormap. */
 	/* Avoid compiler warnings about unused parameters. */
-	cmap = 0;
+	(void)cmap;
 
 	assert(jas_image_numcmpts(image) <= 3);
 

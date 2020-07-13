@@ -97,7 +97,7 @@ int pgx_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 	pgx_enc_t *enc = &encbuf;
 
 	/* Avoid compiler warnings about unused parameters. */
-	optstr = 0;
+	(void)optstr;
 
 	switch (jas_clrspc_fam(jas_image_clrspc(image))) {
 	case JAS_CLRSPC_FAM_GRAY:

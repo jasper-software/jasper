@@ -161,7 +161,7 @@ jas_image_t *mif_decode(jas_stream_t *in, const char *optstr)
 	int bias;
 
 	/* Avoid warnings about unused parameters. */
-	optstr = 0;
+	(void)optstr;
 
 	hdr = 0;
 	image = 0;
