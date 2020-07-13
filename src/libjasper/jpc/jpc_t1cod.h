@@ -192,28 +192,19 @@ extern jpc_mqctx_t jpc_mqctxs[];
 * Functions and macros.
 \******************************************************************************/
 
-/* Initialize the MQ contexts. */
-void jpc_initctxs(jpc_mqctx_t *ctxs);
-
 /* Get the zero coding context. */
-JAS_ATTRIBUTE_CONST
-int jpc_getzcctxno(int f, int orient);
 #define	JPC_GETZCCTXNO(f, orient) \
 	(jpc_zcctxnolut[((orient) << 8) | ((f) & JPC_OTHSIGMSK)])
 
 /* Get the sign prediction bit. */
-JAS_ATTRIBUTE_CONST
-int jpc_getspb(int f);
 #define	JPC_GETSPB(f) \
 	(jpc_spblut[((f) & (JPC_PRIMSIGMSK | JPC_SGNMSK)) >> 4])
 
 /* Get the sign coding context. */
-int jpc_getscctxno(int f);
 #define	JPC_GETSCCTXNO(f) \
 	(jpc_scctxnolut[((f) & (JPC_PRIMSIGMSK | JPC_SGNMSK)) >> 4])
 
 /* Get the magnitude context. */
-int jpc_getmagctxno(int f);
 #define	JPC_GETMAGCTXNO(f) \
 	(jpc_magctxnolut[((f) & JPC_OTHSIGMSK) | ((((f) & JPC_REFINE) != 0) << 11)])
 

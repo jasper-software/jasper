@@ -104,6 +104,18 @@ jpc_mqctx_t jpc_mqctxs[JPC_NUMCTXS];
 *
 \******************************************************************************/
 
+JAS_ATTRIBUTE_CONST
+static int jpc_getzcctxno(int f, int orient);
+
+JAS_ATTRIBUTE_CONST
+static int jpc_getspb(int f);
+
+JAS_ATTRIBUTE_CONST
+static int jpc_getscctxno(int f);
+
+JAS_ATTRIBUTE_CONST
+static int jpc_getmagctxno(int f);
+
 static void jpc_initmqctxs(void);
 
 /******************************************************************************\
@@ -290,7 +302,7 @@ jpc_fix_t jpc_getsignmsedec_func(jpc_fix_t x, int bitpos)
 	return y;
 }
 
-int jpc_getzcctxno(int f, int orient)
+static int jpc_getzcctxno(int f, int orient)
 {
 	int h;
 	int v;
@@ -373,7 +385,7 @@ int jpc_getzcctxno(int f, int orient)
 	return JPC_ZCCTXNO + n;
 }
 
-int jpc_getspb(int f)
+static int jpc_getspb(int f)
 {
 	int hc;
 	int vc;
@@ -391,7 +403,7 @@ int jpc_getspb(int f)
 	return n;
 }
 
-int jpc_getscctxno(int f)
+static int jpc_getscctxno(int f)
 {
 	int hc;
 	int vc;
@@ -432,7 +444,7 @@ int jpc_getscctxno(int f)
 	return JPC_SCCTXNO + n;
 }
 
-int jpc_getmagctxno(int f)
+static int jpc_getmagctxno(int f)
 {
 	int n;
 
@@ -446,7 +458,7 @@ int jpc_getmagctxno(int f)
 	return JPC_MAGCTXNO + n;
 }
 
-void jpc_initctxs(jpc_mqctx_t *ctxs)
+static void jpc_initctxs(jpc_mqctx_t *ctxs)
 {
 	jpc_mqctx_t *ctx;
 	int i;
