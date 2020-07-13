@@ -886,7 +886,6 @@ long mainhdrlen;
 	jpc_enc_tccp_t *tccp;
 	uint_fast16_t cmptno;
 	jpc_tsfb_band_t bandinfos[JPC_MAXBANDS];
-	jpc_fix_t mctsynweight;
 	jpc_enc_tcp_t *tcp;
 	jpc_tsfb_t *tsfb;
 	jpc_tsfb_band_t *bandinfo;
@@ -984,7 +983,6 @@ startoff = jas_stream_getrwcount(enc->out);
 		jpc_tsfb_getbands(tsfb, 0, 0, 1 << tccp->maxrlvls, 1 << tccp->maxrlvls,
 		  bandinfos);
 		jpc_tsfb_destroy(tsfb);
-		mctsynweight = jpc_mct_getsynweight(tcp->mctid, cmptno);
 		numbands = 3 * tccp->maxrlvls - 2;
 		for (bandno = 0, bandinfo = bandinfos; bandno < numbands;
 		  ++bandno, ++bandinfo) {
@@ -1096,8 +1094,6 @@ startoff = jas_stream_getrwcount(enc->out);
 static int jpc_enc_encodemainbody(jpc_enc_t *enc)
 {
 	int tileno;
-	int tilex;
-	int tiley;
 	jpc_sot_t *sot;
 	jpc_enc_tcmpt_t *comp;
 	jpc_enc_tcmpt_t *endcomps;
@@ -1110,7 +1106,6 @@ static int jpc_enc_encodemainbody(jpc_enc_t *enc)
 	int adjust;
 	int j;
 	int absbandno;
-	long numbytes;
 	long tilehdrlen;
 	long tilelen;
 	jpc_enc_tile_t *tile;
@@ -1131,13 +1126,7 @@ static int jpc_enc_encodemainbody(jpc_enc_t *enc)
 
 	cp = enc->cp;
 
-	/* Avoid compile warnings. */
-	numbytes = 0;
-
 	for (tileno = 0; tileno < JAS_CAST(int, cp->numtiles); ++tileno) {
-		tilex = tileno % cp->numhtiles;
-		tiley = tileno / cp->numhtiles;
-
 		if (!(enc->curtile = jpc_enc_tile_create(enc->cp, enc->image,
 		  tileno))) {
 			jas_eprintf("cannot create tile\n");
