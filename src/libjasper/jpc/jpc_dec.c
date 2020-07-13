@@ -696,7 +696,6 @@ static int jpc_dec_tileinit(jpc_dec_t *dec, jpc_dec_tile_t *tile)
 	uint_fast32_t tlcbgxstart;
 	uint_fast32_t tlcbgystart;
 	uint_fast32_t brcbgxend;
-	uint_fast32_t brcbgyend;
 	uint_fast32_t cbgxstart;
 	uint_fast32_t cbgystart;
 	uint_fast32_t cbgxend;
@@ -801,14 +800,12 @@ static int jpc_dec_tileinit(jpc_dec_t *dec, jpc_dec_tile_t *tile)
 				tlcbgxstart = tlprcxstart;
 				tlcbgystart = tlprcystart;
 				brcbgxend = brprcxend;
-				brcbgyend = brprcyend;
 				rlvl->cbgwidthexpn = rlvl->prcwidthexpn;
 				rlvl->cbgheightexpn = rlvl->prcheightexpn;
 			} else {
 				tlcbgxstart = JPC_CEILDIVPOW2(tlprcxstart, 1);
 				tlcbgystart = JPC_CEILDIVPOW2(tlprcystart, 1);
 				brcbgxend = JPC_CEILDIVPOW2(brprcxend, 1);
-				brcbgyend = JPC_CEILDIVPOW2(brprcyend, 1);
 				rlvl->cbgwidthexpn = rlvl->prcwidthexpn - 1;
 				rlvl->cbgheightexpn = rlvl->prcheightexpn - 1;
 				if (rlvl->cbgwidthexpn < 0 || rlvl->cbgheightexpn < 0) {
