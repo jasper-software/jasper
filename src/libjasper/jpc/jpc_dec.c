@@ -465,7 +465,7 @@ static int jpc_dec_process_crg(jpc_dec_t *dec, jpc_ms_t *ms)
 static int jpc_dec_process_soc(jpc_dec_t *dec, jpc_ms_t *ms)
 {
 	/* Eliminate warnings about unused variables. */
-	ms = 0;
+	(void)ms;
 
 	/* We should expect to encounter a SIZ marker segment next. */
 	dec->state = JPC_MHSIZ;
@@ -580,7 +580,7 @@ static int jpc_dec_process_sod(jpc_dec_t *dec, jpc_ms_t *ms)
 	int pos;
 
 	/* Eliminate compiler warnings about unused variables. */
-	ms = 0;
+	(void)ms;
 
 	if (!(tile = dec->curtile)) {
 		return -1;
@@ -1227,7 +1227,7 @@ static int jpc_dec_process_eoc(jpc_dec_t *dec, jpc_ms_t *ms)
 	jpc_dec_tile_t *tile;
 
 	/* Eliminate compiler warnings about unused variables. */
-	ms = 0;
+	(void)ms;
 
 	for (tileno = 0, tile = dec->tiles; tileno < dec->numtiles; ++tileno,
 	  ++tile) {
@@ -1613,8 +1613,8 @@ static int jpc_dec_process_ppt(jpc_dec_t *dec, jpc_ms_t *ms)
 static int jpc_dec_process_com(jpc_dec_t *dec, jpc_ms_t *ms)
 {
 	/* Eliminate compiler warnings about unused variables. */
-	dec = 0;
-	ms = 0;
+	(void)dec;
+	(void)ms;
 
 	return 0;
 }
@@ -1622,7 +1622,7 @@ static int jpc_dec_process_com(jpc_dec_t *dec, jpc_ms_t *ms)
 static int jpc_dec_process_unk(jpc_dec_t *dec, jpc_ms_t *ms)
 {
 	/* Eliminate compiler warnings about unused variables. */
-	dec = 0;
+	(void)dec;
 
 	jas_eprintf("warning: ignoring unknown marker segment (0x%x)\n",
 	  ms->id);
@@ -1821,7 +1821,7 @@ static int jpc_dec_cp_setfromcox(jpc_dec_cp_t *cp, jpc_dec_ccp_t *ccp,
 	int rlvlno;
 
 	/* Eliminate compiler warnings about unused variables. */
-	cp = 0;
+	(void)cp;
 
 	if ((flags & JPC_COC) || !(ccp->flags & JPC_COC)) {
 		ccp->numrlvls = compparms->numdlvls + 1;
@@ -1866,7 +1866,7 @@ static int jpc_dec_cp_setfromqcx(jpc_dec_cp_t *cp, jpc_dec_ccp_t *ccp,
 	int bandno;
 
 	/* Eliminate compiler warnings about unused variables. */
-	cp = 0;
+	(void)cp;
 
 	if ((flags & JPC_QCC) || !(ccp->flags & JPC_QCC)) {
 		ccp->flags |= flags | JPC_QSET;
