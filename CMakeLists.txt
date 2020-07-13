@@ -193,7 +193,7 @@ set(CPACK_GENERATOR "TGZ")
 include(CPack)
 
 if (JAS_STRICT)
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wno-unused")
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pedantic")
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -W -Wformat -Wmissing-prototypes -Wstrict-prototypes")
 endif()
