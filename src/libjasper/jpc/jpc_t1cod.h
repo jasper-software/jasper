@@ -176,10 +176,10 @@
 
 /* These lookup tables are used by various macros/functions. */
 /* Do not access these lookup tables directly. */
-extern int jpc_zcctxnolut[];
-extern int jpc_spblut[];
-extern int jpc_scctxnolut[];
-extern int jpc_magctxnolut[];
+extern uint_least8_t jpc_zcctxnolut[];
+extern bool jpc_spblut[];
+extern uint_least8_t jpc_scctxnolut[];
+extern uint_least8_t jpc_magctxnolut[];
 extern jpc_fix_t jpc_refnmsedec[];
 extern jpc_fix_t jpc_signmsedec[];
 extern jpc_fix_t jpc_refnmsedec0[];

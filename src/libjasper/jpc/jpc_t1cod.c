@@ -88,10 +88,10 @@ static double jpc_pow2i(int n);
 * Global data.
 \******************************************************************************/
 
-int jpc_zcctxnolut[4 * 256];
-int jpc_spblut[256];
-int jpc_scctxnolut[256];
-int jpc_magctxnolut[4096];
+uint_least8_t jpc_zcctxnolut[4 * 256];
+bool jpc_spblut[256];
+uint_least8_t jpc_scctxnolut[256];
+uint_least8_t jpc_magctxnolut[4096];
 
 jpc_fix_t jpc_signmsedec[1 << JPC_NMSEDEC_BITS];
 jpc_fix_t jpc_refnmsedec[1 << JPC_NMSEDEC_BITS];
@@ -105,16 +105,16 @@ jpc_mqctx_t jpc_mqctxs[JPC_NUMCTXS];
 \******************************************************************************/
 
 JAS_ATTRIBUTE_CONST
-static int jpc_getzcctxno(int f, int orient);
+static uint_least8_t jpc_getzcctxno(int f, int orient);
 
 JAS_ATTRIBUTE_CONST
-static int jpc_getspb(int f);
+static bool jpc_getspb(int f);
 
 JAS_ATTRIBUTE_CONST
-static int jpc_getscctxno(int f);
+static uint_least8_t jpc_getscctxno(int f);
 
 JAS_ATTRIBUTE_CONST
-static int jpc_getmagctxno(int f);
+static uint_least8_t jpc_getmagctxno(int f);
 
 static void jpc_initmqctxs(void);
 
@@ -302,7 +302,7 @@ jpc_fix_t jpc_getsignmsedec_func(jpc_fix_t x, int bitpos)
 	return y;
 }
 
-static int jpc_getzcctxno(int f, int orient)
+static uint_least8_t jpc_getzcctxno(int f, int orient)
 {
 	int h;
 	int v;
@@ -385,11 +385,11 @@ static int jpc_getzcctxno(int f, int orient)
 	return JPC_ZCCTXNO + n;
 }
 
-static int jpc_getspb(int f)
+static bool jpc_getspb(int f)
 {
 	int hc;
 	int vc;
-	int n;
+	bool n;
 
 	hc = JAS_MIN(((f & (JPC_ESIG | JPC_ESGN)) == JPC_ESIG) + ((f & (JPC_WSIG | JPC_WSGN)) == JPC_WSIG), 1) -
 	  JAS_MIN(((f & (JPC_ESIG | JPC_ESGN)) == (JPC_ESIG | JPC_ESGN)) + ((f & (JPC_WSIG | JPC_WSGN)) == (JPC_WSIG | JPC_WSGN)), 1);
@@ -403,7 +403,7 @@ static int jpc_getspb(int f)
 	return n;
 }
 
-static int jpc_getscctxno(int f)
+static uint_least8_t jpc_getscctxno(int f)
 {
 	int hc;
 	int vc;
@@ -444,7 +444,7 @@ static int jpc_getscctxno(int f)
 	return JPC_SCCTXNO + n;
 }
 
-static int jpc_getmagctxno(int f)
+static uint_least8_t jpc_getmagctxno(int f)
 {
 	int n;
 
