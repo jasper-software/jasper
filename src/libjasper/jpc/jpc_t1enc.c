@@ -200,14 +200,12 @@ int jpc_enc_enccblk(jpc_enc_tcmpt_t *tcmpt, jpc_enc_band_t *band, jpc_enc_cblk_t
 	int t;
 	jpc_bitstream_t *bout;
 	jpc_enc_pass_t *termpass;
-	jpc_enc_rlvl_t *rlvl;
 	int vcausal;
 	int segsym;
 	int termmode;
 	int c;
 
 	bout = 0;
-	rlvl = band->rlvl;
 
 	cblk->stream = jas_stream_memopen(0, 0);
 	assert(cblk->stream);
