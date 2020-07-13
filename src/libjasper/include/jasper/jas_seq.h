@@ -200,9 +200,6 @@ typedef jas_matrix_t jas_seq_t;
 	(((matrix)->numrows_ > 1) ? jas_matrix_getref(matrix, i, 0) : \
 	  jas_matrix_getref(matrix, 0, i))
 
-#define jas_matrix_length(matrix) \
-	(max((matrix)->numrows_, (matrix)->numcols_))
-
 /* Create a matrix with the specified dimensions. */
 JAS_DLLEXPORT jas_matrix_t *jas_matrix_create(jas_matind_t numrows, jas_matind_t numcols);
 
