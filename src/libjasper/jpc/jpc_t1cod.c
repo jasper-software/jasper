@@ -134,7 +134,7 @@ int JPC_PASSTYPE(int passno)
 int JPC_NOMINALGAIN(int qmfbid, int numlvls, int lvlno, int orient)
 {
 	/* Avoid compiler warnings about unused parameters. */
-	numlvls = 0;
+	(void)numlvls;
 
 	if (qmfbid == JPC_COX_INS) {
 		return 0;
@@ -300,7 +300,7 @@ int jpc_getzcctxno(int f, int orient)
 	int hv;
 
 	/* Avoid compiler warning. */
-	n = 0;
+	(void)n;
 
 	h = ((f & JPC_WSIG) != 0) + ((f & JPC_ESIG) != 0);
 	v = ((f & JPC_NSIG) != 0) + ((f & JPC_SSIG) != 0);
@@ -398,7 +398,7 @@ int jpc_getscctxno(int f)
 	int n;
 
 	/* Avoid compiler warning. */
-	n = 0;
+	(void)n;
 
 	hc = JAS_MIN(((f & (JPC_ESIG | JPC_ESGN)) == JPC_ESIG) + ((f & (JPC_WSIG | JPC_WSGN)) == JPC_WSIG),
 	  1) - JAS_MIN(((f & (JPC_ESIG | JPC_ESGN)) == (JPC_ESIG | JPC_ESGN)) +
