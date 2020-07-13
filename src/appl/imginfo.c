@@ -136,7 +136,6 @@ int main(int argc, char **argv)
 	int height;
 	int depth;
 	int numcmpts;
-	int verbose;
 	const char *fmtname;
 	int debug;
 	size_t max_samples;
@@ -153,7 +152,6 @@ int main(int argc, char **argv)
 	max_samples = 0;
 	max_samples_valid = false;
 	infile = 0;
-	verbose = 0;
 	debug = 0;
 #if defined(JAS_DEFAULT_MAX_MEM_USAGE)
 	size_t max_mem = JAS_DEFAULT_MAX_MEM_USAGE;
@@ -164,7 +162,7 @@ int main(int argc, char **argv)
 	while ((id = jas_getopt(argc, argv, opts)) >= 0) {
 		switch (id) {
 		case OPT_VERBOSE:
-			verbose = 1;
+			/* not used - can we remove this option? */
 			break;
 		case OPT_VERSION:
 			printf("%s\n", JAS_VERSION);
