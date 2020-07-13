@@ -139,7 +139,6 @@ int main(int argc, char **argv)
 	int verbose;
 	const char *fmtname;
 	int debug;
-	size_t max_mem;
 	size_t max_samples;
 	bool max_samples_valid;
 	char optstr[32];
@@ -157,7 +156,7 @@ int main(int argc, char **argv)
 	verbose = 0;
 	debug = 0;
 #if defined(JAS_DEFAULT_MAX_MEM_USAGE)
-	max_mem = JAS_DEFAULT_MAX_MEM_USAGE;
+	size_t max_mem = JAS_DEFAULT_MAX_MEM_USAGE;
 #endif
 	dec_opt_spec[0] = '\0';
 
@@ -182,7 +181,9 @@ int main(int argc, char **argv)
 			max_samples_valid = true;
 			break;
 		case OPT_MAXMEM:
+#if defined(JAS_DEFAULT_MAX_MEM_USAGE)
 			max_mem = strtoull(jas_optarg, 0, 10);
+#endif
 			break;
 		case OPT_DECOPT:
 			if (dec_opt_spec[0] != '\0') {

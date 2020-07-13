@@ -105,7 +105,9 @@ typedef struct {
 
 	int verbose;
 
+#if defined(JAS_DEFAULT_MAX_MEM_USAGE)
 	size_t max_mem;
+#endif
 
 } cmdopts_t;
 
@@ -262,7 +264,9 @@ int main(int argc, char **argv)
 			cmdopts.verbose = 1;
 			break;
 		case 'm':
+#if defined(JAS_DEFAULT_MAX_MEM_USAGE)
 			cmdopts.max_mem = strtoull(jas_optarg, 0, 10);
+#endif
 			break;
 		case 'V':
 			printf("%s\n", JAS_VERSION);

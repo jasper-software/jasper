@@ -178,7 +178,6 @@ int main(int argc, char **argv)
 	int maxonly;
 	int minonly;
 	int fmtid;
-	size_t max_mem;
 
 	verbose = 0;
 	origpath = 0;
@@ -189,7 +188,7 @@ int main(int argc, char **argv)
 	maxonly = 0;
 	minonly = 0;
 #if defined(JAS_DEFAULT_MAX_MEM_USAGE)
-	max_mem = JAS_DEFAULT_MAX_MEM_USAGE;
+	size_t max_mem = JAS_DEFAULT_MAX_MEM_USAGE;
 #endif
 
 	if (jas_init()) {
@@ -227,7 +226,9 @@ int main(int argc, char **argv)
 			exit(EXIT_SUCCESS);
 			break;
 		case OPT_MAXMEM:
+#if defined(JAS_DEFAULT_MAX_MEM_USAGE)
 			max_mem = strtoull(jas_optarg, 0, 10);
+#endif
 			break;
 		case OPT_HELP:
 		default:
