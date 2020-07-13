@@ -89,6 +89,9 @@
 
 jas_image_t *jpg_decode(jas_stream_t *in, const char *optstr)
 {
+	(void)in;
+	(void)optstr;
+
 	jas_eprintf("error: JPEG decoder not available\n");
 	jas_eprintf("The IJG JPEG library is required for JPEG decoding support.\n");
 	jas_eprintf("%s", JPG_IJGINFO);
@@ -103,6 +106,10 @@ jas_image_t *jpg_decode(jas_stream_t *in, const char *optstr)
 
 int jpg_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 {
+	(void)image;
+	(void)out;
+	(void)optstr;
+
 	jas_eprintf("error: JPEG encoder not available\n");
 	jas_eprintf("The IJG JPEG library is required for JPEG encoding support.\n");
 	jas_eprintf("%s", JPG_IJGINFO);
