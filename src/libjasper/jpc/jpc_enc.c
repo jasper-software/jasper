@@ -144,7 +144,6 @@ static void jpc_enc_dump(jpc_enc_t *enc);
 * Local prototypes.
 \******************************************************************************/
 
-static int dump_passes(jpc_enc_pass_t *passes, int numpasses, jpc_enc_cblk_t *cblk);
 static void calcrdslopes(jpc_enc_cblk_t *cblk);
 static void dump_layeringinfo(jpc_enc_t *enc);
 static void jpc_quantize(jas_matrix_t *data, jpc_fix_t stepsize);
@@ -157,7 +156,6 @@ static int jpc_enc_encodemainhdr(jpc_enc_t *enc);
 static int jpc_enc_encodemainbody(jpc_enc_t *enc);
 static int jpc_enc_encodetiledata(jpc_enc_t *enc);
 static int rateallocate(jpc_enc_t *enc, unsigned numlyrs, uint_fast32_t *cumlens);
-static int setins(int numvalues, jpc_flt_t *values, jpc_flt_t value);
 static jpc_enc_cp_t *cp_create(const char *optstr, jas_image_t *image);
 static void jpc_enc_cp_destroy(jpc_enc_cp_t *cp);
 static uint_fast32_t jpc_abstorelstepsize(jpc_fix_t absdelta, int scaleexpn);
@@ -1477,27 +1475,6 @@ int jpc_enc_encodetiledata(jpc_enc_t *enc)
 assert(enc->tmpstream);
 	if (jpc_enc_encpkts(enc, enc->tmpstream)) {
 		return -1;
-	}
-	return 0;
-}
-
-int dump_passes(jpc_enc_pass_t *passes, int numpasses, jpc_enc_cblk_t *cblk)
-{
-	jpc_enc_pass_t *pass;
-	int i;
-	jas_stream_memobj_t *smo;
-
-	smo = cblk->stream->obj_;
-
-	pass = passes;
-	for (i = 0; i < numpasses; ++i) {
-		jas_eprintf("start=%d end=%d type=%d term=%d lyrno=%d firstchar=%02x size=%ld pos=%ld\n",
-		  (int)pass->start, (int)pass->end, (int)pass->type, (int)pass->term, (int)pass->lyrno,
-		  smo->buf_[pass->start], (long)smo->len_, (long)smo->pos_);
-#if 0
-		jas_memdump(stderr, &smo->buf_[pass->start], pass->end - pass->start);
-#endif
-		++pass;
 	}
 	return 0;
 }
