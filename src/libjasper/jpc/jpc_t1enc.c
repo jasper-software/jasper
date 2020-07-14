@@ -113,8 +113,6 @@ int jpc_enc_enccblks(jpc_enc_t *enc)
 	jpc_enc_band_t *endbands;
 	jpc_enc_cblk_t *cblk;
 	jpc_enc_cblk_t *endcblks;
-	int i;
-	int j;
 	jpc_fix_t mx;
 	jpc_fix_t bmx;
 	jpc_fix_t v;
@@ -144,8 +142,8 @@ int jpc_enc_enccblks(jpc_enc_t *enc)
 					endcblks = &prc->cblks[prc->numcblks];
 					for (cblk = prc->cblks; cblk != endcblks; ++cblk) {
 						mx = 0;
-						for (i = 0; i < jas_matrix_numrows(cblk->data); ++i) {
-							for (j = 0; j < jas_matrix_numcols(cblk->data); ++j) {
+						for (jas_matind_t i = 0; i < jas_matrix_numrows(cblk->data); ++i) {
+							for (jas_matind_t j = 0; j < jas_matrix_numcols(cblk->data); ++j) {
 								v = JAS_ABS(jas_matrix_get(cblk->data, i, j));
 								if (v > mx) {
 									mx = v;

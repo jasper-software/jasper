@@ -1091,8 +1091,6 @@ static int jpc_dec_tilefini(jpc_dec_t *dec, jpc_dec_tile_t *tile)
 
 static int jpc_dec_tiledecode(jpc_dec_t *dec, jpc_dec_tile_t *tile)
 {
-	int i;
-	int j;
 	jpc_dec_tcomp_t *tcomp;
 	jpc_dec_rlvl_t *rlvl;
 	jpc_dec_band_t *band;
@@ -1174,8 +1172,8 @@ static int jpc_dec_tiledecode(jpc_dec_t *dec, jpc_dec_tile_t *tile)
 	if (tile->realmode) {
 		for (compno = 0, tcomp = tile->tcomps; compno < dec->numcomps;
 		  ++compno, ++tcomp) {
-			for (i = 0; i < jas_matrix_numrows(tcomp->data); ++i) {
-				for (j = 0; j < jas_matrix_numcols(tcomp->data); ++j) {
+			for (jas_matind_t i = 0; i < jas_matrix_numrows(tcomp->data); ++i) {
+				for (jas_matind_t j = 0; j < jas_matrix_numcols(tcomp->data); ++j) {
 					v = jas_matrix_get(tcomp->data, i, j);
 					v = jpc_fix_round(v);
 					jas_matrix_set(tcomp->data, i, j, jpc_fixtoint(v));
@@ -1188,8 +1186,8 @@ static int jpc_dec_tiledecode(jpc_dec_t *dec, jpc_dec_tile_t *tile)
 	for (compno = 0, tcomp = tile->tcomps, cmpt = dec->cmpts; compno <
 	  dec->numcomps; ++compno, ++tcomp, ++cmpt) {
 		adjust = cmpt->sgnd ? 0 : (1 << (cmpt->prec - 1));
-		for (i = 0; i < jas_matrix_numrows(tcomp->data); ++i) {
-			for (j = 0; j < jas_matrix_numcols(tcomp->data); ++j) {
+		for (jas_matind_t i = 0; i < jas_matrix_numrows(tcomp->data); ++i) {
+			for (jas_matind_t j = 0; j < jas_matrix_numcols(tcomp->data); ++j) {
 				*jas_matrix_getref(tcomp->data, i, j) += adjust;
 			}
 		}
@@ -1942,18 +1940,14 @@ static jpc_fix_t jpc_calcabsstepsize(int stepsize, int numbits)
 
 static void jpc_dequantize(jas_matrix_t *x, jpc_fix_t absstepsize)
 {
-	int i;
-	int j;
-	int t;
-
 	assert(absstepsize >= 0);
 	if (absstepsize == jpc_inttofix(1)) {
 		return;
 	}
 
-	for (i = 0; i < jas_matrix_numrows(x); ++i) {
-		for (j = 0; j < jas_matrix_numcols(x); ++j) {
-			t = jas_matrix_get(x, i, j);
+	for (jas_matind_t i = 0; i < jas_matrix_numrows(x); ++i) {
+		for (jas_matind_t j = 0; j < jas_matrix_numcols(x); ++j) {
+			jas_seqent_t t = jas_matrix_get(x, i, j);
 			if (t) {
 				t = jpc_fix_mul(t, absstepsize);
 			} else {
@@ -1967,8 +1961,6 @@ static void jpc_dequantize(jas_matrix_t *x, jpc_fix_t absstepsize)
 
 static void jpc_undo_roi(jas_matrix_t *x, int roishift, int bgshift, int numbps)
 {
-	int i;
-	int j;
 	int thresh;
 	jpc_fix_t val;
 	jpc_fix_t mag;
@@ -1988,8 +1980,8 @@ static void jpc_undo_roi(jas_matrix_t *x, int roishift, int bgshift, int numbps)
 	thresh = 1 << roishift;
 
 	warn = false;
-	for (i = 0; i < jas_matrix_numrows(x); ++i) {
-		for (j = 0; j < jas_matrix_numcols(x); ++j) {
+	for (jas_matind_t i = 0; i < jas_matrix_numrows(x); ++i) {
+		for (jas_matind_t j = 0; j < jas_matrix_numcols(x); ++j) {
 			val = jas_matrix_get(x, i, j);
 			mag = JAS_ABS(val);
 			if (mag >= thresh) {

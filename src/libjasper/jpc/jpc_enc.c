@@ -1104,7 +1104,6 @@ static int jpc_enc_encodemainbody(jpc_enc_t *enc)
 	jpc_qcc_t *qcc;
 	jpc_cod_t *cod;
 	int adjust;
-	int j;
 	int absbandno;
 	long tilehdrlen;
 	long tilelen;
@@ -1116,8 +1115,6 @@ static int jpc_enc_encodemainbody(jpc_enc_t *enc)
 	jpc_enc_ccp_t *ccps;
 	jpc_enc_tccp_t *tccp;
 	int bandno;
-	uint_fast32_t x;
-	uint_fast32_t y;
 	int mingbits;
 	int actualnumbps;
 	jpc_fix_t mxmag;
@@ -1143,8 +1140,8 @@ static int jpc_enc_encodemainbody(jpc_enc_t *enc)
 		for (cmptno = 0, comp = tile->tcmpts; cmptno < tile->numtcmpts; ++cmptno, ++comp) {
 			if (!cp->ccps[cmptno].sgnd) {
 				adjust = 1 << (cp->ccps[cmptno].prec - 1);
-				for (unsigned i = 0; i < jas_matrix_numrows(comp->data); ++i) {
-					for (j = 0; j < jas_matrix_numcols(comp->data); ++j) {
+				for (jas_matind_t i = 0; i < jas_matrix_numrows(comp->data); ++i) {
+					for (jas_matind_t j = 0; j < jas_matrix_numcols(comp->data); ++j) {
 						*jas_matrix_getref(comp->data, i, j) -= adjust;
 					}
 				}
@@ -1202,8 +1199,8 @@ assert(jas_image_numcmpts(enc->image) == 3);
 					}
 					actualnumbps = 0;
 					mxmag = 0;
-					for (y = 0; y < JAS_CAST(uint_fast32_t, jas_matrix_numrows(band->data)); ++y) {
-						for (x = 0; x < JAS_CAST(uint_fast32_t, jas_matrix_numcols(band->data)); ++x) {
+					for (jas_matind_t y = 0; y < jas_matrix_numrows(band->data); ++y) {
+						for (jas_matind_t x = 0; x < jas_matrix_numcols(band->data); ++x) {
 							mag = JAS_ABS(jas_matrix_get(band->data, y, x));
 							if (mag > mxmag) {
 								mxmag = mag;
@@ -1470,16 +1467,14 @@ assert(enc->tmpstream);
 
 void jpc_quantize(jas_matrix_t *data, jpc_fix_t stepsize)
 {
-	int i;
-	int j;
 	jpc_fix_t t;
 
 	if (stepsize == jpc_inttofix(1)) {
 		return;
 	}
 
-	for (i = 0; i < jas_matrix_numrows(data); ++i) {
-		for (j = 0; j < jas_matrix_numcols(data); ++j) {
+	for (jas_matind_t i = 0; i < jas_matrix_numrows(data); ++i) {
+		for (jas_matind_t j = 0; j < jas_matrix_numcols(data); ++j) {
 			t = jas_matrix_get(data, i, j);
 
 {
