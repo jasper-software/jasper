@@ -447,13 +447,36 @@ JAS_DLLEXPORT int jas_image_addcmpt(jas_image_t *image, int cmptno,
 JAS_DLLEXPORT int jas_image_copycmpt(jas_image_t *dstimage, unsigned dstcmptno,
   jas_image_t *srcimage, unsigned srccmptno);
 
-#define	JAS_IMAGE_CDT_GETSGND(dtype) (((dtype) >> 7) & 1)
-#define	JAS_IMAGE_CDT_SETSGND(dtype) (((dtype) & 1) << 7)
-#define	JAS_IMAGE_CDT_GETPREC(dtype) ((dtype) & 0x7f)
-#define	JAS_IMAGE_CDT_SETPREC(dtype) ((dtype) & 0x7f)
+JAS_ATTRIBUTE_CONST
+static inline bool JAS_IMAGE_CDT_GETSGND(uint_least8_t dtype)
+{
+	return (dtype >> 7) & 1;
+}
 
-#define	jas_image_cmptdtype(image, cmptno) \
-	(JAS_IMAGE_CDT_SETSGND((image)->cmpts_[cmptno]->sgnd_) | JAS_IMAGE_CDT_SETPREC((image)->cmpts_[cmptno]->prec_))
+JAS_ATTRIBUTE_CONST
+static inline uint_least8_t JAS_IMAGE_CDT_SETSGND(bool sgnd)
+{
+	return (uint_least8_t)sgnd << 7;
+}
+
+JAS_ATTRIBUTE_CONST
+static inline uint_least8_t JAS_IMAGE_CDT_GETPREC(uint_least8_t dtype)
+{
+	return dtype & 0x7f;
+}
+
+JAS_ATTRIBUTE_CONST
+static inline uint_least8_t JAS_IMAGE_CDT_SETPREC(uint_least8_t dtype)
+{
+	return dtype & 0x7f;
+}
+
+JAS_ATTRIBUTE_PURE
+static inline uint_least8_t jas_image_cmptdtype(const jas_image_t *image, unsigned cmptno)
+{
+	return JAS_IMAGE_CDT_SETSGND(image->cmpts_[cmptno]->sgnd_) |
+		JAS_IMAGE_CDT_SETPREC(image->cmpts_[cmptno]->prec_);
+}
 
 JAS_DLLEXPORT int jas_image_depalettize(jas_image_t *image, unsigned cmptno, unsigned numlutents,
   const int_fast32_t *lutents, int dtype, unsigned newcmptno);
