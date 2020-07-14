@@ -308,7 +308,7 @@ typedef struct {
 
 /* Create an image. */
 JAS_DLLEXPORT jas_image_t *jas_image_create(unsigned numcmpts,
-  jas_image_cmptparm_t *cmptparms, jas_clrspc_t clrspc);
+  const jas_image_cmptparm_t *cmptparms, jas_clrspc_t clrspc);
 
 /* Create an "empty" image. */
 JAS_DLLEXPORT jas_image_t *jas_image_create0(void);
@@ -434,14 +434,14 @@ JAS_DLLEXPORT int jas_image_readcmpt(jas_image_t *image, unsigned cmptno, jas_im
 /* Write a rectangular region of an image component. */
 JAS_DLLEXPORT int jas_image_writecmpt(jas_image_t *image, unsigned cmptno, jas_image_coord_t x,
   jas_image_coord_t y, jas_image_coord_t width, jas_image_coord_t height,
-  jas_matrix_t *data);
+  const jas_matrix_t *data);
 
 /* Delete a component from an image. */
 JAS_DLLEXPORT void jas_image_delcmpt(jas_image_t *image, unsigned cmptno);
 
 /* Add a component to an image. */
 JAS_DLLEXPORT int jas_image_addcmpt(jas_image_t *image, int cmptno,
-  jas_image_cmptparm_t *cmptparm);
+  const jas_image_cmptparm_t *cmptparm);
 
 /* Copy a component from one image to another. */
 JAS_DLLEXPORT int jas_image_copycmpt(jas_image_t *dstimage, unsigned dstcmptno,
@@ -456,7 +456,7 @@ JAS_DLLEXPORT int jas_image_copycmpt(jas_image_t *dstimage, unsigned dstcmptno,
 	(JAS_IMAGE_CDT_SETSGND((image)->cmpts_[cmptno]->sgnd_) | JAS_IMAGE_CDT_SETPREC((image)->cmpts_[cmptno]->prec_))
 
 JAS_DLLEXPORT int jas_image_depalettize(jas_image_t *image, unsigned cmptno, unsigned numlutents,
-  int_fast32_t *lutents, int dtype, unsigned newcmptno);
+  const int_fast32_t *lutents, int dtype, unsigned newcmptno);
 
 JAS_DLLEXPORT int jas_image_readcmptsample(jas_image_t *image, unsigned cmptno, int x, int y);
 JAS_DLLEXPORT void jas_image_writecmptsample(jas_image_t *image, unsigned cmptno, int x, int y,
@@ -474,7 +474,7 @@ JAS_DLLEXPORT void jas_image_clearfmts(void);
 
 /* Add entry to table of image formats. */
 JAS_DLLEXPORT int jas_image_addfmt(int id, const char *name, const char *ext, const char *desc,
-  jas_image_fmtops_t *ops);
+  const jas_image_fmtops_t *ops);
 
 /* Get the ID for the image format with the specified name. */
 JAS_ATTRIBUTE_PURE
@@ -509,7 +509,7 @@ int jas_image_sampcmpt(jas_image_t *image, unsigned cmptno, unsigned newcmptno,
   jas_image_coord_t vs, int sgnd, int prec);
 int jas_image_writecmpt2(jas_image_t *image, unsigned cmptno, jas_image_coord_t x,
   jas_image_coord_t y, jas_image_coord_t width, jas_image_coord_t height,
-  long *buf);
+  const long *buf);
 int jas_image_readcmpt2(jas_image_t *image, unsigned cmptno, jas_image_coord_t x,
   jas_image_coord_t y, jas_image_coord_t width, jas_image_coord_t height,
   long *buf);
