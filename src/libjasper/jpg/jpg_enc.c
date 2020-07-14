@@ -146,7 +146,7 @@ static int jpg_copyfiletostream(jas_stream_t *out, FILE *in)
 static void jpg_start_input(j_compress_ptr cinfo, struct jpg_src_s *sinfo)
 {
 	/* Avoid compiler warnings about unused parameters. */
-	cinfo = 0;
+	(void)cinfo;
 
 	sinfo->row = 0;
 }
@@ -183,8 +183,8 @@ static JDIMENSION jpg_get_pixel_rows(j_compress_ptr cinfo, struct jpg_src_s *sin
 static void jpg_finish_input(j_compress_ptr cinfo, struct jpg_src_s *sinfo)
 {
 	/* Avoid compiler warnings about unused parameters. */
-	cinfo = 0;
-	sinfo = 0;
+	(void)cinfo;
+	(void)sinfo;
 }
 
 /******************************************************************************\
