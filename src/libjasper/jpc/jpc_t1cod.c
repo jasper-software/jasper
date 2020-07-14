@@ -314,6 +314,7 @@ static uint_least8_t jpc_getzcctxno(int f, int orient)
 		t = h;
 		h = v;
 		v = t;
+		/* fall through */
 	case JPC_TSFB_LL:
 	case JPC_TSFB_LH:
 		if (!h) {
