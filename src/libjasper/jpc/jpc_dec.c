@@ -2207,7 +2207,7 @@ static int jpc_dec_dump(jpc_dec_t *dec, FILE *out)
 						assert(!band->prcs);
 						continue;
 					}
-					fprintf(out, "xs = %"PRIiFAST32", ys = %"PRIiFAST32", xe = %"PRIiFAST32", ye = %"PRIiFAST32", w = %"PRIiFAST32", h = %"PRIiFAST32"\n",
+					fprintf(out, "xs = %"PRIjas_seqent", ys = %"PRIjas_seqent", xe = %"PRIjas_seqent", ye = %"PRIjas_seqent", w = %"PRIjas_seqent", h = %"PRIjas_seqent"\n",
 					  jas_seq2d_xstart(band->data),
 					  jas_seq2d_ystart(band->data),
 					  jas_seq2d_xend(band->data),
@@ -2230,7 +2230,7 @@ static int jpc_dec_dump(jpc_dec_t *dec, FILE *out)
 						  prc->numcblks; ++cblkno,
 						  ++cblk) {
 							fprintf(out, "CODE BLOCK %d\n", cblkno);
-							fprintf(out, "xs = %"PRIiFAST32", ys = %"PRIiFAST32", xe = %"PRIiFAST32", ye = %"PRIiFAST32", w = %"PRIiFAST32", h = %"PRIiFAST32"\n",
+							fprintf(out, "xs = %"PRIjas_seqent", ys = %"PRIjas_seqent", xe = %"PRIjas_seqent", ye = %"PRIjas_seqent", w = %"PRIjas_seqent", h = %"PRIjas_seqent"\n",
 							  jas_seq2d_xstart(cblk->data),
 							  jas_seq2d_ystart(cblk->data),
 							  jas_seq2d_xend(cblk->data),

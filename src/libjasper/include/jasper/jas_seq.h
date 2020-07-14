@@ -100,8 +100,10 @@ extern "C" {
 /* An element in a sequence. */
 #ifdef JAS_ENABLE_32BIT
 typedef int_least32_t jas_seqent_t;
+#define PRIjas_seqent PRIiLEAST32
 #else
 typedef int_fast32_t jas_seqent_t;
+#define PRIjas_seqent PRIiFAST32
 #endif
 
 /* An element in a matrix. */
