@@ -409,9 +409,6 @@ static uint_least8_t jpc_getscctxno(int f)
 	int vc;
 	int n;
 
-	/* Avoid compiler warning. */
-	(void)n;
-
 	hc = JAS_MIN(((f & (JPC_ESIG | JPC_ESGN)) == JPC_ESIG) + ((f & (JPC_WSIG | JPC_WSGN)) == JPC_WSIG),
 	  1) - JAS_MIN(((f & (JPC_ESIG | JPC_ESGN)) == (JPC_ESIG | JPC_ESGN)) +
 	  ((f & (JPC_WSIG | JPC_WSGN)) == (JPC_WSIG | JPC_WSGN)), 1);
