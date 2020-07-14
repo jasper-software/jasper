@@ -365,6 +365,10 @@ error:
    int, 32 bit) */
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wtautological-constant-out-of-range-compare"
+#elif defined(__GNUC__)
+#pragma GCC diagnostic push
+/* on GCC, it's this warning: */
+#pragma GCC diagnostic ignored "-Wtype-limits"
 #endif
 
 static jas_image_t *jpg_mkimage(j_decompress_ptr cinfo)
@@ -422,7 +426,7 @@ error:
 	return 0;
 }
 
-#ifdef __clang__
+#ifdef __GNUC__
 #pragma GCC diagnostic pop
 #endif
 
