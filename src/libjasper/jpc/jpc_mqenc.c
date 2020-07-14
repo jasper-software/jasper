@@ -243,7 +243,7 @@ void jpc_mqenc_init(jpc_mqenc_t *mqenc)
 
 /* Initialize one or more contexts. */
 
-void jpc_mqenc_setctxs(jpc_mqenc_t *mqenc, int numctxs, jpc_mqctx_t *ctxs)
+void jpc_mqenc_setctxs(jpc_mqenc_t *mqenc, int numctxs, const jpc_mqctx_t *ctxs)
 {
 	const jpc_mqstate_t **ctx;
 	int n;
@@ -378,7 +378,7 @@ static void jpc_mqenc_setbits(jpc_mqenc_t *mqenc)
 
 /* Dump a MQ encoder to a stream for debugging. */
 
-int jpc_mqenc_dump(jpc_mqenc_t *mqenc, FILE *out)
+int jpc_mqenc_dump(const jpc_mqenc_t *mqenc, FILE *out)
 {
 	fprintf(out, "AREG = %08"PRIxFAST32", CREG = %08"PRIxFAST32", CTREG = %"PRIuFAST32"\n",
 	  mqenc->areg, mqenc->creg, mqenc->ctreg);

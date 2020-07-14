@@ -176,7 +176,7 @@ void jpc_mqenc_init(jpc_mqenc_t *enc);
         ((enc)->curctx = &(enc)->ctxs[ctxno]);
 
 /* Set the state information for multiple contexts. */
-void jpc_mqenc_setctxs(jpc_mqenc_t *enc, int numctxs, jpc_mqctx_t *ctxs);
+void jpc_mqenc_setctxs(jpc_mqenc_t *enc, int numctxs, const jpc_mqctx_t *ctxs);
 
 /******************************************************************************\
 * Miscellaneous functions/macros.
@@ -200,7 +200,7 @@ int jpc_mqenc_flush(jpc_mqenc_t *enc, int termmode);
 * Functions/macros for debugging.
 \******************************************************************************/
 
-int jpc_mqenc_dump(jpc_mqenc_t *mqenc, FILE *out);
+int jpc_mqenc_dump(const jpc_mqenc_t *mqenc, FILE *out);
 
 /******************************************************************************\
 * Implementation-specific details.
