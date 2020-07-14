@@ -420,7 +420,9 @@ static uint_least8_t jpc_getscctxno(int f)
 		} else {
 			n = 1;
 		}
-	} else if (hc == 1) {
+	} else {
+		assert(hc == 1);
+
 		if (vc == -1) {
 			n = 2;
 		} else if (!vc) {
