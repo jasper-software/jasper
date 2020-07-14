@@ -294,14 +294,6 @@ jpc_initmqctxs();
 	}
 }
 
-jpc_fix_t jpc_getsignmsedec_func(jpc_fix_t x, int bitpos)
-{
-	jpc_fix_t y;
-	assert(!(x & (~JAS_ONES(bitpos + 1))));
-	y = jpc_getsignmsedec_macro(x, bitpos);
-	return y;
-}
-
 static uint_least8_t jpc_getzcctxno(int f, int orient)
 {
 	int h;
