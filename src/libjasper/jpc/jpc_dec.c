@@ -458,6 +458,8 @@ static int jpc_dec_process_crg(jpc_dec_t *dec, jpc_ms_t *ms)
 		cmpt->hsubstep = crg->comps[cmptno].hoff;
 		cmpt->vsubstep = crg->comps[cmptno].voff;
 		*/
+		/* suppress -Wunused-but-set-variable */
+		(void)crg;
 	}
 	return 0;
 }

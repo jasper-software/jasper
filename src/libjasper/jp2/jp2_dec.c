@@ -395,6 +395,9 @@ jas_image_t *jp2_decode(jas_stream_t *in, const char *optstr)
 				} else {
 				jas_image_setcmpttype(dec->image, newcmptno, jp2_getct(jas_image_clrspc(dec->image), 0, channo + 1));
 				}
+#else
+				/* suppress -Wunused-but-set-variable */
+				(void)cdefd;
 #endif
 			} else {
 				jas_eprintf("error: invalid MTYP in CMAP box\n");
