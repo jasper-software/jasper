@@ -24,11 +24,11 @@ The official web site for the JasPer software has the following URL:
 The official Git repository for the JasPer software is hosted
 by GitHub.  The URL for the GitHub site is as follows:
 
-    https://github.com/mdadams/jasper
+    https://github.com/jasper-software/jasper
 
 The Git repository can be accessed via the URL:
 
-    https://github.com/mdadams/jasper.git
+    https://github.com/jasper-software/jasper.git
 
 Information on how to install this software can be found in the
 file INSTALL.
@@ -45,7 +45,7 @@ All bug reports should be submitted via the issue-tracking system
 provided by GitHub.  To submit a bug report, go the the following
 URL and click on the "New issue" button:
 
-    https://github.com/mdadams/jasper/issues
+    https://github.com/jasper-software/jasper/issues
 
 Please do not submit bug reports directly to the author via email,
 as bug reports that are not submitted via the above issue-tracking
