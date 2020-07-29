@@ -335,6 +335,12 @@ static jas_image_cmpt_t *jas_image_cmpt_create(int_fast32_t tlx,
 	  inmem
 	  ));
 
+	if (depth < 1U + sgnd) {
+		/* we need at least 1 bit for unsigned samples and 2
+		   bits for signed samples */
+		return NULL;
+	}
+
 	if (width < 0 || height < 0 || hstep <= 0 || vstep <= 0) {
 		return NULL;
 	}
