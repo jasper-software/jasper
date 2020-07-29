@@ -1123,7 +1123,7 @@ static int jpc_dec_tiledecode(jpc_dec_t *dec, jpc_dec_tile_t *tile)
 				}
 				jpc_undo_roi(band->data, band->roishift, ccp->roishift -
 				  band->roishift, band->numbps);
-				if (tile->realmode) {
+				if (ccp->qmfbid == JPC_COX_INS) {
 					jas_matrix_asl(band->data, JPC_FIX_FRACBITS);
 					jpc_dequantize(band->data, band->absstepsize);
 				}
@@ -1169,9 +1169,10 @@ static int jpc_dec_tiledecode(jpc_dec_t *dec, jpc_dec_tile_t *tile)
 	}
 
 	/* Perform rounding and convert to integer values. */
-	if (tile->realmode) {
-		for (compno = 0, tcomp = tile->tcomps; compno < dec->numcomps;
+	for (compno = 0, tcomp = tile->tcomps; compno < dec->numcomps;
 		  ++compno, ++tcomp) {
+		ccp = &tile->cp->ccps[compno];
+		if (ccp->qmfbid == JPC_COX_INS) {
 			for (jas_matind_t i = 0; i < jas_matrix_numrows(tcomp->data); ++i) {
 				for (jas_matind_t j = 0; j < jas_matrix_numcols(tcomp->data); ++j) {
 					v = jas_matrix_get(tcomp->data, i, j);
