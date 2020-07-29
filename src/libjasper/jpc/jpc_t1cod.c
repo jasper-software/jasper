@@ -295,12 +295,11 @@ jpc_initmqctxs();
 
 static uint_least8_t jpc_getzcctxno(unsigned f, unsigned orient)
 {
+	assert(orient < 4);
+
 	unsigned n;
 	unsigned t;
 	unsigned hv;
-
-	/* Avoid compiler warning. */
-	(void)n;
 
 	unsigned h = ((f & JPC_WSIG) != 0) + ((f & JPC_ESIG) != 0);
 	unsigned v = ((f & JPC_NSIG) != 0) + ((f & JPC_SSIG) != 0);
@@ -369,6 +368,10 @@ static uint_least8_t jpc_getzcctxno(unsigned f, unsigned orient)
 			n = 8;
 		}
 		break;
+
+	default:
+		assert(false);
+		JAS_UNREACHABLE();
 	}
 	assert(n < JPC_NUMZCCTXS);
 	return JPC_ZCCTXNO + n;
