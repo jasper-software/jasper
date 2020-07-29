@@ -105,7 +105,7 @@ jpc_mqctx_t jpc_mqctxs[JPC_NUMCTXS];
 \******************************************************************************/
 
 JAS_ATTRIBUTE_CONST
-static uint_least8_t jpc_getzcctxno(int f, int orient);
+static uint_least8_t jpc_getzcctxno(unsigned f, unsigned orient);
 
 JAS_ATTRIBUTE_CONST
 static bool jpc_getspb(int f);
@@ -246,7 +246,6 @@ int JPC_ISTERMINATED(int passno, int firstpassno, int numpasses, int termall,
 void jpc_initluts()
 {
 	int i;
-	int orient;
 	int refine;
 	float u;
 	float v;
@@ -255,7 +254,7 @@ void jpc_initluts()
 /* XXX - hack */
 jpc_initmqctxs();
 
-	for (orient = 0; orient < 4; ++orient) {
+	for (unsigned orient = 0; orient < 4; ++orient) {
 		for (i = 0; i < 256; ++i) {
 			jpc_zcctxnolut[(orient << 8) | i] = jpc_getzcctxno(i, orient);
 		}
@@ -294,21 +293,18 @@ jpc_initmqctxs();
 	}
 }
 
-static uint_least8_t jpc_getzcctxno(int f, int orient)
+static uint_least8_t jpc_getzcctxno(unsigned f, unsigned orient)
 {
-	int h;
-	int v;
-	int d;
-	int n;
-	int t;
-	int hv;
+	unsigned n;
+	unsigned t;
+	unsigned hv;
 
 	/* Avoid compiler warning. */
 	(void)n;
 
-	h = ((f & JPC_WSIG) != 0) + ((f & JPC_ESIG) != 0);
-	v = ((f & JPC_NSIG) != 0) + ((f & JPC_SSIG) != 0);
-	d = ((f & JPC_NWSIG) != 0) + ((f & JPC_NESIG) != 0) + ((f & JPC_SESIG) != 0) + ((f & JPC_SWSIG) != 0);
+	unsigned h = ((f & JPC_WSIG) != 0) + ((f & JPC_ESIG) != 0);
+	unsigned v = ((f & JPC_NSIG) != 0) + ((f & JPC_SSIG) != 0);
+	const unsigned d = ((f & JPC_NWSIG) != 0) + ((f & JPC_NESIG) != 0) + ((f & JPC_SESIG) != 0) + ((f & JPC_SWSIG) != 0);
 	switch (orient) {
 	case JPC_TSFB_HL:
 		t = h;
