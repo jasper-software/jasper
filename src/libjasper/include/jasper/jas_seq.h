@@ -263,13 +263,13 @@ JAS_DLLEXPORT void jas_matrix_clip(jas_matrix_t *matrix, jas_seqent_t minval,
   jas_seqent_t maxval);
 
 /* Arithmetic shift left of all elements in a matrix. */
-JAS_DLLEXPORT void jas_matrix_asl(jas_matrix_t *matrix, int n);
+JAS_DLLEXPORT void jas_matrix_asl(jas_matrix_t *matrix, unsigned n);
 
 /* Arithmetic shift right of all elements in a matrix. */
-JAS_DLLEXPORT void jas_matrix_asr(jas_matrix_t *matrix, int n);
+JAS_DLLEXPORT void jas_matrix_asr(jas_matrix_t *matrix, unsigned n);
 
 /* Almost-but-not-quite arithmetic shift right of all elements in a matrix. */
-JAS_DLLEXPORT void jas_matrix_divpow2(jas_matrix_t *matrix, int n);
+JAS_DLLEXPORT void jas_matrix_divpow2(jas_matrix_t *matrix, unsigned n);
 
 /* Set all elements of a matrix to the specified value. */
 JAS_DLLEXPORT void jas_matrix_setall(jas_matrix_t *matrix, jas_seqent_t val);
