@@ -107,10 +107,10 @@
 
 typedef struct {
 
-	uint_fast16_t id;
+	uint_least16_t id;
 	/* The marker segment type. */
 
-	int validstates;
+	uint_least16_t validstates;
 	/* The states in which this type of marker segment can be
 	  validly encountered. */
 
