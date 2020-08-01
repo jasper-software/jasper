@@ -375,6 +375,7 @@ static void jpc_dec_opts_destroy(jpc_dec_importopts_t *opts)
 * Code for table-driven code stream decoder.
 \******************************************************************************/
 
+JAS_ATTRIBUTE_CONST
 static const jpc_dec_mstabent_t *jpc_dec_mstab_lookup(uint_fast16_t id)
 {
 	const jpc_dec_mstabent_t *mstabent;
