@@ -144,7 +144,7 @@ static inline jpc_fix_t jpc_fix_div(jpc_fix_big_t x, jpc_fix_t y)
 }
 
 JAS_ATTRIBUTE_CONST
-static inline jpc_fix_t jpc_fix_neg(jpc_fix_big_t x)
+static inline jpc_fix_t jpc_fix_neg(jpc_fix_t x)
 {
 	return JAS_FIX_NEG(jpc_fix_t, JPC_FIX_FRACBITS, x);
 }
