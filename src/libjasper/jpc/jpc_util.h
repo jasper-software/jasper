@@ -70,10 +70,10 @@
 int jpc_atoaf(const char *s, int *numvalues, double **values);
 
 /* Upsample a sequence. */
-jas_seq_t *jpc_seq_upsample(jas_seq_t *seq, int n);
+jas_seq_t *jpc_seq_upsample(const jas_seq_t *seq, int n);
 
 /* Convolve two sequences. */
-jas_seq_t *jpc_seq_conv(jas_seq_t *seq0, jas_seq_t *seq1);
+jas_seq_t *jpc_seq_conv(const jas_seq_t *seq0, const jas_seq_t *seq1);
 
 /* Compute the norm of a sequence. */
 JAS_ATTRIBUTE_PURE

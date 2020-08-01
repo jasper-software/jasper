@@ -86,7 +86,7 @@
 
 int jpc_atoaf(const char *s, int *numvalues, double **values)
 {
-	static char delim[] = ", \t\n";
+	static const char delim[] = ", \t\n";
 	char buf[4096];
 	int n;
 	double *vs;
@@ -132,7 +132,7 @@ int jpc_atoaf(const char *s, int *numvalues, double **values)
 	return 0;
 }
 
-jas_seq_t *jpc_seq_upsample(jas_seq_t *x, int m)
+jas_seq_t *jpc_seq_upsample(const jas_seq_t *x, int m)
 {
 	jas_seq_t *z;
 	int i;
@@ -160,7 +160,7 @@ jpc_fix_t jpc_seq_norm(const jas_seq_t *x)
 	return jpc_dbltofix(sqrt(jpc_fixtodbl(s)));
 }
 
-jas_seq_t *jpc_seq_conv(jas_seq_t *x, jas_seq_t *y)
+jas_seq_t *jpc_seq_conv(const jas_seq_t *x, const jas_seq_t *y)
 {
 	int i;
 	int j;
