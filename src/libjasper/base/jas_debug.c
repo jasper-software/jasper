@@ -142,7 +142,7 @@ int jas_memdump(FILE *out, void *data, size_t len)
 
 void jas_deprecated(const char *s)
 {
-	static char message[] =
+	static const char message[] =
 	"WARNING!!! WARNING!!! WARNING!!! WARNING!!! WARNING!!! WARNING!!!\n"
 	"WARNING!!! WARNING!!! WARNING!!! WARNING!!! WARNING!!! WARNING!!!\n"
 	"WARNING!!! WARNING!!! WARNING!!! WARNING!!! WARNING!!! WARNING!!!\n"
