@@ -299,8 +299,17 @@ JAS_DLLEXPORT jas_matrix_t *jas_matrix_copy(jas_matrix_t *x);
 
 JAS_DLLEXPORT jas_matrix_t *jas_matrix_input(FILE *);
 
-#define jas_seqent_asl jas_fast32_asl
-#define jas_seqent_asr jas_fast32_asr
+JAS_ATTRIBUTE_CONST
+static inline jas_seqent_t jas_seqent_asl(jas_seqent_t x, unsigned n)
+{
+	return jas_fast32_asl(x, n);
+}
+
+JAS_ATTRIBUTE_CONST
+static inline jas_seqent_t jas_seqent_asr(jas_seqent_t x, unsigned n)
+{
+	return jas_fast32_asr(x, n);
+}
 
 /******************************************************************************\
 * Functions/macros for 2-D sequence class.
