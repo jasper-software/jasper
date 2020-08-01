@@ -170,8 +170,9 @@ jas_seq_t *jpc_seq_conv(const jas_seq_t *x, const jas_seq_t *y)
 	jpc_fix_t v;
 
 	z = jas_seq_create(jas_seq_start(x) + jas_seq_start(y),
-	  jas_seq_end(x) + jas_seq_end(y) - 1);
-	assert(z);
+			   jas_seq_end(x) + jas_seq_end(y) - 1);
+	if (!z)
+		return NULL;
 	for (i = jas_seq_start(z); i < jas_seq_end(z); i++) {
 		s = jpc_inttofix(0);
 		for (j = jas_seq_start(y); j < jas_seq_end(y); j++) {
