@@ -717,7 +717,6 @@ static int jpc_dec_tileinit(jpc_dec_t *dec, jpc_dec_tile_t *tile)
 	jpc_dec_cp_t *cp;
 	jpc_tsfb_band_t bnds[JPC_MAXBANDS];
 	jpc_pchg_t *pchg;
-	int pchgno;
 	jpc_dec_cmpt_t *cmpt;
 
 	cp = tile->cp;
@@ -968,7 +967,7 @@ static int jpc_dec_tileinit(jpc_dec_t *dec, jpc_dec_tile_t *tile)
 		return -1;
 	}
 
-	for (pchgno = 0; pchgno < jpc_pchglist_numpchgs(tile->cp->pchglist);
+	for (unsigned pchgno = 0; pchgno < jpc_pchglist_numpchgs(tile->cp->pchglist);
 	  ++pchgno) {
 		pchg = jpc_pchg_copy(jpc_pchglist_get(tile->cp->pchglist, pchgno));
 		assert(pchg);

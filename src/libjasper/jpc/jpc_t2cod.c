@@ -97,9 +97,9 @@ int jpc_pi_next(jpc_pi_t *pi)
 			pi->prcno = 0;
 			pi->lyrno = 0;
 			pi->prgvolfirst = true;
-			if (pi->pchgno < jpc_pchglist_numpchgs(pi->pchglist)) {
+			if ((unsigned)pi->pchgno < jpc_pchglist_numpchgs(pi->pchglist)) {
 				pi->pchg = jpc_pchglist_get(pi->pchglist, pi->pchgno);
-			} else if (pi->pchgno == jpc_pchglist_numpchgs(pi->pchglist)) {
+			} else if ((unsigned)pi->pchgno == jpc_pchglist_numpchgs(pi->pchglist)) {
 				pi->pchg = &pi->defaultpchg;
 			} else {
 				return 1;
@@ -606,13 +606,12 @@ int jpc_pchglist_insert(jpc_pchglist_t *pchglist, int pchgno, jpc_pchg_t *pchg)
 	return 0;
 }
 
-jpc_pchg_t *jpc_pchglist_remove(jpc_pchglist_t *pchglist, int pchgno)
+jpc_pchg_t *jpc_pchglist_remove(jpc_pchglist_t *pchglist, unsigned pchgno)
 {
-	int i;
 	jpc_pchg_t *pchg;
 	assert(pchgno < pchglist->numpchgs);
 	pchg = pchglist->pchgs[pchgno];
-	for (i = pchgno + 1; i < pchglist->numpchgs; ++i) {
+	for (unsigned i = pchgno + 1; i < pchglist->numpchgs; ++i) {
 		pchglist->pchgs[i - 1] = pchglist->pchgs[i];
 	}
 	--pchglist->numpchgs;
@@ -633,11 +632,10 @@ jpc_pchglist_t *jpc_pchglist_copy(const jpc_pchglist_t *pchglist)
 {
 	jpc_pchglist_t *newpchglist;
 	jpc_pchg_t *newpchg;
-	int pchgno;
 	if (!(newpchglist = jpc_pchglist_create())) {
 		return 0;
 	}
-	for (pchgno = 0; pchgno < pchglist->numpchgs; ++pchgno) {
+	for (unsigned pchgno = 0; pchgno < pchglist->numpchgs; ++pchgno) {
 		if (!(newpchg = jpc_pchg_copy(pchglist->pchgs[pchgno])) ||
 		  jpc_pchglist_insert(newpchglist, -1, newpchg)) {
 			jpc_pchglist_destroy(newpchglist);
@@ -649,9 +647,8 @@ jpc_pchglist_t *jpc_pchglist_copy(const jpc_pchglist_t *pchglist)
 
 void jpc_pchglist_destroy(jpc_pchglist_t *pchglist)
 {
-	int pchgno;
 	if (pchglist->pchgs) {
-		for (pchgno = 0; pchgno < pchglist->numpchgs; ++pchgno) {
+		for (unsigned pchgno = 0; pchgno < pchglist->numpchgs; ++pchgno) {
 			jpc_pchg_destroy(pchglist->pchgs[pchgno]);
 		}
 		jas_free(pchglist->pchgs);
@@ -664,12 +661,12 @@ void jpc_pchg_destroy(jpc_pchg_t *pchg)
 	jas_free(pchg);
 }
 
-const jpc_pchg_t *jpc_pchglist_get(const jpc_pchglist_t *pchglist, int pchgno)
+const jpc_pchg_t *jpc_pchglist_get(const jpc_pchglist_t *pchglist, unsigned pchgno)
 {
 	return pchglist->pchgs[pchgno];
 }
 
-int jpc_pchglist_numpchgs(const jpc_pchglist_t *pchglist)
+unsigned jpc_pchglist_numpchgs(const jpc_pchglist_t *pchglist)
 {
 	return pchglist->numpchgs;
 }
