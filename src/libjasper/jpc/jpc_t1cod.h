@@ -74,6 +74,7 @@
 
 #include "jpc_fix.h"
 #include "jpc_mqcod.h"
+#include "jasper/jas_math.h"
 
 /******************************************************************************\
 * Constants.
