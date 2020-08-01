@@ -293,20 +293,20 @@ int JPC_NOMINALGAIN(int qmfbid, int numlvls, int lvlno, int orient);
 
 /* Get the coding pass type. */
 JAS_ATTRIBUTE_CONST
-int JPC_PASSTYPE(int passno);
+int JPC_PASSTYPE(unsigned passno);
 
 /* Get the segment type. */
 JAS_ATTRIBUTE_CONST
-int JPC_SEGTYPE(int passno, int firstpassno, int bypass);
+int JPC_SEGTYPE(unsigned passno, unsigned firstpassno, bool bypass);
 
 /* Get the number of coding passess in the segment. */
 JAS_ATTRIBUTE_CONST
-int JPC_SEGPASSCNT(int passno, int firstpassno, int numpasses, int bypass,
-  int termall);
+unsigned JPC_SEGPASSCNT(unsigned passno, unsigned firstpassno, unsigned numpasses, bool bypass,
+  bool termall);
 
 /* Is the coding pass terminated? */
 JAS_ATTRIBUTE_CONST
-int JPC_ISTERMINATED(int passno, int firstpassno, int numpasses, int termall,
-  int lazy);
+bool JPC_ISTERMINATED(unsigned passno, unsigned firstpassno, unsigned numpasses, bool termall,
+  bool lazy);
 
 #endif
