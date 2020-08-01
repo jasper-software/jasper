@@ -1577,6 +1577,7 @@ static int jpc_dec_process_ppm(jpc_dec_t *dec, jpc_ms_t *ms)
 	ppm->data = 0;
 	ppmstabent->len = ppm->len;
 	if (jpc_ppxstab_insert(dec->ppmstab, ppmstabent)) {
+		jpc_ppxstabent_destroy(ppmstabent);
 		return -1;
 	}
 	return 0;
@@ -1602,6 +1603,7 @@ static int jpc_dec_process_ppt(jpc_dec_t *dec, jpc_ms_t *ms)
 	ppt->data = 0;
 	pptstabent->len = ppt->len;
 	if (jpc_ppxstab_insert(tile->pptstab, pptstabent)) {
+		jpc_ppxstabent_destroy(pptstabent);
 		return -1;
 	}
 	return 0;
