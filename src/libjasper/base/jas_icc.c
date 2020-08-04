@@ -80,14 +80,14 @@
 
 static jas_iccattrval_t *jas_iccattrval_create0(void);
 
-static int jas_iccgetuint(jas_stream_t *in, int n, jas_ulonglong *val);
+static int jas_iccgetuint(jas_stream_t *in, unsigned n, jas_ulonglong *val);
 static int jas_iccgetuint8(jas_stream_t *in, jas_iccuint8_t *val);
 static int jas_iccgetuint16(jas_stream_t *in, jas_iccuint16_t *val);
 static int jas_iccgetsint32(jas_stream_t *in, jas_iccsint32_t *val);
 static int jas_iccgetuint32(jas_stream_t *in, jas_iccuint32_t *val);
 static int jas_iccgetuint64(jas_stream_t *in, jas_iccuint64_t *val);
-static int jas_iccputuint(jas_stream_t *out, int n, jas_ulonglong val);
-static int jas_iccputsint(jas_stream_t *out, int n, jas_longlong val);
+static int jas_iccputuint(jas_stream_t *out, unsigned n, jas_ulonglong val);
+static int jas_iccputsint(jas_stream_t *out, unsigned n, jas_longlong val);
 static jas_iccprof_t *jas_iccprof_create(void);
 static int jas_iccprof_readhdr(jas_stream_t *in, jas_icchdr_t *hdr);
 static int jas_iccprof_writehdr(jas_stream_t *out, const jas_icchdr_t *hdr);
@@ -104,8 +104,8 @@ static void jas_icccurv_destroy(jas_iccattrval_t *attrval);
 static int jas_icccurv_copy(jas_iccattrval_t *attrval,
   const jas_iccattrval_t *othattrval);
 static int jas_icccurv_input(jas_iccattrval_t *attrval, jas_stream_t *in,
-  int cnt);
-static int jas_icccurv_getsize(const jas_iccattrval_t *attrval);
+  unsigned cnt);
+static unsigned jas_icccurv_getsize(const jas_iccattrval_t *attrval);
 static int jas_icccurv_output(jas_iccattrval_t *attrval, jas_stream_t *out);
 static void jas_icccurv_dump(const jas_iccattrval_t *attrval, FILE *out);
 
@@ -113,8 +113,8 @@ static void jas_icctxtdesc_destroy(jas_iccattrval_t *attrval);
 static int jas_icctxtdesc_copy(jas_iccattrval_t *attrval,
   const jas_iccattrval_t *othattrval);
 static int jas_icctxtdesc_input(jas_iccattrval_t *attrval, jas_stream_t *in,
-  int cnt);
-static int jas_icctxtdesc_getsize(const jas_iccattrval_t *attrval);
+  unsigned cnt);
+static unsigned jas_icctxtdesc_getsize(const jas_iccattrval_t *attrval);
 static int jas_icctxtdesc_output(jas_iccattrval_t *attrval, jas_stream_t *out);
 static void jas_icctxtdesc_dump(const jas_iccattrval_t *attrval, FILE *out);
 
@@ -122,27 +122,27 @@ static void jas_icctxt_destroy(jas_iccattrval_t *attrval);
 static int jas_icctxt_copy(jas_iccattrval_t *attrval,
   const jas_iccattrval_t *othattrval);
 static int jas_icctxt_input(jas_iccattrval_t *attrval, jas_stream_t *in,
-  int cnt);
-static int jas_icctxt_getsize(const jas_iccattrval_t *attrval);
+  unsigned cnt);
+static unsigned jas_icctxt_getsize(const jas_iccattrval_t *attrval);
 static int jas_icctxt_output(jas_iccattrval_t *attrval, jas_stream_t *out);
 static void jas_icctxt_dump(const jas_iccattrval_t *attrval, FILE *out);
 
 static int jas_iccxyz_input(jas_iccattrval_t *attrval, jas_stream_t *in,
-  int cnt);
-static int jas_iccxyz_getsize(const jas_iccattrval_t *attrval);
+  unsigned cnt);
+static unsigned jas_iccxyz_getsize(const jas_iccattrval_t *attrval);
 static int jas_iccxyz_output(jas_iccattrval_t *attrval, jas_stream_t *out);
 static void jas_iccxyz_dump(const jas_iccattrval_t *attrval, FILE *out);
 
 static jas_iccattrtab_t *jas_iccattrtab_create(void);
 static void jas_iccattrtab_destroy(jas_iccattrtab_t *tab);
-static int jas_iccattrtab_resize(jas_iccattrtab_t *tab, int maxents);
+static int jas_iccattrtab_resize(jas_iccattrtab_t *tab, unsigned maxents);
 static int jas_iccattrtab_add(jas_iccattrtab_t *attrtab, int i,
   jas_iccuint32_t name, jas_iccattrval_t *val);
-static int jas_iccattrtab_replace(jas_iccattrtab_t *attrtab, int i,
+static int jas_iccattrtab_replace(jas_iccattrtab_t *attrtab, unsigned i,
   jas_iccuint32_t name, jas_iccattrval_t *val);
-static void jas_iccattrtab_delete(jas_iccattrtab_t *attrtab, int i);
-static long jas_iccpadtomult(long x, long y);
-static int jas_iccattrtab_get(jas_iccattrtab_t *attrtab, int i,
+static void jas_iccattrtab_delete(jas_iccattrtab_t *attrtab, unsigned i);
+static unsigned jas_iccpadtomult(unsigned x, unsigned y);
+static int jas_iccattrtab_get(jas_iccattrtab_t *attrtab, unsigned i,
   jas_iccattrname_t *name, jas_iccattrval_t **val);
 static int jas_iccprof_puttagtab(jas_stream_t *out, const jas_icctagtab_t *tagtab);
 
@@ -150,8 +150,8 @@ static void jas_icclut16_destroy(jas_iccattrval_t *attrval);
 static int jas_icclut16_copy(jas_iccattrval_t *attrval,
   const jas_iccattrval_t *othattrval);
 static int jas_icclut16_input(jas_iccattrval_t *attrval, jas_stream_t *in,
-  int cnt);
-static int jas_icclut16_getsize(const jas_iccattrval_t *attrval);
+  unsigned cnt);
+static unsigned jas_icclut16_getsize(const jas_iccattrval_t *attrval);
 static int jas_icclut16_output(jas_iccattrval_t *attrval, jas_stream_t *out);
 static void jas_icclut16_dump(const jas_iccattrval_t *attrval, FILE *out);
 
@@ -159,17 +159,17 @@ static void jas_icclut8_destroy(jas_iccattrval_t *attrval);
 static int jas_icclut8_copy(jas_iccattrval_t *attrval,
   const jas_iccattrval_t *othattrval);
 static int jas_icclut8_input(jas_iccattrval_t *attrval, jas_stream_t *in,
-  int cnt);
-static int jas_icclut8_getsize(const jas_iccattrval_t *attrval);
+  unsigned cnt);
+static unsigned jas_icclut8_getsize(const jas_iccattrval_t *attrval);
 static int jas_icclut8_output(jas_iccattrval_t *attrval, jas_stream_t *out);
 static void jas_icclut8_dump(const jas_iccattrval_t *attrval, FILE *out);
 
 static int jas_iccputtime(jas_stream_t *out, const jas_icctime_t *ctime);
 static int jas_iccputxyz(jas_stream_t *out, const jas_iccxyz_t *xyz);
 
-static long jas_iccpowi(int x, int n);
+static unsigned jas_iccpowi(unsigned x, unsigned n);
 
-static char *jas_iccsigtostr(int sig, char *buf);
+static char *jas_iccsigtostr(unsigned sig, char *buf);
 
 
 static const jas_iccattrvalinfo_t jas_iccattrvalinfos[] = {
@@ -253,15 +253,12 @@ void jas_iccprof_dump(const jas_iccprof_t *prof, FILE *out)
 jas_iccprof_t *jas_iccprof_load(jas_stream_t *in)
 {
 	jas_iccprof_t *prof;
-	int numtags;
 	long curoff;
 	long reloff;
 	long prevoff;
 	jas_iccsig_t type;
 	jas_iccattrval_t *attrval;
 	jas_iccattrval_t *prevattrval;
-	int i;
-	int len;
 
 	prof = 0;
 	attrval = 0;
@@ -280,11 +277,11 @@ jas_iccprof_t *jas_iccprof_load(jas_stream_t *in)
 	}
 	jas_iccprof_sorttagtab(&prof->tagtab);
 
-	numtags = prof->tagtab.numents;
+	const unsigned numtags = prof->tagtab.numents;
 	curoff = JAS_ICC_HDRLEN + 4 + 12 * numtags;
 	prevoff = 0;
 	prevattrval = 0;
-	for (i = 0; i < numtags; ++i) {
+	for (unsigned i = 0; i < numtags; ++i) {
 		const jas_icctagtabent_t *tagtabent = &prof->tagtab.ents[i];
 		if (tagtabent->off == JAS_CAST(jas_iccuint32_t, prevoff)) {
 			if (prevattrval) {
@@ -327,7 +324,7 @@ jas_iccprof_t *jas_iccprof_load(jas_stream_t *in)
 		if (!(attrval = jas_iccattrval_create(type))) {
 			goto error;
 		}
-		len = tagtabent->len - 8;
+		const unsigned len = tagtabent->len - 8;
 		if ((*attrval->ops->input)(attrval, in, len)) {
 			goto error;
 		}
@@ -355,8 +352,6 @@ int jas_iccprof_save(jas_iccprof_t *prof, jas_stream_t *out)
 	long curoff;
 	long reloff;
 	long newoff;
-	int i;
-	int j;
 	jas_icctagtabent_t *tagtabent;
 	jas_icctagtabent_t *sharedtagtabent;
 	jas_icctagtabent_t *tmptagtabent;
@@ -370,7 +365,7 @@ int jas_iccprof_save(jas_iccprof_t *prof, jas_stream_t *out)
 		goto error;
 	tagtab->numents = prof->attrtab->numattrs;
 	curoff = JAS_ICC_HDRLEN + 4 + 12 * tagtab->numents;
-	for (i = 0; i < JAS_CAST(int, tagtab->numents); ++i) {
+	for (unsigned i = 0; i < tagtab->numents; ++i) {
 		tagtabent = &tagtab->ents[i];
 		if (jas_iccattrtab_get(prof->attrtab, i, &attrname, &attrval))
 			goto error;
@@ -378,7 +373,7 @@ int jas_iccprof_save(jas_iccprof_t *prof, jas_stream_t *out)
 		tagtabent->tag = attrname;
 		tagtabent->data = &attrval->data;
 		sharedtagtabent = 0;
-		for (j = 0; j < i; ++j) {
+		for (unsigned j = 0; j < i; ++j) {
 			tmptagtabent = &tagtab->ents[j];
 			if (tagtabent->data == tmptagtabent->data) {
 				sharedtagtabent = tmptagtabent;
@@ -393,7 +388,7 @@ int jas_iccprof_save(jas_iccprof_t *prof, jas_stream_t *out)
 			tagtabent->off = curoff;
 			tagtabent->len = (*attrval->ops->getsize)(attrval) + 8;
 			tagtabent->first = 0;
-			if (i < JAS_CAST(int, tagtab->numents - 1)) {
+			if (i < tagtab->numents - 1) {
 				curoff = jas_iccpadtomult(curoff + tagtabent->len, 4);
 			} else {
 				curoff += tagtabent->len;
@@ -407,7 +402,7 @@ int jas_iccprof_save(jas_iccprof_t *prof, jas_stream_t *out)
 	if (jas_iccprof_puttagtab(out, &prof->tagtab))
 		goto error;
 	curoff = JAS_ICC_HDRLEN + 4 + 12 * tagtab->numents;
-	for (i = 0; i < JAS_CAST(int, tagtab->numents);) {
+	for (unsigned i = 0; i < tagtab->numents;) {
 		tagtabent = &tagtab->ents[i];
 		assert(curoff == JAS_CAST(long, tagtabent->off));
 		if (jas_iccattrtab_get(prof->attrtab, i, &attrname, &attrval))
@@ -420,10 +415,10 @@ int jas_iccprof_save(jas_iccprof_t *prof, jas_stream_t *out)
 		jas_iccattrval_destroy(attrval);
 		curoff += tagtabent->len;
 		++i;
-		while (i < JAS_CAST(int, tagtab->numents) &&
+		while (i < tagtab->numents &&
 		  tagtab->ents[i].first)
 			++i;
-		newoff = (i < JAS_CAST(int, tagtab->numents)) ?
+		newoff = (i < tagtab->numents) ?
 		  tagtab->ents[i].off : prof->hdr.size;
 		reloff = newoff - curoff;
 		assert(reloff >= 0);
@@ -464,11 +459,10 @@ static int jas_iccprof_writehdr(jas_stream_t *out, const jas_icchdr_t *hdr)
 
 static int jas_iccprof_puttagtab(jas_stream_t *out, const jas_icctagtab_t *tagtab)
 {
-	int i;
 	jas_icctagtabent_t *tagtabent;
 	if (jas_iccputuint32(out, tagtab->numents))
 		goto error;
-	for (i = 0; i < JAS_CAST(int, tagtab->numents); ++i) {
+	for (unsigned i = 0; i < tagtab->numents; ++i) {
 		tagtabent = &tagtab->ents[i];
 		if (jas_iccputuint32(out, tagtabent->tag) ||
 		  jas_iccputuint32(out, tagtabent->off) ||
@@ -505,7 +499,6 @@ static int jas_iccprof_readhdr(jas_stream_t *in, jas_icchdr_t *hdr)
 
 static int jas_iccprof_gettagtab(jas_stream_t *in, jas_icctagtab_t *tagtab)
 {
-	int i;
 	jas_icctagtabent_t *tagtabent;
 
 	if (tagtab->ents) {
@@ -518,7 +511,7 @@ static int jas_iccprof_gettagtab(jas_stream_t *in, jas_icctagtab_t *tagtab)
 	  sizeof(jas_icctagtabent_t))))
 		goto error;
 	tagtabent = tagtab->ents;
-	for (i = 0; i < JAS_CAST(long, tagtab->numents); ++i) {
+	for (unsigned i = 0; i < tagtab->numents; ++i) {
 		if (jas_iccgetuint32(in, &tagtabent->tag) ||
 		jas_iccgetuint32(in, &tagtabent->off) ||
 		jas_iccgetuint32(in, &tagtabent->len))
@@ -680,10 +673,9 @@ error:
 static jas_iccattrtab_t *jas_iccattrtab_copy(const jas_iccattrtab_t *attrtab)
 {
 	jas_iccattrtab_t *newattrtab;
-	int i;
 	if (!(newattrtab = jas_iccattrtab_create()))
 		return NULL;
-	for (i = 0; i < attrtab->numattrs; ++i) {
+	for (unsigned i = 0; i < attrtab->numattrs; ++i) {
 		if (jas_iccattrtab_add(newattrtab, i, attrtab->attrs[i].name,
 		  attrtab->attrs[i].val))
 			goto error;
@@ -707,11 +699,10 @@ static void jas_iccattrtab_destroy(jas_iccattrtab_t *tab)
 
 void jas_iccattrtab_dump(const jas_iccattrtab_t *attrtab, FILE *out)
 {
-	int i;
 	char buf[16];
 	fprintf(out, "numattrs=%d\n", attrtab->numattrs);
 	fprintf(out, "---\n");
-	for (i = 0; i < attrtab->numattrs; ++i) {
+	for (unsigned i = 0; i < attrtab->numattrs; ++i) {
 		const jas_iccattr_t *attr = &attrtab->attrs[i];
 		const jas_iccattrval_t *attrval = attr->val;
 		const jas_iccattrvalinfo_t *info = jas_iccattrvalinfo_lookup(attrval->type);
@@ -728,7 +719,7 @@ void jas_iccattrtab_dump(const jas_iccattrtab_t *attrtab, FILE *out)
 	}
 }
 
-static int jas_iccattrtab_resize(jas_iccattrtab_t *tab, int maxents)
+static int jas_iccattrtab_resize(jas_iccattrtab_t *tab, unsigned maxents)
 {
 	jas_iccattr_t *newattrs;
 	assert(maxents >= tab->numattrs);
@@ -745,13 +736,12 @@ static int jas_iccattrtab_resize(jas_iccattrtab_t *tab, int maxents)
 static int jas_iccattrtab_add(jas_iccattrtab_t *attrtab, int i,
   jas_iccuint32_t name, jas_iccattrval_t *val)
 {
-	int n;
 	jas_iccattr_t *attr;
 	jas_iccattrval_t *tmpattrval;
 	if (i < 0) {
 		i = attrtab->numattrs;
 	}
-	assert(i >= 0 && i <= attrtab->numattrs);
+	assert(i >= 0 && (unsigned)i <= attrtab->numattrs);
 	if (attrtab->numattrs >= attrtab->maxattrs) {
 		if (jas_iccattrtab_resize(attrtab, attrtab->numattrs + 32)) {
 			return -1;
@@ -759,7 +749,7 @@ static int jas_iccattrtab_add(jas_iccattrtab_t *attrtab, int i,
 	}
 	if (!(tmpattrval = jas_iccattrval_clone(val)))
 		return -1;
-	n = attrtab->numattrs - i;
+	const unsigned n = attrtab->numattrs - i;
 	if (n > 0)
 		memmove(&attrtab->attrs[i + 1], &attrtab->attrs[i],
 		  n * sizeof(jas_iccattr_t));
@@ -770,7 +760,7 @@ static int jas_iccattrtab_add(jas_iccattrtab_t *attrtab, int i,
 	return 0;
 }
 
-static int jas_iccattrtab_replace(jas_iccattrtab_t *attrtab, int i,
+static int jas_iccattrtab_replace(jas_iccattrtab_t *attrtab, unsigned i,
   jas_iccuint32_t name, jas_iccattrval_t *val)
 {
 	jas_iccattrval_t *newval;
@@ -786,9 +776,9 @@ error:
 	return -1;
 }
 
-static void jas_iccattrtab_delete(jas_iccattrtab_t *attrtab, int i)
+static void jas_iccattrtab_delete(jas_iccattrtab_t *attrtab, unsigned i)
 {
-	int n;
+	unsigned n;
 	jas_iccattrval_destroy(attrtab->attrs[i].val);
 	if ((n = attrtab->numattrs - i - 1) > 0)
 		memmove(&attrtab->attrs[i], &attrtab->attrs[i + 1],
@@ -796,11 +786,11 @@ static void jas_iccattrtab_delete(jas_iccattrtab_t *attrtab, int i)
 	--attrtab->numattrs;
 }
 
-static int jas_iccattrtab_get(jas_iccattrtab_t *attrtab, int i,
+static int jas_iccattrtab_get(jas_iccattrtab_t *attrtab, unsigned i,
   jas_iccattrname_t *name, jas_iccattrval_t **val)
 {
 	jas_iccattr_t *attr;
-	if (i < 0 || i >= attrtab->numattrs)
+	if (i >= attrtab->numattrs)
 		goto error;
 	attr = &attrtab->attrs[i];
 	*name = attr->name;
@@ -814,9 +804,8 @@ error:
 static int jas_iccattrtab_lookup(const jas_iccattrtab_t *attrtab,
   jas_iccuint32_t name)
 {
-	int i;
 	jas_iccattr_t *attr;
-	for (i = 0; i < attrtab->numattrs; ++i) {
+	for (unsigned i = 0; i < attrtab->numattrs; ++i) {
 		attr = &attrtab->attrs[i];
 		if (attr->name == name)
 			return i;
@@ -920,7 +909,7 @@ static jas_iccattrval_t *jas_iccattrval_create0()
 \******************************************************************************/
 
 static int jas_iccxyz_input(jas_iccattrval_t *attrval, jas_stream_t *in,
-  int len)
+  unsigned len)
 {
 	if (len != 4 * 3) abort();
 	return jas_iccgetxyz(in, &attrval->data.xyz);
@@ -936,7 +925,7 @@ static int jas_iccxyz_output(jas_iccattrval_t *attrval, jas_stream_t *out)
 	return 0;
 }
 
-static int jas_iccxyz_getsize(const jas_iccattrval_t *attrval)
+static unsigned jas_iccxyz_getsize(const jas_iccattrval_t *attrval)
 {
 	/* Avoid compiler warnings about unused parameters. */
 	(void)attrval;
@@ -976,10 +965,9 @@ static int jas_icccurv_copy(jas_iccattrval_t *attrval,
 }
 
 static int jas_icccurv_input(jas_iccattrval_t *attrval, jas_stream_t *in,
-  int cnt)
+  unsigned cnt)
 {
 	jas_icccurv_t *curv = &attrval->data.curv;
-	unsigned int i;
 
 	curv->numents = 0;
 	curv->ents = 0;
@@ -988,12 +976,12 @@ static int jas_icccurv_input(jas_iccattrval_t *attrval, jas_stream_t *in,
 		goto error;
 	if (!(curv->ents = jas_alloc2(curv->numents, sizeof(jas_iccuint16_t))))
 		goto error;
-	for (i = 0; i < curv->numents; ++i) {
+	for (unsigned i = 0; i < curv->numents; ++i) {
 		if (jas_iccgetuint16(in, &curv->ents[i]))
 			goto error;
 	}
 
-	if (JAS_CAST(int, 4 + 2 * curv->numents) != cnt)
+	if (4 + 2 * curv->numents != cnt)
 		goto error;
 	return 0;
 
@@ -1002,7 +990,7 @@ error:
 	return -1;
 }
 
-static int jas_icccurv_getsize(const jas_iccattrval_t *attrval)
+static unsigned jas_icccurv_getsize(const jas_iccattrval_t *attrval)
 {
 	const jas_icccurv_t *curv = &attrval->data.curv;
 	return 4 + 2 * curv->numents;
@@ -1011,11 +999,10 @@ static int jas_icccurv_getsize(const jas_iccattrval_t *attrval)
 static int jas_icccurv_output(jas_iccattrval_t *attrval, jas_stream_t *out)
 {
 	const jas_icccurv_t *curv = &attrval->data.curv;
-	unsigned int i;
 
 	if (jas_iccputuint32(out, curv->numents))
 		goto error;
-	for (i = 0; i < curv->numents; ++i) {
+	for (unsigned i = 0; i < curv->numents; ++i) {
 		if (jas_iccputuint16(out, curv->ents[i]))
 			goto error;
 	}
@@ -1026,14 +1013,13 @@ error:
 
 static void jas_icccurv_dump(const jas_iccattrval_t *attrval, FILE *out)
 {
-	int i;
 	const jas_icccurv_t *curv = &attrval->data.curv;
 	fprintf(out, "number of entries = %"PRIuFAST32"\n", curv->numents);
 	if (curv->numents == 1) {
 		fprintf(out, "gamma = %f\n", curv->ents[0] / 256.0);
 	} else {
-		for (i = 0; i < JAS_CAST(int, curv->numents); ++i) {
-			if (i < 3 || i >= JAS_CAST(int, curv->numents) - 3) {
+		for (unsigned i = 0; i < curv->numents; ++i) {
+			if (i < 3 || i >= curv->numents - 3) {
 				fprintf(out, "entry[%d] = %f\n", i, curv->ents[i] / 65535.0);
 			}
 		}
@@ -1073,9 +1059,8 @@ static int jas_icctxtdesc_copy(jas_iccattrval_t *attrval,
 }
 
 static int jas_icctxtdesc_input(jas_iccattrval_t *attrval, jas_stream_t *in,
-  int cnt)
+  unsigned cnt)
 {
-	int n;
 	int c;
 	jas_icctxtdesc_t *txtdesc = &attrval->data.txtdesc;
 	txtdesc->ascdata = 0;
@@ -1108,12 +1093,12 @@ static int jas_icctxtdesc_input(jas_iccattrval_t *attrval, jas_stream_t *in,
 	txtdesc->asclen = JAS_CAST(jas_iccuint32_t, strlen(txtdesc->ascdata) + 1);
 #define WORKAROUND_BAD_PROFILES
 #ifdef WORKAROUND_BAD_PROFILES
-	n = txtdesc->asclen + txtdesc->uclen * 2 + 15 + 67;
+	const unsigned n = txtdesc->asclen + txtdesc->uclen * 2 + 15 + 67;
 	if (n > cnt) {
 		return -1;
 	}
 	if (n < cnt) {
-		if (jas_stream_gobble(in, cnt - n) != cnt - n)
+		if (jas_stream_gobble(in, cnt - n) != (int)(cnt - n))
 			goto error;
 	}
 #else
@@ -1126,11 +1111,10 @@ error:
 	return -1;
 }
 
-static int jas_icctxtdesc_getsize(const jas_iccattrval_t *attrval)
+static unsigned jas_icctxtdesc_getsize(const jas_iccattrval_t *attrval)
 {
 	const jas_icctxtdesc_t *txtdesc = &attrval->data.txtdesc;
-	return JAS_CAST(int, strlen(txtdesc->ascdata) + 1 + txtdesc->uclen * 2 +
-	  15 + 67);
+	return strlen(txtdesc->ascdata) + 1 + txtdesc->uclen * 2 + 15 + 67;
 }
 
 static int jas_icctxtdesc_output(jas_iccattrval_t *attrval, jas_stream_t *out)
@@ -1191,16 +1175,16 @@ static int jas_icctxt_copy(jas_iccattrval_t *attrval,
 }
 
 static int jas_icctxt_input(jas_iccattrval_t *attrval, jas_stream_t *in,
-  int cnt)
+  unsigned cnt)
 {
 	jas_icctxt_t *txt = &attrval->data.txt;
 	txt->string = 0;
 	if (!(txt->string = jas_malloc(cnt)))
 		goto error;
-	if (jas_stream_read(in, txt->string, cnt) != cnt)
+	if (jas_stream_read(in, txt->string, cnt) != (int)cnt)
 		goto error;
 	txt->string[cnt - 1] = '\0';
-	if (JAS_CAST(int, strlen(txt->string)) + 1 != cnt)
+	if (strlen(txt->string) + 1 != cnt)
 		goto error;
 	return 0;
 error:
@@ -1208,10 +1192,10 @@ error:
 	return -1;
 }
 
-static int jas_icctxt_getsize(const jas_iccattrval_t *attrval)
+static unsigned jas_icctxt_getsize(const jas_iccattrval_t *attrval)
 {
 	const jas_icctxt_t *txt = &attrval->data.txt;
-	return JAS_CAST(int, strlen(txt->string) + 1);
+	return strlen(txt->string) + 1;
 }
 
 static int jas_icctxt_output(jas_iccattrval_t *attrval, jas_stream_t *out)
@@ -1269,11 +1253,8 @@ static int jas_icclut8_copy(jas_iccattrval_t *attrval,
 }
 
 static int jas_icclut8_input(jas_iccattrval_t *attrval, jas_stream_t *in,
-  int cnt)
+  unsigned cnt)
 {
-	int i;
-	int j;
-	int clutsize;
 	jas_icclut8_t *lut8 = &attrval->data.lut8;
 	lut8->clut = 0;
 	lut8->intabs = 0;
@@ -1285,8 +1266,8 @@ static int jas_icclut8_input(jas_iccattrval_t *attrval, jas_stream_t *in,
 	  jas_iccgetuint8(in, &lut8->clutlen) ||
 	  jas_stream_getc(in) == EOF)
 		goto error;
-	for (i = 0; i < 3; ++i) {
-		for (j = 0; j < 3; ++j) {
+	for (unsigned i = 0; i < 3; ++i) {
+		for (unsigned j = 0; j < 3; ++j) {
 			if (jas_iccgetsint32(in, &lut8->e[i][j]))
 				goto error;
 		}
@@ -1294,41 +1275,41 @@ static int jas_icclut8_input(jas_iccattrval_t *attrval, jas_stream_t *in,
 	if (jas_iccgetuint16(in, &lut8->numintabents) ||
 	  jas_iccgetuint16(in, &lut8->numouttabents))
 		goto error;
-	clutsize = jas_iccpowi(lut8->clutlen, lut8->numinchans) * lut8->numoutchans;
+	const unsigned clutsize = jas_iccpowi(lut8->clutlen, lut8->numinchans) * lut8->numoutchans;
 	if (!(lut8->clut = jas_alloc2(clutsize, sizeof(jas_iccuint8_t))) ||
 	  !(lut8->intabsbuf = jas_alloc3(lut8->numinchans,
 	  lut8->numintabents, sizeof(jas_iccuint8_t))) ||
 	  !(lut8->intabs = jas_alloc2(lut8->numinchans,
 	  sizeof(jas_iccuint8_t *))))
 		goto error;
-	for (i = 0; i < lut8->numinchans; ++i)
+	for (unsigned i = 0; i < lut8->numinchans; ++i)
 		lut8->intabs[i] = &lut8->intabsbuf[i * lut8->numintabents];
 	if (!(lut8->outtabsbuf = jas_alloc3(lut8->numoutchans,
 	  lut8->numouttabents, sizeof(jas_iccuint8_t))) ||
 	  !(lut8->outtabs = jas_alloc2(lut8->numoutchans,
 	  sizeof(jas_iccuint8_t *))))
 		goto error;
-	for (i = 0; i < lut8->numoutchans; ++i)
+	for (unsigned i = 0; i < lut8->numoutchans; ++i)
 		lut8->outtabs[i] = &lut8->outtabsbuf[i * lut8->numouttabents];
-	for (i = 0; i < lut8->numinchans; ++i) {
-		for (j = 0; j < JAS_CAST(int, lut8->numintabents); ++j) {
+	for (unsigned i = 0; i < lut8->numinchans; ++i) {
+		for (unsigned j = 0; j < lut8->numintabents; ++j) {
 			if (jas_iccgetuint8(in, &lut8->intabs[i][j]))
 				goto error;
 		}
 	}
-	for (i = 0; i < lut8->numoutchans; ++i) {
-		for (j = 0; j < JAS_CAST(int, lut8->numouttabents); ++j) {
+	for (unsigned i = 0; i < lut8->numoutchans; ++i) {
+		for (unsigned j = 0; j < lut8->numouttabents; ++j) {
 			if (jas_iccgetuint8(in, &lut8->outtabs[i][j]))
 				goto error;
 		}
 	}
-	for (i = 0; i < clutsize; ++i) {
+	for (unsigned i = 0; i < clutsize; ++i) {
 		if (jas_iccgetuint8(in, &lut8->clut[i]))
 			goto error;
 	}
-	if (JAS_CAST(int, 44 + lut8->numinchans * lut8->numintabents +
+	if (44 + lut8->numinchans * lut8->numintabents +
 	  lut8->numoutchans * lut8->numouttabents +
-	  jas_iccpowi(lut8->clutlen, lut8->numinchans) * lut8->numoutchans) !=
+	  jas_iccpowi(lut8->clutlen, lut8->numinchans) * lut8->numoutchans !=
 	  cnt)
 		goto error;
 	return 0;
@@ -1337,7 +1318,7 @@ error:
 	return -1;
 }
 
-static int jas_icclut8_getsize(const jas_iccattrval_t *attrval)
+static unsigned jas_icclut8_getsize(const jas_iccattrval_t *attrval)
 {
 	const jas_icclut8_t *lut8 = &attrval->data.lut8;
 	return 44 + lut8->numinchans * lut8->numintabents +
@@ -1348,9 +1329,6 @@ static int jas_icclut8_getsize(const jas_iccattrval_t *attrval)
 static int jas_icclut8_output(jas_iccattrval_t *attrval, jas_stream_t *out)
 {
 	jas_icclut8_t *lut8 = &attrval->data.lut8;
-	int i;
-	int j;
-	int n;
 	lut8->clut = 0;
 	lut8->intabs = 0;
 	lut8->intabsbuf = 0;
@@ -1361,8 +1339,8 @@ static int jas_icclut8_output(jas_iccattrval_t *attrval, jas_stream_t *out)
 	  jas_stream_putc(out, lut8->clutlen) == EOF ||
 	  jas_stream_putc(out, 0) == EOF)
 		goto error;
-	for (i = 0; i < 3; ++i) {
-		for (j = 0; j < 3; ++j) {
+	for (unsigned i = 0; i < 3; ++i) {
+		for (unsigned j = 0; j < 3; ++j) {
 			if (jas_iccputsint32(out, lut8->e[i][j]))
 				goto error;
 		}
@@ -1370,18 +1348,15 @@ static int jas_icclut8_output(jas_iccattrval_t *attrval, jas_stream_t *out)
 	if (jas_iccputuint16(out, lut8->numintabents) ||
 	  jas_iccputuint16(out, lut8->numouttabents))
 		goto error;
-	n = lut8->numinchans * lut8->numintabents;
-	for (i = 0; i < n; ++i) {
+	for (unsigned i = 0, n = lut8->numinchans * lut8->numintabents; i < n; ++i) {
 		if (jas_iccputuint8(out, lut8->intabsbuf[i]))
 			goto error;
 	}
-	n = lut8->numoutchans * lut8->numouttabents;
-	for (i = 0; i < n; ++i) {
+	for (unsigned i = 0, n = lut8->numoutchans * lut8->numouttabents; i < n; ++i) {
 		if (jas_iccputuint8(out, lut8->outtabsbuf[i]))
 			goto error;
 	}
-	n = jas_iccpowi(lut8->clutlen, lut8->numinchans) * lut8->numoutchans;
-	for (i = 0; i < n; ++i) {
+	for (unsigned i = 0, n = jas_iccpowi(lut8->clutlen, lut8->numinchans) * lut8->numoutchans; i < n; ++i) {
 		if (jas_iccputuint8(out, lut8->clut[i]))
 			goto error;
 	}
@@ -1393,12 +1368,10 @@ error:
 static void jas_icclut8_dump(const jas_iccattrval_t *attrval, FILE *out)
 {
 	const jas_icclut8_t *lut8 = &attrval->data.lut8;
-	int i;
-	int j;
 	fprintf(out, "numinchans=%d, numoutchans=%d, clutlen=%d\n",
 	  lut8->numinchans, lut8->numoutchans, lut8->clutlen);
-	for (i = 0; i < 3; ++i) {
-		for (j = 0; j < 3; ++j) {
+	for (unsigned i = 0; i < 3; ++i) {
+		for (unsigned j = 0; j < 3; ++j) {
 			fprintf(out, "e[%d][%d]=%f ", i, j, lut8->e[i][j] / 65536.0);
 		}
 		fprintf(out, "\n");
@@ -1448,11 +1421,8 @@ static int jas_icclut16_copy(jas_iccattrval_t *attrval,
 }
 
 static int jas_icclut16_input(jas_iccattrval_t *attrval, jas_stream_t *in,
-  int cnt)
+  unsigned cnt)
 {
-	int i;
-	int j;
-	int clutsize;
 	jas_icclut16_t *lut16 = &attrval->data.lut16;
 	lut16->clut = 0;
 	lut16->intabs = 0;
@@ -1464,8 +1434,8 @@ static int jas_icclut16_input(jas_iccattrval_t *attrval, jas_stream_t *in,
 	  jas_iccgetuint8(in, &lut16->clutlen) ||
 	  jas_stream_getc(in) == EOF)
 		goto error;
-	for (i = 0; i < 3; ++i) {
-		for (j = 0; j < 3; ++j) {
+	for (unsigned i = 0; i < 3; ++i) {
+		for (unsigned j = 0; j < 3; ++j) {
 			if (jas_iccgetsint32(in, &lut16->e[i][j]))
 				goto error;
 		}
@@ -1473,42 +1443,42 @@ static int jas_icclut16_input(jas_iccattrval_t *attrval, jas_stream_t *in,
 	if (jas_iccgetuint16(in, &lut16->numintabents) ||
 	  jas_iccgetuint16(in, &lut16->numouttabents))
 		goto error;
-	clutsize = jas_iccpowi(lut16->clutlen, lut16->numinchans) * lut16->numoutchans;
+	const unsigned clutsize = jas_iccpowi(lut16->clutlen, lut16->numinchans) * lut16->numoutchans;
 	if (!(lut16->clut = jas_alloc2(clutsize, sizeof(jas_iccuint16_t))) ||
 	  !(lut16->intabsbuf = jas_alloc3(lut16->numinchans,
 	  lut16->numintabents, sizeof(jas_iccuint16_t))) ||
 	  !(lut16->intabs = jas_alloc2(lut16->numinchans,
 	  sizeof(jas_iccuint16_t *))))
 		goto error;
-	for (i = 0; i < lut16->numinchans; ++i)
+	for (unsigned i = 0; i < lut16->numinchans; ++i)
 		lut16->intabs[i] = &lut16->intabsbuf[i * lut16->numintabents];
 	if (!(lut16->outtabsbuf = jas_alloc3(lut16->numoutchans,
 	  lut16->numouttabents, sizeof(jas_iccuint16_t))) ||
 	  !(lut16->outtabs = jas_alloc2(lut16->numoutchans,
 	  sizeof(jas_iccuint16_t *))))
 		goto error;
-	for (i = 0; i < lut16->numoutchans; ++i)
+	for (unsigned i = 0; i < lut16->numoutchans; ++i)
 		lut16->outtabs[i] = &lut16->outtabsbuf[i * lut16->numouttabents];
-	for (i = 0; i < lut16->numinchans; ++i) {
-		for (j = 0; j < JAS_CAST(int, lut16->numintabents); ++j) {
+	for (unsigned i = 0; i < lut16->numinchans; ++i) {
+		for (unsigned j = 0; j < lut16->numintabents; ++j) {
 			if (jas_iccgetuint16(in, &lut16->intabs[i][j]))
 				goto error;
 		}
 	}
-	for (i = 0; i < lut16->numoutchans; ++i) {
-		for (j = 0; j < JAS_CAST(int, lut16->numouttabents); ++j) {
+	for (unsigned i = 0; i < lut16->numoutchans; ++i) {
+		for (unsigned j = 0; j < lut16->numouttabents; ++j) {
 			if (jas_iccgetuint16(in, &lut16->outtabs[i][j]))
 				goto error;
 		}
 	}
-	for (i = 0; i < clutsize; ++i) {
+	for (unsigned i = 0; i < clutsize; ++i) {
 		if (jas_iccgetuint16(in, &lut16->clut[i]))
 			goto error;
 	}
-	if (JAS_CAST(int, 44 + 2 * (lut16->numinchans * lut16->numintabents +
+	if (44 + 2 * (lut16->numinchans * lut16->numintabents +
           lut16->numoutchans * lut16->numouttabents +
           jas_iccpowi(lut16->clutlen, lut16->numinchans) *
-	  lut16->numoutchans)) != cnt)
+	  lut16->numoutchans) != cnt)
 		goto error;
 	return 0;
 error:
@@ -1516,7 +1486,7 @@ error:
 	return -1;
 }
 
-static int jas_icclut16_getsize(const jas_iccattrval_t *attrval)
+static unsigned jas_icclut16_getsize(const jas_iccattrval_t *attrval)
 {
 	const jas_icclut16_t *lut16 = &attrval->data.lut16;
 	return 44 + 2 * (lut16->numinchans * lut16->numintabents +
@@ -1527,16 +1497,13 @@ static int jas_icclut16_getsize(const jas_iccattrval_t *attrval)
 static int jas_icclut16_output(jas_iccattrval_t *attrval, jas_stream_t *out)
 {
 	const jas_icclut16_t *lut16 = &attrval->data.lut16;
-	int i;
-	int j;
-	int n;
 	if (jas_stream_putc(out, lut16->numinchans) == EOF ||
 	  jas_stream_putc(out, lut16->numoutchans) == EOF ||
 	  jas_stream_putc(out, lut16->clutlen) == EOF ||
 	  jas_stream_putc(out, 0) == EOF)
 		goto error;
-	for (i = 0; i < 3; ++i) {
-		for (j = 0; j < 3; ++j) {
+	for (unsigned i = 0; i < 3; ++i) {
+		for (unsigned j = 0; j < 3; ++j) {
 			if (jas_iccputsint32(out, lut16->e[i][j]))
 				goto error;
 		}
@@ -1544,18 +1511,15 @@ static int jas_icclut16_output(jas_iccattrval_t *attrval, jas_stream_t *out)
 	if (jas_iccputuint16(out, lut16->numintabents) ||
 	  jas_iccputuint16(out, lut16->numouttabents))
 		goto error;
-	n = lut16->numinchans * lut16->numintabents;
-	for (i = 0; i < n; ++i) {
+	for (unsigned i = 0, n = lut16->numinchans * lut16->numintabents; i < n; ++i) {
 		if (jas_iccputuint16(out, lut16->intabsbuf[i]))
 			goto error;
 	}
-	n = lut16->numoutchans * lut16->numouttabents;
-	for (i = 0; i < n; ++i) {
+	for (unsigned i = 0, n = lut16->numoutchans * lut16->numouttabents; i < n; ++i) {
 		if (jas_iccputuint16(out, lut16->outtabsbuf[i]))
 			goto error;
 	}
-	n = jas_iccpowi(lut16->clutlen, lut16->numinchans) * lut16->numoutchans;
-	for (i = 0; i < n; ++i) {
+	for (unsigned i = 0, n = jas_iccpowi(lut16->clutlen, lut16->numinchans) * lut16->numoutchans; i < n; ++i) {
 		if (jas_iccputuint16(out, lut16->clut[i]))
 			goto error;
 	}
@@ -1567,12 +1531,10 @@ error:
 static void jas_icclut16_dump(const jas_iccattrval_t *attrval, FILE *out)
 {
 	const jas_icclut16_t *lut16 = &attrval->data.lut16;
-	int i;
-	int j;
 	fprintf(out, "numinchans=%d, numoutchans=%d, clutlen=%d\n",
 	  lut16->numinchans, lut16->numoutchans, lut16->clutlen);
-	for (i = 0; i < 3; ++i) {
-		for (j = 0; j < 3; ++j) {
+	for (unsigned i = 0; i < 3; ++i) {
+		for (unsigned j = 0; j < 3; ++j) {
 			fprintf(out, "e[%d][%d]=%f ", i, j, lut16->e[i][j] / 65536.0);
 		}
 		fprintf(out, "\n");
@@ -1585,13 +1547,12 @@ static void jas_icclut16_dump(const jas_iccattrval_t *attrval, FILE *out)
 *
 \******************************************************************************/
 
-static int jas_iccgetuint(jas_stream_t *in, int n, jas_ulonglong *val)
+static int jas_iccgetuint(jas_stream_t *in, unsigned n, jas_ulonglong *val)
 {
-	int i;
 	int c;
 	jas_ulonglong v;
 	v = 0;
-	for (i = n; i > 0; --i) {
+	for (unsigned i = n; i > 0; --i) {
 		if ((c = jas_stream_getc(in)) == EOF)
 			return -1;
 		v = (v << 8) | c;
@@ -1646,11 +1607,10 @@ static int jas_iccgetuint64(jas_stream_t *in, jas_iccuint64_t *val)
 	return 0;
 }
 
-static int jas_iccputuint(jas_stream_t *out, int n, jas_ulonglong val)
+static int jas_iccputuint(jas_stream_t *out, unsigned n, jas_ulonglong val)
 {
-	int i;
 	int c;
-	for (i = n; i > 0; --i) {
+	for (unsigned i = n; i > 0; --i) {
 		c = (val >> (8 * (i - 1))) & 0xff;
 		if (jas_stream_putc(out, c) == EOF)
 			return -1;
@@ -1658,7 +1618,7 @@ static int jas_iccputuint(jas_stream_t *out, int n, jas_ulonglong val)
 	return 0;
 }
 
-static int jas_iccputsint(jas_stream_t *out, int n, jas_longlong val)
+static int jas_iccputsint(jas_stream_t *out, unsigned n, jas_longlong val)
 {
 	jas_ulonglong tmp;
 	tmp = (val < 0) ? (abort(), 0) : val;
@@ -1669,13 +1629,12 @@ static int jas_iccputsint(jas_stream_t *out, int n, jas_longlong val)
 *
 \******************************************************************************/
 
-static char *jas_iccsigtostr(int sig, char *buf)
+static char *jas_iccsigtostr(unsigned sig, char *buf)
 {
-	int n;
 	int c;
 	char *bufptr;
 	bufptr = buf;
-	for (n = 4; n > 0; --n) {
+	for (unsigned n = 4; n > 0; --n) {
 		c = (sig >> 24) & 0xff;
 		if (isalpha(c) || isdigit(c)) {
 			*bufptr++ = c;
@@ -1686,22 +1645,22 @@ static char *jas_iccsigtostr(int sig, char *buf)
 	return buf;
 }
 
-static long jas_iccpadtomult(long x, long y)
+static unsigned jas_iccpadtomult(unsigned x, unsigned y)
 {
 	return ((x + y - 1) / y) * y;
 }
 
-static long jas_iccpowi(int x, int n)
+static unsigned jas_iccpowi(unsigned x, unsigned n)
 {
-	long y;
+	unsigned y;
 	y = 1;
-	while (--n >= 0)
+	while (n-- > 0)
 		y *= x;
 	return y;
 }
 
 
-jas_iccprof_t *jas_iccprof_createfrombuf(const jas_uchar *buf, int len)
+jas_iccprof_t *jas_iccprof_createfrombuf(const jas_uchar *buf, unsigned len)
 {
 	jas_stream_t *in;
 	jas_iccprof_t *prof;
@@ -1717,7 +1676,7 @@ error:
 	return 0;
 }
 
-jas_iccprof_t *jas_iccprof_createfromclrspc(int clrspc)
+jas_iccprof_t *jas_iccprof_createfromclrspc(unsigned clrspc)
 {
 	jas_iccprof_t *prof;
 	switch (clrspc) {

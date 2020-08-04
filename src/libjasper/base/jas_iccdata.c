@@ -459,7 +459,7 @@ const jas_uchar jas_iccprofdata_srgb[] =
 	0xfe, 0x4b, 0xfe, 0xdc, 0xff, 0x6d, 0xff, 0xff
 };
 
-const int jas_iccprofdata_srgblen = sizeof(jas_iccprofdata_srgb);
+const unsigned jas_iccprofdata_srgblen = sizeof(jas_iccprofdata_srgb);
 
 const jas_uchar jas_iccprofdata_sgray[] = {
 	0x00, 0x00, 0x01, 0x8a, 0x00, 0x00, 0x00, 0x00,
@@ -514,4 +514,4 @@ const jas_uchar jas_iccprofdata_sgray[] = {
 	0x01, 0xcd
 };
 
-const int jas_iccprofdata_sgraylen = sizeof(jas_iccprofdata_sgray);
+const unsigned jas_iccprofdata_sgraylen = sizeof(jas_iccprofdata_sgray);

@@ -300,15 +300,15 @@ struct jas_iccattrval_s;
 typedef struct {
 	void (*destroy)(struct jas_iccattrval_s *);
 	int (*copy)(struct jas_iccattrval_s *, const struct jas_iccattrval_s *);
-	int (*input)(struct jas_iccattrval_s *, jas_stream_t *, int);
+	int (*input)(struct jas_iccattrval_s *, jas_stream_t *, unsigned);
 	int (*output)(struct jas_iccattrval_s *, jas_stream_t *);
-	int (*getsize)(const struct jas_iccattrval_s *);
+	unsigned (*getsize)(const struct jas_iccattrval_s *);
 	void (*dump)(const struct jas_iccattrval_s *, FILE *);
 } jas_iccattrvalops_t;
 
 /* Attribute value type (type and value information). */
 typedef struct jas_iccattrval_s {
-	int refcnt; /* reference count */
+	unsigned refcnt; /* reference count */
 	jas_iccsig_t type; /* type */
 	const jas_iccattrvalops_t *ops; /* type-dependent operations */
 	union {
@@ -347,8 +347,8 @@ typedef struct {
 } jas_iccattr_t;
 
 typedef struct {
-	int numattrs;
-	int maxattrs;
+	unsigned numattrs;
+	unsigned maxattrs;
 	jas_iccattr_t *attrs;
 } jas_iccattrtab_t;
 
@@ -399,11 +399,11 @@ JAS_DLLEXPORT jas_iccattrval_t *jas_iccattrval_create(jas_iccuint32_t type);
 JAS_DLLEXPORT void jas_iccattrtab_dump(const jas_iccattrtab_t *attrtab, FILE *out);
 
 extern const jas_uchar jas_iccprofdata_srgb[];
-extern const int jas_iccprofdata_srgblen;
+extern const unsigned jas_iccprofdata_srgblen;
 extern const jas_uchar jas_iccprofdata_sgray[];
-extern const int jas_iccprofdata_sgraylen;
-JAS_DLLEXPORT jas_iccprof_t *jas_iccprof_createfrombuf(const jas_uchar *buf, int len);
-JAS_DLLEXPORT jas_iccprof_t *jas_iccprof_createfromclrspc(int clrspc);
+extern const unsigned jas_iccprofdata_sgraylen;
+JAS_DLLEXPORT jas_iccprof_t *jas_iccprof_createfrombuf(const jas_uchar *buf, unsigned len);
+JAS_DLLEXPORT jas_iccprof_t *jas_iccprof_createfromclrspc(unsigned clrspc);
 
 #ifdef __cplusplus
 }
