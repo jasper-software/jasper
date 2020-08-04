@@ -128,7 +128,6 @@ int bmp_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 	default:
 		jas_eprintf("error: BMP format does not support color space\n");
 		return -1;
-		break;
 	}
 
 	switch (jas_clrspc_fam(clrspc)) {
@@ -154,7 +153,6 @@ int bmp_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 		break;
 	default:
 		abort();
-		break;
 	}
 
 	width = jas_image_cmptwidth(image, enc->cmpts[0]);

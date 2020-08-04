@@ -142,7 +142,6 @@ int ras_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 	default:
 		jas_eprintf("error: unsupported color space\n");
 		return -1;
-		break;
 	}
 
 	width = jas_image_cmptwidth(image, enc->cmpts[0]);
@@ -212,7 +211,6 @@ static int ras_putdata(jas_stream_t *out, ras_hdr_t *hdr, jas_image_t *image, in
 		break;
 	default:
 		ret = -1;
-		break;
 	}
 	return ret;
 }

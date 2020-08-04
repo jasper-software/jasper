@@ -110,7 +110,6 @@ int pgx_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 	default:
 		jas_eprintf("error: PGX format does not support color space\n");
 		return -1;
-		break;
 	}
 
 	width = jas_image_cmptwidth(image, enc->cmpt);

@@ -342,16 +342,12 @@ static J_COLOR_SPACE tojpgcs(int colorspace)
 	switch (jas_clrspc_fam(colorspace)) {
 	case JAS_CLRSPC_FAM_RGB:
 		return JCS_RGB;
-		break;
 	case JAS_CLRSPC_FAM_YCBCR:
 		return JCS_YCbCr;
-		break;
 	case JAS_CLRSPC_FAM_GRAY:
 		return JCS_GRAYSCALE;
-		break;
 	default:
 		abort();
-		break;
 	}
 }
 

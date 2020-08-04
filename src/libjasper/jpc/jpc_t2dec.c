@@ -447,14 +447,12 @@ int jpc_dec_decodepkts(jpc_dec_t *dec, jas_stream_t *pkthdrstream, jas_stream_t 
 			case JPC_MS_EOC:
 			case JPC_MS_SOT:
 				return 0;
-				break;
 			case JPC_MS_SOP:
 			case JPC_MS_EPH:
 			case 0:
 				break;
 			default:
 				return -1;
-				break;
 			}
 		}
 		if ((ret = jpc_pi_next(pi))) {

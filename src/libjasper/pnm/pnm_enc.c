@@ -166,7 +166,6 @@ int pnm_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 	default:
 		jas_eprintf("error: unsupported color space %d\n", clrspc_fam);
 		return -1;
-		break;
 	}
 
 

@@ -143,7 +143,6 @@ static int ras_dec_parseopts(const char *optstr, ras_dec_importopts_t *opts)
 		default:
 			jas_eprintf("warning: ignoring invalid option %s\n",
 			  jas_tvparser_gettag(tvp));
-			break;
 		}
 	}
 
@@ -319,7 +318,6 @@ static int ras_getdata(jas_stream_t *in, ras_hdr_t *hdr, ras_cmap_t *cmap,
 	default:
 		jas_eprintf("error: encoding method not supported\n");
 		ret = -1;
-		break;
 	}
 	return ret;
 }
@@ -458,7 +456,6 @@ static int ras_getcmap(jas_stream_t *in, ras_hdr_t *hdr, ras_cmap_t *cmap)
 		break;
 	default:
 		return -1;
-		break;
 	}
 
 	return 0;

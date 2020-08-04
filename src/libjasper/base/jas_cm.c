@@ -1059,7 +1059,6 @@ static int icctoclrspc(int iccclrspc, int refflag)
 			return JAS_CLRSPC_CIELAB;
 		default:
 			abort();
-			break;
 		}
 	} else {
 		switch (iccclrspc) {
@@ -1071,7 +1070,6 @@ static int icctoclrspc(int iccclrspc, int refflag)
 			return JAS_CLRSPC_GENGRAY;
 		default:
 			abort();
-			break;
 		}
 	}
 }
@@ -1281,13 +1279,10 @@ int jas_clrspc_numchans(int clrspc)
 	case JAS_CLRSPC_FAM_RGB:
 	case JAS_CLRSPC_FAM_YCBCR:
 		return 3;
-		break;
 	case JAS_CLRSPC_FAM_GRAY:
 		return 1;
-		break;
 	default:
 		abort();
-		break;
 	}
 }
 
