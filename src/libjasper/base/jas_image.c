@@ -125,7 +125,7 @@ static jas_image_fmtinfo_t jas_image_fmtinfos[JAS_IMAGE_MAXFMTS];
 \******************************************************************************/
 
 jas_image_t *jas_image_create(unsigned numcmpts, const jas_image_cmptparm_t *cmptparms,
-  int clrspc)
+  jas_clrspc_t clrspc)
 {
 	jas_image_t *image;
 	size_t rawsize;
