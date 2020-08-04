@@ -78,25 +78,25 @@
 
 static jas_cmprof_t *jas_cmprof_create(void);
 static void jas_cmshapmatlut_cleanup(jas_cmshapmatlut_t *);
-static jas_cmreal_t jas_cmshapmatlut_lookup(jas_cmshapmatlut_t *lut, jas_cmreal_t x);
+static jas_cmreal_t jas_cmshapmatlut_lookup(const jas_cmshapmatlut_t *lut, jas_cmreal_t x);
 
 static void jas_cmpxform_destroy(jas_cmpxform_t *pxform);
 static jas_cmpxform_t *jas_cmpxform_copy(jas_cmpxform_t *pxform);
 
 static void jas_cmshapmat_destroy(jas_cmpxform_t *pxform);
-static int jas_cmshapmat_apply(jas_cmpxform_t *pxform, jas_cmreal_t *in,
+static int jas_cmshapmat_apply(const jas_cmpxform_t *pxform, const jas_cmreal_t *in,
   jas_cmreal_t *out, int cnt);
 
 static int jas_cmputint(long **bufptr, int sgnd, int prec, long val);
-static int jas_cmgetint(long **bufptr, int sgnd, int prec, long *val);
+static int jas_cmgetint(const long **bufptr, int sgnd, int prec, long *val);
 static int jas_cmpxformseq_append(jas_cmpxformseq_t *pxformseq,
   jas_cmpxformseq_t *othpxformseq);
 static int jas_cmpxformseq_appendcnvt(jas_cmpxformseq_t *pxformseq,
   int, int);
 static int jas_cmpxformseq_resize(jas_cmpxformseq_t *pxformseq, int n);
 
-static int mono(jas_iccprof_t *prof, int op, jas_cmpxformseq_t **pxformseq);
-static int triclr(jas_iccprof_t *prof, int op, jas_cmpxformseq_t **retpxformseq);
+static int mono(const jas_iccprof_t *prof, int op, jas_cmpxformseq_t **pxformseq);
+static int triclr(const jas_iccprof_t *prof, int op, jas_cmpxformseq_t **retpxformseq);
 
 static void jas_cmpxformseq_destroy(jas_cmpxformseq_t *pxformseq);
 static int jas_cmpxformseq_delete(jas_cmpxformseq_t *pxformseq, int i);
@@ -132,9 +132,9 @@ static int icctoclrspc(int iccclrspc, int refflag);
 static jas_cmpxform_t *jas_cmpxform_create0(void);
 static jas_cmpxform_t *jas_cmpxform_createshapmat(void);
 static void jas_cmshapmatlut_init(jas_cmshapmatlut_t *lut);
-static int jas_cmshapmatlut_set(jas_cmshapmatlut_t *lut, jas_icccurv_t *curv);
+static int jas_cmshapmatlut_set(jas_cmshapmatlut_t *lut, const jas_icccurv_t *curv);
 
-static jas_cmpxformops_t shapmat_ops = {jas_cmshapmat_destroy, jas_cmshapmat_apply, 0};
+static const jas_cmpxformops_t shapmat_ops = {jas_cmshapmat_destroy, jas_cmshapmat_apply, 0};
 static jas_cmprof_t *jas_cmprof_createsycc(void);
 
 /******************************************************************************\
@@ -244,7 +244,7 @@ error:
 	return 0;
 }
 
-jas_cmprof_t *jas_cmprof_createfromiccprof(jas_iccprof_t *iccprof)
+jas_cmprof_t *jas_cmprof_createfromiccprof(const jas_iccprof_t *iccprof)
 {
 	jas_cmprof_t *prof;
 	jas_icchdr_t icchdr;
@@ -339,7 +339,7 @@ void jas_cmprof_destroy(jas_cmprof_t *prof)
 	jas_free(prof);
 }
 
-jas_cmprof_t *jas_cmprof_copy(jas_cmprof_t *prof)
+jas_cmprof_t *jas_cmprof_copy(const jas_cmprof_t *prof)
 {
 	jas_cmprof_t *newprof;
 	int i;
@@ -470,11 +470,9 @@ error:
 }
 
 #define	APPLYBUFSIZ	2048
-int jas_cmxform_apply(jas_cmxform_t *xform, jas_cmpixmap_t *in, jas_cmpixmap_t *out)
+int jas_cmxform_apply(const jas_cmxform_t *xform, const jas_cmpixmap_t *in, jas_cmpixmap_t *out)
 {
-	jas_cmcmptfmt_t *fmt;
 	jas_cmreal_t buf[2][APPLYBUFSIZ];
-	jas_cmpxformseq_t *pxformseq;
 	int i;
 	int j;
 	int width;
@@ -483,20 +481,17 @@ int jas_cmxform_apply(jas_cmxform_t *xform, jas_cmpixmap_t *in, jas_cmpixmap_t *
 	int n;
 	jas_cmreal_t *inbuf;
 	jas_cmreal_t *outbuf;
-	jas_cmpxform_t *pxform;
-	long *dataptr;
 	int maxchans;
 	int bufmax;
 	int m;
 	int bias;
 	jas_cmreal_t scale;
 	long v;
-	jas_cmreal_t *bufptr;
 
 	if (xform->numinchans > in->numcmpts || xform->numoutchans > out->numcmpts)
 		goto error;
 
-	fmt = &in->cmptfmts[0];
+	const jas_cmcmptfmt_t *fmt = &in->cmptfmts[0];
 	width = fmt->width;
 	height = fmt->height;
 	for (i = 1; i < xform->numinchans; ++i) {
@@ -513,9 +508,9 @@ int jas_cmxform_apply(jas_cmxform_t *xform, jas_cmpixmap_t *in, jas_cmpixmap_t *
 	}
 
 	maxchans = 0;
-	pxformseq = xform->pxformseq;
+	const jas_cmpxformseq_t *pxformseq = xform->pxformseq;
 	for (i = 0; i < pxformseq->numpxforms; ++i) {
-		pxform = pxformseq->pxforms[i];
+		const jas_cmpxform_t *pxform = pxformseq->pxforms[i];
 		if (pxform->numinchans > maxchans) {
 			maxchans = pxform->numinchans;
 		}
@@ -537,8 +532,8 @@ int jas_cmxform_apply(jas_cmxform_t *xform, jas_cmpixmap_t *in, jas_cmpixmap_t *
 			fmt = &in->cmptfmts[i];
 			scale = (double)((1 << fmt->prec) - 1);
 			bias = fmt->sgnd ? (1 << (fmt->prec - 1)) : 0;
-			dataptr = &fmt->buf[n];
-			bufptr = &inbuf[i];
+			const long *dataptr = &fmt->buf[n];
+			jas_cmreal_t *bufptr = &inbuf[i];
 			for (j = 0; j < m; ++j) {
 				if (jas_cmgetint(&dataptr, fmt->sgnd, fmt->prec, &v))
 					goto error;
@@ -550,7 +545,7 @@ int jas_cmxform_apply(jas_cmxform_t *xform, jas_cmpixmap_t *in, jas_cmpixmap_t *
 		inbuf = &buf[0][0];
 		outbuf = inbuf;
 		for (i = 0; i < pxformseq->numpxforms; ++i) {
-			pxform = pxformseq->pxforms[i];
+			const jas_cmpxform_t *pxform = pxformseq->pxforms[i];
 			if (pxform->numoutchans > pxform->numinchans) {
 				outbuf = (inbuf == &buf[0][0]) ? &buf[1][0] : &buf[0][0];
 			} else {
@@ -565,8 +560,8 @@ int jas_cmxform_apply(jas_cmxform_t *xform, jas_cmpixmap_t *in, jas_cmpixmap_t *
 			fmt = &out->cmptfmts[i];
 			scale = (double)((1 << fmt->prec) - 1);
 			bias = fmt->sgnd ? (1 << (fmt->prec - 1)) : 0;
-			bufptr = &outbuf[i];
-			dataptr = &fmt->buf[n];
+			const jas_cmreal_t *bufptr = &outbuf[i];
+			long *dataptr = &fmt->buf[n];
 			for (j = 0; j < m; ++j) {
 				v = (*bufptr) * scale + bias;
 				bufptr += xform->numoutchans;
@@ -788,11 +783,10 @@ static void jas_cmshapmat_destroy(jas_cmpxform_t *pxform)
 		jas_cmshapmatlut_cleanup(&shapmat->luts[i]);
 }
 
-static int jas_cmshapmat_apply(jas_cmpxform_t *pxform, jas_cmreal_t *in,
+static int jas_cmshapmat_apply(const jas_cmpxform_t *pxform, const jas_cmreal_t *in,
   jas_cmreal_t *out, int cnt)
 {
-	jas_cmshapmat_t *shapmat = &pxform->data.shapmat;
-	jas_cmreal_t *src;
+	const jas_cmshapmat_t *shapmat = &pxform->data.shapmat;
 	jas_cmreal_t *dst;
 	jas_cmreal_t a0;
 	jas_cmreal_t a1;
@@ -800,7 +794,7 @@ static int jas_cmshapmat_apply(jas_cmpxform_t *pxform, jas_cmreal_t *in,
 	jas_cmreal_t b0;
 	jas_cmreal_t b1;
 	jas_cmreal_t b2;
-	src = in;
+	const jas_cmreal_t *src = in;
 	dst = out;
 	if (!shapmat->mono) {
 		while (--cnt >= 0) {
@@ -890,7 +884,7 @@ static double gammafn(double x, double gamma)
 	return pow(x, gamma);
 }
 
-static int jas_cmshapmatlut_set(jas_cmshapmatlut_t *lut, jas_icccurv_t *curv)
+static int jas_cmshapmatlut_set(jas_cmshapmatlut_t *lut, const jas_icccurv_t *curv)
 {
 	jas_cmreal_t gamma;
 	int i;
@@ -923,7 +917,7 @@ error:
 	return -1;
 }
 
-static jas_cmreal_t jas_cmshapmatlut_lookup(jas_cmshapmatlut_t *lut, jas_cmreal_t x)
+static jas_cmreal_t jas_cmshapmatlut_lookup(const jas_cmshapmatlut_t *lut, jas_cmreal_t x)
 {
 	jas_cmreal_t t;
 	int lo;
@@ -939,7 +933,7 @@ static jas_cmreal_t jas_cmshapmatlut_lookup(jas_cmshapmatlut_t *lut, jas_cmreal_
 }
 
 static int jas_cmshapmatlut_invert(jas_cmshapmatlut_t *invlut,
-  jas_cmshapmatlut_t *lut, int n)
+  const jas_cmshapmatlut_t *lut, int n)
 {
 	int i;
 	int j;
@@ -1074,7 +1068,7 @@ static int icctoclrspc(int iccclrspc, int refflag)
 	}
 }
 
-static int mono(jas_iccprof_t *iccprof, int op, jas_cmpxformseq_t **retpxformseq)
+static int mono(const jas_iccprof_t *iccprof, int op, jas_cmpxformseq_t **retpxformseq)
 {
 	jas_iccattrval_t *graytrc = NULL;
 	jas_cmshapmat_t *shapmat;
@@ -1133,7 +1127,7 @@ error:
 	return -1;
 }
 
-static int triclr(jas_iccprof_t *iccprof, int op, jas_cmpxformseq_t **retpxformseq)
+static int triclr(const jas_iccprof_t *iccprof, int op, jas_cmpxformseq_t **retpxformseq)
 {
 	int i;
 	jas_iccattrval_t *trcs[3];
@@ -1237,7 +1231,7 @@ error:
 	return -1;
 }
 
-static int jas_cmgetint(long **bufptr, int sgnd, int prec, long *val)
+static int jas_cmgetint(const long **bufptr, int sgnd, int prec, long *val)
 {
 	long v;
 	int m;
@@ -1286,7 +1280,7 @@ int jas_clrspc_numchans(jas_clrspc_t clrspc)
 	}
 }
 
-jas_iccprof_t *jas_iccprof_createfromcmprof(jas_cmprof_t *prof)
+jas_iccprof_t *jas_iccprof_createfromcmprof(const jas_cmprof_t *prof)
 {
 	return jas_iccprof_copy(prof->iccprof);
 }
