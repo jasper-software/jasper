@@ -365,18 +365,16 @@ hdroffstart = jas_stream_getrwcount(pkthdrstream);
 	}
 
 	if (cp->csty & JPC_COD_EPH) {
-		if (jpc_dec_lookahead(pkthdrstream) == JPC_MS_EPH) {
-			if (!(ms = jpc_getms(pkthdrstream, dec->cstate))) {
-				jas_eprintf("cannot get (EPH) marker segment\n");
-				return -1;
-			}
-			if (jpc_ms_gettype(ms) != JPC_MS_EPH) {
-				jpc_ms_destroy(ms);
-				jas_eprintf("missing EPH marker segment\n");
-				return -1;
-			}
-			jpc_ms_destroy(ms);
+		if (!(ms = jpc_getms(pkthdrstream, dec->cstate))) {
+			jas_eprintf("cannot get (EPH) marker segment\n");
+			return -1;
 		}
+		if (jpc_ms_gettype(ms) != JPC_MS_EPH) {
+			jpc_ms_destroy(ms);
+			jas_eprintf("missing EPH marker segment\n");
+			return -1;
+		}
+		jpc_ms_destroy(ms);
 	}
 
 	/* decode the packet body. */
