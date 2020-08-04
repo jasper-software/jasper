@@ -70,6 +70,7 @@
 #include "jasper/jas_malloc.h"
 #include "jasper/jas_math.h"
 
+#include <assert.h>
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
@@ -638,8 +639,7 @@ static void jas_cmpxformseq_destroy(jas_cmpxformseq_t *pxformseq)
 static int jas_cmpxformseq_delete(jas_cmpxformseq_t *pxformseq, int i)
 {
 	assert(i >= 0 && i < pxformseq->numpxforms);
-	if (i != pxformseq->numpxforms - 1)
-		abort();
+	assert(i == pxformseq->numpxforms - 1);
 	jas_cmpxform_destroy(pxformseq->pxforms[i]);
 	pxformseq->pxforms[i] = 0;
 	--pxformseq->numpxforms;
