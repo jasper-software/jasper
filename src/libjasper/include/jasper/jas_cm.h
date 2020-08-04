@@ -246,8 +246,6 @@ void jas_cmxform_destroy(jas_cmxform_t *xform);
 int jas_cmxform_apply(jas_cmxform_t *xform, jas_cmpixmap_t *in,
   jas_cmpixmap_t *out);
 
-int jas_cxform_optimize(jas_cmxform_t *xform, int optimize);
-
 /* Create a profile. */
 JAS_DLLEXPORT jas_cmprof_t *jas_cmprof_createfromiccprof(jas_iccprof_t *iccprof);
 JAS_DLLEXPORT jas_cmprof_t *jas_cmprof_createfromclrspc(int clrspc);
