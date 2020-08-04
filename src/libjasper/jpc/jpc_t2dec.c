@@ -90,7 +90,7 @@
 *
 \******************************************************************************/
 
-long jpc_dec_lookahead(jas_stream_t *in);
+static long jpc_dec_lookahead(jas_stream_t *in);
 static int jpc_getcommacode(jpc_bitstream_t *in);
 static int jpc_getnumnewpasses(jpc_bitstream_t *in);
 static int jpc_dec_decodepkt(jpc_dec_t *dec, jas_stream_t *pkthdrstream, jas_stream_t *in, int compno, int lvlno,
@@ -581,7 +581,7 @@ jpc_pi_t *jpc_dec_pi_create(jpc_dec_t *dec, jpc_dec_tile_t *tile)
 	return pi;
 }
 
-long jpc_dec_lookahead(jas_stream_t *in)
+static long jpc_dec_lookahead(jas_stream_t *in)
 {
 	uint_fast16_t x;
 	if (jpc_getuint16(in, &x)) {
