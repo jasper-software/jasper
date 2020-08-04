@@ -706,7 +706,8 @@ void jas_iccattrtab_dump(const jas_iccattrtab_t *attrtab, FILE *out)
 		const jas_iccattr_t *attr = &attrtab->attrs[i];
 		const jas_iccattrval_t *attrval = attr->val;
 		const jas_iccattrvalinfo_t *info = jas_iccattrvalinfo_lookup(attrval->type);
-		if (!info) abort();
+		assert(info);
+		(void)info;
 		fprintf(out, "attrno=%d; attrname=\"%s\"(0x%08"PRIxFAST32"); attrtype=\"%s\"(0x%08"PRIxFAST32")\n",
 		  i,
 		  jas_iccsigtostr(attr->name, &buf[0]),
@@ -911,7 +912,8 @@ static jas_iccattrval_t *jas_iccattrval_create0()
 static int jas_iccxyz_input(jas_iccattrval_t *attrval, jas_stream_t *in,
   unsigned len)
 {
-	if (len != 4 * 3) abort();
+	assert(len == 4 * 3);
+	(void)len;
 	return jas_iccgetxyz(in, &attrval->data.xyz);
 }
 
@@ -1620,8 +1622,9 @@ static int jas_iccputuint(jas_stream_t *out, unsigned n, jas_ulonglong val)
 
 static int jas_iccputsint(jas_stream_t *out, unsigned n, jas_longlong val)
 {
+	assert(val >= 0);
 	jas_ulonglong tmp;
-	tmp = (val < 0) ? (abort(), 0) : val;
+	tmp = (val < 0) ? 0 : val;
 	return jas_iccputuint(out, n, tmp);
 }
 
