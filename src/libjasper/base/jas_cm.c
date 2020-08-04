@@ -141,7 +141,7 @@ static jas_cmprof_t *jas_cmprof_createsycc(void);
 * Color profile class.
 \******************************************************************************/
 
-jas_cmprof_t *jas_cmprof_createfromclrspc(int clrspc)
+jas_cmprof_t *jas_cmprof_createfromclrspc(jas_clrspc_t clrspc)
 {
 	jas_iccprof_t *iccprof;
 	jas_cmprof_t *prof;
@@ -1271,7 +1271,7 @@ static int jas_cmputint(long **bufptr, int sgnd, int prec, long val)
 	return 0;
 }
 
-int jas_clrspc_numchans(int clrspc)
+int jas_clrspc_numchans(jas_clrspc_t clrspc)
 {
 	switch (jas_clrspc_fam(clrspc)) {
 	case JAS_CLRSPC_FAM_XYZ:

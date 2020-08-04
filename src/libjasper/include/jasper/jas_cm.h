@@ -215,7 +215,7 @@ typedef struct {
 #define	JAS_CMPROF_NUMPXFORMSEQS	13
 
 typedef struct {
-	int clrspc;
+	jas_clrspc_t clrspc;
 	int numchans;
 	int refclrspc;
 	int numrefchans;
@@ -248,12 +248,12 @@ int jas_cmxform_apply(jas_cmxform_t *xform, jas_cmpixmap_t *in,
 
 /* Create a profile. */
 JAS_DLLEXPORT jas_cmprof_t *jas_cmprof_createfromiccprof(jas_iccprof_t *iccprof);
-JAS_DLLEXPORT jas_cmprof_t *jas_cmprof_createfromclrspc(int clrspc);
+JAS_DLLEXPORT jas_cmprof_t *jas_cmprof_createfromclrspc(jas_clrspc_t clrspc);
 
 /* Destroy a profile. */
 JAS_DLLEXPORT void jas_cmprof_destroy(jas_cmprof_t *prof);
 
-int jas_clrspc_numchans(int clrspc);
+int jas_clrspc_numchans(jas_clrspc_t clrspc);
 JAS_DLLEXPORT jas_iccprof_t *jas_iccprof_createfromcmprof(jas_cmprof_t *prof);
 
 #define	jas_cmprof_clrspc(prof) ((prof)->clrspc)
