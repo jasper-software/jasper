@@ -85,21 +85,21 @@ static jas_cmpxform_t *jas_cmpxform_copy(jas_cmpxform_t *pxform);
 
 static void jas_cmshapmat_destroy(jas_cmpxform_t *pxform);
 static int jas_cmshapmat_apply(const jas_cmpxform_t *pxform, const jas_cmreal_t *in,
-  jas_cmreal_t *out, int cnt);
+  jas_cmreal_t *out, unsigned cnt);
 
-static int jas_cmputint(long **bufptr, int sgnd, int prec, long val);
-static int jas_cmgetint(const long **bufptr, int sgnd, int prec, long *val);
+static int jas_cmputint(long **bufptr, int sgnd, unsigned prec, long val);
+static int jas_cmgetint(const long **bufptr, int sgnd, unsigned prec, long *val);
 static int jas_cmpxformseq_append(jas_cmpxformseq_t *pxformseq,
   jas_cmpxformseq_t *othpxformseq);
 static int jas_cmpxformseq_appendcnvt(jas_cmpxformseq_t *pxformseq,
   int, int);
-static int jas_cmpxformseq_resize(jas_cmpxformseq_t *pxformseq, int n);
+static int jas_cmpxformseq_resize(jas_cmpxformseq_t *pxformseq, unsigned n);
 
 static int mono(const jas_iccprof_t *prof, int op, jas_cmpxformseq_t **pxformseq);
 static int triclr(const jas_iccprof_t *prof, int op, jas_cmpxformseq_t **retpxformseq);
 
 static void jas_cmpxformseq_destroy(jas_cmpxformseq_t *pxformseq);
-static int jas_cmpxformseq_delete(jas_cmpxformseq_t *pxformseq, int i);
+static int jas_cmpxformseq_delete(jas_cmpxformseq_t *pxformseq, unsigned i);
 static jas_cmpxformseq_t *jas_cmpxformseq_create(void);
 static jas_cmpxformseq_t *jas_cmpxformseq_copy(jas_cmpxformseq_t *pxformseq);
 static int jas_cmshapmat_invmat(jas_cmreal_t out[3][4], jas_cmreal_t in[3][4]);
@@ -178,8 +178,6 @@ static jas_cmprof_t *jas_cmprof_createsycc()
 	jas_cmpxform_t *revpxform = NULL;
 	jas_cmshapmat_t *fwdshapmat;
 	jas_cmshapmat_t *revshapmat;
-	int i;
-	int j;
 
 	if (!(prof = jas_cmprof_createfromclrspc(JAS_CLRSPC_SRGB)))
 		goto error;
@@ -218,8 +216,8 @@ static jas_cmprof_t *jas_cmprof_createsycc()
 	revshapmat->usemat = 1;
 	jas_cmshapmat_invmat(revshapmat->mat, fwdshapmat->mat);
 
-	for (i = 0; i < JAS_CMXFORM_NUMINTENTS; ++i) {
-		j = SEQFWD(i);
+	for (unsigned i = 0; i < JAS_CMXFORM_NUMINTENTS; ++i) {
+		unsigned j = SEQFWD(i);
 		if (prof->pxformseqs[j]) {
 			if (jas_cmpxformseq_insertpxform(prof->pxformseqs[j], 0,
 			  fwdpxform))
@@ -314,21 +312,19 @@ error:
 
 static jas_cmprof_t *jas_cmprof_create()
 {
-	int i;
 	jas_cmprof_t *prof;
 	if (!(prof = jas_malloc(sizeof(jas_cmprof_t))))
 		return 0;
 	memset(prof, 0, sizeof(jas_cmprof_t));
 	prof->iccprof = 0;
-	for (i = 0; i < JAS_CMPROF_NUMPXFORMSEQS; ++i)
+	for (unsigned i = 0; i < JAS_CMPROF_NUMPXFORMSEQS; ++i)
 		prof->pxformseqs[i] = 0;
 	return prof;
 }
 
 void jas_cmprof_destroy(jas_cmprof_t *prof)
 { 
-	int i;
-	for (i = 0; i < JAS_CMPROF_NUMPXFORMSEQS; ++i) {
+	for (unsigned i = 0; i < JAS_CMPROF_NUMPXFORMSEQS; ++i) {
 		if (prof->pxformseqs[i]) {
 			jas_cmpxformseq_destroy(prof->pxformseqs[i]);
 			prof->pxformseqs[i] = 0;
@@ -342,7 +338,6 @@ void jas_cmprof_destroy(jas_cmprof_t *prof)
 jas_cmprof_t *jas_cmprof_copy(const jas_cmprof_t *prof)
 {
 	jas_cmprof_t *newprof;
-	int i;
 
 	if (!(newprof = jas_cmprof_create()))
 		goto error;
@@ -351,7 +346,7 @@ jas_cmprof_t *jas_cmprof_copy(const jas_cmprof_t *prof)
 	newprof->refclrspc = prof->refclrspc;
 	newprof->numrefchans = prof->numrefchans;
 	newprof->iccprof = jas_iccprof_copy(prof->iccprof);
-	for (i = 0; i < JAS_CMPROF_NUMPXFORMSEQS; ++i) {
+	for (unsigned i = 0; i < JAS_CMPROF_NUMPXFORMSEQS; ++i) {
 		if (prof->pxformseqs[i]) {
 			if (!(newprof->pxformseqs[i] = jas_cmpxformseq_copy(prof->pxformseqs[i])))
 				goto error;
@@ -473,18 +468,8 @@ error:
 int jas_cmxform_apply(const jas_cmxform_t *xform, const jas_cmpixmap_t *in, jas_cmpixmap_t *out)
 {
 	jas_cmreal_t buf[2][APPLYBUFSIZ];
-	int i;
-	int j;
-	int width;
-	int height;
-	int total;
-	int n;
 	jas_cmreal_t *inbuf;
 	jas_cmreal_t *outbuf;
-	int maxchans;
-	int bufmax;
-	int m;
-	int bias;
 	jas_cmreal_t scale;
 	long v;
 
@@ -492,24 +477,24 @@ int jas_cmxform_apply(const jas_cmxform_t *xform, const jas_cmpixmap_t *in, jas_
 		goto error;
 
 	const jas_cmcmptfmt_t *fmt = &in->cmptfmts[0];
-	width = fmt->width;
-	height = fmt->height;
-	for (i = 1; i < xform->numinchans; ++i) {
+	const unsigned width = fmt->width;
+	const unsigned height = fmt->height;
+	for (unsigned i = 1; i < xform->numinchans; ++i) {
 		fmt = &in->cmptfmts[i];
 		if (fmt->width != width || fmt->height != height) {
 			goto error;
 		}
 	}
-	for (i = 0; i < xform->numoutchans; ++i) {
+	for (unsigned i = 0; i < xform->numoutchans; ++i) {
 		fmt = &out->cmptfmts[i];
 		if (fmt->width != width || fmt->height != height) {
 			goto error;
 		}
 	}
 
-	maxchans = 0;
+	unsigned maxchans = 0;
 	const jas_cmpxformseq_t *pxformseq = xform->pxformseq;
-	for (i = 0; i < pxformseq->numpxforms; ++i) {
+	for (unsigned i = 0; i < pxformseq->numpxforms; ++i) {
 		const jas_cmpxform_t *pxform = pxformseq->pxforms[i];
 		if (pxform->numinchans > maxchans) {
 			maxchans = pxform->numinchans;
@@ -518,23 +503,23 @@ int jas_cmxform_apply(const jas_cmxform_t *xform, const jas_cmpixmap_t *in, jas_
 			maxchans = pxform->numoutchans;
 		}
 	}
-	bufmax = APPLYBUFSIZ / maxchans;
+	const unsigned bufmax = APPLYBUFSIZ / maxchans;
 	assert(bufmax > 0);
 
-	total = width * height;
-	n = 0;
+	const unsigned total = width * height;
+	unsigned n = 0;
 	while (n < total) {
 
 		inbuf = &buf[0][0];
-		m = JAS_MIN(total - n, bufmax);
+		const unsigned m = JAS_MIN(total - n, bufmax);
 
-		for (i = 0; i < xform->numinchans; ++i) {
+		for (unsigned i = 0; i < xform->numinchans; ++i) {
 			fmt = &in->cmptfmts[i];
 			scale = (double)((1 << fmt->prec) - 1);
-			bias = fmt->sgnd ? (1 << (fmt->prec - 1)) : 0;
+			const unsigned bias = fmt->sgnd ? (1 << (fmt->prec - 1)) : 0;
 			const long *dataptr = &fmt->buf[n];
 			jas_cmreal_t *bufptr = &inbuf[i];
-			for (j = 0; j < m; ++j) {
+			for (unsigned j = 0; j < m; ++j) {
 				if (jas_cmgetint(&dataptr, fmt->sgnd, fmt->prec, &v))
 					goto error;
 				*bufptr = (v - bias) / scale;
@@ -544,7 +529,7 @@ int jas_cmxform_apply(const jas_cmxform_t *xform, const jas_cmpixmap_t *in, jas_
 
 		inbuf = &buf[0][0];
 		outbuf = inbuf;
-		for (i = 0; i < pxformseq->numpxforms; ++i) {
+		for (unsigned i = 0; i < pxformseq->numpxforms; ++i) {
 			const jas_cmpxform_t *pxform = pxformseq->pxforms[i];
 			if (pxform->numoutchans > pxform->numinchans) {
 				outbuf = (inbuf == &buf[0][0]) ? &buf[1][0] : &buf[0][0];
@@ -556,13 +541,13 @@ int jas_cmxform_apply(const jas_cmxform_t *xform, const jas_cmpixmap_t *in, jas_
 			inbuf = outbuf;
 		}
 
-		for (i = 0; i < xform->numoutchans; ++i) {
+		for (unsigned i = 0; i < xform->numoutchans; ++i) {
 			fmt = &out->cmptfmts[i];
 			scale = (double)((1 << fmt->prec) - 1);
-			bias = fmt->sgnd ? (1 << (fmt->prec - 1)) : 0;
+			const unsigned bias = fmt->sgnd ? (1 << (fmt->prec - 1)) : 0;
 			const jas_cmreal_t *bufptr = &outbuf[i];
 			long *dataptr = &fmt->buf[n];
-			for (j = 0; j < m; ++j) {
+			for (unsigned j = 0; j < m; ++j) {
 				v = (*bufptr) * scale + bias;
 				bufptr += xform->numoutchans;
 				if (jas_cmputint(&dataptr, fmt->sgnd, fmt->prec, v))
@@ -631,9 +616,9 @@ static void jas_cmpxformseq_destroy(jas_cmpxformseq_t *pxformseq)
 	jas_free(pxformseq);
 }
 
-static int jas_cmpxformseq_delete(jas_cmpxformseq_t *pxformseq, int i)
+static int jas_cmpxformseq_delete(jas_cmpxformseq_t *pxformseq, unsigned i)
 {
-	assert(i >= 0 && i < pxformseq->numpxforms);
+	assert(i < pxformseq->numpxforms);
 	assert(i == pxformseq->numpxforms - 1);
 	jas_cmpxform_destroy(pxformseq->pxforms[i]);
 	pxformseq->pxforms[i] = 0;
@@ -656,10 +641,9 @@ static int jas_cmpxformseq_insertpxform(jas_cmpxformseq_t *pxformseq,
   int i, jas_cmpxform_t *pxform)
 {
 	jas_cmpxform_t *tmppxform;
-	int n;
 	if (i < 0)
 		i = pxformseq->numpxforms;
-	assert(i >= 0 && i <= pxformseq->numpxforms);
+	assert(i >= 0 && (unsigned)i <= pxformseq->numpxforms);
 	if (pxformseq->numpxforms >= pxformseq->maxpxforms) {
 		if (jas_cmpxformseq_resize(pxformseq, pxformseq->numpxforms +
 		  16))
@@ -668,7 +652,7 @@ static int jas_cmpxformseq_insertpxform(jas_cmpxformseq_t *pxformseq,
 	assert(pxformseq->numpxforms < pxformseq->maxpxforms);
 	if (!(tmppxform = jas_cmpxform_copy(pxform)))
 		goto error;
-	n = pxformseq->numpxforms - i;
+	const unsigned n = pxformseq->numpxforms - i;
 	if (n > 0) {
 		memmove(&pxformseq->pxforms[i + 1], &pxformseq->pxforms[i],
 		  n * sizeof(jas_cmpxform_t *));
@@ -683,16 +667,14 @@ error:
 static int jas_cmpxformseq_append(jas_cmpxformseq_t *pxformseq,
   jas_cmpxformseq_t *othpxformseq)
 {
-	int n;
-	int i;
 	jas_cmpxform_t *pxform;
 	jas_cmpxform_t *othpxform;
-	n = pxformseq->numpxforms + othpxformseq->numpxforms;
+	const unsigned n = pxformseq->numpxforms + othpxformseq->numpxforms;
 	if (n > pxformseq->maxpxforms) {
 		if (jas_cmpxformseq_resize(pxformseq, n))
 			goto error;
 	}
-	for (i = 0; i < othpxformseq->numpxforms; ++i) {
+	for (unsigned i = 0; i < othpxformseq->numpxforms; ++i) {
 		othpxform = othpxformseq->pxforms[i];
 		if (!(pxform = jas_cmpxform_copy(othpxform)))
 			goto error;
@@ -704,7 +686,7 @@ error:
 	return -1;
 }
 
-static int jas_cmpxformseq_resize(jas_cmpxformseq_t *pxformseq, int n)
+static int jas_cmpxformseq_resize(jas_cmpxformseq_t *pxformseq, unsigned n)
 {
 	jas_cmpxform_t **p;
 	assert(n >= pxformseq->numpxforms);
@@ -753,8 +735,6 @@ static jas_cmpxform_t *jas_cmpxform_copy(jas_cmpxform_t *pxform)
 
 static jas_cmpxform_t *jas_cmpxform_createshapmat()
 {
-	int i;
-	int j;
 	jas_cmpxform_t *pxform;
 	jas_cmshapmat_t *shapmat;
 	if (!(pxform = jas_cmpxform_create0()))
@@ -765,10 +745,10 @@ static jas_cmpxform_t *jas_cmpxform_createshapmat()
 	shapmat->order = 0;
 	shapmat->useluts = 0;
 	shapmat->usemat = 0;
-	for (i = 0; i < 3; ++i)
+	for (unsigned i = 0; i < 3; ++i)
 		jas_cmshapmatlut_init(&shapmat->luts[i]);
-	for (i = 0; i < 3; ++i) {
-		for (j = 0; j < 4; ++j)
+	for (unsigned i = 0; i < 3; ++i) {
+		for (unsigned j = 0; j < 4; ++j)
 			shapmat->mat[i][j] = 0.0;
 	}
 	++pxform->refcnt;
@@ -778,13 +758,12 @@ static jas_cmpxform_t *jas_cmpxform_createshapmat()
 static void jas_cmshapmat_destroy(jas_cmpxform_t *pxform)
 {
 	jas_cmshapmat_t *shapmat = &pxform->data.shapmat;
-	int i;
-	for (i = 0; i < 3; ++i)
+	for (unsigned i = 0; i < 3; ++i)
 		jas_cmshapmatlut_cleanup(&shapmat->luts[i]);
 }
 
 static int jas_cmshapmat_apply(const jas_cmpxform_t *pxform, const jas_cmreal_t *in,
-  jas_cmreal_t *out, int cnt)
+  jas_cmreal_t *out, unsigned cnt)
 {
 	const jas_cmshapmat_t *shapmat = &pxform->data.shapmat;
 	jas_cmreal_t *dst;
@@ -797,7 +776,7 @@ static int jas_cmshapmat_apply(const jas_cmpxform_t *pxform, const jas_cmreal_t 
 	const jas_cmreal_t *src = in;
 	dst = out;
 	if (!shapmat->mono) {
-		while (--cnt >= 0) {
+		while (cnt-- > 0) {
 			a0 = *src++;
 			a1 = *src++;
 			a2 = *src++;
@@ -834,7 +813,7 @@ static int jas_cmshapmat_apply(const jas_cmpxform_t *pxform, const jas_cmreal_t 
 		}
 	} else {
 		if (!shapmat->order) {
-			while (--cnt >= 0) {
+			while (cnt-- > 0) {
 				a0 = *src++;
 				if (shapmat->useluts)
 					a0 = jas_cmshapmatlut_lookup(&shapmat->luts[0], a0);
@@ -847,7 +826,7 @@ static int jas_cmshapmat_apply(const jas_cmpxform_t *pxform, const jas_cmreal_t 
 			}
 		} else {
 assert(0);
-			while (--cnt >= 0) {
+			while (cnt-- > 0) {
 				a0 = *src++;
 				src++;
 				src++;
@@ -887,7 +866,6 @@ static double gammafn(double x, double gamma)
 static int jas_cmshapmatlut_set(jas_cmshapmatlut_t *lut, const jas_icccurv_t *curv)
 {
 	jas_cmreal_t gamma;
-	int i;
 	gamma = 0;
 	jas_cmshapmatlut_cleanup(lut);
 	if (curv->numents == 0) {
@@ -901,14 +879,14 @@ static int jas_cmshapmatlut_set(jas_cmshapmatlut_t *lut, const jas_icccurv_t *cu
 		if (!(lut->data = jas_alloc2(lut->size, sizeof(jas_cmreal_t))))
 			goto error;
 		gamma = curv->ents[0] / 256.0;
-		for (i = 0; i < lut->size; ++i) {
+		for (unsigned i = 0; i < lut->size; ++i) {
 			lut->data[i] = gammafn(i / (double) (lut->size - 1), gamma);
 		}
 	} else {
 		lut->size = curv->numents;
 		if (!(lut->data = jas_alloc2(lut->size, sizeof(jas_cmreal_t))))
 			goto error;
-		for (i = 0; i < lut->size; ++i) {
+		for (unsigned i = 0; i < lut->size; ++i) {
 			lut->data[i] = curv->ents[i] / 65535.0;
 		}
 	}
@@ -921,12 +899,11 @@ static jas_cmreal_t jas_cmshapmatlut_lookup(const jas_cmshapmatlut_t *lut, jas_c
 {
 	jas_cmreal_t t;
 	int lo;
-	int hi;
 	t = x * (lut->size - 1);
 	lo = floor(t);
 	if (lo < 0)
 		return lut->data[0];
-	hi = ceil(t);
+	const unsigned hi = ceil(t);
 	if (hi >= lut->size)
 		return lut->data[lut->size - 1];
 	return lut->data[lo] + (t - lo) * (lut->data[hi] - lut->data[lo]);
@@ -935,9 +912,6 @@ static jas_cmreal_t jas_cmshapmatlut_lookup(const jas_cmshapmatlut_t *lut, jas_c
 static int jas_cmshapmatlut_invert(jas_cmshapmatlut_t *invlut,
   const jas_cmshapmatlut_t *lut, int n)
 {
-	int i;
-	int j;
-	int k;
 	jas_cmreal_t ax;
 	jas_cmreal_t ay;
 	jas_cmreal_t bx;
@@ -950,7 +924,7 @@ static int jas_cmshapmatlut_invert(jas_cmshapmatlut_t *invlut,
 		invlut->data = 0;
 	}
 	/* The sample values should be nondecreasing. */
-	for (i = 1; i < lut->size; ++i) {
+	for (unsigned i = 1; i < lut->size; ++i) {
 		if (lut->data[i - 1] > lut->data[i]) {
 			assert(0);
 			return -1;
@@ -959,12 +933,13 @@ static int jas_cmshapmatlut_invert(jas_cmshapmatlut_t *invlut,
 	if (!(invlut->data = jas_alloc2(n, sizeof(jas_cmreal_t))))
 		return -1;
 	invlut->size = n;
-	for (i = 0; i < invlut->size; ++i) {
+	for (unsigned i = 0; i < invlut->size; ++i) {
 		sy = ((double) i) / (invlut->size - 1);
 		sx = 1.0;
-		for (j = 0; j < lut->size; ++j) {
+		for (unsigned j = 0; j < lut->size; ++j) {
 			ay = lut->data[j];
 			if (sy == ay) {
+				unsigned k;
 				for (k = j + 1; k < lut->size; ++k) {
 					by = lut->data[k];
 					if (by != sy)
@@ -1129,7 +1104,6 @@ error:
 
 static int triclr(const jas_iccprof_t *iccprof, int op, jas_cmpxformseq_t **retpxformseq)
 {
-	int i;
 	jas_iccattrval_t *trcs[3];
 	jas_iccattrval_t *cols[3];
 	jas_cmshapmat_t *shapmat;
@@ -1140,7 +1114,7 @@ static int triclr(const jas_iccprof_t *iccprof, int op, jas_cmpxformseq_t **retp
 
 	pxform = 0;
 	pxformseq = 0;
-	for (i = 0; i < 3; ++i) {
+	for (unsigned i = 0; i < 3; ++i) {
 		trcs[i] = 0;
 		cols[i] = 0;
 	}
@@ -1153,7 +1127,7 @@ static int triclr(const jas_iccprof_t *iccprof, int op, jas_cmpxformseq_t **retp
 	  !(cols[1] = jas_iccprof_getattr(iccprof, JAS_ICC_TAG_GRNMATCOL)) ||
 	  !(cols[2] = jas_iccprof_getattr(iccprof, JAS_ICC_TAG_BLUMATCOL)))
 		goto error;
-	for (i = 0; i < 3; ++i) {
+	for (unsigned i = 0; i < 3; ++i) {
 		if (trcs[i]->type != JAS_ICC_TYPE_CURV ||
 		  cols[i]->type != JAS_ICC_TYPE_XYZ)
 			goto error;
@@ -1172,29 +1146,29 @@ static int triclr(const jas_iccprof_t *iccprof, int op, jas_cmpxformseq_t **retp
 	shapmat->usemat = 1;
 	if (!op) {
 		shapmat->order = 0;
-		for (i = 0; i < 3; ++i) {
+		for (unsigned i = 0; i < 3; ++i) {
 			shapmat->mat[0][i] = cols[i]->data.xyz.x / 65536.0;
 			shapmat->mat[1][i] = cols[i]->data.xyz.y / 65536.0;
 			shapmat->mat[2][i] = cols[i]->data.xyz.z / 65536.0;
 		}
-		for (i = 0; i < 3; ++i)
+		for (unsigned i = 0; i < 3; ++i)
 			shapmat->mat[i][3] = 0.0;
-		for (i = 0; i < 3; ++i) {
+		for (unsigned i = 0; i < 3; ++i) {
 			if (jas_cmshapmatlut_set(&shapmat->luts[i], &trcs[i]->data.curv))
 				goto error;
 		}
 	} else {
 		shapmat->order = 1;
-		for (i = 0; i < 3; ++i) {
+		for (unsigned i = 0; i < 3; ++i) {
 			mat[0][i] = cols[i]->data.xyz.x / 65536.0;
 			mat[1][i] = cols[i]->data.xyz.y / 65536.0;
 			mat[2][i] = cols[i]->data.xyz.z / 65536.0;
 		}
-		for (i = 0; i < 3; ++i)
+		for (unsigned i = 0; i < 3; ++i)
 			mat[i][3] = 0.0;
 		if (jas_cmshapmat_invmat(shapmat->mat, mat))
 			goto error;
-		for (i = 0; i < 3; ++i) {
+		for (unsigned i = 0; i < 3; ++i) {
 			jas_cmshapmatlut_init(&lut);
 			if (jas_cmshapmatlut_set(&lut, &trcs[i]->data.curv))
 				goto error;
@@ -1203,7 +1177,7 @@ static int triclr(const jas_iccprof_t *iccprof, int op, jas_cmpxformseq_t **retp
 			jas_cmshapmatlut_cleanup(&lut);
 		}
 	}
-	for (i = 0; i < 3; ++i) {
+	for (unsigned i = 0; i < 3; ++i) {
 		jas_iccattrval_destroy(trcs[i]);
 		jas_iccattrval_destroy(cols[i]);
 	}
@@ -1213,7 +1187,7 @@ static int triclr(const jas_iccprof_t *iccprof, int op, jas_cmpxformseq_t **retp
 
 error:
 
-	for (i = 0; i < 3; ++i) {
+	for (unsigned i = 0; i < 3; ++i) {
 		if (trcs[i]) {
 			jas_iccattrval_destroy(trcs[i]);
 		}
@@ -1231,7 +1205,7 @@ error:
 	return -1;
 }
 
-static int jas_cmgetint(const long **bufptr, int sgnd, int prec, long *val)
+static int jas_cmgetint(const long **bufptr, int sgnd, unsigned prec, long *val)
 {
 	long v;
 	int m;
@@ -1249,7 +1223,7 @@ static int jas_cmgetint(const long **bufptr, int sgnd, int prec, long *val)
 	return 0;
 }
 
-static int jas_cmputint(long **bufptr, int sgnd, int prec, long val)
+static int jas_cmputint(long **bufptr, int sgnd, unsigned prec, long val)
 {
 	int m;
 	if (sgnd) {
@@ -1265,7 +1239,7 @@ static int jas_cmputint(long **bufptr, int sgnd, int prec, long val)
 	return 0;
 }
 
-int jas_clrspc_numchans(jas_clrspc_t clrspc)
+unsigned jas_clrspc_numchans(jas_clrspc_t clrspc)
 {
 	switch (jas_clrspc_fam(clrspc)) {
 	case JAS_CLRSPC_FAM_XYZ:
