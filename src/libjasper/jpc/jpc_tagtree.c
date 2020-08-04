@@ -196,10 +196,9 @@ static jpc_tagtree_t *jpc_tagtree_alloc()
 
 /* Copy state information from one tag tree to another. */
 
-void jpc_tagtree_copy(jpc_tagtree_t *dsttree, jpc_tagtree_t *srctree)
+void jpc_tagtree_copy(jpc_tagtree_t *dsttree, const jpc_tagtree_t *srctree)
 {
 	int n;
-	jpc_tagtreenode_t *srcnode;
 	jpc_tagtreenode_t *dstnode;
 
 	/* The two tag trees must have similar sizes. */
@@ -207,7 +206,7 @@ void jpc_tagtree_copy(jpc_tagtree_t *dsttree, jpc_tagtree_t *srctree)
 	  srctree->numleafsv_ == dsttree->numleafsv_);
 
 	n = srctree->numnodes_;
-	srcnode = srctree->nodes_;
+	const jpc_tagtreenode_t *srcnode = srctree->nodes_;
 	dstnode = dsttree->nodes_;
 	while (--n >= 0) {
 		dstnode->value_ = srcnode->value_;
@@ -378,12 +377,11 @@ int jpc_tagtree_decode(jpc_tagtree_t *tree, jpc_tagtreenode_t *leaf,
 * Code for debugging.
 \******************************************************************************/
 
-void jpc_tagtree_dump(jpc_tagtree_t *tree, FILE *out)
+void jpc_tagtree_dump(const jpc_tagtree_t *tree, FILE *out)
 {
-	jpc_tagtreenode_t *node;
 	int n;
 
-	node = tree->nodes_;
+	const jpc_tagtreenode_t *node = tree->nodes_;
 	n = tree->numnodes_;
 	while (--n >= 0) {
 		fprintf(out, "node %p, parent %p, value %d, lower %d, known %d\n",
