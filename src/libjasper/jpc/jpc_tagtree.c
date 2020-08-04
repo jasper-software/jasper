@@ -169,9 +169,7 @@ jpc_tagtree_t *jpc_tagtree_create(int numleafsh, int numleafsv)
 
 void jpc_tagtree_destroy(jpc_tagtree_t *tree)
 {
-	if (tree->nodes_) {
-		jas_free(tree->nodes_);
-	}
+	jas_free(tree->nodes_);
 	jas_free(tree);
 }
 
