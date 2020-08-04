@@ -193,11 +193,6 @@ jas_iccattrvalinfo_t jas_iccattrvalinfos[] = {
 	{0, {0, 0, 0, 0, 0, 0}}
 };
 
-typedef struct {
-	jas_iccuint32_t tag;
-	char *name;
-} jas_icctaginfo_t;
-
 /******************************************************************************\
 * profile class
 \******************************************************************************/
