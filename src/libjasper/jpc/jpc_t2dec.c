@@ -300,6 +300,17 @@ static int jpc_dec_decodepkt(jpc_dec_t *dec, jas_stream_t *pkthdrstream, jas_str
 					JAS_DBGLOG(10, ("increment=%d ", m));
 					while (numnewpasses > 0) {
 						const unsigned passno = cblk->firstpassno + cblk->numpasses + mycounter;
+						if (passno >= 10000) {
+							/* with this value,
+							   JPC_SEGPASSCNT()
+							   would return 0,
+							   which is an illegal
+							   value and would
+							   later crash in
+							   jpc_floorlog2() */
+							jpc_bitstream_close(inb);
+							return -1;
+						}
 	/* XXX - the maxpasses is not set precisely but this doesn't matter... */
 						const unsigned maxpasses = JPC_SEGPASSCNT(passno, cblk->firstpassno, 10000, (ccp->cblkctx & JPC_COX_LAZY) != 0, (ccp->cblkctx & JPC_COX_TERMALL) != 0);
 						if (!discard && !seg) {
