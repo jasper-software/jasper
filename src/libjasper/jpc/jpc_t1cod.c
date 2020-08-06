@@ -136,8 +136,8 @@ enum jpc_passtype JPC_PASSTYPE(unsigned passno)
 		passtype = JPC_REFPASS;
 		break;
 	default:
-		passtype = -1;
 		assert(0);
+		JAS_UNREACHABLE();
 	}
 	return passtype;
 }
@@ -162,7 +162,8 @@ int JPC_NOMINALGAIN(int qmfbid, int numlvls, int lvlno, enum jpc_tsfb_orient ori
 		case JPC_TSFB_HH:
 			return 2;
 		default:
-			abort();
+			assert(false);
+			JAS_UNREACHABLE();
 		}
 	}
 }
@@ -206,8 +207,8 @@ unsigned JPC_SEGPASSCNT(unsigned passno, unsigned firstpassno, unsigned numpasse
 				ret = 1;
 				break;
 			default:
-				ret = -1;
 				assert(0);
+				JAS_UNREACHABLE();
 			}
 		}
 	} else {

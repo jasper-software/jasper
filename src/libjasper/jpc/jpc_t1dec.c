@@ -279,8 +279,8 @@ if (bpno < 0) {
 				  cblk->data);
 				break;
 			default:
-				ret = -1;
-				break;
+				assert(false);
+				JAS_UNREACHABLE();
 			}
 			/* Do we need to reset after each coding pass? */
 			if (tile->cp->ccps[compno].cblkctx & JPC_COX_RESET) {
