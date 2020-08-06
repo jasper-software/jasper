@@ -252,11 +252,7 @@ assert(pass->term == 1);
 			}
 		}
 
-#if 1
-		passtype = (pass - cblk->passes + 2) % 3;
-#else
-		passtype = JPC_PASSTYPE(pass - cblk->passes + 2);
-#endif
+		passtype = JPC_PASSTYPE(pass - cblk->passes);
 		pass->start = jas_stream_tell(cblk->stream);
 #if 0
 assert(jas_stream_tell(cblk->stream) == jas_stream_getrwcount(cblk->stream));

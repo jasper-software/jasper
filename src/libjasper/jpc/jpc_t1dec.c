@@ -250,11 +250,7 @@ static int jpc_dec_decodecblk(jpc_dec_t *dec, jpc_dec_tile_t *tile, jpc_dec_tcom
 if (bpno < 0) {
 	goto premature_exit;
 }
-#if 1
-			passtype = (seg->passno + i + 2) % 3;
-#else
-			passtype = JPC_PASSTYPE(seg->passno + i + 2);
-#endif
+			passtype = JPC_PASSTYPE(seg->passno + i);
 			assert(bpno >= 0 && bpno < 31);
 			switch (passtype) {
 			case JPC_SIGPASS:
