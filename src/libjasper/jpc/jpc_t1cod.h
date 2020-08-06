@@ -296,7 +296,7 @@ void jpc_initluts(void);
 
 /* Get the nominal gain associated with a particular band. */
 JAS_ATTRIBUTE_CONST
-int JPC_NOMINALGAIN(int qmfbid, int numlvls, int lvlno, enum jpc_tsfb_orient orient);
+unsigned JPC_NOMINALGAIN(unsigned qmfbid, unsigned numlvls, unsigned lvlno, enum jpc_tsfb_orient orient);
 
 /* Get the coding pass type. */
 JAS_ATTRIBUTE_CONST
