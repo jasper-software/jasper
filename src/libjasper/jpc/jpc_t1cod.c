@@ -222,16 +222,13 @@ unsigned JPC_SEGPASSCNT(unsigned passno, unsigned firstpassno, unsigned numpasse
 bool JPC_ISTERMINATED(unsigned passno, unsigned firstpassno, unsigned numpasses, bool termall,
   bool lazy)
 {
-	int ret;
 	int n;
 	if (passno - firstpassno == numpasses - 1) {
-		ret = 1;
+		return true;
 	} else {
 		n = JPC_SEGPASSCNT(passno, firstpassno, numpasses, lazy, termall);
-		ret = (n <= 1) ? 1 : 0;
+		return n <= 1;
 	}
-
-	return ret;
 }
 
 /******************************************************************************\
