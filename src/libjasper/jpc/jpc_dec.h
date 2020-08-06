@@ -82,6 +82,7 @@
 #include "jpc_tagtree.h"
 #include "jpc_cs.h"
 #include "jpc_mqdec.h"
+#include "jpc_t1cod.h"
 #include "jpc_t2cod.h"
 
 /******************************************************************************\
@@ -241,7 +242,7 @@ typedef struct jpc_dec_seg_s {
 	int maxpasses;
 
 	/* The type of data in this segment (i.e., MQ or raw). */
-	int type;
+	enum jpc_segtype type;
 
 	/* A stream containing the data for this segment. */
 	jas_stream_t *stream;

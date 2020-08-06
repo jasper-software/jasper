@@ -89,12 +89,16 @@
  * Segment types.
  */
 
-/* Invalid. */
-#define JPC_SEG_INVALID	0
-/* MQ. */
-#define JPC_SEG_MQ		1
-/* Raw. */
-#define JPC_SEG_RAW		2
+enum jpc_segtype {
+	/** Invalid. */
+	JPC_SEG_INVALID,
+
+	/* MQ. */
+	JPC_SEG_MQ,
+
+	/* Raw. */
+	JPC_SEG_RAW,
+};
 
 /* The nominal word size. */
 #define	JPC_PREC	32
@@ -300,7 +304,7 @@ enum jpc_passtype JPC_PASSTYPE(unsigned passno);
 
 /* Get the segment type. */
 JAS_ATTRIBUTE_CONST
-int JPC_SEGTYPE(unsigned passno, unsigned firstpassno, bool bypass);
+enum jpc_segtype JPC_SEGTYPE(unsigned passno, unsigned firstpassno, bool bypass);
 
 /* Get the number of coding passess in the segment. */
 JAS_ATTRIBUTE_CONST

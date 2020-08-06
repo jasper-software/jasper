@@ -76,6 +76,7 @@
 #include "jasper/jas_seq.h"
 #include "jasper/jas_stream.h"
 
+#include "jpc_t1cod.h"
 #include "jpc_t2cod.h"
 #include "jpc_mqenc.h"
 #include "jpc_tagtree.h"
@@ -270,7 +271,7 @@ typedef struct {
 	int end;
 
 	/* The type of data in this pass (i.e., MQ or raw). */
-	int type;
+	enum jpc_segtype type;
 
 	/* Flag indicating that this pass is terminated. */
 	int term;

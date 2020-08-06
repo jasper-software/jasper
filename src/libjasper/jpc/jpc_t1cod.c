@@ -171,7 +171,7 @@ int JPC_NOMINALGAIN(int qmfbid, int numlvls, int lvlno, enum jpc_tsfb_orient ori
 * Coding pass related functions.
 \******************************************************************************/
 
-int JPC_SEGTYPE(unsigned passno, unsigned firstpassno, bool bypass)
+enum jpc_segtype JPC_SEGTYPE(unsigned passno, unsigned firstpassno, bool bypass)
 {
 	if (bypass) {
 		enum jpc_passtype passtype = JPC_PASSTYPE(passno);
