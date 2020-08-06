@@ -100,9 +100,11 @@
 #define	JPC_PREC	32
 
 /* Tier-1 coding pass types. */
-#define	JPC_SIGPASS	0	/* significance */
-#define	JPC_REFPASS	1	/* refinement */
-#define	JPC_CLNPASS	2	/* cleanup */
+enum jpc_passtype {
+	JPC_SIGPASS, /*< significance */
+	JPC_REFPASS, /*< refinement */
+	JPC_CLNPASS, /*< cleanup */
+};
 
 /*
  * Per-sample state information for tier-1 coding.
@@ -294,7 +296,7 @@ int JPC_NOMINALGAIN(int qmfbid, int numlvls, int lvlno, enum jpc_tsfb_orient ori
 
 /* Get the coding pass type. */
 JAS_ATTRIBUTE_CONST
-int JPC_PASSTYPE(unsigned passno);
+enum jpc_passtype JPC_PASSTYPE(unsigned passno);
 
 /* Get the segment type. */
 JAS_ATTRIBUTE_CONST

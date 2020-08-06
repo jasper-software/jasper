@@ -194,7 +194,6 @@ int jpc_enc_enccblk(jpc_enc_tcmpt_t *tcmpt, jpc_enc_band_t *band, jpc_enc_cblk_t
 	int n;
 	int adjust;
 	int ret;
-	int passtype;
 	int t;
 	jpc_bitstream_t *bout;
 	jpc_enc_pass_t *termpass;
@@ -252,7 +251,7 @@ assert(pass->term == 1);
 			}
 		}
 
-		passtype = JPC_PASSTYPE(pass - cblk->passes);
+		enum jpc_passtype passtype = JPC_PASSTYPE(pass - cblk->passes);
 		pass->start = jas_stream_tell(cblk->stream);
 #if 0
 assert(jas_stream_tell(cblk->stream) == jas_stream_getrwcount(cblk->stream));

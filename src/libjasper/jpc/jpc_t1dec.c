@@ -191,7 +191,6 @@ static int jpc_dec_decodecblk(jpc_dec_t *dec, jpc_dec_tile_t *tile, jpc_dec_tcom
 	jpc_dec_seg_t *seg;
 	int i;
 	int bpno;
-	int passtype;
 	int ret;
 	int compno;
 	int filldata;
@@ -250,7 +249,7 @@ static int jpc_dec_decodecblk(jpc_dec_t *dec, jpc_dec_tile_t *tile, jpc_dec_tcom
 if (bpno < 0) {
 	goto premature_exit;
 }
-			passtype = JPC_PASSTYPE(seg->passno + i);
+			enum jpc_passtype passtype = JPC_PASSTYPE(seg->passno + i);
 			assert(bpno >= 0 && bpno < 31);
 			switch (passtype) {
 			case JPC_SIGPASS:

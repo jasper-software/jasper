@@ -122,7 +122,7 @@ static void jpc_initmqctxs(void);
 * Code.
 \******************************************************************************/
 
-int JPC_PASSTYPE(unsigned passno)
+enum jpc_passtype JPC_PASSTYPE(unsigned passno)
 {
 	int passtype;
 	switch (passno % 3) {
@@ -173,9 +173,8 @@ int JPC_NOMINALGAIN(int qmfbid, int numlvls, int lvlno, enum jpc_tsfb_orient ori
 
 int JPC_SEGTYPE(unsigned passno, unsigned firstpassno, bool bypass)
 {
-	int passtype;
 	if (bypass) {
-		passtype = JPC_PASSTYPE(passno);
+		enum jpc_passtype passtype = JPC_PASSTYPE(passno);
 		if (passtype == JPC_CLNPASS) {
 			return JPC_SEG_MQ;
 		}
@@ -188,7 +187,6 @@ int JPC_SEGTYPE(unsigned passno, unsigned firstpassno, bool bypass)
 unsigned JPC_SEGPASSCNT(unsigned passno, unsigned firstpassno, unsigned numpasses, bool bypass, bool termall)
 {
 	unsigned ret;
-	int passtype;
 
 	if (termall) {
 		ret = 1;
@@ -196,7 +194,7 @@ unsigned JPC_SEGPASSCNT(unsigned passno, unsigned firstpassno, unsigned numpasse
 		if (passno < firstpassno + 10) {
 			ret = 10 - (passno - firstpassno);
 		} else {
-			passtype = JPC_PASSTYPE(passno);
+			enum jpc_passtype passtype = JPC_PASSTYPE(passno);
 			switch (passtype) {
 			case JPC_SIGPASS:
 				ret = 2;
