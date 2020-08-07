@@ -319,7 +319,7 @@ int jpc_enc_encpkt(jpc_enc_t *enc, jas_stream_t *out, int compno, int lvlno, int
 				if (pass->term || pass == lastpass) {
 					datalen = pass->end - n;
 					assert(jpc_int_firstone(datalen) < cblk->numlenbits +
-					  jpc_floorlog2(passcount));
+					  (int)jpc_floorlog2(passcount));
 					if (jpc_bitstream_putbits(outb, cblk->numlenbits +
 					  jpc_floorlog2(passcount), datalen) == EOF) {
 						return -1;
