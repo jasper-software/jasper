@@ -212,6 +212,6 @@ int jpc_mqenc_dump(const jpc_mqenc_t *mqenc, FILE *out);
 int jpc_mqenc_codemps2(jpc_mqenc_t *enc);
 int jpc_mqenc_codelps(jpc_mqenc_t *enc);
 
-int jpc_mqenc_putbit(jpc_mqenc_t *enc, int bit);
+int jpc_mqenc_putbit(jpc_mqenc_t *enc, bool bit);
 
 #endif
