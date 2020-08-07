@@ -128,7 +128,7 @@ typedef struct {
 	int_fast16_t lastbyte;
 
 	/* The error indicator. */
-	int err;
+	bool err;
 	
 } jpc_mqenc_t;
 

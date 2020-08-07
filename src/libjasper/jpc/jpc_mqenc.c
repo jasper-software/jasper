@@ -166,7 +166,7 @@
 { \
 	if (enc->outbuf >= 0) { \
 		if (jas_stream_putc(enc->out, (unsigned char)enc->outbuf) == EOF) { \
-			enc->err |= 1; \
+			enc->err = true; \
 		} \
 	} \
 	enc->lastbyte = enc->outbuf; \
@@ -238,7 +238,7 @@ void jpc_mqenc_init(jpc_mqenc_t *mqenc)
 	mqenc->creg = 0;
 	mqenc->ctreg = 12;
 	mqenc->lastbyte = -1;
-	mqenc->err = 0;
+	mqenc->err = false;
 }
 
 /* Initialize one or more contexts. */
