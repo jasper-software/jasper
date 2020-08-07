@@ -184,7 +184,7 @@ static void jpc_mqenc_setbits(jpc_mqenc_t *mqenc);
 
 /* Create a MQ encoder. */
 
-jpc_mqenc_t *jpc_mqenc_create(int maxctxs, jas_stream_t *out)
+jpc_mqenc_t *jpc_mqenc_create(unsigned maxctxs, jas_stream_t *out)
 {
 	jpc_mqenc_t *mqenc;
 
@@ -243,20 +243,19 @@ void jpc_mqenc_init(jpc_mqenc_t *mqenc)
 
 /* Initialize one or more contexts. */
 
-void jpc_mqenc_setctxs(jpc_mqenc_t *mqenc, int numctxs, const jpc_mqctx_t *ctxs)
+void jpc_mqenc_setctxs(jpc_mqenc_t *mqenc, unsigned numctxs, const jpc_mqctx_t *ctxs)
 {
 	const jpc_mqstate_t **ctx;
-	int n;
 
 	ctx = mqenc->ctxs;
-	n = JAS_MIN(mqenc->maxctxs, numctxs);
-	while (--n >= 0) {
+	unsigned n = JAS_MIN(mqenc->maxctxs, numctxs);
+	while (n-- > 0) {
 		*ctx = &jpc_mqstates[2 * ctxs->ind + ctxs->mps];
 		++ctx;
 		++ctxs;
 	}
 	n = mqenc->maxctxs - numctxs;
-	while (--n >= 0) {
+	while (n-- > 0) {
 		*ctx = &jpc_mqstates[0];
 		++ctx;
 	}

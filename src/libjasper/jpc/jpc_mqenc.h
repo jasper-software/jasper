@@ -110,7 +110,7 @@ typedef struct {
 	uint_fast32_t ctreg;
 
 	/* The maximum number of contexts. */
-	int maxctxs;
+	unsigned maxctxs;
 
 	/* The per-context information. */
 	const jpc_mqstate_t **ctxs;
@@ -155,7 +155,7 @@ typedef struct {
 \******************************************************************************/
 
 /* Create a MQ encoder. */
-jpc_mqenc_t *jpc_mqenc_create(int maxctxs, jas_stream_t *out);
+jpc_mqenc_t *jpc_mqenc_create(unsigned maxctxs, jas_stream_t *out);
 
 /* Destroy a MQ encoder. */
 void jpc_mqenc_destroy(jpc_mqenc_t *enc);
@@ -177,7 +177,7 @@ static inline void jpc_mqenc_setcurctx(jpc_mqenc_t *enc, unsigned ctxno) {
 }
 
 /* Set the state information for multiple contexts. */
-void jpc_mqenc_setctxs(jpc_mqenc_t *enc, int numctxs, const jpc_mqctx_t *ctxs);
+void jpc_mqenc_setctxs(jpc_mqenc_t *enc, unsigned numctxs, const jpc_mqctx_t *ctxs);
 
 /******************************************************************************\
 * Miscellaneous functions/macros.
