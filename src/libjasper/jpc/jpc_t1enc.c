@@ -83,6 +83,10 @@
 #include <stdlib.h>
 #include <assert.h>
 
+/* Encode a single code block. */
+static int jpc_enc_enccblk(const jpc_enc_tcmpt_t *comp,
+  const jpc_enc_band_t *band, jpc_enc_cblk_t *cblk);
+
 static int jpc_encsigpass(jpc_mqenc_t *mqenc, int bitpos, enum jpc_tsfb_orient orient, int,
   jas_matrix_t *flags, const jas_matrix_t *data, int term, long *nmsedec);
 
@@ -186,7 +190,7 @@ static int getthebyte(jas_stream_t *in, long off)
 }
 
 /* Encode a single code block. */
-int jpc_enc_enccblk(const jpc_enc_tcmpt_t *tcmpt, const jpc_enc_band_t *band, jpc_enc_cblk_t *cblk)
+static int jpc_enc_enccblk(const jpc_enc_tcmpt_t *tcmpt, const jpc_enc_band_t *band, jpc_enc_cblk_t *cblk)
 {
 	jpc_enc_pass_t *pass;
 	jpc_enc_pass_t *endpasses;

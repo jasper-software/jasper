@@ -83,8 +83,4 @@
 /* Encode all of the code blocks. */
 int jpc_enc_enccblks(jpc_enc_t *enc);
 
-/* Encode a single code block. */
-int jpc_enc_enccblk(const jpc_enc_tcmpt_t *comp,
-  const jpc_enc_band_t *band, jpc_enc_cblk_t *cblk);
-
 #endif
