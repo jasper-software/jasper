@@ -411,7 +411,7 @@ typedef struct jpc_enc_band_s {
 	jas_matrix_t *data;
 
 	/* The orientation of this band (i.e., LL, LH, HL, or HH). */
-	int orient;
+	enum jpc_tsfb_orient orient;
 
 	/* The number of bit planes associated with this band. */
 	int numbps;

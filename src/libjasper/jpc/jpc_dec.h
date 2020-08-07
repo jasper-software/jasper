@@ -359,7 +359,7 @@ typedef struct {
 	jas_matrix_t *data;
 
 	/* The orientation of this band (i.e., LL, LH, HL, or HH). */
-	int orient;
+	enum jpc_tsfb_orient orient;
 
 	/* The encoded quantizer step size. */
 	int stepsize;

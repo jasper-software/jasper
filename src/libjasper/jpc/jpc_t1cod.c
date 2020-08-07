@@ -105,7 +105,7 @@ jpc_mqctx_t jpc_mqctxs[JPC_NUMCTXS];
 \******************************************************************************/
 
 JAS_ATTRIBUTE_CONST
-static uint_least8_t jpc_getzcctxno(unsigned f, unsigned orient);
+static uint_least8_t jpc_getzcctxno(unsigned f, enum jpc_tsfb_orient orient);
 
 JAS_ATTRIBUTE_CONST
 static bool jpc_getspb(int f);
@@ -142,7 +142,7 @@ int JPC_PASSTYPE(unsigned passno)
 	return passtype;
 }
 
-int JPC_NOMINALGAIN(int qmfbid, int numlvls, int lvlno, int orient)
+int JPC_NOMINALGAIN(int qmfbid, int numlvls, int lvlno, enum jpc_tsfb_orient orient)
 {
 	/* Avoid compiler warnings about unused parameters. */
 	(void)numlvls;
@@ -288,7 +288,7 @@ jpc_initmqctxs();
 	}
 }
 
-static uint_least8_t jpc_getzcctxno(unsigned f, unsigned orient)
+static uint_least8_t jpc_getzcctxno(unsigned f, enum jpc_tsfb_orient orient)
 {
 	assert(orient < 4);
 

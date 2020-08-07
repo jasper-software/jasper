@@ -89,7 +89,7 @@
 
 static int jpc_dec_decodecblk(jpc_dec_t *dec, jpc_dec_tile_t *tile, jpc_dec_tcomp_t *tcomp, jpc_dec_band_t *band,
   jpc_dec_cblk_t *cblk, int dopartial, int maxlyrs);
-static int dec_sigpass(jpc_dec_t *dec, jpc_mqdec_t *mqdec, int bitpos, int orient,
+static int dec_sigpass(jpc_dec_t *dec, jpc_mqdec_t *mqdec, int bitpos, enum jpc_tsfb_orient orient,
   int vcausalflag, jas_matrix_t *flags, jas_matrix_t *data);
 static int dec_rawsigpass(jpc_dec_t *dec, jpc_bitstream_t *in, int bitpos,
   int vcausalflag, jas_matrix_t *flags, jas_matrix_t *data);
@@ -97,7 +97,7 @@ static int dec_refpass(jpc_dec_t *dec, jpc_mqdec_t *mqdec, int bitpos, int vcaus
   jas_matrix_t *flags, jas_matrix_t *data);
 static int dec_rawrefpass(jpc_dec_t *dec, jpc_bitstream_t *in, int bitpos,
   int vcausalflag, jas_matrix_t *flags, jas_matrix_t *data);
-static int dec_clnpass(jpc_dec_t *dec, jpc_mqdec_t *mqdec, int bitpos, int orient,
+static int dec_clnpass(jpc_dec_t *dec, jpc_mqdec_t *mqdec, int bitpos, enum jpc_tsfb_orient orient,
   int vcausalflag, int segsymflag, jas_matrix_t *flags, jas_matrix_t *data);
 
 #if defined(DEBUG)
@@ -356,7 +356,7 @@ premature_exit:
 	} \
 }
 
-static int dec_sigpass(jpc_dec_t *dec, register jpc_mqdec_t *mqdec, int bitpos, int orient,
+static int dec_sigpass(jpc_dec_t *dec, register jpc_mqdec_t *mqdec, int bitpos, enum jpc_tsfb_orient orient,
   int vcausalflag, jas_matrix_t *flags, jas_matrix_t *data)
 {
 	int i;
@@ -770,7 +770,7 @@ plabel \
 	*(fp) &= ~JPC_VISIT; \
 }
 
-static int dec_clnpass(jpc_dec_t *dec, register jpc_mqdec_t *mqdec, int bitpos, int orient,
+static int dec_clnpass(jpc_dec_t *dec, register jpc_mqdec_t *mqdec, int bitpos, enum jpc_tsfb_orient orient,
   int vcausalflag, int segsymflag, jas_matrix_t *flags, jas_matrix_t *data)
 {
 	int i;

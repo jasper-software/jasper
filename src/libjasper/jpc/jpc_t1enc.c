@@ -83,13 +83,13 @@
 #include <stdlib.h>
 #include <assert.h>
 
-static int jpc_encsigpass(jpc_mqenc_t *mqenc, int bitpos, int orient, int,
+static int jpc_encsigpass(jpc_mqenc_t *mqenc, int bitpos, enum jpc_tsfb_orient orient, int,
   jas_matrix_t *flags, jas_matrix_t *data, int term, long *nmsedec);
 
 static int jpc_encrefpass(jpc_mqenc_t *mqenc, int bitpos, jas_matrix_t *flags,
   jas_matrix_t *data, int term, long *nmsedec);
 
-static int jpc_encclnpass(jpc_mqenc_t *mqenc, int bitpos, int orient, int,
+static int jpc_encclnpass(jpc_mqenc_t *mqenc, int bitpos, enum jpc_tsfb_orient orient, int,
   int, jas_matrix_t *flags, jas_matrix_t *data, int term, long *nmsedec);
 
 static int jpc_encrawsigpass(jpc_bitstream_t *out, int bitpos, int,
@@ -428,7 +428,7 @@ dump_passes(cblk->passes, cblk->numpasses, cblk);
 	} \
 }
 
-static int jpc_encsigpass(jpc_mqenc_t *mqenc, int bitpos, int orient, int vcausalflag,
+static int jpc_encsigpass(jpc_mqenc_t *mqenc, int bitpos, enum jpc_tsfb_orient orient, int vcausalflag,
   jas_matrix_t *flags, jas_matrix_t *data, int term, long *nmsedec)
 {
 	int i;
@@ -828,7 +828,7 @@ label2 \
 	*(fp) &= ~JPC_VISIT; \
 }
 
-static int jpc_encclnpass(jpc_mqenc_t *mqenc, int bitpos, int orient, int vcausalflag, int segsymflag, jas_matrix_t *flags,
+static int jpc_encclnpass(jpc_mqenc_t *mqenc, int bitpos, enum jpc_tsfb_orient orient, int vcausalflag, int segsymflag, jas_matrix_t *flags,
   jas_matrix_t *data, int term, long *nmsedec)
 {
 	int i;

@@ -74,6 +74,7 @@
 
 #include "jpc_fix.h"
 #include "jpc_mqcod.h"
+#include "jpc_tsfb.h"
 #include "jasper/jas_math.h"
 
 /******************************************************************************\
@@ -204,9 +205,9 @@ static inline jpc_fix_t JPC_ASR(jpc_fix_t x, int n)
 
 /* Get the zero coding context. */
 JAS_ATTRIBUTE_CONST
-static inline uint_least8_t JPC_GETZCCTXNO(unsigned f, unsigned orient)
+static inline uint_least8_t JPC_GETZCCTXNO(unsigned f, enum jpc_tsfb_orient orient)
 {
-	return jpc_zcctxnolut[(orient << 8) | (f & JPC_OTHSIGMSK)];
+	return jpc_zcctxnolut[((unsigned)orient << 8) | (f & JPC_OTHSIGMSK)];
 }
 
 /* Get the sign prediction bit. */
@@ -289,7 +290,7 @@ void jpc_initluts(void);
 
 /* Get the nominal gain associated with a particular band. */
 JAS_ATTRIBUTE_CONST
-int JPC_NOMINALGAIN(int qmfbid, int numlvls, int lvlno, int orient);
+int JPC_NOMINALGAIN(int qmfbid, int numlvls, int lvlno, enum jpc_tsfb_orient orient);
 
 /* Get the coding pass type. */
 JAS_ATTRIBUTE_CONST

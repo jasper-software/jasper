@@ -88,10 +88,12 @@
 #define	JPC_TSFB_MAXDEPTH	32
 #define	JPC_TSFB_RITIMODE	JPC_QMFB1D_RITIMODE
 
-#define JPC_TSFB_LL	0
-#define JPC_TSFB_LH	1
-#define JPC_TSFB_HL	2
-#define JPC_TSFB_HH	3
+enum jpc_tsfb_orient {
+	JPC_TSFB_LL = 0,
+	JPC_TSFB_LH = 1,
+	JPC_TSFB_HL = 2,
+	JPC_TSFB_HH = 3,
+};
 
 /******************************************************************************\
 * Types.
@@ -102,7 +104,7 @@ typedef struct {
 	int ystart;
 	int xend;
 	int yend;
-	int orient;
+	enum jpc_tsfb_orient orient;
 	int locxstart;
 	int locystart;
 	int locxend;
