@@ -205,7 +205,7 @@ int jpc_enc_encpkt(jpc_enc_t *enc, jas_stream_t *out, int compno, int lvlno, int
 	}
 
 	if (!(outb = jpc_bitstream_sopen(out, "w+"))) {
-		abort();
+		return -1;
 	}
 
 	if (jpc_bitstream_putbit(outb, 1) == EOF) {
