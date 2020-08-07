@@ -321,8 +321,8 @@ int jp2_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 			needcdef = 0;
 		break;
 	default:
-		abort();
-		break;
+		assert(false);
+		JAS_UNREACHABLE();
 	}
 
 	if (needcdef) {
@@ -492,7 +492,7 @@ static int clrspctojp2(jas_clrspc_t clrspc)
 	case JAS_CLRSPC_SGRAY:
 		return JP2_COLR_SGRAY;
 	default:
-		abort();
-		break;
+		assert(false);
+		JAS_UNREACHABLE();
 	}
 }
