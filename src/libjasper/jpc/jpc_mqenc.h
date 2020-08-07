@@ -172,8 +172,9 @@ void jpc_mqenc_init(jpc_mqenc_t *enc);
 \******************************************************************************/
 
 /* Set the current context. */
-#define	jpc_mqenc_setcurctx(enc, ctxno) \
-        ((enc)->curctx = &(enc)->ctxs[ctxno]);
+static inline void jpc_mqenc_setcurctx(jpc_mqenc_t *enc, unsigned ctxno) {
+	enc->curctx = &enc->ctxs[ctxno];
+}
 
 /* Set the state information for multiple contexts. */
 void jpc_mqenc_setctxs(jpc_mqenc_t *enc, int numctxs, const jpc_mqctx_t *ctxs);
@@ -183,8 +184,9 @@ void jpc_mqenc_setctxs(jpc_mqenc_t *enc, int numctxs, const jpc_mqctx_t *ctxs);
 \******************************************************************************/
 
 /* Get the error state of a MQ encoder. */
-#define	jpc_mqenc_error(enc) \
-	((enc)->err)
+static inline bool jpc_mqenc_error(const jpc_mqenc_t *enc) {
+	return enc->err;
+}
 
 /* Get the current encoder state. */
 void jpc_mqenc_getstate(const jpc_mqenc_t *enc, jpc_mqencstate_t *state);

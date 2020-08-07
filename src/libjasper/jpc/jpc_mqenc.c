@@ -162,14 +162,14 @@
 	} \
 }
 
-#define	jpc_mqenc_byteout2(enc) \
-{ \
-	if (enc->outbuf >= 0) { \
-		if (jas_stream_putc(enc->out, (unsigned char)enc->outbuf) == EOF) { \
-			enc->err = true; \
-		} \
-	} \
-	enc->lastbyte = enc->outbuf; \
+static void jpc_mqenc_byteout2(jpc_mqenc_t *enc)
+{
+	if (enc->outbuf >= 0) {
+		if (jas_stream_putc(enc->out, (unsigned char)enc->outbuf) == EOF) {
+			enc->err = true;
+		}
+	}
+	enc->lastbyte = enc->outbuf;
 }
 
 /******************************************************************************\
