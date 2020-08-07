@@ -953,7 +953,7 @@ startoff = jas_stream_getrwcount(enc->out);
 	com->len = JAS_CAST(uint_fast16_t, strlen(buf));
 	com->regid = JPC_COM_LATIN;
 	if (!(com->data = JAS_CAST(jas_uchar *, jas_strdup(buf)))) {
-		abort();
+		return -1;
 	}
 	if (jpc_putms(enc->out, enc->cstate, enc->mrk)) {
 		jas_eprintf("cannot write COM marker\n");
@@ -1371,7 +1371,6 @@ and other characteristics */
 /************************************************************************/
 
 		if (jpc_enc_enccblks(enc)) {
-			abort();
 			return -1;
 		}
 
@@ -1802,7 +1801,7 @@ int rateallocate(jpc_enc_t *enc, unsigned numlyrs, uint_fast32_t *cumlens)
 			/* Save the tier 2 coding state. */
 			jpc_restore_t2state(enc);
 			if (jas_stream_seek(out, oldpos, SEEK_SET) < 0) {
-				abort();
+				return -1;
 			}
 
 			JAS_DBGLOG(10, ("maxlen=%08ld actuallen=%08ld thresh=%f\n",
