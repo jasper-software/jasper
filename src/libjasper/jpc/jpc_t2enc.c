@@ -137,7 +137,7 @@ int jpc_enc_encpkts(jpc_enc_t *enc, jas_stream_t *out)
 
 	tile = enc->curtile;
 
-	jpc_init_t2state(enc, 0);
+	jpc_init_t2state(enc, false);
 	pi = tile->pi;
 	jpc_pi_init(pi);
 
@@ -491,7 +491,7 @@ void jpc_restore_t2state(jpc_enc_t *enc)
 	}
 }
 
-void jpc_init_t2state(jpc_enc_t *enc, int raflag)
+void jpc_init_t2state(jpc_enc_t *enc, bool raflag)
 {
 /* It is assumed that band->numbps and cblk->numbps precomputed */
 

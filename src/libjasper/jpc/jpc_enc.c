@@ -1692,7 +1692,7 @@ int rateallocate(jpc_enc_t *enc, unsigned numlyrs, uint_fast32_t *cumlens)
 	JAS_DBGLOG(10, ("min rdslope = %f max rdslope = %f\n", mnrdslope,
 	  mxrdslope));
 
-	jpc_init_t2state(enc, 1);
+	jpc_init_t2state(enc, true);
 
 	for (unsigned lyrno = 0; lyrno < numlyrs; ++lyrno) {
 

@@ -97,7 +97,7 @@ void jpc_save_t2state(jpc_enc_t *enc);
 void jpc_restore_t2state(jpc_enc_t *enc);
 
 /* Initialize the tier-2 coding state. */
-void jpc_init_t2state(jpc_enc_t *enc, int raflag);
+void jpc_init_t2state(jpc_enc_t *enc, bool raflag);
 
 /* Create a packet iterator for the encoder. */
 jpc_pi_t *jpc_enc_pi_create(jpc_enc_cp_t *cp, jpc_enc_tile_t *tile);
