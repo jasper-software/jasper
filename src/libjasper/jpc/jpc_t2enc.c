@@ -171,7 +171,6 @@ int jpc_enc_encpkt(jpc_enc_t *enc, jas_stream_t *out, int compno, int lvlno, int
 	jpc_enc_pass_t *endpass;
 	jpc_enc_pass_t *endpasses;
 	int i;
-	int included;
 	int ret;
 	jpc_tagtreenode_t *leaf;
 	int n;
@@ -233,7 +232,7 @@ int jpc_enc_encpkt(jpc_enc_t *enc, jas_stream_t *out, int compno, int lvlno, int
 				jpc_tagtree_setvalue(prc->nlibtree, leaf, cblk->numimsbs);
 			}
 			pass = cblk->curpass;
-			included = (pass && pass->lyrno == lyrno);
+			const bool included = (pass && pass->lyrno == lyrno);
 			if (included && (!cblk->numencpasses)) {
 				assert(pass->lyrno == lyrno);
 				leaf = jpc_tagtree_getleaf(prc->incltree,
@@ -245,7 +244,7 @@ int jpc_enc_encpkt(jpc_enc_t *enc, jas_stream_t *out, int compno, int lvlno, int
 		endcblks = &prc->cblks[prc->numcblks];
 		for (cblk = prc->cblks; cblk != endcblks; ++cblk) {
 			pass = cblk->curpass;
-			included = (pass && pass->lyrno == lyrno);
+			const bool included = (pass && pass->lyrno == lyrno);
 			if (!cblk->numencpasses) {
 				leaf = jpc_tagtree_getleaf(prc->incltree,
 				  cblk - prc->cblks);
