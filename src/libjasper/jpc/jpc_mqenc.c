@@ -361,8 +361,8 @@ int jpc_mqenc_flush(jpc_mqenc_t *mqenc, int termmode)
 		}
 		break;
 	default:
-		abort();
-		break;
+		assert(false);
+		JAS_UNREACHABLE();
 	}
 	return 0;
 }
