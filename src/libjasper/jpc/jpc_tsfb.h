@@ -113,7 +113,7 @@ typedef struct {
 } jpc_tsfb_band_t;
 
 typedef struct {
-	int numlvls;
+	unsigned numlvls;
 	const jpc_qmfb2d_t *qmfb;
 } jpc_tsfb_t;
 
@@ -122,7 +122,7 @@ typedef struct {
 \******************************************************************************/
 
 /* Create a TSFB. */
-jpc_tsfb_t *jpc_cod_gettsfb(int qmfbid, int numlevels);
+jpc_tsfb_t *jpc_cod_gettsfb(unsigned qmfbid, unsigned numlevels);
 
 /* Destroy a TSFB. */
 void jpc_tsfb_destroy(jpc_tsfb_t *tsfb);
@@ -134,7 +134,7 @@ int jpc_tsfb_analyze(jpc_tsfb_t *tsfb, jas_seq2d_t *x);
 int jpc_tsfb_synthesize(jpc_tsfb_t *tsfb, jas_seq2d_t *x);
 
 int jpc_tsfb_analyze2(jpc_tsfb_t *tsfb, jpc_fix_t *a, int xstart, int ystart,
-  int width, int height, int stride, int numlvls);
+  unsigned width, unsigned height, unsigned stride, unsigned numlvls);
 
 /* Get band information for a TSFB. */
 int jpc_tsfb_getbands(jpc_tsfb_t *tsfb, uint_fast32_t xstart,
