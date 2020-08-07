@@ -1639,9 +1639,7 @@ int rateallocate(jpc_enc_t *enc, unsigned numlyrs, uint_fast32_t *cumlens)
 	tile = enc->curtile;
 
 	for (unsigned lyrno = 1; lyrno < numlyrs - 1; ++lyrno) {
-		if (cumlens[lyrno - 1] > cumlens[lyrno]) {
-			abort();
-		}
+		assert(cumlens[lyrno - 1] <= cumlens[lyrno]);
 	}
 
 	if (!(out = jas_stream_memopen(0, 0))) {
