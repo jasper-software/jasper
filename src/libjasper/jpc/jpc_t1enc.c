@@ -377,7 +377,10 @@ dump_passes(cblk->passes, cblk->numpasses, cblk);
 				pass->end = termpass->end;
 			}
 			if ((c = getthebyte(cblk->stream, pass->end - 1)) == EOF) {
-				abort();
+				if (bout) {
+					jpc_bitstream_close(bout);
+				}
+				return -1;
 			}
 			if (c == 0xff) {
 				++pass->end;
