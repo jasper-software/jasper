@@ -196,11 +196,8 @@ static int jpc_enc_enccblk(const jpc_enc_tcmpt_t *tcmpt, const jpc_enc_band_t *b
 	jpc_enc_pass_t *endpasses;
 	int bitpos;
 	int n;
-	int adjust;
 	int ret;
-	int t;
 	jpc_bitstream_t *bout;
-	int termmode;
 	int c;
 
 	bout = 0;
@@ -260,6 +257,7 @@ assert(jas_stream_tell(cblk->stream) == jas_stream_getrwcount(cblk->stream));
 		assert(bitpos >= 0);
 		const bool vcausal = (tcmpt->cblksty & JPC_COX_VSC) != 0;
 		const bool segsym = (tcmpt->cblksty & JPC_COX_SEGSYM) != 0;
+		unsigned termmode;
 		if (pass->term) {
 			termmode = ((tcmpt->cblksty & JPC_COX_PTERM) ?
 			  JPC_MQENC_PTERM : JPC_MQENC_DEFTERM) + 1;
@@ -365,7 +363,8 @@ dump_passes(cblk->passes, cblk->numpasses, cblk);
 				++termpass;
 			}
 			if (pass->type == JPC_SEG_MQ) {
-				t = (pass->mqencstate.lastbyte == 0xff) ? 1 : 0;
+				unsigned t = (pass->mqencstate.lastbyte == 0xff) ? 1 : 0;
+				unsigned adjust;
 				if (pass->mqencstate.ctreg >= 5) {
 					adjust = 4 + t;
 				} else {
@@ -430,27 +429,18 @@ static int jpc_encsigpass(jpc_mqenc_t *mqenc, int bitpos, enum jpc_tsfb_orient o
   jas_matrix_t *flags, const jas_matrix_t *data, int term, long *nmsedec)
 {
 	int i;
-	int j;
 	int one;
-	int vscanlen;
-	int width;
-	int height;
-	int frowstep;
-	int drowstep;
-	int fstripestep;
-	int dstripestep;
 	jpc_fix_t *fstripestart;
 	jpc_fix_t *fp;
 	jpc_fix_t *fvscanstart;
-	int k;
 
 	*nmsedec = 0;
-	width = jas_matrix_numcols(data);
-	height = jas_matrix_numrows(data);
-	frowstep = jas_matrix_rowstep(flags);
-	drowstep = jas_matrix_rowstep(data);
-	fstripestep = frowstep << 2;
-	dstripestep = drowstep << 2;
+	const unsigned width = jas_matrix_numcols(data);
+	const unsigned height = jas_matrix_numrows(data);
+	const unsigned frowstep = jas_matrix_rowstep(flags);
+	const unsigned drowstep = jas_matrix_rowstep(data);
+	const unsigned fstripestep = frowstep << 2;
+	const unsigned dstripestep = drowstep << 2;
 
 	one = 1 << (bitpos + JPC_NUMEXTRABITS);
 
@@ -460,11 +450,11 @@ static int jpc_encsigpass(jpc_mqenc_t *mqenc, int bitpos, enum jpc_tsfb_orient o
 	  dstripestart += dstripestep) {
 		fvscanstart = fstripestart;
 		const jpc_fix_t *dvscanstart = dstripestart;
-		vscanlen = JAS_MIN(i, 4);
-		for (j = width; j > 0; --j, ++fvscanstart, ++dvscanstart) {
+		const unsigned vscanlen = JAS_MIN(i, 4);
+		for (unsigned j = width; j > 0; --j, ++fvscanstart, ++dvscanstart) {
 			fp = fvscanstart;
 			const jpc_fix_t *dp = dvscanstart;
-			k = vscanlen;
+			unsigned k = vscanlen;
 
 			sigpass_step(fp, frowstep, dp, bitpos, one,
 			  nmsedec, orient, mqenc, vcausalflag);
@@ -525,27 +515,18 @@ static int jpc_encrawsigpass(jpc_bitstream_t *out, int bitpos, bool vcausalflag,
   const jas_matrix_t *data, int term, long *nmsedec)
 {
 	int i;
-	int j;
-	int k;
 	int one;
-	int vscanlen;
-	int width;
-	int height;
-	int frowstep;
-	int drowstep;
-	int fstripestep;
-	int dstripestep;
 	jpc_fix_t *fstripestart;
 	jpc_fix_t *fp;
 	jpc_fix_t *fvscanstart;
 
 	*nmsedec = 0;
-	width = jas_matrix_numcols(data);
-	height = jas_matrix_numrows(data);
-	frowstep = jas_matrix_rowstep(flags);
-	drowstep = jas_matrix_rowstep(data);
-	fstripestep = frowstep << 2;
-	dstripestep = drowstep << 2;
+	const unsigned width = jas_matrix_numcols(data);
+	const unsigned height = jas_matrix_numrows(data);
+	const unsigned frowstep = jas_matrix_rowstep(flags);
+	const unsigned drowstep = jas_matrix_rowstep(data);
+	const unsigned fstripestep = frowstep << 2;
+	const unsigned dstripestep = drowstep << 2;
 
 	one = 1 << (bitpos + JPC_NUMEXTRABITS);
 
@@ -555,11 +536,11 @@ static int jpc_encrawsigpass(jpc_bitstream_t *out, int bitpos, bool vcausalflag,
 	  dstripestart += dstripestep) {
 		fvscanstart = fstripestart;
 		const jpc_fix_t *dvscanstart = dstripestart;
-		vscanlen = JAS_MIN(i, 4);
-		for (j = width; j > 0; --j, ++fvscanstart, ++dvscanstart) {
+		const unsigned vscanlen = JAS_MIN(i, 4);
+		for (unsigned j = width; j > 0; --j, ++fvscanstart, ++dvscanstart) {
 			fp = fvscanstart;
 			const jpc_fix_t *dp = dvscanstart;
-			k = vscanlen;
+			unsigned k = vscanlen;
 
 			rawsigpass_step(fp, frowstep, dp, bitpos, one,
 			  nmsedec, out, vcausalflag);
@@ -623,28 +604,19 @@ static int jpc_encrefpass(jpc_mqenc_t *mqenc, int bitpos, jas_matrix_t *flags, c
   int term, long *nmsedec)
 {
 	int i;
-	int j;
 	int one;
-	int vscanlen;
 	int d;
-	int width;
-	int height;
-	int frowstep;
-	int drowstep;
-	int fstripestep;
-	int dstripestep;
 	jpc_fix_t *fstripestart;
 	jpc_fix_t *fvscanstart;
 	jpc_fix_t *fp;
-int k;
 
 	*nmsedec = 0;
-	width = jas_matrix_numcols(data);
-	height = jas_matrix_numrows(data);
-	frowstep = jas_matrix_rowstep(flags);
-	drowstep = jas_matrix_rowstep(data);
-	fstripestep = frowstep << 2;
-	dstripestep = drowstep << 2;
+	const unsigned width = jas_matrix_numcols(data);
+	const unsigned height = jas_matrix_numrows(data);
+	const unsigned frowstep = jas_matrix_rowstep(flags);
+	const unsigned drowstep = jas_matrix_rowstep(data);
+	const unsigned fstripestep = frowstep << 2;
+	const unsigned dstripestep = drowstep << 2;
 
 	one = 1 << (bitpos + JPC_NUMEXTRABITS);
 
@@ -654,11 +626,11 @@ int k;
 	  dstripestart += dstripestep) {
 		fvscanstart = fstripestart;
 		const jpc_fix_t *dvscanstart = dstripestart;
-		vscanlen = JAS_MIN(i, 4);
-		for (j = width; j > 0; --j, ++fvscanstart, ++dvscanstart) {
+		const unsigned vscanlen = JAS_MIN(i, 4);
+		for (unsigned j = width; j > 0; --j, ++fvscanstart, ++dvscanstart) {
 			fp = fvscanstart;
 			const jpc_fix_t *dp = dvscanstart;
-			k = vscanlen;
+			unsigned k = vscanlen;
 
 			refpass_step(fp, dp, bitpos, one, nmsedec,
 			  mqenc, vcausalflag);
@@ -712,27 +684,18 @@ static int jpc_encrawrefpass(jpc_bitstream_t *out, int bitpos, jas_matrix_t *fla
   const jas_matrix_t *data, int term, long *nmsedec)
 {
 	int i;
-	int j;
-	int k;
 	int one;
-	int vscanlen;
-	int width;
-	int height;
-	int frowstep;
-	int drowstep;
-	int fstripestep;
-	int dstripestep;
 	jpc_fix_t *fstripestart;
 	jpc_fix_t *fvscanstart;
 	jpc_fix_t *fp;
 
 	*nmsedec = 0;
-	width = jas_matrix_numcols(data);
-	height = jas_matrix_numrows(data);
-	frowstep = jas_matrix_rowstep(flags);
-	drowstep = jas_matrix_rowstep(data);
-	fstripestep = frowstep << 2;
-	dstripestep = drowstep << 2;
+	const unsigned width = jas_matrix_numcols(data);
+	const unsigned height = jas_matrix_numrows(data);
+	const unsigned frowstep = jas_matrix_rowstep(flags);
+	const unsigned drowstep = jas_matrix_rowstep(data);
+	const unsigned fstripestep = frowstep << 2;
+	const unsigned dstripestep = drowstep << 2;
 
 	one = 1 << (bitpos + JPC_NUMEXTRABITS);
 
@@ -742,11 +705,11 @@ static int jpc_encrawrefpass(jpc_bitstream_t *out, int bitpos, jas_matrix_t *fla
 	  dstripestart += dstripestep) {
 		fvscanstart = fstripestart;
 		const jpc_fix_t *dvscanstart = dstripestart;
-		vscanlen = JAS_MIN(i, 4);
-		for (j = width; j > 0; --j, ++fvscanstart, ++dvscanstart) {
+		const unsigned vscanlen = JAS_MIN(i, 4);
+		for (unsigned j = width; j > 0; --j, ++fvscanstart, ++dvscanstart) {
 			fp = fvscanstart;
 			const jpc_fix_t *dp = dvscanstart;
-			k = vscanlen;
+			unsigned k = vscanlen;
 
 			rawrefpass_step(fp, dp, bitpos, one, nmsedec,
 			  out, vcausalflag);
@@ -814,28 +777,18 @@ static int jpc_encclnpass(jpc_mqenc_t *mqenc, int bitpos, enum jpc_tsfb_orient o
   const jas_matrix_t *data, int term, long *nmsedec)
 {
 	int i;
-	int j;
-	int k;
-	int vscanlen;
-	int runlen;
 	jpc_fix_t *fp;
-	int width;
-	int height;
 	int one;
-	int frowstep;
-	int drowstep;
-	int fstripestep;
-	int dstripestep;
 	jpc_fix_t *fstripestart;
 	jpc_fix_t *fvscanstart;
 
 	*nmsedec = 0;
-	width = jas_matrix_numcols(data);
-	height = jas_matrix_numrows(data);
-	frowstep = jas_matrix_rowstep(flags);
-	drowstep = jas_matrix_rowstep(data);
-	fstripestep = frowstep << 2;
-	dstripestep = drowstep << 2;
+	const unsigned width = jas_matrix_numcols(data);
+	const unsigned height = jas_matrix_numrows(data);
+	const unsigned frowstep = jas_matrix_rowstep(flags);
+	const unsigned drowstep = jas_matrix_rowstep(data);
+	const unsigned fstripestep = frowstep << 2;
+	const unsigned dstripestep = drowstep << 2;
 
 	one = 1 << (bitpos + JPC_NUMEXTRABITS);
 
@@ -845,11 +798,12 @@ static int jpc_encclnpass(jpc_mqenc_t *mqenc, int bitpos, enum jpc_tsfb_orient o
 	  dstripestart += dstripestep) {
 		fvscanstart = fstripestart;
 		const jpc_fix_t *dvscanstart = dstripestart;
-		vscanlen = JAS_MIN(i, 4);
-		for (j = width; j > 0; --j, ++fvscanstart, ++dvscanstart) {
+		const unsigned vscanlen = JAS_MIN(i, 4);
+		for (unsigned j = width; j > 0; --j, ++fvscanstart, ++dvscanstart) {
 
 			fp = fvscanstart;
 			const jpc_fix_t *dp;
+			unsigned k;
 			if (vscanlen >= 4 && !((*fp) & (JPC_SIG | JPC_VISIT |
 			  JPC_OTHSIGMSK)) && (fp += frowstep, !((*fp) & (JPC_SIG |
 			  JPC_VISIT | JPC_OTHSIGMSK))) && (fp += frowstep, !((*fp) &
@@ -863,7 +817,7 @@ static int jpc_encclnpass(jpc_mqenc_t *mqenc, int bitpos, enum jpc_tsfb_orient o
 					}
 					dp += drowstep;
 				}
-				runlen = k;
+				unsigned runlen = k;
 				if (runlen >= 4) {
 					jpc_mqenc_setcurctx(mqenc, JPC_AGGCTXNO);
 					jpc_mqenc_putbit(mqenc, false);
@@ -888,7 +842,6 @@ static int jpc_encclnpass(jpc_mqenc_t *mqenc, int bitpos, enum jpc_tsfb_orient o
 					goto clnpass_partial3;
 				}
 			} else {
-				runlen = 0;
 				fp = fvscanstart;
 				dp = dvscanstart;
 				k = vscanlen;
