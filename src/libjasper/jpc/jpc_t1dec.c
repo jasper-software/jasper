@@ -190,7 +190,6 @@ static int jpc_dec_decodecblk(jpc_dec_t *dec, jpc_dec_tile_t *tile, jpc_dec_tcom
 {
 	jpc_dec_seg_t *seg;
 	int bpno;
-	int i;
 	int ret;
 	int filldata;
 	int fillmask;
@@ -208,7 +207,7 @@ static int jpc_dec_decodecblk(jpc_dec_t *dec, jpc_dec_tile_t *tile, jpc_dec_tcom
 
 	seg = cblk->segs.head;
 	while (seg && (seg != cblk->curseg || dopartial) && (maxlyrs < 0 ||
-	  seg->lyrno < maxlyrs)) {
+	  seg->lyrno < (unsigned)maxlyrs)) {
 		assert(seg->numpasses >= seg->maxpasses || dopartial);
 		assert(seg->stream);
 		jas_stream_rewind(seg->stream);
@@ -232,7 +231,7 @@ static int jpc_dec_decodecblk(jpc_dec_t *dec, jpc_dec_tile_t *tile, jpc_dec_tcom
 		}
 
 
-		for (i = 0; i < seg->numpasses; ++i) {
+		for (unsigned i = 0; i < seg->numpasses; ++i) {
 			if (cblk->numimsbs > band->numbps) {
 				ccp = &tile->cp->ccps[compno];
 				if (ccp->roishift <= 0) {
