@@ -156,7 +156,7 @@ int jpc_enc_encpkts(jpc_enc_t *enc, jas_stream_t *out)
 	return 0;
 }
 
-int jpc_enc_encpkt(jpc_enc_t *enc, jas_stream_t *out, int compno, int lvlno, int prcno, unsigned lyrno)
+int jpc_enc_encpkt(jpc_enc_t *enc, jas_stream_t *out, unsigned compno, unsigned lvlno, unsigned prcno, unsigned lyrno)
 {
 	jpc_enc_tcmpt_t *comp;
 	jpc_enc_rlvl_t *lvl;
@@ -173,14 +173,8 @@ int jpc_enc_encpkt(jpc_enc_t *enc, jas_stream_t *out, int compno, int lvlno, int
 	int i;
 	int ret;
 	jpc_tagtreenode_t *leaf;
-	int n;
 	int t1;
 	int t2;
-	int adjust;
-	int maxadjust;
-	int datalen;
-	int numnewpasses;
-	int passcount;
 	jpc_enc_tile_t *tile;
 	jpc_enc_prc_t *prc;
 	jpc_enc_cp_t *cp;
@@ -283,22 +277,22 @@ int jpc_enc_encpkt(jpc_enc_t *enc, jas_stream_t *out, int compno, int lvlno, int
 			while (endpass != endpasses && endpass->lyrno == lyrno){
 				++endpass;
 			}
-			numnewpasses = endpass - startpass;
+			const unsigned numnewpasses = endpass - startpass;
 			if (jpc_putnumnewpasses(outb, numnewpasses)) {
 				return -1;
 			}
 			JAS_DBGLOG(10, ("numnewpasses=%d ", numnewpasses));
 
 			lastpass = endpass - 1;
-			n = startpass->start;
-			passcount = 1;
-			maxadjust = 0;
+			unsigned n = startpass->start;
+			unsigned passcount = 1;
+			unsigned maxadjust = 0;
 			for (pass = startpass; pass != endpass; ++pass) {
 				if (pass->term || pass == lastpass) {
-					datalen = pass->end - n;
+					unsigned datalen = pass->end - n;
 					t1 = jpc_int_firstone(datalen) + 1;
 					t2 = cblk->numlenbits + jpc_floorlog2(passcount);
-					adjust = JAS_MAX(t1 - t2, 0);
+					const unsigned adjust = JAS_MAX(t1 - t2, 0);
 					maxadjust = JAS_MAX(adjust, maxadjust);
 					n += datalen;
 					passcount = 1;
@@ -316,7 +310,7 @@ int jpc_enc_encpkt(jpc_enc_t *enc, jas_stream_t *out, int compno, int lvlno, int
 			passcount = 1;
 			for (pass = startpass; pass != endpass; ++pass) {
 				if (pass->term || pass == lastpass) {
-					datalen = pass->end - n;
+					unsigned datalen = pass->end - n;
 					assert(jpc_int_firstone(datalen) < cblk->numlenbits +
 					  (int)jpc_floorlog2(passcount));
 					if (jpc_bitstream_putbits(outb, cblk->numlenbits +
@@ -375,7 +369,7 @@ int jpc_enc_encpkt(jpc_enc_t *enc, jas_stream_t *out, int compno, int lvlno, int
 				++endpass;
 			}
 			lastpass = endpass - 1;
-			numnewpasses = endpass - startpass;
+			const unsigned numnewpasses = endpass - startpass;
 
 			jas_stream_seek(cblk->stream, startpass->start, SEEK_SET);
 			assert(jas_stream_tell(cblk->stream) == startpass->start);

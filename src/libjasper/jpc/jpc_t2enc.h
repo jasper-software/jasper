@@ -87,8 +87,8 @@
 int jpc_enc_encpkts(jpc_enc_t *enc, jas_stream_t *out);
 
 /* Encode the specified packet. */
-int jpc_enc_encpkt(jpc_enc_t *enc, jas_stream_t *out, int compno, int lvlno,
-  int prcno, unsigned lyrno);
+int jpc_enc_encpkt(jpc_enc_t *enc, jas_stream_t *out, unsigned compno, unsigned lvlno,
+  unsigned prcno, unsigned lyrno);
 
 /* Save the tier-2 coding state. */
 void jpc_save_t2state(jpc_enc_t *enc);
