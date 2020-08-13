@@ -93,6 +93,14 @@
 #include <io.h>
 #endif
 
+/* O_CLOEXEC is a Linux-specific flag which helps avoid leaking file
+   descriptors to child processes created by another thread; for
+   simplicity, we always specify it, and this definition is a fallback
+   for systems where this feature is not available */
+#ifndef O_CLOEXEC
+#define O_CLOEXEC 0
+#endif
+
 /******************************************************************************\
 * Local function prototypes.
 \******************************************************************************/
@@ -410,6 +418,8 @@ jas_stream_t *jas_stream_fopen(const char *filename, const char *mode)
 		openflags |= O_CREAT | O_TRUNC;
 	}
 
+	openflags |= O_CLOEXEC;
+
 	/* Allocate space for the underlying file stream object. */
 	if (!(obj = jas_malloc(sizeof(jas_stream_fileobj_t)))) {
 		jas_stream_destroy(stream);
@@ -496,7 +506,7 @@ jas_stream_t *jas_stream_tmpfile()
 	tmpnam(obj->pathname);
 
 	/* Open the underlying file. */
-	if ((obj->fd = open(obj->pathname, O_CREAT | O_EXCL | O_RDWR | O_TRUNC | O_BINARY,
+	if ((obj->fd = open(obj->pathname, O_CREAT | O_EXCL | O_RDWR | O_TRUNC | O_BINARY | O_CLOEXEC,
 	  JAS_STREAM_PERMS)) < 0) {
 		jas_stream_destroy(stream);
 		return 0;
