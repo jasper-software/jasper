@@ -98,33 +98,33 @@ static int jp2_putuint64(jas_stream_t *out, uint_fast64_t val);
 
 static int jp2_getint(jas_stream_t *in, int s, int n, int_fast32_t *val);
 
-void jp2_box_dump(jp2_box_t *box, FILE *out);
+static void jp2_box_dump(const jp2_box_t *box, FILE *out);
 
 static int jp2_jp_getdata(jp2_box_t *box, jas_stream_t *in);
-static int jp2_jp_putdata(jp2_box_t *box, jas_stream_t *out);
+static int jp2_jp_putdata(const jp2_box_t *box, jas_stream_t *out);
 static int jp2_ftyp_getdata(jp2_box_t *box, jas_stream_t *in);
-static int jp2_ftyp_putdata(jp2_box_t *box, jas_stream_t *out);
+static int jp2_ftyp_putdata(const jp2_box_t *box, jas_stream_t *out);
 static int jp2_ihdr_getdata(jp2_box_t *box, jas_stream_t *in);
-static int jp2_ihdr_putdata(jp2_box_t *box, jas_stream_t *out);
+static int jp2_ihdr_putdata(const jp2_box_t *box, jas_stream_t *out);
 static void jp2_bpcc_destroy(jp2_box_t *box);
 static int jp2_bpcc_getdata(jp2_box_t *box, jas_stream_t *in);
-static int jp2_bpcc_putdata(jp2_box_t *box, jas_stream_t *out);
+static int jp2_bpcc_putdata(const jp2_box_t *box, jas_stream_t *out);
 static int jp2_colr_getdata(jp2_box_t *box, jas_stream_t *in);
-static int jp2_colr_putdata(jp2_box_t *box, jas_stream_t *out);
-static void jp2_colr_dumpdata(jp2_box_t *box, FILE *out);
+static int jp2_colr_putdata(const jp2_box_t *box, jas_stream_t *out);
+static void jp2_colr_dumpdata(const jp2_box_t *box, FILE *out);
 static void jp2_colr_destroy(jp2_box_t *box);
 static void jp2_cdef_destroy(jp2_box_t *box);
 static int jp2_cdef_getdata(jp2_box_t *box, jas_stream_t *in);
-static int jp2_cdef_putdata(jp2_box_t *box, jas_stream_t *out);
-static void jp2_cdef_dumpdata(jp2_box_t *box, FILE *out);
+static int jp2_cdef_putdata(const jp2_box_t *box, jas_stream_t *out);
+static void jp2_cdef_dumpdata(const jp2_box_t *box, FILE *out);
 static void jp2_cmap_destroy(jp2_box_t *box);
 static int jp2_cmap_getdata(jp2_box_t *box, jas_stream_t *in);
-static int jp2_cmap_putdata(jp2_box_t *box, jas_stream_t *out);
-static void jp2_cmap_dumpdata(jp2_box_t *box, FILE *out);
+static int jp2_cmap_putdata(const jp2_box_t *box, jas_stream_t *out);
+static void jp2_cmap_dumpdata(const jp2_box_t *box, FILE *out);
 static void jp2_pclr_destroy(jp2_box_t *box);
 static int jp2_pclr_getdata(jp2_box_t *box, jas_stream_t *in);
-static int jp2_pclr_putdata(jp2_box_t *box, jas_stream_t *out);
-static void jp2_pclr_dumpdata(jp2_box_t *box, FILE *out);
+static int jp2_pclr_putdata(const jp2_box_t *box, jas_stream_t *out);
+static void jp2_pclr_dumpdata(const jp2_box_t *box, FILE *out);
 
 /******************************************************************************\
 * Local data.
@@ -342,7 +342,7 @@ error:
 	return 0;
 }
 
-void jp2_box_dump(jp2_box_t *box, FILE *out)
+static void jp2_box_dump(const jp2_box_t *box, FILE *out)
 {
 	const jp2_boxinfo_t *boxinfo;
 	boxinfo = jp2_boxinfolookup(box->type);
@@ -422,9 +422,9 @@ static int jp2_bpcc_getdata(jp2_box_t *box, jas_stream_t *in)
 	return 0;
 }
 
-static void jp2_colr_dumpdata(jp2_box_t *box, FILE *out)
+static void jp2_colr_dumpdata(const jp2_box_t *box, FILE *out)
 {
-	jp2_colr_t *colr = &box->data.colr;
+	const jp2_colr_t *colr = &box->data.colr;
 	fprintf(out, "method=%d; pri=%d; approx=%d\n", (int)colr->method, (int)colr->pri, (int)colr->approx);
 	switch (colr->method) {
 	case JP2_COLR_ENUM:
@@ -476,9 +476,9 @@ static int jp2_colr_getdata(jp2_box_t *box, jas_stream_t *in)
 	return 0;
 }
 
-static void jp2_cdef_dumpdata(jp2_box_t *box, FILE *out)
+static void jp2_cdef_dumpdata(const jp2_box_t *box, FILE *out)
 {
-	jp2_cdef_t *cdef = &box->data.cdef;
+	const jp2_cdef_t *cdef = &box->data.cdef;
 	unsigned int i;
 	for (i = 0; i < cdef->numchans; ++i) {
 		fprintf(out,
@@ -575,18 +575,18 @@ error:
 	return -1;
 }
 
-static int jp2_jp_putdata(jp2_box_t *box, jas_stream_t *out)
+static int jp2_jp_putdata(const jp2_box_t *box, jas_stream_t *out)
 {
-	jp2_jp_t *jp = &box->data.jp;
+	const jp2_jp_t *jp = &box->data.jp;
 	if (jp2_putuint32(out, jp->magic)) {
 		return -1;
 	}
 	return 0;
 }
 
-static int jp2_ftyp_putdata(jp2_box_t *box, jas_stream_t *out)
+static int jp2_ftyp_putdata(const jp2_box_t *box, jas_stream_t *out)
 {
-	jp2_ftyp_t *ftyp = &box->data.ftyp;
+	const jp2_ftyp_t *ftyp = &box->data.ftyp;
 	unsigned int i;
 	if (jp2_putuint32(out, ftyp->majver) || jp2_putuint32(out, ftyp->minver)) {
 		return -1;
@@ -599,9 +599,9 @@ static int jp2_ftyp_putdata(jp2_box_t *box, jas_stream_t *out)
 	return 0;
 }
 
-static int jp2_ihdr_putdata(jp2_box_t *box, jas_stream_t *out)
+static int jp2_ihdr_putdata(const jp2_box_t *box, jas_stream_t *out)
 {
-	jp2_ihdr_t *ihdr = &box->data.ihdr;
+	const jp2_ihdr_t *ihdr = &box->data.ihdr;
 	if (jp2_putuint32(out, ihdr->height) || jp2_putuint32(out, ihdr->width) ||
 	  jp2_putuint16(out, ihdr->numcmpts) || jp2_putuint8(out, ihdr->bpc) ||
 	  jp2_putuint8(out, ihdr->comptype) || jp2_putuint8(out, ihdr->csunk) ||
@@ -611,9 +611,9 @@ static int jp2_ihdr_putdata(jp2_box_t *box, jas_stream_t *out)
 	return 0;
 }
 
-static int jp2_bpcc_putdata(jp2_box_t *box, jas_stream_t *out)
+static int jp2_bpcc_putdata(const jp2_box_t *box, jas_stream_t *out)
 {
-	jp2_bpcc_t *bpcc = &box->data.bpcc;
+	const jp2_bpcc_t *bpcc = &box->data.bpcc;
 	unsigned int i;
 	for (i = 0; i < bpcc->numcmpts; ++i) {
 		if (jp2_putuint8(out, bpcc->bpcs[i])) {
@@ -623,9 +623,9 @@ static int jp2_bpcc_putdata(jp2_box_t *box, jas_stream_t *out)
 	return 0;
 }
 
-static int jp2_colr_putdata(jp2_box_t *box, jas_stream_t *out)
+static int jp2_colr_putdata(const jp2_box_t *box, jas_stream_t *out)
 {
-	jp2_colr_t *colr = &box->data.colr;
+	const jp2_colr_t *colr = &box->data.colr;
 	if (jp2_putuint8(out, colr->method) || jp2_putuint8(out, colr->pri) ||
 	  jp2_putuint8(out, colr->approx)) {
 		return -1;
@@ -645,18 +645,17 @@ static int jp2_colr_putdata(jp2_box_t *box, jas_stream_t *out)
 	return 0;
 }
 
-static int jp2_cdef_putdata(jp2_box_t *box, jas_stream_t *out)
+static int jp2_cdef_putdata(const jp2_box_t *box, jas_stream_t *out)
 {
-	jp2_cdef_t *cdef = &box->data.cdef;
+	const jp2_cdef_t *cdef = &box->data.cdef;
 	unsigned int i;
-	jp2_cdefchan_t *ent;
 
 	if (jp2_putuint16(out, cdef->numchans)) {
 		return -1;
 	}
 
 	for (i = 0; i < cdef->numchans; ++i) {
-		ent = &cdef->ents[i];
+		const jp2_cdefchan_t *ent = &cdef->ents[i];
 		if (jp2_putuint16(out, ent->channo) ||
 		  jp2_putuint16(out, ent->type) ||
 		  jp2_putuint16(out, ent->assoc)) {
@@ -842,7 +841,7 @@ static int jp2_cmap_getdata(jp2_box_t *box, jas_stream_t *in)
 	return 0;
 }
 
-static int jp2_cmap_putdata(jp2_box_t *box, jas_stream_t *out)
+static int jp2_cmap_putdata(const jp2_box_t *box, jas_stream_t *out)
 {
 	/* Eliminate compiler warning about unused variables. */
 	(void)box;
@@ -851,14 +850,13 @@ static int jp2_cmap_putdata(jp2_box_t *box, jas_stream_t *out)
 	return -1;
 }
 
-static void jp2_cmap_dumpdata(jp2_box_t *box, FILE *out)
+static void jp2_cmap_dumpdata(const jp2_box_t *box, FILE *out)
 {
-	jp2_cmap_t *cmap = &box->data.cmap;
+	const jp2_cmap_t *cmap = &box->data.cmap;
 	unsigned int i;
-	jp2_cmapent_t *ent;
 	fprintf(out, "numchans = %d\n", (int) cmap->numchans);
 	for (i = 0; i < cmap->numchans; ++i) {
-		ent = &cmap->ents[i];
+		const jp2_cmapent_t *ent = &cmap->ents[i];
 		fprintf(out, "cmptno=%d; map=%d; pcol=%d\n",
 		  (int) ent->cmptno, (int) ent->map, (int) ent->pcol);
 	}
@@ -919,10 +917,10 @@ static int jp2_pclr_getdata(jp2_box_t *box, jas_stream_t *in)
 	return 0;
 }
 
-static int jp2_pclr_putdata(jp2_box_t *box, jas_stream_t *out)
+static int jp2_pclr_putdata(const jp2_box_t *box, jas_stream_t *out)
 {
 #if 0
-	jp2_pclr_t *pclr = &box->data.pclr;
+	const jp2_pclr_t *pclr = &box->data.pclr;
 #endif
 	/* Eliminate warning about unused variable. */
 	(void)box;
@@ -930,9 +928,9 @@ static int jp2_pclr_putdata(jp2_box_t *box, jas_stream_t *out)
 	return -1;
 }
 
-static void jp2_pclr_dumpdata(jp2_box_t *box, FILE *out)
+static void jp2_pclr_dumpdata(const jp2_box_t *box, FILE *out)
 {
-	jp2_pclr_t *pclr = &box->data.pclr;
+	const jp2_pclr_t *pclr = &box->data.pclr;
 	unsigned int i;
 	int j;
 	fprintf(out, "numents=%d; numchans=%d\n", (int) pclr->numlutents,
