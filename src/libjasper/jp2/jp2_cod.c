@@ -198,7 +198,9 @@ static jp2_box_t *jp2_box_create0(void)
 jp2_box_t *jp2_box_create(int type)
 {
 	const jp2_boxinfo_t *boxinfo = jp2_boxinfolookup(type);
-	if (!boxinfo) {
+	assert(boxinfo != NULL);
+	if (boxinfo == &jp2_boxinfo_unk) {
+		// on error, jp2_boxinfolookup() returns &jp2_boxinfo_unk
 		return NULL;
 	}
 
