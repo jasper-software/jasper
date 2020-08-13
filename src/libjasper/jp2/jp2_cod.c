@@ -197,16 +197,17 @@ static jp2_box_t *jp2_box_create0(void)
 
 jp2_box_t *jp2_box_create(int type)
 {
+	const jp2_boxinfo_t *boxinfo = jp2_boxinfolookup(type);
+	if (!boxinfo) {
+		return NULL;
+	}
+
 	jp2_box_t *box;
-	const jp2_boxinfo_t *boxinfo;
 	if (!(box = jp2_box_create0())) {
 		return 0;
 	}
 	box->type = type;
 	box->len = 0;
-	if (!(boxinfo = jp2_boxinfolookup(type))) {
-		return 0;
-	}
 	box->info = boxinfo;
 	box->ops = &boxinfo->ops;
 	return box;
