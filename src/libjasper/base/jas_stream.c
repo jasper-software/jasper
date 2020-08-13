@@ -542,6 +542,21 @@ static int make_mkstemp_template(char *buffer, size_t size)
  */
 static int easy_mkstemp(char *buffer, size_t size)
 {
+#if defined(__linux__) && defined(O_TMPFILE)
+	/* try to use O_TMPFILE, which is a Linux-specific feature to
+	   create a temporary file without a name, not linked to any
+	   directory; this is even more secure than mkstemp() */
+	const char *tmpdir = getenv("TMPDIR");
+	if (tmpdir == NULL)
+		tmpdir = "/tmp";
+
+	int fd = open(tmpdir, O_TMPFILE|O_RDWR, JAS_STREAM_PERMS);
+	if (fd >= 0) {
+		*buffer = 0;
+		return fd;
+	}
+#endif
+
 	if (make_mkstemp_template(buffer, size))
 		return -1;
 
@@ -595,7 +610,7 @@ jas_stream_t *jas_stream_tmpfile()
 	on it.  Not all operating systems support this functionality, however.
 	For example, under Microsoft Windows the unlink operation will fail,
 	since the file is open. */
-	if (unlink(obj->pathname)) {
+	if (*obj->pathname != 0 && unlink(obj->pathname) < 0) {
 		/* We will try unlinking the file again after it is closed. */
 		obj->flags |= JAS_STREAM_FILEOBJ_DELONCLOSE;
 	}
