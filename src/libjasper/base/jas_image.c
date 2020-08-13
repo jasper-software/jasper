@@ -1134,8 +1134,6 @@ int jas_image_sampcmpt(jas_image_t *image, unsigned cmptno, unsigned newcmptno,
   jas_image_coord_t ho, jas_image_coord_t vo, jas_image_coord_t hs,
   jas_image_coord_t vs, int sgnd, int prec)
 {
-	jas_image_cmpt_t *oldcmpt;
-	jas_image_cmpt_t *newcmpt;
 	int width;
 	int height;
 	jas_image_coord_t tlx;
@@ -1162,7 +1160,7 @@ int jas_image_sampcmpt(jas_image_t *image, unsigned cmptno, unsigned newcmptno,
 	jas_image_coord_t cmptbry;
 
 	assert(cmptno < image->numcmpts_);
-	oldcmpt = image->cmpts_[cmptno];
+	const jas_image_cmpt_t *const oldcmpt = image->cmpts_[cmptno];
 	assert(oldcmpt->tlx_ == 0 && oldcmpt->tly_ == 0);
 	jas_image_calcbbox2(image, &tlx, &tly, &brx, &bry);
 	width = FLOORDIV(brx - ho + hs, hs);
@@ -1179,7 +1177,7 @@ int jas_image_sampcmpt(jas_image_t *image, unsigned cmptno, unsigned newcmptno,
 		goto error;
 cmptbrx = oldcmpt->tlx_ + (oldcmpt->width_ - 1) * oldcmpt->hstep_;
 cmptbry = oldcmpt->tly_ + (oldcmpt->height_ - 1) * oldcmpt->vstep_;
-	newcmpt = image->cmpts_[newcmptno];
+	const jas_image_cmpt_t *const newcmpt = image->cmpts_[newcmptno];
 	jas_stream_rewind(newcmpt->stream_);
 	for (i = 0; i < height; ++i) {
 		y = newcmpt->tly_ + newcmpt->vstep_ * i;
@@ -1387,7 +1385,7 @@ static long uptomult(long x, long y)
 	return ((x + y - 1) / y) * y;
 }
 
-jas_image_t *jas_image_chclrspc(jas_image_t *image, jas_cmprof_t *outprof,
+jas_image_t *jas_image_chclrspc(jas_image_t *image, const jas_cmprof_t *outprof,
   int intent)
 {
 	jas_image_t *inimage;
