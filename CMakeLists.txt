@@ -244,6 +244,7 @@ check_include_files(sys/types.h JAS_HAVE_SYS_TYPES_H)
 
 check_function_exists(gettimeofday JAS_HAVE_GETTIMEOFDAY)
 check_function_exists(getrusage JAS_HAVE_GETRUSAGE)
+check_function_exists(mkostemp JAS_HAVE_MKOSTEMP)
 
 ################################################################################
 # Check for the JPEG library.

@@ -92,6 +92,9 @@
 #if defined(WIN32) || defined(JAS_HAVE_IO_H)
 #include <io.h>
 #endif
+#ifdef _WIN32
+#include <windows.h> // for GetTempPathA()
+#endif
 
 /* O_CLOEXEC is a Linux-specific flag which helps avoid leaking file
    descriptors to child processes created by another thread; for
@@ -477,6 +480,84 @@ jas_stream_t *jas_stream_freopen(const char *path, const char *mode, FILE *fp)
 	return stream;
 }
 
+#ifndef _WIN32
+
+/**
+ * Copy the absolute path of the directory for temporary files to the
+ * given buffer (without a null terminator), including a trailing path
+ * separator.
+ *
+ * @return the number of characters copied to the buffer or 0 on error
+ */
+static size_t get_temp_directory(char *buffer, size_t size)
+{
+	const char *tmpdir = getenv("TMPDIR");
+	if (tmpdir == NULL)
+		tmpdir = "/tmp";
+
+	size_t length = strlen(tmpdir);
+	if (length + 1 > size)
+		return 0;
+
+	memcpy(buffer, tmpdir, length);
+	buffer[length++] = '/';
+	return length;
+}
+
+#endif /* !_WIN32 */
+
+/**
+ * Generate a template for mkstemp().
+ *
+ * @return 0 on success, -1 on error
+ */
+static int make_mkstemp_template(char *buffer, size_t size)
+{
+#ifdef _WIN32
+	char temp_directory[MAX_PATH];
+	if (GetTempPathA(sizeof(temp_directory), temp_directory) == 0)
+		return -1;
+
+	(void)size;
+
+	return GetTempFileNameA(temp_directory, "jasper", 0, buffer) > 0
+		? 0 : -1;
+#else
+	static const char base[] = "jasper.XXXXXX";
+
+	size_t length = get_temp_directory(buffer, size);
+	if (length == 0 || length + sizeof(base) >= size)
+		return -1;
+
+	memcpy(buffer + length, base, sizeof(base));
+	return 0;
+#endif
+}
+
+/**
+ * A wrapper for mkstemp() which generates a template for mkstemp()
+ * before calling the function.
+ *
+ * @return a non-negative file descriptor on success, -1 on error
+ */
+static int easy_mkstemp(char *buffer, size_t size)
+{
+	if (make_mkstemp_template(buffer, size))
+		return -1;
+
+#ifdef _WIN32
+	return open(buffer,
+		    O_CREAT | O_EXCL | O_RDWR | O_TRUNC | O_BINARY | O_CLOEXEC,
+		    JAS_STREAM_PERMS);
+#else
+#ifdef JAS_HAVE_MKOSTEMP
+	return mkostemp(buffer, O_CLOEXEC);
+#else
+	return mkstemp(buffer);
+#endif
+#endif
+}
+
 jas_stream_t *jas_stream_tmpfile()
 {
 	jas_stream_t *stream;
@@ -502,12 +583,8 @@ jas_stream_t *jas_stream_tmpfile()
 	obj->pathname[0] = '\0';
 	stream->obj_ = obj;
 
-	/* Choose a file name. */
-	tmpnam(obj->pathname);
-
-	/* Open the underlying file. */
-	if ((obj->fd = open(obj->pathname, O_CREAT | O_EXCL | O_RDWR | O_TRUNC | O_BINARY | O_CLOEXEC,
-	  JAS_STREAM_PERMS)) < 0) {
+	/* Create the temporary file. */
+	if ((obj->fd = easy_mkstemp(obj->pathname, sizeof(obj->pathname))) < 0) {
 		jas_stream_destroy(stream);
 		return 0;
 	}
