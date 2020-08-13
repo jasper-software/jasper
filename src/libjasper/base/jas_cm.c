@@ -363,8 +363,8 @@ error:
 * Transform class.
 \******************************************************************************/
 
-jas_cmxform_t *jas_cmxform_create(jas_cmprof_t *inprof, jas_cmprof_t *outprof,
-  jas_cmprof_t *prfprof, int op, int intent, int optimize)
+jas_cmxform_t *jas_cmxform_create(const jas_cmprof_t *inprof, const jas_cmprof_t *outprof,
+  const jas_cmprof_t *prfprof, int op, int intent, int optimize)
 {
 	jas_cmxform_t *xform;
 	jas_cmpxformseq_t *inpxformseq;

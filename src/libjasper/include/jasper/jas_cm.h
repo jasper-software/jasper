@@ -237,8 +237,8 @@ int jas_cm_prof_setattr(jas_cm_prof_t *prof, jas_cm_attrname_t name, void *val);
 void *jas_cm_prof_getattr(jas_cm_prof_t *prof, jas_cm_attrname_t name);
 #endif
 
-jas_cmxform_t *jas_cmxform_create(jas_cmprof_t *inprof, jas_cmprof_t *outprof,
-  jas_cmprof_t *proofprof, int op, int intent, int optimize);
+jas_cmxform_t *jas_cmxform_create(const jas_cmprof_t *inprof, const jas_cmprof_t *outprof,
+  const jas_cmprof_t *proofprof, int op, int intent, int optimize);
 
 void jas_cmxform_destroy(jas_cmxform_t *xform);
 
