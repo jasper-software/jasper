@@ -716,7 +716,7 @@ static int loadimage()
 	int vh;
 	int vw;
 	char *pathname;
-	jas_cmprof_t *outprof;
+	jas_cmprof_t *outprof = NULL;
 
 	assert(!gs.image);
 	assert(!gs.altimage);
@@ -763,6 +763,9 @@ static int loadimage()
 		goto error;
 	if (!(gs.altimage = jas_image_chclrspc(gs.image, outprof, JAS_CMXFORM_INTENT_PER)))
 		goto error;
+
+	jas_cmprof_destroy(outprof);
+	outprof = NULL;
 
 	vw = jas_image_width(gs.image);
 	vh = jas_image_height(gs.image);
@@ -820,7 +823,9 @@ static int loadimage()
 
 	return 0;
 
-error:
+ error:
+	if (outprof != NULL)
+		jas_cmprof_destroy(outprof);
 	unloadimage();
 	return -1;
 }
