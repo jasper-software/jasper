@@ -344,8 +344,7 @@ error:
 
 static void jp2_box_dump(const jp2_box_t *box, FILE *out)
 {
-	const jp2_boxinfo_t *boxinfo;
-	boxinfo = jp2_boxinfolookup(box->type);
+	const jp2_boxinfo_t *boxinfo = box->info;
 	assert(boxinfo);
 
 	fprintf(out, "JP2 box: ");
