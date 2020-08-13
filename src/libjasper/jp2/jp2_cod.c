@@ -187,8 +187,6 @@ static jp2_box_t *jp2_box_create0(void)
 		return 0;
 	}
 	memset(box, 0, sizeof(jp2_box_t));
-	box->type = 0;
-	box->len = 0;
 	// Mark the box data as never having been constructed
 	// so that we will not errantly attempt to destroy it later.
 	box->ops = &jp2_boxinfo_unk.ops;
