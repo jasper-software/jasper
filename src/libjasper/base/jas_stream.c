@@ -115,17 +115,17 @@ static void jas_stream_initbuf(jas_stream_t *stream, int bufmode, char *buf,
   int bufsize);
 
 static int mem_read(jas_stream_obj_t *obj, char *buf, unsigned cnt);
-static int mem_write(jas_stream_obj_t *obj, char *buf, unsigned cnt);
+static int mem_write(jas_stream_obj_t *obj, const char *buf, unsigned cnt);
 static long mem_seek(jas_stream_obj_t *obj, long offset, int origin);
 static int mem_close(jas_stream_obj_t *obj);
 
 static int sfile_read(jas_stream_obj_t *obj, char *buf, unsigned cnt);
-static int sfile_write(jas_stream_obj_t *obj, char *buf, unsigned cnt);
+static int sfile_write(jas_stream_obj_t *obj, const char *buf, unsigned cnt);
 static long sfile_seek(jas_stream_obj_t *obj, long offset, int origin);
 static int sfile_close(jas_stream_obj_t *obj);
 
 static int file_read(jas_stream_obj_t *obj, char *buf, unsigned cnt);
-static int file_write(jas_stream_obj_t *obj, char *buf, unsigned cnt);
+static int file_write(jas_stream_obj_t *obj, const char *buf, unsigned cnt);
 static long file_seek(jas_stream_obj_t *obj, long offset, int origin);
 static int file_close(jas_stream_obj_t *obj);
 
@@ -1208,7 +1208,7 @@ static int mem_resize(jas_stream_memobj_t *m, size_t bufsize)
 }
 
 /* FIXME integral type */
-static int mem_write(jas_stream_obj_t *obj, char *buf, unsigned cnt)
+static int mem_write(jas_stream_obj_t *obj, const char *buf, unsigned cnt)
 {
 	size_t n;
 	jas_stream_memobj_t *m = (jas_stream_memobj_t *)obj;
@@ -1320,7 +1320,7 @@ static int file_read(jas_stream_obj_t *obj, char *buf, unsigned cnt)
 }
 
 /* FIXME integral type */
-static int file_write(jas_stream_obj_t *obj, char *buf, unsigned cnt)
+static int file_write(jas_stream_obj_t *obj, const char *buf, unsigned cnt)
 {
 	jas_stream_fileobj_t *fileobj;
 	JAS_DBGLOG(100, ("file_write(%p, %p, %u)\n", obj, buf, cnt));
@@ -1372,7 +1372,7 @@ static int sfile_read(jas_stream_obj_t *obj, char *buf, unsigned cnt)
 }
 
 /* FIXME integral type */
-static int sfile_write(jas_stream_obj_t *obj, char *buf, unsigned cnt)
+static int sfile_write(jas_stream_obj_t *obj, const char *buf, unsigned cnt)
 {
 	FILE *fp;
 	size_t n;

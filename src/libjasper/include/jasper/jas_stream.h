@@ -179,7 +179,7 @@ typedef struct {
 	int (*read_)(jas_stream_obj_t *obj, char *buf, unsigned cnt);
 
 	/* Write characters to a file object. */
-	int (*write_)(jas_stream_obj_t *obj, char *buf, unsigned cnt);
+	int (*write_)(jas_stream_obj_t *obj, const char *buf, unsigned cnt);
 
 	/* Set the position for a file object. */
 	long (*seek_)(jas_stream_obj_t *obj, long offset, int origin);
