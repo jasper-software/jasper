@@ -556,8 +556,6 @@ static void pan(float dx, float dy)
 
 static void panzoom(float dx, float dy, float sx, float sy)
 {
-	float w;
-	float h;
 	float cx;
 	float cy;
 	int reginh;
@@ -582,8 +580,8 @@ static void panzoom(float dx, float dy, float sx, float sy)
 	if (sx != 1.0 || sy != 1.0) {
 		cx = (gs.botleftx + gs.toprightx) / 2.0;
 		cy = (gs.botlefty + gs.toprighty) / 2.0;
-		w = gs.toprightx - gs.botleftx;
-		h = gs.toprighty - gs.botlefty;
+		float w = gs.toprightx - gs.botleftx;
+		float h = gs.toprighty - gs.botlefty;
 		gs.botleftx = cx - 0.5 * w / sx;
 		gs.botlefty = cy - 0.5 * h / sy;
 		gs.toprightx = cx + 0.5 * w / sx;
@@ -602,8 +600,7 @@ static void panzoom(float dx, float dy, float sx, float sy)
 		}
 	}
 	if (gs.botleftx < 0 || gs.toprightx > gs.vp.width) {
-		float w;
-		w = gs.toprightx - gs.botleftx;
+		float w = gs.toprightx - gs.botleftx;
 		gs.botleftx = 0.5 * gs.vp.width - 0.5 * w;
 		gs.toprightx = 0.5 * gs.vp.width + 0.5 * w;
 	}
@@ -620,8 +617,7 @@ static void panzoom(float dx, float dy, float sx, float sy)
 		}
 	}
 	if (gs.botlefty < 0 || gs.toprighty > gs.vp.height) {
-		float h;
-		h = gs.toprighty - gs.botlefty;
+		float h = gs.toprighty - gs.botlefty;
 		gs.botlefty = 0.5 * gs.vp.height - 0.5 * h;
 		gs.toprighty = 0.5 * gs.vp.height + 0.5 * h;
 	}
