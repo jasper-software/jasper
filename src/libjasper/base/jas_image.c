@@ -662,10 +662,8 @@ const char *jas_image_fmttostr(int fmt)
 int jas_image_getfmt(jas_stream_t *in)
 {
 	jas_image_fmtinfo_t *fmtinfo;
-	bool found;
 
 	/* Check for data in each of the supported formats. */
-	found = 0;
 	unsigned i;
 	for (i = 0, fmtinfo = jas_image_fmtinfos; i < jas_image_numfmts; ++i,
 	  ++fmtinfo) {
@@ -674,13 +672,12 @@ int jas_image_getfmt(jas_stream_t *in)
 			JAS_DBGLOG(20, ("testing for format %s ... ", fmtinfo->name));
 			if (!(*fmtinfo->ops.validate)(in)) {
 				JAS_DBGLOG(20, ("test succeeded\n"));
-				found = 1;
-				break;
+				return fmtinfo->id;
 			}
 			JAS_DBGLOG(20, ("test failed\n"));
 		}
 	}
-	return found ? fmtinfo->id : (-1);
+	return -1;
 }
 
 int jas_image_fmtfromname(const char *name)
