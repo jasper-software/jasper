@@ -221,9 +221,8 @@ bool jpc_mqdec_getbit_func(register jpc_mqdec_t *mqdec)
 /* Apply MPS_EXCHANGE algorithm (with RENORMD). */
 bool jpc_mqdec_mpsexchrenormd(register jpc_mqdec_t *mqdec)
 {
-	bool ret;
 	register const jpc_mqstate_t *state = *mqdec->curctx;
-	jpc_mqdec_mpsexchange(mqdec->areg, state->qeval, mqdec->curctx, ret);
+	bool ret = jpc_mqdec_mpsexchange(mqdec->areg, state->qeval, mqdec->curctx);
 	jpc_mqdec_renormd(mqdec->areg, mqdec->creg, mqdec->ctreg, mqdec->in,
 	  mqdec->eof, mqdec->inbuffer);
 	return ret;
@@ -232,9 +231,8 @@ bool jpc_mqdec_mpsexchrenormd(register jpc_mqdec_t *mqdec)
 /* Apply LPS_EXCHANGE algorithm (with RENORMD). */
 bool jpc_mqdec_lpsexchrenormd(register jpc_mqdec_t *mqdec)
 {
-	bool ret;
 	register const jpc_mqstate_t *state = *mqdec->curctx;
-	jpc_mqdec_lpsexchange(mqdec->areg, state->qeval, mqdec->curctx, ret);
+	bool ret = jpc_mqdec_lpsexchange(&mqdec->areg, state->qeval, mqdec->curctx);
 	jpc_mqdec_renormd(mqdec->areg, mqdec->creg, mqdec->ctreg, mqdec->in,
 	  mqdec->eof, mqdec->inbuffer);
 	return ret;
