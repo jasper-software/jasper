@@ -630,6 +630,16 @@ int jas_stream_close(jas_stream_t *stream)
 	return 0;
 }
 
+static bool jas_stream_is_unbuffered(const jas_stream_t *stream)
+{
+	return stream->bufsize_ <= 1;
+}
+
+static bool jas_stream_is_input_buffer_empty(const jas_stream_t *stream)
+{
+	return stream->cnt_ == 0;
+}
+
 /******************************************************************************\
 * Code for reading and writing streams.
 \******************************************************************************/
@@ -672,7 +682,36 @@ int jas_stream_read(jas_stream_t *stream, void *buf, unsigned cnt)
 
 	JAS_DBGLOG(100, ("jas_stream_read(%p, %p, %u)\n", stream, buf, cnt));
 
+	if (cnt == 0)
+		return 0;
+
 	bufptr = buf;
+
+	if (jas_stream_is_unbuffered(stream) && stream->rwlimit_ < 0 &&
+	    jas_stream_is_input_buffer_empty(stream)) {
+		/* fast path for unbuffered streams */
+
+		if ((stream->flags_ & JAS_STREAM_ERRMASK) != 0)
+			return 0;
+
+		if ((stream->openmode_ & JAS_STREAM_READ) == 0)
+			return 0;
+
+		assert((stream->bufmode_ & JAS_STREAM_WRBUF) == 0);
+
+		stream->bufmode_ |= JAS_STREAM_RDBUF;
+
+		int nbytes = stream->ops_->read_(stream->obj_, bufptr, cnt);
+		if (nbytes <= 0) {
+			stream->flags_ |= nbytes < 0
+				? JAS_STREAM_ERR
+				: JAS_STREAM_EOF;
+			return 0;
+		}
+
+		stream->rwcnt_ += nbytes;
+		return nbytes;
+	}
 
 	unsigned n = 0;
 	while (n < cnt) {
@@ -693,7 +732,30 @@ int jas_stream_write(jas_stream_t *stream, const void *buf, unsigned cnt)
 
 	JAS_DBGLOG(100, ("jas_stream_write(%p, %p, %d)\n", stream, buf, cnt));
 
+	if (cnt == 0)
+		return 0;
+
 	bufptr = buf;
+
+	if (jas_stream_is_unbuffered(stream) && stream->rwlimit_ < 0) {
+		/* fast path for unbuffered streams */
+
+		/* need to flush the output buffer before we do a raw
+		   write */
+		if (jas_stream_flushbuf(stream, EOF))
+			return 0;
+
+		stream->bufmode_ |= JAS_STREAM_WRBUF;
+
+		int nbytes = stream->ops_->write_(stream->obj_, bufptr, cnt);
+		if (nbytes != (int)cnt) {
+			stream->flags_ |= JAS_STREAM_ERR;
+			return 0;
+		}
+
+		stream->rwcnt_ += nbytes;
+		return nbytes;
+	}
 
 	unsigned n = 0;
 	while (n < cnt) {
