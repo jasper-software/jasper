@@ -102,7 +102,7 @@ static void jpc_mqdec_bytein(jpc_mqdec_t *mqdec);
 \******************************************************************************/
 
 /* Create a MQ decoder. */
-jpc_mqdec_t *jpc_mqdec_create(int maxctxs, jas_stream_t *in)
+jpc_mqdec_t *jpc_mqdec_create(unsigned maxctxs, jas_stream_t *in)
 {
 	jpc_mqdec_t *mqdec;
 
@@ -182,20 +182,19 @@ void jpc_mqdec_setinput(jpc_mqdec_t *mqdec, jas_stream_t *in)
 
 /* Initialize one or more contexts. */
 
-void jpc_mqdec_setctxs(const jpc_mqdec_t *mqdec, int numctxs, const jpc_mqctx_t *ctxs)
+void jpc_mqdec_setctxs(const jpc_mqdec_t *mqdec, unsigned numctxs, const jpc_mqctx_t *ctxs)
 {
 	const jpc_mqstate_t **ctx;
-	int n;
 
 	ctx = mqdec->ctxs;
-	n = JAS_MIN(mqdec->maxctxs, numctxs);
-	while (--n >= 0) {
+	unsigned n = JAS_MIN(mqdec->maxctxs, numctxs);
+	while (n-- > 0) {
 		*ctx = &jpc_mqstates[2 * ctxs->ind + ctxs->mps];
 		++ctx;
 		++ctxs;
 	}
 	n = mqdec->maxctxs - numctxs;
-	while (--n >= 0) {
+	while (n-- > 0) {
 		*ctx = &jpc_mqstates[0];
 		++ctx;
 	}

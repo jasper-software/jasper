@@ -105,7 +105,7 @@ typedef struct {
 	const jpc_mqstate_t **ctxs;
 
 	/* The maximum number of contexts. */
-	int maxctxs;
+	unsigned maxctxs;
 
 	/* The stream from which to read data. */
 	jas_stream_t *in;
@@ -123,7 +123,7 @@ typedef struct {
 \******************************************************************************/
 
 /* Create a MQ decoder. */
-jpc_mqdec_t *jpc_mqdec_create(int maxctxs, jas_stream_t *in);
+jpc_mqdec_t *jpc_mqdec_create(unsigned maxctxs, jas_stream_t *in);
 
 /* Destroy a MQ decoder. */
 void jpc_mqdec_destroy(jpc_mqdec_t *dec);
@@ -147,7 +147,7 @@ void jpc_mqdec_init(jpc_mqdec_t *dec);
 	((mqdec)->curctx = &(mqdec)->ctxs[ctxno]);
 
 /* Set the state information for all contexts of a MQ decoder. */
-void jpc_mqdec_setctxs(const jpc_mqdec_t *dec, int numctxs, const jpc_mqctx_t *ctxs);
+void jpc_mqdec_setctxs(const jpc_mqdec_t *dec, unsigned numctxs, const jpc_mqctx_t *ctxs);
 
 /******************************************************************************\
 * Functions/macros for decoding bits.
