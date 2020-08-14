@@ -508,23 +508,29 @@ int jas_image_readcmpt(jas_image_t *image, unsigned cmptno, jas_image_coord_t x,
 		}
 	}
 
+	jas_stream_t *const stream = cmpt->stream_;
+	const uint_least32_t cmpt_width = cmpt->width_;
+	const unsigned cps = cmpt->cps_;
+	const unsigned prec = cmpt->prec_;
+	const bool sgnd = cmpt->sgnd_;
+
 	dr = jas_matrix_getref(data, 0, 0);
 	const uint_least32_t drs = jas_matrix_rowstep(data);
 	for (i = 0; i < height; ++i, dr += drs) {
 		d = dr;
-		if (jas_stream_seek(cmpt->stream_, (cmpt->width_ * (y + i) + x)
-		  * cmpt->cps_, SEEK_SET) < 0) {
+		if (jas_stream_seek(stream, (cmpt_width * (y + i) + x)
+		  * cps, SEEK_SET) < 0) {
 			return -1;
 		}
 		for (j = width; j > 0; --j, ++d) {
 			v = 0;
-			for (unsigned k = cmpt->cps_; k > 0; --k) {
-				if ((c = jas_stream_getc(cmpt->stream_)) == EOF) {
+			for (unsigned k = cps; k > 0; --k) {
+				if ((c = jas_stream_getc(stream)) == EOF) {
 					return -1;
 				}
 				v = (v << 8) | (c & 0xff);
 			}
-			*d = bitstoint(v, cmpt->prec_, cmpt->sgnd_);
+			*d = bitstoint(v, prec, sgnd);
 		}
 	}
 
@@ -565,19 +571,25 @@ int jas_image_writecmpt(jas_image_t *image, unsigned cmptno, jas_image_coord_t x
 		return -1;
 	}
 
+	jas_stream_t *const stream = cmpt->stream_;
+	const uint_least32_t cmpt_width = cmpt->width_;
+	const unsigned cps = cmpt->cps_;
+	const unsigned prec = cmpt->prec_;
+	const bool sgnd = cmpt->sgnd_;
+
 	const jas_seqent_t *dr = jas_matrix_getref(data, 0, 0);
 	const uint_least32_t drs = jas_matrix_rowstep(data);
 	for (i = 0; i < height; ++i, dr += drs) {
 		const jas_seqent_t *d = dr;
-		if (jas_stream_seek(cmpt->stream_, (cmpt->width_ * (y + i) + x)
-		  * cmpt->cps_, SEEK_SET) < 0) {
+		if (jas_stream_seek(stream, (cmpt_width * (y + i) + x)
+		  * cps, SEEK_SET) < 0) {
 			return -1;
 		}
 		for (j = width; j > 0; --j, ++d) {
-			v = inttobits(*d, cmpt->prec_, cmpt->sgnd_);
-			for (unsigned k = cmpt->cps_; k > 0; --k) {
-				c = (v >> (8 * (cmpt->cps_ - 1))) & 0xff;
-				if (jas_stream_putc(cmpt->stream_,
+			v = inttobits(*d, prec, sgnd);
+			for (unsigned k = cps; k > 0; --k) {
+				c = (v >> (8 * (cps - 1))) & 0xff;
+				if (jas_stream_putc(stream,
 				  (unsigned char) c) == EOF) {
 					return -1;
 				}
