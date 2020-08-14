@@ -146,9 +146,6 @@ void jpc_mqdec_init(jpc_mqdec_t *dec);
 #define	jpc_mqdec_setcurctx(dec, ctxno) \
 	((mqdec)->curctx = &(mqdec)->ctxs[ctxno]);
 
-/* Set the state information for a particular context of a MQ decoder. */
-void jpc_mqdec_setctx(jpc_mqdec_t *dec, int ctxno, const jpc_mqctx_t *ctx);
-
 /* Set the state information for all contexts of a MQ decoder. */
 void jpc_mqdec_setctxs(const jpc_mqdec_t *dec, int numctxs, const jpc_mqctx_t *ctxs);
 

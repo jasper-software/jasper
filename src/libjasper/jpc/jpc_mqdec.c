@@ -201,15 +201,6 @@ void jpc_mqdec_setctxs(const jpc_mqdec_t *mqdec, int numctxs, const jpc_mqctx_t 
 	}
 }
 
-/* Initialize a context. */
-
-void jpc_mqdec_setctx(jpc_mqdec_t *mqdec, int ctxno, const jpc_mqctx_t *ctx)
-{
-	const jpc_mqstate_t **ctxi;
-	ctxi = &mqdec->ctxs[ctxno];
-	*ctxi = &jpc_mqstates[2 * ctx->ind + ctx->mps];
-}
-
 /******************************************************************************\
 * Code for decoding a bit.
 \******************************************************************************/
