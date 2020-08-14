@@ -1060,11 +1060,10 @@ static int jas_strtoopenmode(const char *s)
 /* FIXME integral type */
 int jas_stream_copy(jas_stream_t *out, jas_stream_t *in, int n)
 {
-	int all;
 	int c;
 	int m;
 
-	all = (n < 0) ? 1 : 0;
+	const bool all = n < 0;
 
 	m = n;
 	while (all || m > 0) {
