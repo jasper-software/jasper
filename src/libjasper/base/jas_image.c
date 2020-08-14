@@ -1031,7 +1031,7 @@ void jas_image_writecmptsample(jas_image_t *image, unsigned cmptno, int x, int y
 	}
 }
 
-int jas_image_getcmptbytype(const jas_image_t *image, int ctype)
+int jas_image_getcmptbytype(const jas_image_t *image, jas_image_cmpttype_t ctype)
 {
 	for (unsigned cmptno = 0; cmptno < image->numcmpts_; ++cmptno) {
 		if (image->cmpts_[cmptno]->type_ == ctype) {
@@ -1392,7 +1392,6 @@ jas_image_t *jas_image_chclrspc(jas_image_t *image, const jas_cmprof_t *outprof,
 	int k;
 	int prec;
 	jas_image_t *outimage;
-	int cmpttype;
 	jas_cmprof_t *inprof;
 	jas_cmprof_t *tmpprof;
 	jas_image_cmptparm_t cmptparm;
@@ -1434,11 +1433,11 @@ jas_image_dump(image, stderr);
 		}
 		unsigned n = jas_image_numcmpts(inimage);
 		for (unsigned i = 0; i < n; ++i) {
-			cmpttype = jas_image_cmpttype(inimage, i);
 			if (jas_image_sampcmpt(inimage, i, i + 1, 0, 0, minhstep, minvstep,
 			  jas_image_cmptsgnd(inimage, i), jas_image_cmptprec(inimage, i))) {
 				goto error;
 			}
+			const jas_image_cmpttype_t cmpttype = jas_image_cmpttype(inimage, i);
 			jas_image_setcmpttype(inimage, i + 1, cmpttype);
 			jas_image_delcmpt(inimage, i);
 		}

@@ -478,7 +478,7 @@ JAS_DLLEXPORT void jas_image_writecmptsample(jas_image_t *image, unsigned cmptno
   int_fast32_t v);
 
 JAS_ATTRIBUTE_PURE
-JAS_DLLEXPORT int jas_image_getcmptbytype(const jas_image_t *image, int ctype);
+JAS_DLLEXPORT int jas_image_getcmptbytype(const jas_image_t *image, jas_image_cmpttype_t ctype);
 
 /******************************************************************************\
 * Image format-related operations.
