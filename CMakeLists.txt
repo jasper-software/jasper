@@ -238,7 +238,6 @@ message("LATEX_FOUND ${LATEX_FOUND}")
 check_include_files(fcntl.h JAS_HAVE_FCNTL_H)
 check_include_files(io.h JAS_HAVE_IO_H)
 check_include_files(unistd.h JAS_HAVE_UNISTD_H)
-check_include_files(windows.h JAS_HAVE_WINDOWS_H)
 check_include_files(sys/time.h JAS_HAVE_SYS_TIME_H)
 check_include_files(sys/types.h JAS_HAVE_SYS_TYPES_H)
 
