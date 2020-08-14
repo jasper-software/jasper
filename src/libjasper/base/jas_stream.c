@@ -1248,13 +1248,12 @@ long jas_stream_length(jas_stream_t *stream)
 /* FIXME integral type */
 static int mem_read(jas_stream_obj_t *obj, char *buf, unsigned cnt)
 {
-	ssize_t n;
 	jas_stream_memobj_t *m;
 	assert(buf);
 
 	JAS_DBGLOG(100, ("mem_read(%p, %p, %u)\n", obj, buf, cnt));
 	m = (jas_stream_memobj_t *)obj;
-	n = m->len_ - m->pos_;
+	size_t n = m->len_ - m->pos_;
 	cnt = JAS_MIN(n, cnt);
 	memcpy(buf, &m->buf_[m->pos_], cnt);
 	m->pos_ += cnt;
