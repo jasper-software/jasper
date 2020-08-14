@@ -99,9 +99,6 @@ static int bmp_putint32(jas_stream_t *out, int_fast32_t val);
 
 int bmp_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 {
-	jas_image_coord_t width;
-	jas_image_coord_t height;
-	int depth;
 	int cmptno;
 	bmp_hdr_t hdr;
 	bmp_info_t *info;
@@ -155,9 +152,9 @@ int bmp_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 		abort();
 	}
 
-	width = jas_image_cmptwidth(image, enc->cmpts[0]);
-	height = jas_image_cmptheight(image, enc->cmpts[0]);
-	depth = jas_image_cmptprec(image, enc->cmpts[0]);
+	const uint_least32_t width = jas_image_cmptwidth(image, enc->cmpts[0]);
+	const uint_least32_t height = jas_image_cmptheight(image, enc->cmpts[0]);
+	const unsigned depth = jas_image_cmptprec(image, enc->cmpts[0]);
 
 	/* Check to ensure that the image to be saved can actually be represented
 	  using the BMP format. */

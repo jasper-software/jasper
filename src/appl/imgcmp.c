@@ -166,9 +166,6 @@ int main(int argc, char **argv)
 	jas_matrix_t *recondata;
 	jas_image_t *diffimage;
 	jas_stream_t *diffstream;
-	int width;
-	int height;
-	int depth;
 	double d;
 	double maxdist;
 	double mindist;
@@ -301,9 +298,9 @@ int main(int argc, char **argv)
 	maxdist = 0;
 	mindist = FLT_MAX;
 	for (unsigned compno = 0; compno < numcomps; ++compno) {
-		width = jas_image_cmptwidth(origimage, compno);
-		height = jas_image_cmptheight(origimage, compno);
-		depth = jas_image_cmptprec(origimage, compno);
+		const uint_least32_t width = jas_image_cmptwidth(origimage, compno);
+		const uint_least32_t height = jas_image_cmptheight(origimage, compno);
+		const unsigned depth = jas_image_cmptprec(origimage, compno);
 		if (jas_image_cmptwidth(reconimage, compno) != width ||
 		 jas_image_cmptheight(reconimage, compno) != height) {
 			fprintf(stderr, "image dimensions differ\n");

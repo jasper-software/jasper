@@ -164,7 +164,7 @@ typedef struct {
 	jas_image_coord_t height_;
 	/* The component height in samples. */
 
-	int prec_;
+	unsigned prec_;
 	/* The precision of the sample data (i.e., the number of bits per
 	sample).  If the samples are signed values, this quantity
 	includes the sign bit. */
@@ -175,7 +175,7 @@ typedef struct {
 	jas_stream_t *stream_;
 	/* The stream containing the component data. */
 
-	int cps_;
+	unsigned cps_;
 	/* The number of characters per sample in the stream. */
 
 	jas_image_cmpttype_t type_;
@@ -243,7 +243,7 @@ typedef struct {
 	jas_image_coord_t height;
 	/* The height of the component in samples. */
 
-	int prec;
+	unsigned prec;
 	/* The precision of the component sample data. */
 
 	int sgnd;
@@ -471,10 +471,10 @@ static inline uint_least8_t jas_image_cmptdtype(const jas_image_t *image, unsign
 }
 
 JAS_DLLEXPORT int jas_image_depalettize(jas_image_t *image, unsigned cmptno, unsigned numlutents,
-  const int_fast32_t *lutents, int dtype, unsigned newcmptno);
+  const int_fast32_t *lutents, unsigned dtype, unsigned newcmptno);
 
-JAS_DLLEXPORT int jas_image_readcmptsample(jas_image_t *image, unsigned cmptno, int x, int y);
-JAS_DLLEXPORT void jas_image_writecmptsample(jas_image_t *image, unsigned cmptno, int x, int y,
+JAS_DLLEXPORT int jas_image_readcmptsample(jas_image_t *image, unsigned cmptno, unsigned x, unsigned y);
+JAS_DLLEXPORT void jas_image_writecmptsample(jas_image_t *image, unsigned cmptno, unsigned x, unsigned y,
   int_fast32_t v);
 
 JAS_ATTRIBUTE_PURE
@@ -521,7 +521,7 @@ JAS_ATTRIBUTE_PURE
 int jas_image_ishomosamp(const jas_image_t *image);
 int jas_image_sampcmpt(jas_image_t *image, unsigned cmptno, unsigned newcmptno,
   jas_image_coord_t ho, jas_image_coord_t vo, jas_image_coord_t hs,
-  jas_image_coord_t vs, int sgnd, int prec);
+  jas_image_coord_t vs, int sgnd, unsigned prec);
 int jas_image_writecmpt2(jas_image_t *image, unsigned cmptno, jas_image_coord_t x,
   jas_image_coord_t y, jas_image_coord_t width, jas_image_coord_t height,
   const long *buf);

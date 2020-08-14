@@ -101,15 +101,15 @@ static jas_image_cmpt_t *jas_image_cmpt_create(int_fast32_t tlx,
   bool inmem);
 static void jas_image_setbbox(jas_image_t *image);
 static jas_image_cmpt_t *jas_image_cmpt_copy(jas_image_cmpt_t *cmpt);
-static int jas_image_growcmpts(jas_image_t *image, int maxcmpts);
-static uint_fast32_t inttobits(jas_seqent_t v, int prec, bool sgnd);
-static jas_seqent_t bitstoint(uint_fast32_t v, int prec, bool sgnd);
-static int putint(jas_stream_t *out, bool sgnd, int prec, long val);
-static int getint(jas_stream_t *in, bool sgnd, int prec, long *val);
+static int jas_image_growcmpts(jas_image_t *image, unsigned maxcmpts);
+static uint_fast32_t inttobits(jas_seqent_t v, unsigned prec, bool sgnd);
+static jas_seqent_t bitstoint(uint_fast32_t v, unsigned prec, bool sgnd);
+static int putint(jas_stream_t *out, bool sgnd, unsigned prec, long val);
+static int getint(jas_stream_t *in, bool sgnd, unsigned prec, long *val);
 static long uptomult(long x, long y);
 static long downtomult(long x, long y);
-static long convert(long val, bool oldsgnd, int oldprec, bool newsgnd,
-  int newprec);
+static long convert(long val, bool oldsgnd, unsigned oldprec, bool newsgnd,
+  unsigned newprec);
 static void jas_image_calcbbox2(const jas_image_t *image, jas_image_coord_t *tlx,
   jas_image_coord_t *tly, jas_image_coord_t *brx, jas_image_coord_t *bry);
 
@@ -117,7 +117,7 @@ static void jas_image_calcbbox2(const jas_image_t *image, jas_image_coord_t *tlx
 * Global data.
 \******************************************************************************/
 
-static int jas_image_numfmts = 0;
+static unsigned jas_image_numfmts = 0;
 static jas_image_fmtinfo_t jas_image_fmtinfos[JAS_IMAGE_MAXFMTS];
 
 /******************************************************************************\
@@ -474,12 +474,10 @@ int jas_image_readcmpt(jas_image_t *image, unsigned cmptno, jas_image_coord_t x,
 	jas_image_cmpt_t *cmpt;
 	jas_image_coord_t i;
 	jas_image_coord_t j;
-	int k;
 	jas_seqent_t v;
 	int c;
 	jas_seqent_t *dr;
 	jas_seqent_t *d;
-	int drs;
 
 	JAS_DBGLOG(100, ("jas_image_readcmpt(%p, %d, %ld, %ld, %ld, %ld, %p)\n",
 	  image, cmptno, JAS_CAST(long, x), JAS_CAST(long, y),
@@ -511,7 +509,7 @@ int jas_image_readcmpt(jas_image_t *image, unsigned cmptno, jas_image_coord_t x,
 	}
 
 	dr = jas_matrix_getref(data, 0, 0);
-	drs = jas_matrix_rowstep(data);
+	const uint_least32_t drs = jas_matrix_rowstep(data);
 	for (i = 0; i < height; ++i, dr += drs) {
 		d = dr;
 		if (jas_stream_seek(cmpt->stream_, (cmpt->width_ * (y + i) + x)
@@ -520,7 +518,7 @@ int jas_image_readcmpt(jas_image_t *image, unsigned cmptno, jas_image_coord_t x,
 		}
 		for (j = width; j > 0; --j, ++d) {
 			v = 0;
-			for (k = cmpt->cps_; k > 0; --k) {
+			for (unsigned k = cmpt->cps_; k > 0; --k) {
 				if ((c = jas_stream_getc(cmpt->stream_)) == EOF) {
 					return -1;
 				}
@@ -540,9 +538,7 @@ int jas_image_writecmpt(jas_image_t *image, unsigned cmptno, jas_image_coord_t x
 	jas_image_cmpt_t *cmpt;
 	jas_image_coord_t i;
 	jas_image_coord_t j;
-	int drs;
 	jas_seqent_t v;
-	int k;
 	int c;
 
 	JAS_DBGLOG(100, ("jas_image_writecmpt(%p, %d, %ld, %ld, %ld, %ld, %p)\n",
@@ -570,7 +566,7 @@ int jas_image_writecmpt(jas_image_t *image, unsigned cmptno, jas_image_coord_t x
 	}
 
 	const jas_seqent_t *dr = jas_matrix_getref(data, 0, 0);
-	drs = jas_matrix_rowstep(data);
+	const uint_least32_t drs = jas_matrix_rowstep(data);
 	for (i = 0; i < height; ++i, dr += drs) {
 		const jas_seqent_t *d = dr;
 		if (jas_stream_seek(cmpt->stream_, (cmpt->width_ * (y + i) + x)
@@ -579,7 +575,7 @@ int jas_image_writecmpt(jas_image_t *image, unsigned cmptno, jas_image_coord_t x
 		}
 		for (j = width; j > 0; --j, ++d) {
 			v = inttobits(*d, cmpt->prec_, cmpt->sgnd_);
-			for (k = cmpt->cps_; k > 0; --k) {
+			for (unsigned k = cmpt->cps_; k > 0; --k) {
 				c = (v >> (8 * (cmpt->cps_ - 1))) & 0xff;
 				if (jas_stream_putc(cmpt->stream_,
 				  (unsigned char) c) == EOF) {
@@ -599,9 +595,8 @@ int jas_image_writecmpt(jas_image_t *image, unsigned cmptno, jas_image_coord_t x
 
 void jas_image_clearfmts()
 {
-	int i;
 	jas_image_fmtinfo_t *fmtinfo;
-	for (i = 0; i < jas_image_numfmts; ++i) {
+	for (unsigned i = 0; i < jas_image_numfmts; ++i) {
 		fmtinfo = &jas_image_fmtinfos[i];
 		if (fmtinfo->name) {
 			jas_free(fmtinfo->name);
@@ -667,11 +662,11 @@ const char *jas_image_fmttostr(int fmt)
 int jas_image_getfmt(jas_stream_t *in)
 {
 	jas_image_fmtinfo_t *fmtinfo;
-	int found;
-	int i;
+	bool found;
 
 	/* Check for data in each of the supported formats. */
 	found = 0;
+	unsigned i;
 	for (i = 0, fmtinfo = jas_image_fmtinfos; i < jas_image_numfmts; ++i,
 	  ++fmtinfo) {
 		if (fmtinfo->ops.validate) {
@@ -690,7 +685,6 @@ int jas_image_getfmt(jas_stream_t *in)
 
 int jas_image_fmtfromname(const char *name)
 {
-	int i;
 	const char *ext;
 	const jas_image_fmtinfo_t *fmtinfo;
 	/* Get the file name extension. */
@@ -699,6 +693,7 @@ int jas_image_fmtfromname(const char *name)
 	}
 	++ext;
 	/* Try to find a format that uses this extension. */	
+	unsigned i;
 	for (i = 0, fmtinfo = jas_image_fmtinfos; i < jas_image_numfmts; ++i,
 	  ++fmtinfo) {
 		/* Do we have a match? */
@@ -792,7 +787,7 @@ int jas_image_addcmpt(jas_image_t *image, int cmptno,
 
 const jas_image_fmtinfo_t *jas_image_lookupfmtbyid(int id)
 {
-	int i;
+	unsigned i;
 	const jas_image_fmtinfo_t *fmtinfo;
 
 	for (i = 0, fmtinfo = jas_image_fmtinfos; i < jas_image_numfmts; ++i, ++fmtinfo) {
@@ -805,7 +800,7 @@ const jas_image_fmtinfo_t *jas_image_lookupfmtbyid(int id)
 
 const jas_image_fmtinfo_t *jas_image_lookupfmtbyname(const char *name)
 {
-	int i;
+	unsigned i;
 	const jas_image_fmtinfo_t *fmtinfo;
 
 	for (i = 0, fmtinfo = jas_image_fmtinfos; i < jas_image_numfmts; ++i, ++fmtinfo) {
@@ -820,14 +815,14 @@ const jas_image_fmtinfo_t *jas_image_lookupfmtbyname(const char *name)
 
 
 
-static uint_fast32_t inttobits(jas_seqent_t v, int prec, bool sgnd)
+static uint_fast32_t inttobits(jas_seqent_t v, unsigned prec, bool sgnd)
 {
 	uint_fast32_t ret;
 	ret = ((sgnd && v < 0) ? ((1 << prec) + v) : v) & JAS_ONES(prec);
 	return ret;
 }
 
-static jas_seqent_t bitstoint(uint_fast32_t v, int prec, bool sgnd)
+static jas_seqent_t bitstoint(uint_fast32_t v, unsigned prec, bool sgnd)
 {
 	jas_seqent_t ret;
 	v &= JAS_ONES(prec);
@@ -874,7 +869,7 @@ static void jas_image_setbbox(jas_image_t *image)
 	}
 }
 
-static int jas_image_growcmpts(jas_image_t *image, int maxcmpts)
+static int jas_image_growcmpts(jas_image_t *image, unsigned maxcmpts)
 {
 	jas_image_cmpt_t **newcmpts;
 
@@ -944,20 +939,20 @@ void jas_image_dump(jas_image_t *image, FILE *out)
 }
 
 int jas_image_depalettize(jas_image_t *image, unsigned cmptno, unsigned numlutents,
-  const int_fast32_t *lutents, int dtype, unsigned newcmptno)
+  const int_fast32_t *lutents, unsigned dtype, unsigned newcmptno)
 {
 	jas_image_cmptparm_t cmptparms;
-	int i;
-	int j;
-	jas_image_cmpt_t *cmpt;
+	const jas_image_cmpt_t *cmpt = image->cmpts_[cmptno];
 
-	cmpt = image->cmpts_[cmptno];
+	const uint_least32_t width = cmpt->width_;
+	const uint_least32_t height = cmpt->height_;
+
 	cmptparms.tlx = cmpt->tlx_;
 	cmptparms.tly = cmpt->tly_;
 	cmptparms.hstep = cmpt->hstep_;
 	cmptparms.vstep = cmpt->vstep_;
-	cmptparms.width = cmpt->width_;
-	cmptparms.height = cmpt->height_;
+	cmptparms.width = width;
+	cmptparms.height = height;
 	cmptparms.prec = JAS_IMAGE_CDT_GETPREC(dtype);
 	cmptparms.sgnd = JAS_IMAGE_CDT_GETSGND(dtype);
 
@@ -969,8 +964,8 @@ int jas_image_depalettize(jas_image_t *image, unsigned cmptno, unsigned numluten
 		cmpt = image->cmpts_[cmptno];
 	}
 
-	for (j = 0; j < cmpt->height_; ++j) {
-		for (i = 0; i < cmpt->width_; ++i) {
+	for (uint_least32_t j = 0; j < height; ++j) {
+		for (uint_least32_t i = 0; i < width; ++i) {
 			int v = jas_image_readcmptsample(image, cmptno, i, j);
 			if (v < 0) {
 				v = 0;
@@ -984,11 +979,10 @@ int jas_image_depalettize(jas_image_t *image, unsigned cmptno, unsigned numluten
 	return 0;
 }
 
-int jas_image_readcmptsample(jas_image_t *image, unsigned cmptno, int x, int y)
+int jas_image_readcmptsample(jas_image_t *image, unsigned cmptno, unsigned x, unsigned y)
 {
 	jas_image_cmpt_t *cmpt;
 	uint_fast32_t v;
-	int k;
 	int c;
 
 	cmpt = image->cmpts_[cmptno];
@@ -998,7 +992,7 @@ int jas_image_readcmptsample(jas_image_t *image, unsigned cmptno, int x, int y)
 		return -1;
 	}
 	v = 0;
-	for (k = cmpt->cps_; k > 0; --k) {
+	for (unsigned k = cmpt->cps_; k > 0; --k) {
 		if ((c = jas_stream_getc(cmpt->stream_)) == EOF) {
 			return -1;
 		}
@@ -1007,12 +1001,11 @@ int jas_image_readcmptsample(jas_image_t *image, unsigned cmptno, int x, int y)
 	return bitstoint(v, cmpt->prec_, cmpt->sgnd_);
 }
 
-void jas_image_writecmptsample(jas_image_t *image, unsigned cmptno, int x, int y,
+void jas_image_writecmptsample(jas_image_t *image, unsigned cmptno, unsigned x, unsigned y,
   int_fast32_t v)
 {
 	jas_image_cmpt_t *cmpt;
 	uint_fast32_t t;
-	int k;
 	int c;
 
 	cmpt = image->cmpts_[cmptno];
@@ -1022,7 +1015,7 @@ void jas_image_writecmptsample(jas_image_t *image, unsigned cmptno, int x, int y
 		return;
 	}
 	t = inttobits(v, cmpt->prec_, cmpt->sgnd_);
-	for (k = cmpt->cps_; k > 0; --k) {
+	for (unsigned k = cmpt->cps_; k > 0; --k) {
 		c = (t >> (8 * (cmpt->cps_ - 1))) & 0xff;
 		if (jas_stream_putc(cmpt->stream_, (unsigned char) c) == EOF) {
 			return;
@@ -1132,16 +1125,12 @@ error:
 
 int jas_image_sampcmpt(jas_image_t *image, unsigned cmptno, unsigned newcmptno,
   jas_image_coord_t ho, jas_image_coord_t vo, jas_image_coord_t hs,
-  jas_image_coord_t vs, int sgnd, int prec)
+  jas_image_coord_t vs, int sgnd, unsigned prec)
 {
-	int width;
-	int height;
 	jas_image_coord_t tlx;
 	jas_image_coord_t tly;
 	jas_image_coord_t brx;
 	jas_image_coord_t bry;
-	int i;
-	int j;
 	jas_image_cmptparm_t cmptparm;
 	jas_image_coord_t ax;
 	jas_image_coord_t ay;
@@ -1163,8 +1152,8 @@ int jas_image_sampcmpt(jas_image_t *image, unsigned cmptno, unsigned newcmptno,
 	const jas_image_cmpt_t *const oldcmpt = image->cmpts_[cmptno];
 	assert(oldcmpt->tlx_ == 0 && oldcmpt->tly_ == 0);
 	jas_image_calcbbox2(image, &tlx, &tly, &brx, &bry);
-	width = FLOORDIV(brx - ho + hs, hs);
-	height = FLOORDIV(bry - vo + vs, vs);
+	const unsigned width = FLOORDIV(brx - ho + hs, hs);
+	const unsigned height = FLOORDIV(bry - vo + vs, vs);
 	cmptparm.tlx = ho;
 	cmptparm.tly = vo;
 	cmptparm.hstep = hs;
@@ -1179,9 +1168,9 @@ cmptbrx = oldcmpt->tlx_ + (oldcmpt->width_ - 1) * oldcmpt->hstep_;
 cmptbry = oldcmpt->tly_ + (oldcmpt->height_ - 1) * oldcmpt->vstep_;
 	const jas_image_cmpt_t *const newcmpt = image->cmpts_[newcmptno];
 	jas_stream_rewind(newcmpt->stream_);
-	for (i = 0; i < height; ++i) {
+	for (unsigned i = 0; i < height; ++i) {
 		y = newcmpt->tly_ + newcmpt->vstep_ * i;
-		for (j = 0; j < width; ++j) {
+		for (unsigned j = 0; j < width; ++j) {
 			x = newcmpt->tlx_ + newcmpt->hstep_ * j;
 			ax = downtomult(x - oldcmpt->tlx_, oldcmpt->hstep_) + oldcmpt->tlx_;
 			ay = downtomult(y - oldcmpt->tly_, oldcmpt->vstep_) + oldcmpt->tly_;
@@ -1290,7 +1279,7 @@ static void jas_image_calcbbox2(const jas_image_t *image, jas_image_coord_t *tlx
 }
 
 JAS_ATTRIBUTE_CONST
-static inline long decode_twos_comp(jas_ulong c, int prec)
+static inline long decode_twos_comp(jas_ulong c, unsigned prec)
 {
 	long result;
 	assert(prec >= 2);
@@ -1301,7 +1290,7 @@ static inline long decode_twos_comp(jas_ulong c, int prec)
 }
 
 JAS_ATTRIBUTE_CONST
-static inline jas_ulong encode_twos_comp(long n, int prec)
+static inline jas_ulong encode_twos_comp(long n, unsigned prec)
 {
 	jas_ulong result;
 	assert(prec >= 2);
@@ -1317,15 +1306,13 @@ static inline jas_ulong encode_twos_comp(long n, int prec)
 	return result;
 }
 
-static int getint(jas_stream_t *in, bool sgnd, int prec, long *val)
+static int getint(jas_stream_t *in, bool sgnd, unsigned prec, long *val)
 {
 	long v;
-	int n;
 	int c;
 	assert((!sgnd && prec >= 1) || (sgnd && prec >= 2));
-	n = (prec + 7) / 8;
 	v = 0;
-	while (--n >= 0) {
+	for (unsigned n = (prec + 7) / 8; n-- > 0;) {
 		if ((c = jas_stream_getc(in)) == EOF)
 			return -1;
 		v = (v << 8) | c;
@@ -1339,9 +1326,8 @@ static int getint(jas_stream_t *in, bool sgnd, int prec, long *val)
 	return 0;
 }
 
-static int putint(jas_stream_t *out, bool sgnd, int prec, long val)
+static int putint(jas_stream_t *out, bool sgnd, unsigned prec, long val)
 {
-	int n;
 	int c;
 	assert((!sgnd && prec >= 1) || (sgnd && prec >= 2));
 	if (sgnd) {
@@ -1349,8 +1335,7 @@ static int putint(jas_stream_t *out, bool sgnd, int prec, long val)
 	}
 	assert(val >= 0);
 	val &= (1 << prec) - 1;
-	n = (prec + 7) / 8;
-	while (--n >= 0) {
+	for (unsigned n = (prec + 7) / 8; n-- > 0;) {
 		c = (val >> (n * 8)) & 0xff;
 		if (jas_stream_putc(out, c) != c)
 			return -1;
@@ -1358,8 +1343,8 @@ static int putint(jas_stream_t *out, bool sgnd, int prec, long val)
 	return 0;
 }
 
-static long convert(long val, bool oldsgnd, int oldprec, bool newsgnd,
-  int newprec)
+static long convert(long val, bool oldsgnd, unsigned oldprec, bool newsgnd,
+  unsigned newprec)
 {
 	if (newsgnd != oldsgnd) {
 	}
@@ -1390,7 +1375,6 @@ jas_image_t *jas_image_chclrspc(jas_image_t *image, const jas_cmprof_t *outprof,
 {
 	jas_image_t *inimage;
 	int k;
-	int prec;
 	jas_image_t *outimage;
 	jas_cmprof_t *inprof;
 	jas_cmprof_t *tmpprof;
@@ -1453,7 +1437,7 @@ jas_image_dump(image, stderr);
 	}
 	const unsigned numinclrchans = jas_clrspc_numchans(jas_cmprof_clrspc(inprof));
 	const unsigned numoutclrchans = jas_clrspc_numchans(jas_cmprof_clrspc(outprof));
-	prec = 8;
+	const unsigned prec = 8;
 
 	if (!(outimage = jas_image_create0())) {
 		goto error;

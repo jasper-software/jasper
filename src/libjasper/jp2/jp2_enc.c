@@ -110,8 +110,6 @@ int jp2_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 	jas_stream_t *iccstream;
 	int pos;
 	int needcdef;
-	int prec;
-	int sgnd;
 
 	box = 0;
 	tmpstream = 0;
@@ -124,8 +122,8 @@ int jp2_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 	}
 
 	allcmptssame = 1;
-	sgnd = jas_image_cmptsgnd(image, 0);
-	prec = jas_image_cmptprec(image, 0);
+	const bool sgnd = jas_image_cmptsgnd(image, 0);
+	const unsigned prec = jas_image_cmptprec(image, 0);
 	for (unsigned i = 1; i < jas_image_numcmpts(image); ++i) {
 		if (jas_image_cmptsgnd(image, i) != sgnd ||
 		  jas_image_cmptprec(image, i) != prec) {
