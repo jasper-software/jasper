@@ -164,9 +164,6 @@ typedef struct {
 	jas_image_coord_t height_;
 	/* The component height in samples. */
 
-#ifdef FIX_ME
-	int smpltype_;
-#else
 	int prec_;
 	/* The precision of the sample data (i.e., the number of bits per
 	sample).  If the samples are signed values, this quantity
@@ -174,7 +171,6 @@ typedef struct {
 
 	int sgnd_;
 	/* The signedness of the sample data. */
-#endif
 
 	jas_stream_t *stream_;
 	/* The stream containing the component data. */
@@ -247,15 +243,11 @@ typedef struct {
 	jas_image_coord_t height;
 	/* The height of the component in samples. */
 
-#ifdef FIX_ME
-	int smpltype;
-#else
 	int prec;
 	/* The precision of the component sample data. */
 
 	int sgnd;
 	/* The signedness of the component sample data. */
-#endif
 
 } jas_image_cmptparm_t;
 
