@@ -585,6 +585,27 @@ int jas_image_writecmpt(jas_image_t *image, unsigned cmptno, jas_image_coord_t x
 		  * cps, SEEK_SET) < 0) {
 			return -1;
 		}
+
+		if (cmpt->cps_ == 1 && !cmpt->sgnd_ && width <= 16384) {
+			/* fast path for 1 byte per sample and
+			   unsigned with bulk writes */
+
+#ifdef _MSC_VER
+			/* can't use variable-length arrays here
+			   because MSVC doesn't support this C99
+			   feature */
+			jas_uchar *buffer = _alloca(width);
+#else
+			jas_uchar buffer[width];
+#endif
+
+			for (j = 0; j < width; ++j)
+				buffer[j] = d[j];
+
+			jas_stream_write(cmpt->stream_, buffer, width);
+			continue;
+		}
+
 		for (j = width; j > 0; --j, ++d) {
 			v = inttobits(*d, prec, sgnd);
 			for (unsigned k = cps; k > 0; --k) {
