@@ -383,7 +383,7 @@ void jpc_tagtree_dump(const jpc_tagtree_t *tree, FILE *out)
 	n = tree->numnodes_;
 	while (--n >= 0) {
 		fprintf(out, "node %p, parent %p, value %d, lower %d, known %d\n",
-		  (void *) node, (void *) node->parent_, node->value_, node->low_,
+		  (const void *) node, (const void *) node->parent_, node->value_, node->low_,
 		  node->known_);
 		++node;
 	}
