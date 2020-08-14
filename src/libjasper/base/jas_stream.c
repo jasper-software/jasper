@@ -1059,25 +1059,25 @@ static int jas_strtoopenmode(const char *s)
 /* FIXME integral type */
 int jas_stream_copy(jas_stream_t *out, jas_stream_t *in, int n)
 {
-	int c;
 	int m;
 
 	const bool all = n < 0;
 
+	char buffer[JAS_STREAM_BUFSIZE];
+
 	m = n;
 	while (all || m > 0) {
-		if ((c = jas_stream_getc_macro(in)) == EOF) {
-			/* The next character of input could not be read. */
-			/* Return with an error if an I/O error occured
-			  (not including EOF) or if an explicit copy count
-			  was specified. */
-			return (!all || jas_stream_error(in)) ? (-1) : 0;
-		}
-		if (jas_stream_putc_macro(out, c) == EOF) {
+		int nbytes = jas_stream_read(in, buffer,
+					     JAS_MIN((size_t)m, sizeof(buffer)));
+		if (nbytes == 0)
+			return !all || jas_stream_error(in) ? -1 : 0;
+
+		if (jas_stream_write(out, buffer, nbytes) != nbytes)
 			return -1;
-		}
-		--m;
+
+		m -= nbytes;
 	}
+
 	return 0;
 }
 
