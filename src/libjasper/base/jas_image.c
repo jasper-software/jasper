@@ -1386,7 +1386,7 @@ static long uptomult(long x, long y)
 }
 
 jas_image_t *jas_image_chclrspc(jas_image_t *image, const jas_cmprof_t *outprof,
-  int intent)
+  jas_cmxform_intent_t intent)
 {
 	jas_image_t *inimage;
 	int k;
@@ -1491,7 +1491,7 @@ jas_image_dump(image, stderr);
 	jas_image_setclrspc(outimage, jas_cmprof_clrspc(outprof));
 
 	if (!(xform = jas_cmxform_create(inprof, outprof, 0, JAS_CMXFORM_OP_FWD,
-	  intent, 0))) {
+	  intent, JAS_CMXFORM_OPTM_SPEED))) {
 		goto error;
 	}
 

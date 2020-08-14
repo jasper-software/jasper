@@ -549,7 +549,7 @@ jas_image_t *converttosrgb(jas_image_t *inimage)
 
 	outprof = jas_cmprof_createfromclrspc(JAS_CLRSPC_SRGB);
 	assert(outprof);
-	xform = jas_cmxform_create(jas_image_cmprof(inimage), outprof, 0, JAS_CMXFORM_FWD, JAS_CMXFORM_INTENT_PER, 0);
+	xform = jas_cmxform_create(jas_image_cmprof(inimage), outprof, 0, JAS_CMXFORM_FWD, JAS_CMXFORM_INTENT_PER, JAS_CMXFORM_OPTM_SPEED);
 	assert(xform);
 
 	inpixmap.numcmpts = jas_image_numcmpts(oldimage);

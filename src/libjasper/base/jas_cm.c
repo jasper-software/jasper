@@ -364,7 +364,7 @@ error:
 \******************************************************************************/
 
 jas_cmxform_t *jas_cmxform_create(const jas_cmprof_t *inprof, const jas_cmprof_t *outprof,
-  const jas_cmprof_t *prfprof, int op, int intent, int optimize)
+  const jas_cmprof_t *prfprof, jas_cmxform_op_t op, jas_cmxform_intent_t intent, jas_cmxform_optm_t optimize)
 {
 	jas_cmxform_t *xform;
 	jas_cmpxformseq_t *inpxformseq;
