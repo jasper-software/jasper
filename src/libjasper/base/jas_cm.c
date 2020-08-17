@@ -92,7 +92,7 @@ static int jas_cmgetint(const long **bufptr, int sgnd, unsigned prec, long *val)
 static int jas_cmpxformseq_append(jas_cmpxformseq_t *pxformseq,
   jas_cmpxformseq_t *othpxformseq);
 static int jas_cmpxformseq_appendcnvt(jas_cmpxformseq_t *pxformseq,
-  int, int);
+  unsigned, unsigned);
 static int jas_cmpxformseq_resize(jas_cmpxformseq_t *pxformseq, unsigned n);
 
 static int mono(const jas_iccprof_t *prof, int op, jas_cmpxformseq_t **pxformseq);
@@ -626,7 +626,7 @@ static int jas_cmpxformseq_delete(jas_cmpxformseq_t *pxformseq, unsigned i)
 }
 
 static int jas_cmpxformseq_appendcnvt(jas_cmpxformseq_t *pxformseq,
-  int dstclrspc, int srcclrspc)
+  unsigned dstclrspc, unsigned srcclrspc)
 {
 	if (dstclrspc == srcclrspc)
 		return 0;
