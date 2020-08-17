@@ -158,7 +158,7 @@ inline static int jas_int_asl(int x, int n)
 
 JAS_ATTRIBUTE_CONST
 JAS_ATTRIBUTE_DISABLE_USAN
-inline static int jas_fast32_asr(int_fast32_t x, int n)
+inline static int_fast32_t jas_fast32_asr(int_fast32_t x, int n)
 {
 	// Ensure that the shift of a negative value appears to behave as a
 	// signed arithmetic shift.
@@ -172,7 +172,7 @@ inline static int jas_fast32_asr(int_fast32_t x, int n)
 
 JAS_ATTRIBUTE_CONST
 JAS_ATTRIBUTE_DISABLE_USAN
-inline static int jas_fast32_asl(int_fast32_t x, int n)
+inline static int_fast32_t jas_fast32_asl(int_fast32_t x, int n)
 {
 	// Ensure that the shift of a negative value appears to behave as a
 	// signed arithmetic shift.
