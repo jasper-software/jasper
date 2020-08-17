@@ -118,12 +118,11 @@ int jas_eprintf(const char *fmt, ...)
 }
 
 /* Dump memory to a stream. */
-int jas_memdump(FILE *out, void *data, size_t len)
+int jas_memdump(FILE *out, const void *data, size_t len)
 {
 	size_t i;
 	size_t j;
-	jas_uchar *dp;
-	dp = data;
+	const jas_uchar *dp = data;
 	for (i = 0; i < len; i += 16) {
 		fprintf(out, "%04zx:", i);
 		for (j = 0; j < 16; ++j) {
