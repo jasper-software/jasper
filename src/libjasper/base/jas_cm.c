@@ -547,7 +547,7 @@ int jas_cmxform_apply(const jas_cmxform_t *xform, const jas_cmpixmap_t *in, jas_
 			const jas_cmreal_t *bufptr = &outbuf[i];
 			long *dataptr = &fmt->buf[n];
 			for (unsigned j = 0; j < m; ++j) {
-				v = (*bufptr) * scale + bias;
+				v = (long)((*bufptr) * scale + bias);
 				bufptr += xform->numoutchans;
 				if (jas_cmputint(&dataptr, fmt->sgnd, fmt->prec, v))
 					goto error;
@@ -896,12 +896,11 @@ error:
 static jas_cmreal_t jas_cmshapmatlut_lookup(const jas_cmshapmatlut_t *lut, jas_cmreal_t x)
 {
 	jas_cmreal_t t;
-	int lo;
 	t = x * (lut->size - 1);
-	lo = floor(t);
+	const int lo = (int)floor(t);
 	if (lo < 0)
 		return lut->data[0];
-	const unsigned hi = ceil(t);
+	const unsigned hi = (unsigned)ceil(t);
 	if (hi >= lut->size)
 		return lut->data[lut->size - 1];
 	return lut->data[lo] + (t - lo) * (lut->data[hi] - lut->data[lo]);
