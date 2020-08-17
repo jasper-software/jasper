@@ -128,7 +128,7 @@ static int jas_cmpxformseq_insertpxform(jas_cmpxformseq_t *pxformseq,
 
 #define gampxformseq(prof)	((prof)->pxformseqs[SEQGAM])
 
-static int icctoclrspc(int iccclrspc, int refflag);
+static jas_clrspc_t icctoclrspc(jas_iccsig_t iccclrspc, int refflag);
 static jas_cmpxform_t *jas_cmpxform_create0(void);
 static jas_cmpxform_t *jas_cmpxform_createshapmat(void);
 static void jas_cmshapmatlut_init(jas_cmshapmatlut_t *lut);
@@ -1018,7 +1018,7 @@ out[2][0], out[2][1], out[2][2], out[2][3]);
 *
 \******************************************************************************/
 
-static int icctoclrspc(int iccclrspc, int refflag)
+static jas_clrspc_t icctoclrspc(jas_iccsig_t iccclrspc, int refflag)
 {
 	if (refflag) {
 		switch (iccclrspc) {
