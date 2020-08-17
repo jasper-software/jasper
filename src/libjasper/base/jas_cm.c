@@ -371,12 +371,11 @@ jas_cmxform_t *jas_cmxform_create(const jas_cmprof_t *inprof, const jas_cmprof_t
 	jas_cmpxformseq_t *outpxformseq;
 	jas_cmpxformseq_t *altoutpxformseq;
 	jas_cmpxformseq_t *prfpxformseq;
-	int prfintent;
 
 	/* Avoid compiler warnings about unused parameters. */
 	(void)optimize;
 
-	prfintent = intent;
+	const jas_cmxform_intent_t prfintent = intent;
 
 	if (!(xform = jas_malloc(sizeof(jas_cmxform_t))))
 		goto error;
