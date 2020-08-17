@@ -1074,7 +1074,7 @@ static int jas_icctxtdesc_input(jas_iccattrval_t *attrval, jas_stream_t *in,
 	if (!(txtdesc->ascdata = jas_malloc(txtdesc->asclen)))
 		goto error;
 	if (jas_stream_read(in, txtdesc->ascdata, txtdesc->asclen) !=
-	  JAS_CAST(int, txtdesc->asclen))
+	  txtdesc->asclen)
 		goto error;
 	txtdesc->ascdata[txtdesc->asclen - 1] = '\0';
 	if (jas_iccgetuint32(in, &txtdesc->uclangcode) ||
@@ -1083,7 +1083,7 @@ static int jas_icctxtdesc_input(jas_iccattrval_t *attrval, jas_stream_t *in,
 	if (!(txtdesc->ucdata = jas_alloc2(txtdesc->uclen, 2)))
 		goto error;
 	if (jas_stream_read(in, txtdesc->ucdata, txtdesc->uclen * 2) !=
-	  JAS_CAST(int, txtdesc->uclen * 2))
+	  txtdesc->uclen * 2)
 		goto error;
 	if (jas_iccgetuint16(in, &txtdesc->sccode))
 		goto error;
@@ -1127,7 +1127,7 @@ static int jas_icctxtdesc_output(jas_iccattrval_t *attrval, jas_stream_t *out)
 	  jas_stream_putc(out, 0) == EOF ||
 	  jas_iccputuint32(out, txtdesc->uclangcode) ||
 	  jas_iccputuint32(out, txtdesc->uclen) ||
-	  jas_stream_write(out, txtdesc->ucdata, txtdesc->uclen * 2) != JAS_CAST(int, txtdesc->uclen * 2) ||
+	  jas_stream_write(out, txtdesc->ucdata, txtdesc->uclen * 2) != txtdesc->uclen * 2 ||
 	  jas_iccputuint16(out, txtdesc->sccode) ||
 	  jas_stream_putc(out, txtdesc->maclen) == EOF)
 		goto error;
@@ -1183,7 +1183,7 @@ static int jas_icctxt_input(jas_iccattrval_t *attrval, jas_stream_t *in,
 	txt->string = 0;
 	if (!(txt->string = jas_malloc(cnt)))
 		goto error;
-	if (jas_stream_read(in, txt->string, cnt) != (int)cnt)
+	if (jas_stream_read(in, txt->string, cnt) != cnt)
 		goto error;
 	txt->string[cnt - 1] = '\0';
 	if (strlen(txt->string) + 1 != cnt)

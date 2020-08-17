@@ -675,7 +675,7 @@ int jas_stream_ungetc(jas_stream_t *stream, int c)
 }
 
 /* FIXME integral type */
-int jas_stream_read(jas_stream_t *stream, void *buf, unsigned cnt)
+unsigned jas_stream_read(jas_stream_t *stream, void *buf, unsigned cnt)
 {
 	int c;
 	char *bufptr;
@@ -740,7 +740,7 @@ unsigned jas_stream_peek(jas_stream_t *stream, void *buf, size_t cnt)
 }
 
 /* FIXME integral type */
-int jas_stream_write(jas_stream_t *stream, const void *buf, unsigned cnt)
+unsigned jas_stream_write(jas_stream_t *stream, const void *buf, unsigned cnt)
 {
 	const char *bufptr;
 
@@ -1143,8 +1143,8 @@ int jas_stream_copy(jas_stream_t *out, jas_stream_t *in, int n)
 
 	m = n;
 	while (all || m > 0) {
-		int nbytes = jas_stream_read(in, buffer,
-					     JAS_MIN((size_t)m, sizeof(buffer)));
+		unsigned nbytes = jas_stream_read(in, buffer,
+						  JAS_MIN((size_t)m, sizeof(buffer)));
 		if (nbytes == 0)
 			return !all || jas_stream_error(in) ? -1 : 0;
 

@@ -468,7 +468,7 @@ static int jp2_colr_getdata(jp2_box_t *box, jas_stream_t *in)
 		if (!(colr->iccp = jas_alloc2(colr->iccplen, sizeof(uint_fast8_t)))) {
 			return -1;
 		}
-		if (jas_stream_read(in, colr->iccp, colr->iccplen) != (int)colr->iccplen) {
+		if (jas_stream_read(in, colr->iccp, colr->iccplen) != colr->iccplen) {
 			return -1;
 		}
 		break;
@@ -637,8 +637,7 @@ static int jp2_colr_putdata(const jp2_box_t *box, jas_stream_t *out)
 		}
 		break;
 	case JP2_COLR_ICC:
-		if (jas_stream_write(out, colr->iccp,
-		  JAS_CAST(int, colr->iccplen)) != JAS_CAST(int, colr->iccplen))
+		if (jas_stream_write(out, colr->iccp, colr->iccplen) != colr->iccplen)
 			return -1;
 		break;
 	}

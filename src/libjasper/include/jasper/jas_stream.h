@@ -355,7 +355,7 @@ JAS_DLLEXPORT long jas_stream_setrwcount(jas_stream_t *stream, long rwcnt);
 #endif
 
 /* Read characters from a stream into a buffer. */
-JAS_DLLEXPORT int jas_stream_read(jas_stream_t *stream, void *buf, unsigned cnt);
+JAS_DLLEXPORT unsigned jas_stream_read(jas_stream_t *stream, void *buf, unsigned cnt);
 
 /* Read characters from a stream into a buffer without actually
    removing them from the stream.  Returns the number of bytes copied
@@ -363,7 +363,7 @@ JAS_DLLEXPORT int jas_stream_read(jas_stream_t *stream, void *buf, unsigned cnt)
 JAS_DLLEXPORT unsigned jas_stream_peek(jas_stream_t *stream, void *buf, size_t cnt);
 
 /* Write characters from a buffer to a stream. */
-JAS_DLLEXPORT int jas_stream_write(jas_stream_t *stream, const void *buf, unsigned cnt);
+JAS_DLLEXPORT unsigned jas_stream_write(jas_stream_t *stream, const void *buf, unsigned cnt);
 
 /* Write formatted output to a stream. */
 JAS_DLLEXPORT int jas_stream_printf(jas_stream_t *stream, const char *fmt, ...);

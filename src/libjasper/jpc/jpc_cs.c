@@ -1259,7 +1259,7 @@ static int jpc_ppt_getparms(jpc_ms_t *ms, jpc_cstate_t *cstate, jas_stream_t *in
 		if (!(ppt->data = jas_malloc(ppt->len))) {
 			goto error;
 		}
-		if (jas_stream_read(in, (char *) ppt->data, ppt->len) != JAS_CAST(int, ppt->len)) {
+		if (jas_stream_read(in, (char *) ppt->data, ppt->len) != ppt->len) {
 			goto error;
 		}
 	} else {
@@ -1282,7 +1282,7 @@ static int jpc_ppt_putparms(jpc_ms_t *ms, jpc_cstate_t *cstate, jas_stream_t *ou
 	if (jpc_putuint8(out, ppt->ind)) {
 		return -1;
 	}
-	if (jas_stream_write(out, (char *) ppt->data, ppt->len) != JAS_CAST(int, ppt->len)) {
+	if (jas_stream_write(out, (char *) ppt->data, ppt->len) != ppt->len) {
 		return -1;
 	}
 	return 0;
@@ -1497,7 +1497,7 @@ static int jpc_com_getparms(jpc_ms_t *ms, jpc_cstate_t *cstate, jas_stream_t *in
 		if (!(com->data = jas_malloc(com->len))) {
 			return -1;
 		}
-		if (jas_stream_read(in, com->data, com->len) != JAS_CAST(int, com->len)) {
+		if (jas_stream_read(in, com->data, com->len) != com->len) {
 			return -1;
 		}
 	} else {
@@ -1516,7 +1516,7 @@ static int jpc_com_putparms(jpc_ms_t *ms, jpc_cstate_t *cstate, jas_stream_t *ou
 	if (jpc_putuint16(out, com->regid)) {
 		return -1;
 	}
-	if (jas_stream_write(out, com->data, com->len) != JAS_CAST(int, com->len)) {
+	if (jas_stream_write(out, com->data, com->len) != com->len) {
 		return -1;
 	}
 	return 0;
@@ -1568,8 +1568,7 @@ static int jpc_unk_getparms(jpc_ms_t *ms, jpc_cstate_t *cstate, jas_stream_t *in
 		if (!(unk->data = jas_alloc2(ms->len, sizeof(unsigned char)))) {
 			return -1;
 		}
-		if (jas_stream_read(in, (char *) unk->data, ms->len) !=
-		  JAS_CAST(int, ms->len)) {
+		if (jas_stream_read(in, (char *) unk->data, ms->len) != ms->len) {
 			jas_free(unk->data);
 			return -1;
 		}
