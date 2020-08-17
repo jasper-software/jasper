@@ -1628,19 +1628,10 @@ int jpc_putuint8(jas_stream_t *out, uint_fast8_t val)
 
 int jpc_getuint16(jas_stream_t *in, uint_fast16_t *val)
 {
-	uint_fast16_t v;
-	int c;
-	if ((c = jas_stream_getc(in)) == EOF) {
+	jas_uchar buffer[2];
+	if (jas_stream_read(in, buffer, sizeof(buffer)) != sizeof(buffer))
 		return -1;
-	}
-	v = c;
-	if ((c = jas_stream_getc(in)) == EOF) {
-		return -1;
-	}
-	v = (v << 8) | c;
-	if (val) {
-		*val = v;
-	}
+	*val = (uint_fast16_t)buffer[0] << 8 | (uint_fast16_t)buffer[1];
 	return 0;
 }
 
@@ -1655,27 +1646,11 @@ int jpc_putuint16(jas_stream_t *out, uint_fast16_t val)
 
 int jpc_getuint32(jas_stream_t *in, uint_fast32_t *val)
 {
-	uint_fast32_t v;
-	int c;
-	if ((c = jas_stream_getc(in)) == EOF) {
+	jas_uchar buffer[4];
+	if (jas_stream_read(in, buffer, sizeof(buffer)) != sizeof(buffer))
 		return -1;
-	}
-	v = c;
-	if ((c = jas_stream_getc(in)) == EOF) {
-		return -1;
-	}
-	v = (v << 8) | c;
-	if ((c = jas_stream_getc(in)) == EOF) {
-		return -1;
-	}
-	v = (v << 8) | c;
-	if ((c = jas_stream_getc(in)) == EOF) {
-		return -1;
-	}
-	v = (v << 8) | c;
-	if (val) {
-		*val = v;
-	}
+	*val = (uint_fast32_t)buffer[0] << 24 | (uint_fast32_t)buffer[1] << 16
+		| (uint_fast32_t)buffer[2] << 8 | (uint_fast32_t)buffer[3];
 	return 0;
 }
 
