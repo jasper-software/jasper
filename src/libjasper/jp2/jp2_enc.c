@@ -273,7 +273,7 @@ int jp2_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 		}
 		jas_stream_rewind(iccstream);
 		if (jas_stream_read(iccstream, colr->iccp, colr->iccplen) !=
-		  colr->iccplen) {
+		  (int)colr->iccplen) {
 			jas_eprintf("cannot read temporary stream\n");
 			goto error;
 		}
