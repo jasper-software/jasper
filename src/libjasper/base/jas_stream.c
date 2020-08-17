@@ -725,6 +725,20 @@ int jas_stream_read(jas_stream_t *stream, void *buf, unsigned cnt)
 	return n;
 }
 
+unsigned jas_stream_peek(jas_stream_t *stream, void *buf, size_t cnt)
+{
+	char *bufptr = buf;
+
+	const unsigned n = jas_stream_read(stream, bufptr, cnt);
+
+	/* Put the characters read back onto the stream. */
+	for (unsigned i = n; i-- > 0;)
+		if (jas_stream_ungetc(stream, bufptr[i]) == EOF)
+			return 0;
+
+	return n;
+}
+
 /* FIXME integral type */
 int jas_stream_write(jas_stream_t *stream, const void *buf, unsigned cnt)
 {
