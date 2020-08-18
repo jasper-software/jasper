@@ -200,9 +200,9 @@ static int jpc_dec_decodepkt(jpc_dec_t *dec, jas_stream_t *pkthdrstream, jas_str
 			}
 			unsigned int maxNsop = 65536;
 			/* checking the packet sequence number */
-			if (dec->numpkts % maxNsop != ms->parms.sop.seqno) {
+			if (tile->pi->pktno % maxNsop != ms->parms.sop.seqno) {
 				jas_eprintf("incorrect packet sequence number %d was found, but expected %d\n",
-					ms->parms.sop.seqno, dec->numpkts % maxNsop);
+					ms->parms.sop.seqno, tile->pi->pktno % maxNsop);
 				jpc_ms_destroy(ms);
 				return -1;
 			}
