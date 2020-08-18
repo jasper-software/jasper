@@ -285,8 +285,8 @@ JAS_ATTRIBUTE_PURE
 static inline size_t jas_matrix_rowstep(const jas_matrix_t *matrix)
 {
 	return matrix->numrows_ > 1
-		? matrix->rows_[1] - matrix->rows_[0]
-		: 0;
+		? (size_t)(matrix->rows_[1] - matrix->rows_[0])
+		: 0u;
 }
 
 /* The spacing between columns of a matrix. */
@@ -376,13 +376,13 @@ static inline size_t jas_seq2d_rowstep(const jas_seq2d_t *s)
 JAS_ATTRIBUTE_PURE
 static inline unsigned jas_seq2d_width(const jas_seq2d_t *s)
 {
-	return s->xend_ - s->xstart_;
+	return (unsigned)(s->xend_ - s->xstart_);
 }
 
 JAS_ATTRIBUTE_PURE
 static inline unsigned jas_seq2d_height(const jas_seq2d_t *s)
 {
-	return s->yend_ - s->ystart_;
+	return (unsigned)(s->yend_ - s->ystart_);
 }
 
 static inline void jas_seq2d_setshift(jas_seq2d_t *s, jas_matind_t x, jas_matind_t y)
