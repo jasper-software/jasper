@@ -185,6 +185,12 @@ static inline jas_matind_t jas_matrix_size(const jas_matrix_t *matrix)
 	return jas_matrix_numcols(matrix) * jas_matrix_numrows(matrix);
 }
 
+JAS_ATTRIBUTE_PURE
+static inline bool jas_matrix_empty(const jas_matrix_t *matrix)
+{
+	return jas_matrix_numcols(matrix) == 0 && jas_matrix_numrows(matrix) == 0;
+}
+
 /* Get a matrix element. */
 JAS_ATTRIBUTE_PURE
 static inline jas_seqent_t jas_matrix_get(const jas_matrix_t *matrix, jas_matind_t i, jas_matind_t j)
@@ -391,6 +397,12 @@ JAS_ATTRIBUTE_PURE
 static inline jas_matind_t jas_seq2d_size(const jas_seq2d_t *s)
 {
 	return jas_seq2d_width(s) * jas_seq2d_height(s);
+}
+
+JAS_ATTRIBUTE_PURE
+static inline bool jas_seq2d_empty(const jas_seq2d_t *s)
+{
+	return jas_seq2d_width(s) == 0 && jas_seq2d_height(s) == 0;
 }
 
 JAS_DLLEXPORT int jas_seq2d_bindsub(jas_matrix_t *s, jas_matrix_t *s1, jas_matind_t xstart,
