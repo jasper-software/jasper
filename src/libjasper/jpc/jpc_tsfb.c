@@ -80,6 +80,9 @@
 
 #include <stdlib.h>
 
+static int jpc_tsfb_analyze2(jpc_tsfb_t *tsfb, jpc_fix_t *a, int xstart, int ystart,
+  unsigned width, unsigned height, unsigned stride, unsigned numlvls);
+
 static int jpc_tsfb_synthesize2(jpc_tsfb_t *tsfb, jpc_fix_t *a, int xstart, int ystart,
   unsigned width, unsigned height, unsigned stride, unsigned numlvls);
 
@@ -128,7 +131,7 @@ int jpc_tsfb_analyze(jpc_tsfb_t *tsfb, jas_seq2d_t *a)
 	  jas_seq2d_height(a), jas_seq2d_rowstep(a), tsfb->numlvls - 1) : 0;
 }
 
-int jpc_tsfb_analyze2(jpc_tsfb_t *tsfb, jpc_fix_t *a, int xstart, int ystart,
+static int jpc_tsfb_analyze2(jpc_tsfb_t *tsfb, jpc_fix_t *a, int xstart, int ystart,
   unsigned width, unsigned height, unsigned stride, unsigned numlvls)
 {
 	if (width > 0 && height > 0) {
