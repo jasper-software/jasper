@@ -521,7 +521,7 @@ int jas_cmxform_apply(const jas_cmxform_t *xform, const jas_cmpixmap_t *in, jas_
 			for (unsigned j = 0; j < m; ++j) {
 				if (jas_cmgetint(&dataptr, fmt->sgnd, fmt->prec, &v))
 					goto error;
-				*bufptr = (v - bias) / scale;
+				*bufptr = (jas_cmreal_t)(v - bias) / scale;
 				bufptr += xform->numinchans;
 			}
 		}
@@ -637,12 +637,11 @@ static int jas_cmpxformseq_appendcnvt(jas_cmpxformseq_t *pxformseq,
 }
 
 static int jas_cmpxformseq_insertpxform(jas_cmpxformseq_t *pxformseq,
-  int i, jas_cmpxform_t *pxform)
+  int _i, jas_cmpxform_t *pxform)
 {
 	jas_cmpxform_t *tmppxform;
-	if (i < 0)
-		i = pxformseq->numpxforms;
-	assert(i >= 0 && (unsigned)i <= pxformseq->numpxforms);
+	const unsigned i = _i >= 0 ? (unsigned)_i : pxformseq->numpxforms;
+	assert(i <= pxformseq->numpxforms);
 	if (pxformseq->numpxforms >= pxformseq->maxpxforms) {
 		if (jas_cmpxformseq_resize(pxformseq, pxformseq->numpxforms +
 		  16))
@@ -877,7 +876,7 @@ static int jas_cmshapmatlut_set(jas_cmshapmatlut_t *lut, const jas_icccurv_t *cu
 		lut->size = 256;
 		if (!(lut->data = jas_alloc2(lut->size, sizeof(jas_cmreal_t))))
 			goto error;
-		gamma = curv->ents[0] / 256.0;
+		gamma = (jas_cmreal_t)curv->ents[0] / 256.0;
 		for (unsigned i = 0; i < lut->size; ++i) {
 			lut->data[i] = gammafn(i / (double) (lut->size - 1), gamma);
 		}
@@ -886,7 +885,7 @@ static int jas_cmshapmatlut_set(jas_cmshapmatlut_t *lut, const jas_icccurv_t *cu
 		if (!(lut->data = jas_alloc2(lut->size, sizeof(jas_cmreal_t))))
 			goto error;
 		for (unsigned i = 0; i < lut->size; ++i) {
-			lut->data[i] = curv->ents[i] / 65535.0;
+			lut->data[i] = (jas_cmreal_t)curv->ents[i] / 65535.0;
 		}
 	}
 	return 0;
@@ -1146,9 +1145,9 @@ static int triclr(const jas_iccprof_t *iccprof, int op, jas_cmpxformseq_t **retp
 	if (!op) {
 		shapmat->order = 0;
 		for (unsigned i = 0; i < 3; ++i) {
-			shapmat->mat[0][i] = cols[i]->data.xyz.x / 65536.0;
-			shapmat->mat[1][i] = cols[i]->data.xyz.y / 65536.0;
-			shapmat->mat[2][i] = cols[i]->data.xyz.z / 65536.0;
+			shapmat->mat[0][i] = (jas_cmreal_t)cols[i]->data.xyz.x / 65536.0;
+			shapmat->mat[1][i] = (jas_cmreal_t)cols[i]->data.xyz.y / 65536.0;
+			shapmat->mat[2][i] = (jas_cmreal_t)cols[i]->data.xyz.z / 65536.0;
 		}
 		for (unsigned i = 0; i < 3; ++i)
 			shapmat->mat[i][3] = 0.0;
@@ -1159,9 +1158,9 @@ static int triclr(const jas_iccprof_t *iccprof, int op, jas_cmpxformseq_t **retp
 	} else {
 		shapmat->order = 1;
 		for (unsigned i = 0; i < 3; ++i) {
-			mat[0][i] = cols[i]->data.xyz.x / 65536.0;
-			mat[1][i] = cols[i]->data.xyz.y / 65536.0;
-			mat[2][i] = cols[i]->data.xyz.z / 65536.0;
+			mat[0][i] = (jas_cmreal_t)cols[i]->data.xyz.x / 65536.0;
+			mat[1][i] = (jas_cmreal_t)cols[i]->data.xyz.y / 65536.0;
+			mat[2][i] = (jas_cmreal_t)cols[i]->data.xyz.z / 65536.0;
 		}
 		for (unsigned i = 0; i < 3; ++i)
 			mat[i][3] = 0.0;
