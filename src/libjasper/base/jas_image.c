@@ -522,6 +522,29 @@ int jas_image_readcmpt(jas_image_t *image, unsigned cmptno, jas_image_coord_t x,
 		  * cps, SEEK_SET) < 0) {
 			return -1;
 		}
+
+		if (cps == 1 && !sgnd && width <= 16384) {
+			/* fast path for 1 byte per sample and
+			   unsigned with bulk reads */
+
+#ifdef _MSC_VER
+			/* can't use variable-length arrays here
+			   because MSVC doesn't support this C99
+			   feature */
+			jas_uchar *buffer = _alloca(width);
+#else
+			jas_uchar buffer[width];
+#endif
+
+			if (jas_stream_read(stream, buffer, width) != width)
+				return -1;
+
+			for (j = 0; j < width; ++j)
+				d[j] = buffer[j];
+
+			continue;
+		}
+
 		for (j = width; j > 0; --j, ++d) {
 			v = 0;
 			for (unsigned k = cps; k > 0; --k) {
