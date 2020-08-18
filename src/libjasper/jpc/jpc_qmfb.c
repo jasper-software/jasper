@@ -708,6 +708,7 @@ static void jpc_ft_fwdlift_row(jpc_fix_t *a, unsigned numcols, bool parity)
 	register jpc_fix_t *hptr;
 
 	const unsigned llen = (numcols + !parity) >> 1;
+	const bool end_parity = parity == (numcols & 1);
 
 	if (numcols > 1) {
 
@@ -718,13 +719,13 @@ static void jpc_ft_fwdlift_row(jpc_fix_t *a, unsigned numcols, bool parity)
 			hptr[0] -= lptr[0];
 			++hptr;
 		}
-		for (unsigned n = numcols - llen - parity - (parity == (numcols & 1)); n > 0; --n) {
+		for (unsigned n = numcols - llen - parity - end_parity; n > 0; --n) {
 			//hptr[0] -= (lptr[0] + lptr[1]) >> 1;
 			hptr[0] -= jpc_fix_asr(lptr[0] + lptr[1], 1);
 			++hptr;
 			++lptr;
 		}
-		if (parity == (numcols & 1)) {
+		if (end_parity) {
 			hptr[0] -= lptr[0];
 		}
 
@@ -736,13 +737,13 @@ static void jpc_ft_fwdlift_row(jpc_fix_t *a, unsigned numcols, bool parity)
 			lptr[0] += jpc_fix_asr(hptr[0] + 1, 1);
 			++lptr;
 		}
-		for (unsigned n = llen - (!parity) - (parity != (numcols & 1)); n > 0; --n) {
+		for (unsigned n = llen - (!parity) - (!end_parity); n > 0; --n) {
 			//lptr[0] += (hptr[0] + hptr[1] + 2) >> 2;
 			lptr[0] += jpc_fix_asr(hptr[0] + hptr[1] + 2, 2);
 			++lptr;
 			++hptr;
 		}
-		if (parity != (numcols & 1)) {
+		if (!end_parity) {
 			//lptr[0] += (hptr[0] + 1) >> 1;
 			lptr[0] += jpc_fix_asr(hptr[0] + 1, 1);
 		}
@@ -768,6 +769,7 @@ static void jpc_ft_fwdlift_colgrp(jpc_fix_t *a, unsigned numrows, unsigned strid
 	register jpc_fix_t *hptr2;
 
 	const unsigned llen = (numrows + !parity) >> 1;
+	const bool end_parity = parity == (numrows & 1);
 
 	if (numrows > 1) {
 
@@ -784,7 +786,7 @@ static void jpc_ft_fwdlift_colgrp(jpc_fix_t *a, unsigned numrows, unsigned strid
 			}
 			hptr += stride;
 		}
-		for (unsigned n = numrows - llen - parity - (parity == (numrows & 1)); n > 0; --n) {
+		for (unsigned n = numrows - llen - parity - end_parity; n > 0; --n) {
 			lptr2 = lptr;
 			hptr2 = hptr;
 			for (unsigned i = 0; i < JPC_QMFB_COLGRPSIZE; ++i) {
@@ -796,7 +798,7 @@ static void jpc_ft_fwdlift_colgrp(jpc_fix_t *a, unsigned numrows, unsigned strid
 			hptr += stride;
 			lptr += stride;
 		}
-		if (parity == (numrows & 1)) {
+		if (end_parity) {
 			lptr2 = lptr;
 			hptr2 = hptr;
 			for (unsigned i = 0; i < JPC_QMFB_COLGRPSIZE; ++i) {
@@ -868,6 +870,7 @@ static void jpc_ft_fwdlift_colres(jpc_fix_t *a, unsigned numrows, unsigned numco
 	register jpc_fix_t *hptr2;
 
 	const unsigned llen = (numrows + !parity) >> 1;
+	const bool end_parity = parity == (numrows & 1);
 
 	if (numrows > 1) {
 
@@ -884,7 +887,7 @@ static void jpc_ft_fwdlift_colres(jpc_fix_t *a, unsigned numrows, unsigned numco
 			}
 			hptr += stride;
 		}
-		for (unsigned n = numrows - llen - parity - (parity == (numrows & 1)); n > 0; --n) {
+		for (unsigned n = numrows - llen - parity - end_parity; n > 0; --n) {
 			lptr2 = lptr;
 			hptr2 = hptr;
 			for (unsigned i = 0; i < numcols; ++i) {
@@ -896,7 +899,7 @@ static void jpc_ft_fwdlift_colres(jpc_fix_t *a, unsigned numrows, unsigned numco
 			hptr += stride;
 			lptr += stride;
 		}
-		if (parity == (numrows & 1)) {
+		if (end_parity) {
 			lptr2 = lptr;
 			hptr2 = hptr;
 			for (unsigned i = 0; i < numcols; ++i) {
@@ -965,6 +968,7 @@ static void jpc_ft_invlift_row(jpc_fix_t *a, unsigned numcols, bool parity)
 	register jpc_fix_t *hptr;
 
 	const unsigned llen = (numcols + !parity) >> 1;
+	const bool end_parity = parity == (numcols & 1);
 
 	if (numcols > 1) {
 
@@ -976,13 +980,13 @@ static void jpc_ft_invlift_row(jpc_fix_t *a, unsigned numcols, bool parity)
 			lptr[0] -= jpc_fix_asr(hptr[0] + 1, 1);
 			++lptr;
 		}
-		for (unsigned n = llen - (!parity) - (parity != (numcols & 1)); n > 0; --n) {
+		for (unsigned n = llen - (!parity) - (!end_parity); n > 0; --n) {
 			//lptr[0] -= (hptr[0] + hptr[1] + 2) >> 2;
 			lptr[0] -= jpc_fix_asr(hptr[0] + hptr[1] + 2, 2);
 			++lptr;
 			++hptr;
 		}
-		if (parity != (numcols & 1)) {
+		if (!end_parity) {
 			//lptr[0] -= (hptr[0] + 1) >> 1;
 			lptr[0] -= jpc_fix_asr(hptr[0] + 1, 1);
 		}
@@ -994,13 +998,13 @@ static void jpc_ft_invlift_row(jpc_fix_t *a, unsigned numcols, bool parity)
 			hptr[0] += lptr[0];
 			++hptr;
 		}
-		for (unsigned n = numcols - llen - parity - (parity == (numcols & 1)); n > 0; --n) {
+		for (unsigned n = numcols - llen - parity - end_parity; n > 0; --n) {
 			//hptr[0] += (lptr[0] + lptr[1]) >> 1;
 			hptr[0] += jpc_fix_asr(lptr[0] + lptr[1], 1);
 			++hptr;
 			++lptr;
 		}
-		if (parity == (numcols & 1)) {
+		if (end_parity) {
 			hptr[0] += lptr[0];
 		}
 
@@ -1025,6 +1029,7 @@ static void jpc_ft_invlift_colgrp(jpc_fix_t *a, unsigned numrows, unsigned strid
 	register jpc_fix_t *hptr2;
 
 	const unsigned llen = (numrows + !parity) >> 1;
+	const bool end_parity = parity == (numrows & 1);
 
 	if (numrows > 1) {
 
@@ -1078,7 +1083,7 @@ static void jpc_ft_invlift_colgrp(jpc_fix_t *a, unsigned numrows, unsigned strid
 			}
 			hptr += stride;
 		}
-		for (unsigned n = numrows - llen - parity - (parity == (numrows & 1)); n > 0; --n) {
+		for (unsigned n = numrows - llen - parity - end_parity; n > 0; --n) {
 			lptr2 = lptr;
 			hptr2 = hptr;
 			for (unsigned i = 0; i < JPC_QMFB_COLGRPSIZE; ++i) {
@@ -1090,7 +1095,7 @@ static void jpc_ft_invlift_colgrp(jpc_fix_t *a, unsigned numrows, unsigned strid
 			hptr += stride;
 			lptr += stride;
 		}
-		if (parity == (numrows & 1)) {
+		if (end_parity) {
 			lptr2 = lptr;
 			hptr2 = hptr;
 			for (unsigned i = 0; i < JPC_QMFB_COLGRPSIZE; ++i) {
@@ -1125,6 +1130,7 @@ static void jpc_ft_invlift_colres(jpc_fix_t *a, unsigned numrows, unsigned numco
 	register jpc_fix_t *hptr2;
 
 	const unsigned llen = (numrows + !parity) >> 1;
+	const bool end_parity = parity == (numrows & 1);
 
 	if (numrows > 1) {
 
@@ -1178,7 +1184,7 @@ static void jpc_ft_invlift_colres(jpc_fix_t *a, unsigned numrows, unsigned numco
 			}
 			hptr += stride;
 		}
-		for (unsigned n = numrows - llen - parity - (parity == (numrows & 1)); n > 0; --n) {
+		for (unsigned n = numrows - llen - parity - end_parity; n > 0; --n) {
 			lptr2 = lptr;
 			hptr2 = hptr;
 			for (unsigned i = 0; i < numcols; ++i) {
@@ -1190,7 +1196,7 @@ static void jpc_ft_invlift_colres(jpc_fix_t *a, unsigned numrows, unsigned numco
 			hptr += stride;
 			lptr += stride;
 		}
-		if (parity == (numrows & 1)) {
+		if (end_parity) {
 			lptr2 = lptr;
 			hptr2 = hptr;
 			for (unsigned i = 0; i < numcols; ++i) {
@@ -1302,6 +1308,7 @@ static void jpc_ns_fwdlift_row(jpc_fix_t *a, unsigned numcols, bool parity)
 	register jpc_fix_t *hptr;
 
 	const unsigned llen = (numcols + !parity) >> 1;
+	const bool end_parity = parity == (numcols & 1);
 
 	if (numcols > 1) {
 
@@ -1313,13 +1320,13 @@ static void jpc_ns_fwdlift_row(jpc_fix_t *a, unsigned numcols, bool parity)
 			  lptr[0]));
 			++hptr;
 		}
-		for (unsigned n = numcols - llen - parity - (parity == (numcols & 1)); n > 0; --n) {
+		for (unsigned n = numcols - llen - parity - end_parity; n > 0; --n) {
 			jpc_fix_pluseq(hptr[0], jpc_fix_mul(jpc_dbltofix(ALPHA),
 			  jpc_fix_add(lptr[0], lptr[1])));
 			++hptr;
 			++lptr;
 		}
-		if (parity == (numcols & 1)) {
+		if (end_parity) {
 			jpc_fix_pluseq(hptr[0], jpc_fix_mul(jpc_dbltofix(2.0 * ALPHA),
 			  lptr[0]));
 		}
@@ -1332,13 +1339,13 @@ static void jpc_ns_fwdlift_row(jpc_fix_t *a, unsigned numcols, bool parity)
 			  hptr[0]));
 			++lptr;
 		}
-		for (unsigned n = llen - (!parity) - (parity != (numcols & 1)); n > 0; --n) {
+		for (unsigned n = llen - (!parity) - (!end_parity); n > 0; --n) {
 			jpc_fix_pluseq(lptr[0], jpc_fix_mul(jpc_dbltofix(BETA),
 			  jpc_fix_add(hptr[0], hptr[1])));
 			++lptr;
 			++hptr;
 		}
-		if (parity != (numcols & 1)) {
+		if (!end_parity) {
 			jpc_fix_pluseq(lptr[0], jpc_fix_mul(jpc_dbltofix(2.0 * BETA),
 			  hptr[0]));
 		}
@@ -1351,13 +1358,13 @@ static void jpc_ns_fwdlift_row(jpc_fix_t *a, unsigned numcols, bool parity)
 			  lptr[0]));
 			++hptr;
 		}
-		for (unsigned n = numcols - llen - parity - (parity == (numcols & 1)); n > 0; --n) {
+		for (unsigned n = numcols - llen - parity - end_parity; n > 0; --n) {
 			jpc_fix_pluseq(hptr[0], jpc_fix_mul(jpc_dbltofix(GAMMA),
 			  jpc_fix_add(lptr[0], lptr[1])));
 			++hptr;
 			++lptr;
 		}
-		if (parity == (numcols & 1)) {
+		if (end_parity) {
 			jpc_fix_pluseq(hptr[0], jpc_fix_mul(jpc_dbltofix(2.0 * GAMMA),
 			  lptr[0]));
 		}
@@ -1370,13 +1377,13 @@ static void jpc_ns_fwdlift_row(jpc_fix_t *a, unsigned numcols, bool parity)
 			  hptr[0]));
 			++lptr;
 		}
-		for (unsigned n = llen - (!parity) - (parity != (numcols & 1)); n > 0; --n) {
+		for (unsigned n = llen - (!parity) - (!end_parity); n > 0; --n) {
 			jpc_fix_pluseq(lptr[0], jpc_fix_mul(jpc_dbltofix(DELTA),
 			  jpc_fix_add(hptr[0], hptr[1])));
 			++lptr;
 			++hptr;
 		}
-		if (parity != (numcols & 1)) {
+		if (!end_parity) {
 			jpc_fix_pluseq(lptr[0], jpc_fix_mul(jpc_dbltofix(2.0 * DELTA),
 			  hptr[0]));
 		}
@@ -1419,6 +1426,7 @@ static void jpc_ns_fwdlift_colgrp(jpc_fix_t *a, unsigned numrows, unsigned strid
 	register jpc_fix_t *hptr2;
 
 	const unsigned llen = (numrows + !parity) >> 1;
+	const bool end_parity = parity == (numrows & 1);
 
 	if (numrows > 1) {
 
@@ -1436,7 +1444,7 @@ static void jpc_ns_fwdlift_colgrp(jpc_fix_t *a, unsigned numrows, unsigned strid
 			}
 			hptr += stride;
 		}
-		for (unsigned n = numrows - llen - parity - (parity == (numrows & 1)); n > 0; --n) {
+		for (unsigned n = numrows - llen - parity - end_parity; n > 0; --n) {
 			lptr2 = lptr;
 			hptr2 = hptr;
 			for (unsigned i = 0; i < JPC_QMFB_COLGRPSIZE; ++i) {
@@ -1448,7 +1456,7 @@ static void jpc_ns_fwdlift_colgrp(jpc_fix_t *a, unsigned numrows, unsigned strid
 			hptr += stride;
 			lptr += stride;
 		}
-		if (parity == (numrows & 1)) {
+		if (end_parity) {
 			lptr2 = lptr;
 			hptr2 = hptr;
 			for (unsigned i = 0; i < JPC_QMFB_COLGRPSIZE; ++i) {
@@ -1510,7 +1518,7 @@ static void jpc_ns_fwdlift_colgrp(jpc_fix_t *a, unsigned numrows, unsigned strid
 			}
 			hptr += stride;
 		}
-		for (unsigned n = numrows - llen - parity - (parity == (numrows & 1)); n > 0; --n) {
+		for (unsigned n = numrows - llen - parity - end_parity; n > 0; --n) {
 			lptr2 = lptr;
 			hptr2 = hptr;
 			for (unsigned i = 0; i < JPC_QMFB_COLGRPSIZE; ++i) {
@@ -1522,7 +1530,7 @@ static void jpc_ns_fwdlift_colgrp(jpc_fix_t *a, unsigned numrows, unsigned strid
 			hptr += stride;
 			lptr += stride;
 		}
-		if (parity == (numrows & 1)) {
+		if (end_parity) {
 			lptr2 = lptr;
 			hptr2 = hptr;
 			for (unsigned i = 0; i < JPC_QMFB_COLGRPSIZE; ++i) {
@@ -1619,6 +1627,7 @@ static void jpc_ns_fwdlift_colres(jpc_fix_t *a, unsigned numrows, unsigned numco
 	register jpc_fix_t *hptr2;
 
 	const unsigned llen = (numrows + !parity) >> 1;
+	const bool end_parity = parity == (numrows & 1);
 
 	if (numrows > 1) {
 
@@ -1636,7 +1645,7 @@ static void jpc_ns_fwdlift_colres(jpc_fix_t *a, unsigned numrows, unsigned numco
 			}
 			hptr += stride;
 		}
-		for (unsigned n = numrows - llen - parity - (parity == (numrows & 1)); n > 0; --n) {
+		for (unsigned n = numrows - llen - parity - end_parity; n > 0; --n) {
 			lptr2 = lptr;
 			hptr2 = hptr;
 			for (unsigned i = 0; i < numcols; ++i) {
@@ -1648,7 +1657,7 @@ static void jpc_ns_fwdlift_colres(jpc_fix_t *a, unsigned numrows, unsigned numco
 			hptr += stride;
 			lptr += stride;
 		}
-		if (parity == (numrows & 1)) {
+		if (end_parity) {
 			lptr2 = lptr;
 			hptr2 = hptr;
 			for (unsigned i = 0; i < numcols; ++i) {
@@ -1710,7 +1719,7 @@ static void jpc_ns_fwdlift_colres(jpc_fix_t *a, unsigned numrows, unsigned numco
 			}
 			hptr += stride;
 		}
-		for (unsigned n = numrows - llen - parity - (parity == (numrows & 1)); n > 0; --n) {
+		for (unsigned n = numrows - llen - parity - end_parity; n > 0; --n) {
 			lptr2 = lptr;
 			hptr2 = hptr;
 			for (unsigned i = 0; i < numcols; ++i) {
@@ -1722,7 +1731,7 @@ static void jpc_ns_fwdlift_colres(jpc_fix_t *a, unsigned numrows, unsigned numco
 			hptr += stride;
 			lptr += stride;
 		}
-		if (parity == (numrows & 1)) {
+		if (end_parity) {
 			lptr2 = lptr;
 			hptr2 = hptr;
 			for (unsigned i = 0; i < numcols; ++i) {
@@ -1816,6 +1825,7 @@ static void jpc_ns_invlift_row(jpc_fix_t *a, unsigned numcols, bool parity)
 	register jpc_fix_t *hptr;
 
 	const unsigned llen = (numcols + !parity) >> 1;
+	const bool end_parity = parity == (numcols & 1);
 
 	if (numcols > 1) {
 
@@ -1841,13 +1851,13 @@ static void jpc_ns_invlift_row(jpc_fix_t *a, unsigned numcols, bool parity)
 			  hptr[0]));
 			++lptr;
 		}
-		for (unsigned n = llen - (!parity) - (parity != (numcols & 1)); n > 0; --n) {
+		for (unsigned n = llen - (!parity) - (!end_parity); n > 0; --n) {
 			jpc_fix_minuseq(lptr[0], jpc_fix_mul(jpc_dbltofix(DELTA),
 			  jpc_fix_add(hptr[0], hptr[1])));
 			++lptr;
 			++hptr;
 		}
-		if (parity != (numcols & 1)) {
+		if (!end_parity) {
 			jpc_fix_minuseq(lptr[0], jpc_fix_mul(jpc_dbltofix(2.0 * DELTA),
 			  hptr[0]));
 		}
@@ -1860,13 +1870,13 @@ static void jpc_ns_invlift_row(jpc_fix_t *a, unsigned numcols, bool parity)
 			  lptr[0]));
 			++hptr;
 		}
-		for (unsigned n = numcols - llen - parity - (parity == (numcols & 1)); n > 0; --n) {
+		for (unsigned n = numcols - llen - parity - end_parity; n > 0; --n) {
 			jpc_fix_minuseq(hptr[0], jpc_fix_mul(jpc_dbltofix(GAMMA),
 			  jpc_fix_add(lptr[0], lptr[1])));
 			++hptr;
 			++lptr;
 		}
-		if (parity == (numcols & 1)) {
+		if (end_parity) {
 			jpc_fix_minuseq(hptr[0], jpc_fix_mul(jpc_dbltofix(2.0 * GAMMA),
 			  lptr[0]));
 		}
@@ -1879,13 +1889,13 @@ static void jpc_ns_invlift_row(jpc_fix_t *a, unsigned numcols, bool parity)
 			  hptr[0]));
 			++lptr;
 		}
-		for (unsigned n = llen - (!parity) - (parity != (numcols & 1)); n > 0; --n) {
+		for (unsigned n = llen - (!parity) - (!end_parity); n > 0; --n) {
 			jpc_fix_minuseq(lptr[0], jpc_fix_mul(jpc_dbltofix(BETA),
 			  jpc_fix_add(hptr[0], hptr[1])));
 			++lptr;
 			++hptr;
 		}
-		if (parity != (numcols & 1)) {
+		if (!end_parity) {
 			jpc_fix_minuseq(lptr[0], jpc_fix_mul(jpc_dbltofix(2.0 * BETA),
 			  hptr[0]));
 		}
@@ -1898,13 +1908,13 @@ static void jpc_ns_invlift_row(jpc_fix_t *a, unsigned numcols, bool parity)
 			  lptr[0]));
 			++hptr;
 		}
-		for (unsigned n = numcols - llen - parity - (parity == (numcols & 1)); n > 0; --n) {
+		for (unsigned n = numcols - llen - parity - end_parity; n > 0; --n) {
 			jpc_fix_minuseq(hptr[0], jpc_fix_mul(jpc_dbltofix(ALPHA),
 			  jpc_fix_add(lptr[0], lptr[1])));
 			++hptr;
 			++lptr;
 		}
-		if (parity == (numcols & 1)) {
+		if (end_parity) {
 			jpc_fix_minuseq(hptr[0], jpc_fix_mul(jpc_dbltofix(2.0 * ALPHA),
 			  lptr[0]));
 		}
@@ -1933,6 +1943,7 @@ static void jpc_ns_invlift_colgrp(jpc_fix_t *a, unsigned numrows, unsigned strid
 	register jpc_fix_t *hptr2;
 
 	const unsigned llen = (numrows + !parity) >> 1;
+	const bool end_parity = parity == (numrows & 1);
 
 	if (numrows > 1) {
 
@@ -1972,7 +1983,7 @@ static void jpc_ns_invlift_colgrp(jpc_fix_t *a, unsigned numrows, unsigned strid
 			}
 			lptr += stride;
 		}
-		for (unsigned n = llen - (!parity) - (parity != (numrows & 1)); n > 0; --n) {
+		for (unsigned n = llen - (!parity) - (!end_parity); n > 0; --n) {
 			lptr2 = lptr;
 			hptr2 = hptr;
 			for (unsigned i = 0; i < JPC_QMFB_COLGRPSIZE; ++i) {
@@ -1984,7 +1995,7 @@ static void jpc_ns_invlift_colgrp(jpc_fix_t *a, unsigned numrows, unsigned strid
 			lptr += stride;
 			hptr += stride;
 		}
-		if (parity != (numrows & 1)) {
+		if (!end_parity) {
 			lptr2 = lptr;
 			hptr2 = hptr;
 			for (unsigned i = 0; i < JPC_QMFB_COLGRPSIZE; ++i) {
@@ -2009,7 +2020,7 @@ static void jpc_ns_invlift_colgrp(jpc_fix_t *a, unsigned numrows, unsigned strid
 			}
 			hptr += stride;
 		}
-		for (unsigned n = numrows - llen - parity - (parity == (numrows & 1)); n > 0; --n) {
+		for (unsigned n = numrows - llen - parity - end_parity; n > 0; --n) {
 			lptr2 = lptr;
 			hptr2 = hptr;
 			for (unsigned i = 0; i < JPC_QMFB_COLGRPSIZE; ++i) {
@@ -2021,7 +2032,7 @@ static void jpc_ns_invlift_colgrp(jpc_fix_t *a, unsigned numrows, unsigned strid
 			hptr += stride;
 			lptr += stride;
 		}
-		if (parity == (numrows & 1)) {
+		if (end_parity) {
 			lptr2 = lptr;
 			hptr2 = hptr;
 			for (unsigned i = 0; i < JPC_QMFB_COLGRPSIZE; ++i) {
@@ -2046,7 +2057,7 @@ static void jpc_ns_invlift_colgrp(jpc_fix_t *a, unsigned numrows, unsigned strid
 			}
 			lptr += stride;
 		}
-		for (unsigned n = llen - (!parity) - (parity != (numrows & 1)); n > 0; --n) {
+		for (unsigned n = llen - (!parity) - (!end_parity); n > 0; --n) {
 			lptr2 = lptr;
 			hptr2 = hptr;
 			for (unsigned i = 0; i < JPC_QMFB_COLGRPSIZE; ++i) {
@@ -2058,7 +2069,7 @@ static void jpc_ns_invlift_colgrp(jpc_fix_t *a, unsigned numrows, unsigned strid
 			lptr += stride;
 			hptr += stride;
 		}
-		if (parity != (numrows & 1)) {
+		if (!end_parity) {
 			lptr2 = lptr;
 			hptr2 = hptr;
 			for (unsigned i = 0; i < JPC_QMFB_COLGRPSIZE; ++i) {
@@ -2083,7 +2094,7 @@ static void jpc_ns_invlift_colgrp(jpc_fix_t *a, unsigned numrows, unsigned strid
 			}
 			hptr += stride;
 		}
-		for (unsigned n = numrows - llen - parity - (parity == (numrows & 1)); n > 0; --n) {
+		for (unsigned n = numrows - llen - parity - end_parity; n > 0; --n) {
 			lptr2 = lptr;
 			hptr2 = hptr;
 			for (unsigned i = 0; i < JPC_QMFB_COLGRPSIZE; ++i) {
@@ -2095,7 +2106,7 @@ static void jpc_ns_invlift_colgrp(jpc_fix_t *a, unsigned numrows, unsigned strid
 			hptr += stride;
 			lptr += stride;
 		}
-		if (parity == (numrows & 1)) {
+		if (end_parity) {
 			lptr2 = lptr;
 			hptr2 = hptr;
 			for (unsigned i = 0; i < JPC_QMFB_COLGRPSIZE; ++i) {
@@ -2133,6 +2144,7 @@ static void jpc_ns_invlift_colres(jpc_fix_t *a, unsigned numrows, unsigned numco
 	register jpc_fix_t *hptr2;
 
 	const unsigned llen = (numrows + !parity) >> 1;
+	const bool end_parity = parity == (numrows & 1);
 
 	if (numrows > 1) {
 
@@ -2172,7 +2184,7 @@ static void jpc_ns_invlift_colres(jpc_fix_t *a, unsigned numrows, unsigned numco
 			}
 			lptr += stride;
 		}
-		for (unsigned n = llen - (!parity) - (parity != (numrows & 1)); n > 0; --n) {
+		for (unsigned n = llen - (!parity) - (!end_parity); n > 0; --n) {
 			lptr2 = lptr;
 			hptr2 = hptr;
 			for (unsigned i = 0; i < numcols; ++i) {
@@ -2184,7 +2196,7 @@ static void jpc_ns_invlift_colres(jpc_fix_t *a, unsigned numrows, unsigned numco
 			lptr += stride;
 			hptr += stride;
 		}
-		if (parity != (numrows & 1)) {
+		if (!end_parity) {
 			lptr2 = lptr;
 			hptr2 = hptr;
 			for (unsigned i = 0; i < numcols; ++i) {
@@ -2209,7 +2221,7 @@ static void jpc_ns_invlift_colres(jpc_fix_t *a, unsigned numrows, unsigned numco
 			}
 			hptr += stride;
 		}
-		for (unsigned n = numrows - llen - parity - (parity == (numrows & 1)); n > 0; --n) {
+		for (unsigned n = numrows - llen - parity - end_parity; n > 0; --n) {
 			lptr2 = lptr;
 			hptr2 = hptr;
 			for (unsigned i = 0; i < numcols; ++i) {
@@ -2221,7 +2233,7 @@ static void jpc_ns_invlift_colres(jpc_fix_t *a, unsigned numrows, unsigned numco
 			hptr += stride;
 			lptr += stride;
 		}
-		if (parity == (numrows & 1)) {
+		if (end_parity) {
 			lptr2 = lptr;
 			hptr2 = hptr;
 			for (unsigned i = 0; i < numcols; ++i) {
@@ -2246,7 +2258,7 @@ static void jpc_ns_invlift_colres(jpc_fix_t *a, unsigned numrows, unsigned numco
 			}
 			lptr += stride;
 		}
-		for (unsigned n = llen - (!parity) - (parity != (numrows & 1)); n > 0; --n) {
+		for (unsigned n = llen - (!parity) - (!end_parity); n > 0; --n) {
 			lptr2 = lptr;
 			hptr2 = hptr;
 			for (unsigned i = 0; i < numcols; ++i) {
@@ -2258,7 +2270,7 @@ static void jpc_ns_invlift_colres(jpc_fix_t *a, unsigned numrows, unsigned numco
 			lptr += stride;
 			hptr += stride;
 		}
-		if (parity != (numrows & 1)) {
+		if (!end_parity) {
 			lptr2 = lptr;
 			hptr2 = hptr;
 			for (unsigned i = 0; i < numcols; ++i) {
@@ -2283,7 +2295,7 @@ static void jpc_ns_invlift_colres(jpc_fix_t *a, unsigned numrows, unsigned numco
 			}
 			hptr += stride;
 		}
-		for (unsigned n = numrows - llen - parity - (parity == (numrows & 1)); n > 0; --n) {
+		for (unsigned n = numrows - llen - parity - end_parity; n > 0; --n) {
 			lptr2 = lptr;
 			hptr2 = hptr;
 			for (unsigned i = 0; i < numcols; ++i) {
@@ -2295,7 +2307,7 @@ static void jpc_ns_invlift_colres(jpc_fix_t *a, unsigned numrows, unsigned numco
 			hptr += stride;
 			lptr += stride;
 		}
-		if (parity == (numrows & 1)) {
+		if (end_parity) {
 			lptr2 = lptr;
 			hptr2 = hptr;
 			for (unsigned i = 0; i < numcols; ++i) {
