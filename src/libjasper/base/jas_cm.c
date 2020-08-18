@@ -909,7 +909,7 @@ static jas_cmreal_t jas_cmshapmatlut_lookup(const jas_cmshapmatlut_t *lut, jas_c
 }
 
 static int jas_cmshapmatlut_invert(jas_cmshapmatlut_t *invlut,
-  const jas_cmshapmatlut_t *lut, int n)
+  const jas_cmshapmatlut_t *lut, unsigned n)
 {
 	jas_cmreal_t ax;
 	jas_cmreal_t ay;
