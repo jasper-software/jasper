@@ -586,7 +586,7 @@ int jas_image_writecmpt(jas_image_t *image, unsigned cmptno, jas_image_coord_t x
 			return -1;
 		}
 
-		if (cmpt->cps_ == 1 && !cmpt->sgnd_ && width <= 16384) {
+		if (cps == 1 && !sgnd && width <= 16384) {
 			/* fast path for 1 byte per sample and
 			   unsigned with bulk writes */
 
@@ -602,7 +602,7 @@ int jas_image_writecmpt(jas_image_t *image, unsigned cmptno, jas_image_coord_t x
 			for (j = 0; j < width; ++j)
 				buffer[j] = d[j];
 
-			jas_stream_write(cmpt->stream_, buffer, width);
+			jas_stream_write(stream, buffer, width);
 			continue;
 		}
 
