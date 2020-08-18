@@ -17,6 +17,9 @@ rem cmake -G "Visual Studio 12 2013 Win64" ^
 cmake ^
   -H%source_dir% -B%build_dir_static% %allow_in_source_build% ^
   -DCMAKE_INSTALL_PREFIX=%install_dir_static% ^
+  -DJAS_ENABLE_LIBJPEG=false ^
+  -DJAS_ENABLE_OPENGL=false ^
+  -DJAS_ENABLE_DOC=false ^
   -DJAS_ENABLE_SHARED=false || exit /B 1
 
 rem list targets
