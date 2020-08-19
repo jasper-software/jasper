@@ -118,19 +118,6 @@ else()
 	set(JAS_REQUIRED "REQUIRED")
 endif()
 
-if (UNIX)
-	if (MACOSX)
-		set(JAS_PLATFORM "UNIX (OSX)")
-	else()
-		set(JAS_PLATFORM "UNIX (Not OSX)")
-	endif()
-elseif (WIN32)
-	set(JAS_PLATFORM "Microsoft Windows")
-else()
-	set(JAS_PLATFORM "Unknown")
-endif()
-message("Platform ${JAS_PLATFORM}")
-
 if (JAS_ENABLE_SHARED AND MACOSX)
 	set(CMAKE_MACOSX_RPATH true)
 endif()
@@ -138,11 +125,6 @@ endif()
 if (JAS_ENABLE_SHARED)
 	set(JAS_DLL 1)
 endif()
-
-message("CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE}")
-message("CMAKE_C_COMPILER_ID ${CMAKE_C_COMPILER_ID}")
-message("CMAKE_C_COMPILER ${CMAKE_C_COMPILER}")
-message("CMAKE_C_FLAGS ${CMAKE_C_FLAGS}")
 
 # If a multiconfiguration generator is used, ensure that various output
 # files are not placed in subdirectories (such as Debug and Release)
@@ -243,7 +225,6 @@ if (JAS_ENABLE_LIBJPEG AND JPEG_FOUND)
 		#include <jpeglib.h>
 		int main() {}
 	" JAS_HAVE_JPEGLIB_H)
-	message("JAS_HAVE_JPEGLIB_H: ${JAS_HAVE_JPEGLIB_H}")
 	if(JAS_HAVE_JPEGLIB_H)
 		set(JAS_HAVE_LIBJPEG 1)
 		include_directories(${JPEG_INCLUDE_DIR})
@@ -260,7 +241,6 @@ else()
 	set(JPEG_INCLUDE_DIR "")
 	set(JPEG_LIBRARIES "")
 endif()
-message("JAS_HAVE_LIBJPEG: ${JAS_HAVE_LIBJPEG}")
 
 ################################################################################
 # Check for the Math library.
