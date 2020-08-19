@@ -502,6 +502,11 @@ int jas_cmxform_apply(const jas_cmxform_t *xform, const jas_cmpixmap_t *in, jas_
 			maxchans = pxform->numoutchans;
 		}
 	}
+
+	if (maxchans == 0)
+		/* avoid division by zero */
+		goto error;
+
 	const unsigned bufmax = APPLYBUFSIZ / maxchans;
 	assert(bufmax > 0);
 
