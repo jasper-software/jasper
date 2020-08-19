@@ -99,7 +99,6 @@ option(JAS_ENABLE_PROGRAMS "Enable building of the programs" true)
 #
 ################################################################################
 
-#set(CMAKE_VERBOSE_MAKEFILE on)
 set(CMAKE_C_STANDARD 11)
 
 if ((CMAKE_GENERATOR MATCHES Xcode) OR
@@ -118,13 +117,6 @@ if (JAS_ENABLE_AUTOMATIC_DEPENDENCIES)
 else()
 	set(JAS_REQUIRED "REQUIRED")
 endif()
-
-# The following lines have been temporarily moved above:
-#if (APPLE AND CMAKE_SYSTEM_NAME MATCHES "Darwin")
-#	set(MACOSX true)
-#else()
-#	set(MACOSX false)
-#endif()
 
 if (UNIX)
 	if (MACOSX)
