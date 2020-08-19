@@ -222,19 +222,7 @@ endif()
 # Perform plaform checks.
 ################################################################################
 
-find_package(Doxygen)
-find_package(LATEX COMPONENTS PDFLATEX)
 find_program(BASH_PROGRAM bash)
-
-# On some (or maybe all?) systems, LATEX_FOUND is not set by FindLATEX.
-# So, instead, rely on LATEX_PDFLATEX_FOUND.
-message("PDFLATEX_COMPILER: ${PDFLATEX_COMPILER}")
-if ((NOT LATEX_FOUND) AND PDFLATEX_COMPILER)
-	message(WARNING "Setting LATEX_FOUND to true.")
-	message(WARNING "Your version of CMake may be buggy.")
-	set(LATEX_FOUND true)
-endif()
-message("LATEX_FOUND ${LATEX_FOUND}")
 
 check_include_files(fcntl.h JAS_HAVE_FCNTL_H)
 check_include_files(io.h JAS_HAVE_IO_H)

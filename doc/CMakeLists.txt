@@ -1,3 +1,17 @@
+find_package(Doxygen)
+
+find_package(LATEX COMPONENTS PDFLATEX)
+
+# On some (or maybe all?) systems, LATEX_FOUND is not set by FindLATEX.
+# So, instead, rely on LATEX_PDFLATEX_FOUND.
+message("PDFLATEX_COMPILER: ${PDFLATEX_COMPILER}")
+if ((NOT LATEX_FOUND) AND PDFLATEX_COMPILER)
+	message(WARNING "Setting LATEX_FOUND to true.")
+	message(WARNING "Your version of CMake may be buggy.")
+	set(LATEX_FOUND true)
+endif()
+message("LATEX_FOUND ${LATEX_FOUND}")
+
 if (DOXYGEN_FOUND)
 
 	configure_file("${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in"
