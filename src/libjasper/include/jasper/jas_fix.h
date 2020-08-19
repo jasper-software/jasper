@@ -89,11 +89,11 @@ extern "C" {
 
 /* The representation of the value zero. */
 #define	JAS_FIX_ZERO(fix_t, fracbits) \
-	JAS_CAST(fix_t, 0)
+	JAS_INTTOFIX(fix_t, fracbits, 0)
 
 /* The representation of the value one. */
 #define	JAS_FIX_ONE(fix_t, fracbits) \
-	(JAS_CAST(fix_t, 1) << (fracbits))
+	JAS_INTTOFIX(fix_t, fracbits, 1)
 
 /* The representation of the value one half. */
 #define	JAS_FIX_HALF(fix_t, fracbits) \
