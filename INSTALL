@@ -143,9 +143,3 @@ JAS_ENABLE_LSAN
 JAS_ENABLE_MSAN
     Enable the Memory Sanitizer.
     Valid values: true or false
-
-JAS_MEMORY_LIMIT
-    DO NOT RELY ON THIS OPTION, AS IT IS LIKELY TO BE REMOVED IN THE FUTURE.
-    Set the maximum amount of memory that can be allocated with jas_malloc
-    and friends.
-    Value: a value of unsigned integral type (e.g., 10000000 or SIZE_MAX).
