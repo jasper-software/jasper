@@ -92,7 +92,6 @@ option(JAS_ENABLE_LIBJPEG "Enable the use of the JPEG Library" true)
 option(JAS_ENABLE_OPENGL "Enable the use of the OpenGL/GLUT Library" true)
 option(JAS_ENABLE_STRICT "Enable pedantic error checking" false)
 option(JAS_ENABLE_AUTOMATIC_DEPENDENCIES "Enable automatic dependencies" true)
-option(JAS_LOCAL "Enable local hacks for developers (do not enable)" false)
 option(JAS_ENABLE_DOC "Enable building of the documentation" true)
 option(JAS_ENABLE_PROGRAMS "Enable building of the programs" true)
 
@@ -148,17 +147,10 @@ if (JAS_ENABLE_SHARED)
 	set(JAS_DLL 1)
 endif()
 
-message("JAS_LOCAL ${JAS_LOCAL}")
 message("CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE}")
 message("CMAKE_C_COMPILER_ID ${CMAKE_C_COMPILER_ID}")
 message("CMAKE_C_COMPILER ${CMAKE_C_COMPILER}")
 message("CMAKE_C_FLAGS ${CMAKE_C_FLAGS}")
-if (JAS_LOCAL AND (CMAKE_BUILD_TYPE MATCHES "Debug"))
-	if (CMAKE_C_COMPILER_ID MATCHES "GNU" OR
-	  CMAKE_C_COMPILER_ID MATCHES "Clang")
-		add_definitions("-O0")
-	endif()
-endif()
 
 # If a multiconfiguration generator is used, ensure that various output
 # files are not placed in subdirectories (such as Debug and Release)
