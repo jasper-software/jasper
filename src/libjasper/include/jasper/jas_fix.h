@@ -105,7 +105,7 @@ extern "C" {
 
 /* Convert an int to a fixed-point number. */
 #define JAS_INTTOFIX(fix_t, fracbits, x) \
-	JAS_CAST(fix_t, (x) << (fracbits))
+	(JAS_CAST(fix_t, x) << (fracbits))
 
 /* Convert a fixed-point number to an int. */
 #define JAS_FIXTOINT(fix_t, fracbits, x) \
