@@ -202,7 +202,7 @@ int jpc_enc_encpkt(jpc_enc_t *enc, jas_stream_t *out, unsigned compno, unsigned 
 	}
 
 	if (jpc_bitstream_putbit(outb, 1) == EOF) {
-		return -1;
+		goto error_close;
 	}
 	//JAS_DBGLOG(10, ("\n"));
 	JAS_DBGLOG(10, ("present.\n"));
@@ -244,11 +244,11 @@ int jpc_enc_encpkt(jpc_enc_t *enc, jas_stream_t *out, unsigned compno, unsigned 
 				  cblk - prc->cblks);
 				if (jpc_tagtree_encode(prc->incltree, leaf, lyrno + 1, outb) <
 				  0) {
-					return -1;
+					goto error_close;
 				}
 			} else {
 				if (jpc_bitstream_putbit(outb, included) == EOF) {
-					return -1;
+					goto error_close;
 				}
 			}
 			JAS_DBGLOG(10, ("included=%d ", included));
@@ -261,7 +261,7 @@ int jpc_enc_encpkt(jpc_enc_t *enc, jas_stream_t *out, unsigned compno, unsigned 
 				for (;;) {
 					if ((ret = jpc_tagtree_encode(prc->nlibtree, leaf, i,
 					  outb)) < 0) {
-						return -1;
+						goto error_close;
 					}
 					if (ret) {
 						break;
@@ -279,7 +279,7 @@ int jpc_enc_encpkt(jpc_enc_t *enc, jas_stream_t *out, unsigned compno, unsigned 
 			}
 			const unsigned numnewpasses = endpass - startpass;
 			if (jpc_putnumnewpasses(outb, numnewpasses)) {
-				return -1;
+				goto error_close;
 			}
 			JAS_DBGLOG(10, ("numnewpasses=%d ", numnewpasses));
 
@@ -301,7 +301,7 @@ int jpc_enc_encpkt(jpc_enc_t *enc, jas_stream_t *out, unsigned compno, unsigned 
 				}
 			}
 			if (jpc_putcommacode(outb, maxadjust)) {
-				return -1;
+				goto error_close;
 			}
 			cblk->numlenbits += maxadjust;
 
@@ -315,7 +315,7 @@ int jpc_enc_encpkt(jpc_enc_t *enc, jas_stream_t *out, unsigned compno, unsigned 
 					  (int)jpc_floorlog2(passcount));
 					if (jpc_bitstream_putbits(outb, cblk->numlenbits +
 					  jpc_floorlog2(passcount), datalen) == EOF) {
-						return -1;
+						goto error_close;
 					}
 					n += datalen;
 					passcount = 1;
@@ -386,6 +386,10 @@ int jpc_enc_encpkt(jpc_enc_t *enc, jas_stream_t *out, unsigned compno, unsigned 
 	JAS_DBGLOG(10, ("encoding packet end\n"));
 
 	return 0;
+
+error_close:
+	jpc_bitstream_close(outb);
+	return -1;
 }
 
 void jpc_save_t2state(jpc_enc_t *enc)
