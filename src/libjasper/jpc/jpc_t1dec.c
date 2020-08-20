@@ -353,9 +353,6 @@ static int dec_sigpass(jpc_dec_t *dec, register jpc_mqdec_t *mqdec, unsigned bit
   bool vcausalflag, jas_matrix_t *flags, jas_matrix_t *data)
 {
 	int i;
-	int one;
-	int half;
-	int oneplushalf;
 	jpc_fix_t *fp;
 	jpc_fix_t *fstripestart;
 	jpc_fix_t *fvscanstart;
@@ -373,9 +370,9 @@ static int dec_sigpass(jpc_dec_t *dec, register jpc_mqdec_t *mqdec, unsigned bit
 	const unsigned fstripestep = frowstep << 2;
 	const unsigned dstripestep = drowstep << 2;
 
-	one = 1 << bitpos;
-	half = one >> 1;
-	oneplushalf = one | half;
+	const jpc_fix_t one = (jpc_fix_t)1 << bitpos;
+	const jpc_fix_t half = one >> 1;
+	const jpc_fix_t oneplushalf = one | half;
 
 	fstripestart = jas_matrix_getref(flags, 1, 1);
 	dstripestart = jas_matrix_getref(data, 0, 0);
@@ -450,9 +447,6 @@ static int dec_rawsigpass(jpc_dec_t *dec, jpc_bitstream_t *in, unsigned bitpos, 
   jas_matrix_t *flags, jas_matrix_t *data)
 {
 	int i;
-	int one;
-	int half;
-	int oneplushalf;
 	jpc_fix_t *fp;
 	jpc_fix_t *fstripestart;
 	jpc_fix_t *fvscanstart;
@@ -470,9 +464,9 @@ static int dec_rawsigpass(jpc_dec_t *dec, jpc_bitstream_t *in, unsigned bitpos, 
 	const unsigned fstripestep = frowstep << 2;
 	const unsigned dstripestep = drowstep << 2;
 
-	one = 1 << bitpos;
-	half = one >> 1;
-	oneplushalf = one | half;
+	const jpc_fix_t one = (jpc_fix_t)1 << bitpos;
+	const jpc_fix_t half = one >> 1;
+	const jpc_fix_t oneplushalf = one | half;
 
 	fstripestart = jas_matrix_getref(flags, 1, 1);
 	dstripestart = jas_matrix_getref(data, 0, 0);
@@ -543,9 +537,6 @@ static int dec_refpass(jpc_dec_t *dec, register jpc_mqdec_t *mqdec, unsigned bit
   bool vcausalflag, jas_matrix_t *flags, jas_matrix_t *data)
 {
 	int i;
-	int one;
-	int poshalf;
-	int neghalf;
 	jpc_fix_t *fp;
 	jpc_fix_t *fstripestart;
 	jpc_fix_t *fvscanstart;
@@ -564,9 +555,9 @@ static int dec_refpass(jpc_dec_t *dec, register jpc_mqdec_t *mqdec, unsigned bit
 	const unsigned fstripestep = frowstep << 2;
 	const unsigned dstripestep = drowstep << 2;
 
-	one = 1 << bitpos;
-	poshalf = one >> 1;
-	neghalf = (bitpos > 0) ? (-poshalf) : (-1);
+	const jpc_fix_t one = (jpc_fix_t)1 << bitpos;
+	const jpc_fix_t poshalf = one >> 1;
+	const jpc_fix_t neghalf = bitpos > 0 ? -poshalf : -1;
 
 	fstripestart = jas_matrix_getref(flags, 1, 1);
 	dstripestart = jas_matrix_getref(data, 0, 0);
@@ -631,9 +622,6 @@ static int dec_rawrefpass(jpc_dec_t *dec, jpc_bitstream_t *in, unsigned bitpos, 
   jas_matrix_t *flags, jas_matrix_t *data)
 {
 	int i;
-	int one;
-	int poshalf;
-	int neghalf;
 	jpc_fix_t *fp;
 	jpc_fix_t *fstripestart;
 	jpc_fix_t *fvscanstart;
@@ -652,9 +640,9 @@ static int dec_rawrefpass(jpc_dec_t *dec, jpc_bitstream_t *in, unsigned bitpos, 
 	const unsigned fstripestep = frowstep << 2;
 	const unsigned dstripestep = drowstep << 2;
 
-	one = 1 << bitpos;
-	poshalf = one >> 1;
-	neghalf = (bitpos > 0) ? (-poshalf) : (-1);
+	const jpc_fix_t one = (jpc_fix_t)1 << bitpos;
+	const jpc_fix_t poshalf = one >> 1;
+	const jpc_fix_t neghalf = bitpos > 0 ? -poshalf : -1;
 
 	fstripestart = jas_matrix_getref(flags, 1, 1);
 	dstripestart = jas_matrix_getref(data, 0, 0);
@@ -729,10 +717,7 @@ plabel \
 static int dec_clnpass(jpc_dec_t *dec, register jpc_mqdec_t *mqdec, unsigned bitpos, enum jpc_tsfb_orient orient,
   bool vcausalflag, bool segsymflag, jas_matrix_t *flags, jas_matrix_t *data)
 {
-	int half;
 	int f;
-	int one;
-	int oneplushalf;
 
 	jpc_fix_t *fp;
 	jpc_fix_t *fstripestart;
@@ -745,9 +730,9 @@ static int dec_clnpass(jpc_dec_t *dec, register jpc_mqdec_t *mqdec, unsigned bit
 	/* Avoid compiler warning about unused parameters. */
 	(void)dec;
 
-	one = 1 << bitpos;
-	half = one >> 1;
-	oneplushalf = one | half;
+	const jpc_fix_t one = (jpc_fix_t)1 << bitpos;
+	const jpc_fix_t half = one >> 1;
+	const jpc_fix_t oneplushalf = one | half;
 
 	const unsigned width = jas_matrix_numcols(data);
 	const unsigned height = jas_matrix_numrows(data);
