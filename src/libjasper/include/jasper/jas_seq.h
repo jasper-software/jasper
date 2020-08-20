@@ -308,13 +308,21 @@ JAS_DLLEXPORT jas_matrix_t *jas_matrix_input(FILE *);
 JAS_ATTRIBUTE_CONST
 static inline jas_seqent_t jas_seqent_asl(jas_seqent_t x, unsigned n)
 {
+#ifdef JAS_ENABLE_32BIT
+	return jas_least32_asl(x, n);
+#else
 	return jas_fast32_asl(x, n);
+#endif
 }
 
 JAS_ATTRIBUTE_CONST
 static inline jas_seqent_t jas_seqent_asr(jas_seqent_t x, unsigned n)
 {
+#ifdef JAS_ENABLE_32BIT
+	return jas_least32_asr(x, n);
+#else
 	return jas_fast32_asr(x, n);
+#endif
 }
 
 /******************************************************************************\
