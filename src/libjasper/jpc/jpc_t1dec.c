@@ -329,7 +329,7 @@ premature_exit:
 * Code for significance pass.
 \******************************************************************************/
 
-#define	jpc_sigpass_step(fp, frowstep, dp, bitpos, oneplushalf, orient, mqdec, vcausalflag) \
+#define	jpc_sigpass_step(fp, frowstep, dp, oneplushalf, orient, mqdec, vcausalflag) \
 { \
 	int f; \
 	int v; \
@@ -390,7 +390,7 @@ static int dec_sigpass(jpc_dec_t *dec, register jpc_mqdec_t *mqdec, int bitpos, 
 			unsigned k = vscanlen;
 
 			/* Process first sample in vertical scan. */
-			jpc_sigpass_step(fp, frowstep, dp, bitpos, oneplushalf,
+			jpc_sigpass_step(fp, frowstep, dp, oneplushalf,
 			  orient, mqdec, vcausalflag);
 			if (--k <= 0) {
 				continue;
@@ -399,7 +399,7 @@ static int dec_sigpass(jpc_dec_t *dec, register jpc_mqdec_t *mqdec, int bitpos, 
 			dp += drowstep;
 
 			/* Process second sample in vertical scan. */
-			jpc_sigpass_step(fp, frowstep, dp, bitpos, oneplushalf,
+			jpc_sigpass_step(fp, frowstep, dp, oneplushalf,
 			  orient, mqdec, 0);
 			if (--k <= 0) {
 				continue;
@@ -408,7 +408,7 @@ static int dec_sigpass(jpc_dec_t *dec, register jpc_mqdec_t *mqdec, int bitpos, 
 			dp += drowstep;
 
 			/* Process third sample in vertical scan. */
-			jpc_sigpass_step(fp, frowstep, dp, bitpos, oneplushalf,
+			jpc_sigpass_step(fp, frowstep, dp, oneplushalf,
 			  orient, mqdec, 0);
 			if (--k <= 0) {
 				continue;
@@ -417,7 +417,7 @@ static int dec_sigpass(jpc_dec_t *dec, register jpc_mqdec_t *mqdec, int bitpos, 
 			dp += drowstep;
 
 			/* Process fourth sample in vertical scan. */
-			jpc_sigpass_step(fp, frowstep, dp, bitpos, oneplushalf,
+			jpc_sigpass_step(fp, frowstep, dp, oneplushalf,
 			  orient, mqdec, 0);
 		}
 	}
@@ -526,7 +526,7 @@ static int dec_rawsigpass(jpc_dec_t *dec, jpc_bitstream_t *in, int bitpos, bool 
 * Code for refinement pass.
 \******************************************************************************/
 
-#define	jpc_refpass_step(fp, dp, poshalf, neghalf, mqdec, vcausalflag) \
+#define	jpc_refpass_step(fp, dp, poshalf, neghalf, mqdec) \
 { \
 	int v; \
 	int t; \
@@ -581,8 +581,7 @@ static int dec_refpass(jpc_dec_t *dec, register jpc_mqdec_t *mqdec, int bitpos,
 			unsigned k = vscanlen;
 
 			/* Process first sample in vertical scan. */
-			jpc_refpass_step(fp, dp, poshalf, neghalf, mqdec,
-			  vcausalflag);
+			jpc_refpass_step(fp, dp, poshalf, neghalf, mqdec);
 			if (--k <= 0) {
 				continue;
 			}
@@ -590,7 +589,7 @@ static int dec_refpass(jpc_dec_t *dec, register jpc_mqdec_t *mqdec, int bitpos,
 			dp += drowstep;
 
 			/* Process second sample in vertical scan. */
-			jpc_refpass_step(fp, dp, poshalf, neghalf, mqdec, 0);
+			jpc_refpass_step(fp, dp, poshalf, neghalf, mqdec);
 			if (--k <= 0) {
 				continue;
 			}
@@ -598,7 +597,7 @@ static int dec_refpass(jpc_dec_t *dec, register jpc_mqdec_t *mqdec, int bitpos,
 			dp += drowstep;
 
 			/* Process third sample in vertical scan. */
-			jpc_refpass_step(fp, dp, poshalf, neghalf, mqdec, 0);
+			jpc_refpass_step(fp, dp, poshalf, neghalf, mqdec);
 			if (--k <= 0) {
 				continue;
 			}
@@ -606,7 +605,7 @@ static int dec_refpass(jpc_dec_t *dec, register jpc_mqdec_t *mqdec, int bitpos,
 			dp += drowstep;
 
 			/* Process fourth sample in vertical scan. */
-			jpc_refpass_step(fp, dp, poshalf, neghalf, mqdec, 0);
+			jpc_refpass_step(fp, dp, poshalf, neghalf, mqdec);
 		}
 	}
 
