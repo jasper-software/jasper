@@ -1181,7 +1181,10 @@ static int jpc_dec_tiledecode(jpc_dec_t *dec, jpc_dec_tile_t *tile)
 	const jpc_dec_cmpt_t *cmpt;
 	for (compno = 0, tcomp = tile->tcomps, cmpt = dec->cmpts; compno <
 	  dec->numcomps; ++compno, ++tcomp, ++cmpt) {
-		const unsigned adjust = cmpt->sgnd ? 0 : (1 << (cmpt->prec - 1));
+		if (cmpt->sgnd)
+			continue;
+
+		const unsigned adjust = 1 << (cmpt->prec - 1);
 		for (jas_matind_t i = 0; i < jas_matrix_numrows(tcomp->data); ++i) {
 			for (jas_matind_t j = 0; j < jas_matrix_numcols(tcomp->data); ++j) {
 				*jas_matrix_getref(tcomp->data, i, j) += adjust;
