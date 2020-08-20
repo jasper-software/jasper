@@ -1195,6 +1195,12 @@ static int jpc_dec_tiledecode(jpc_dec_t *dec, jpc_dec_tile_t *tile)
 	/* Perform clipping. */
 	for (compno = 0, tcomp = tile->tcomps, cmpt = dec->cmpts; compno <
 	  dec->numcomps; ++compno, ++tcomp, ++cmpt) {
+		if (cmpt->prec >= sizeof(jpc_fix_t) * 8 - 2 + cmpt->sgnd)
+			/* no need to clip, because the calculated
+			   minimum/maximum values would overflow our
+			   integer type anyway */
+			continue;
+
 		const jas_seqent_t mn = cmpt->sgnd
 			? (-((jpc_fix_t)1 << (cmpt->prec - 1)))
 			: (0);
