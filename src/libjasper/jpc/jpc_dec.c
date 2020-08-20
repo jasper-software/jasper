@@ -1165,8 +1165,9 @@ static int jpc_dec_tiledecode(jpc_dec_t *dec, jpc_dec_tile_t *tile)
 		const jpc_dec_ccp_t *ccp = &tile->cp->ccps[compno];
 		if (ccp->qmfbid == JPC_COX_INS) {
 			jas_matrix_t *const data = tcomp->data;
+			const jas_matind_t height = jas_matrix_numrows(data);
 			const jas_matind_t numcols = jas_matrix_numcols(data);
-			for (jas_matind_t i = 0; i < jas_matrix_numrows(data); ++i) {
+			for (jas_matind_t i = 0; i < height; ++i) {
 				jpc_fix_t *p = jas_matrix_getref(data, i, 0);
 				for (jas_matind_t j = 0; j < numcols; ++j) {
 					v = p[j];
@@ -1184,10 +1185,14 @@ static int jpc_dec_tiledecode(jpc_dec_t *dec, jpc_dec_tile_t *tile)
 		if (cmpt->sgnd)
 			continue;
 
+		jas_matrix_t *const data = tcomp->data;
+		const jas_matind_t width = jas_matrix_numcols(data);
+		const jas_matind_t height = jas_matrix_numrows(data);
 		const jas_seqent_t adjust = (jas_seqent_t)1 << (cmpt->prec - 1);
-		for (jas_matind_t i = 0; i < jas_matrix_numrows(tcomp->data); ++i) {
-			for (jas_matind_t j = 0; j < jas_matrix_numcols(tcomp->data); ++j) {
-				*jas_matrix_getref(tcomp->data, i, j) += adjust;
+		for (jas_matind_t i = 0; i < height; ++i) {
+			jpc_fix_t *p = jas_matrix_getref(data, i, 0);
+			for (jas_matind_t j = 0; j < width; ++j) {
+				p[j] += adjust;
 			}
 		}
 	}
@@ -1991,9 +1996,12 @@ static void jpc_undo_roi(jas_matrix_t *x, int roishift, int bgshift, unsigned nu
 	thresh = 1 << roishift;
 
 	warn = false;
-	for (jas_matind_t i = 0; i < jas_matrix_numrows(x); ++i) {
+
+	const jas_matind_t width = jas_matrix_numcols(x);
+	const jas_matind_t height = jas_matrix_numrows(x);
+	for (jas_matind_t i = 0; i < height; ++i) {
 		jpc_fix_t *p = jas_matrix_getref(x, i, 0);
-		for (jas_matind_t j = 0; j < jas_matrix_numcols(x); ++j, ++p) {
+		for (jas_matind_t j = 0; j < width; ++j, ++p) {
 			val = *p;
 			mag = JAS_ABS(val);
 			if (mag >= thresh) {
