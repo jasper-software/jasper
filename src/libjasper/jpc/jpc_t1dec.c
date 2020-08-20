@@ -329,24 +329,25 @@ premature_exit:
 * Code for significance pass.
 \******************************************************************************/
 
-#define	jpc_sigpass_step(fp, frowstep, dp, oneplushalf, orient, mqdec, vcausalflag) \
-{ \
-	int f; \
-	int v; \
-	f = *(fp); \
-	if ((f & JPC_OTHSIGMSK) && !(f & (JPC_SIG | JPC_VISIT))) { \
-		jpc_mqdec_setcurctx((mqdec), JPC_GETZCCTXNO(f, (orient))); \
-		JPC_T1D_GETBIT((mqdec), v, "SIG", "ZC"); \
-		if (v) { \
-			jpc_mqdec_setcurctx((mqdec), JPC_GETSCCTXNO(f)); \
-			JPC_T1D_GETBIT((mqdec), v, "SIG", "SC"); \
-			v ^= JPC_GETSPB(f); \
-			JPC_UPDATEFLAGS4((fp), (frowstep), v, (vcausalflag)); \
-			*(fp) |= JPC_SIG; \
-			*(dp) = (v) ? (-(jpc_fix_t)(oneplushalf)) : (jpc_fix_t)(oneplushalf); \
-		} \
-		*(fp) |= JPC_VISIT; \
-	} \
+JAS_FORCE_INLINE
+static void jpc_sigpass_step(jpc_fix_t *fp, size_t frowstep, jpc_fix_t *dp, jpc_fix_t oneplushalf, enum jpc_tsfb_orient orient, jpc_mqdec_t *mqdec, bool vcausalflag)
+{
+	const jpc_fix_t f = *(fp);
+	if ((f & JPC_OTHSIGMSK) && !(f & (JPC_SIG | JPC_VISIT))) {
+		jpc_mqdec_setcurctx(mqdec, JPC_GETZCCTXNO(f, orient));
+
+		int v;
+		JPC_T1D_GETBIT(mqdec, v, "SIG", "ZC");
+		if (v) {
+			jpc_mqdec_setcurctx(mqdec, JPC_GETSCCTXNO(f));
+			JPC_T1D_GETBIT(mqdec, v, "SIG", "SC");
+			v ^= JPC_GETSPB(f);
+			JPC_UPDATEFLAGS4(fp, frowstep, v, vcausalflag);
+			*fp |= JPC_SIG;
+			*dp = v ? -oneplushalf : oneplushalf;
+		}
+		*fp |= JPC_VISIT;
+	}
 }
 
 static int dec_sigpass(jpc_dec_t *dec, register jpc_mqdec_t *mqdec, unsigned bitpos, enum jpc_tsfb_orient orient,
@@ -421,26 +422,29 @@ static int dec_sigpass(jpc_dec_t *dec, register jpc_mqdec_t *mqdec, unsigned bit
 	return 0;
 }
 
-#define	jpc_rawsigpass_step(fp, frowstep, dp, oneplushalf, in, vcausalflag) \
-{ \
-	jpc_fix_t f = *(fp); \
-	jpc_fix_t v; \
-	if ((f & JPC_OTHSIGMSK) && !(f & (JPC_SIG | JPC_VISIT))) { \
-		JPC_T1D_RAWGETBIT(in, v, "SIG", "ZC"); \
-		if (v < 0) { \
-			return -1; \
-		} \
-		if (v) { \
-			JPC_T1D_RAWGETBIT(in, v, "SIG", "SC"); \
-			if (v < 0) { \
-				return -1; \
-			} \
-			JPC_UPDATEFLAGS4((fp), (frowstep), v, (vcausalflag)); \
-			*(fp) |= JPC_SIG; \
-			*(dp) = v ? (-oneplushalf) : (oneplushalf); \
-		} \
-		*(fp) |= JPC_VISIT; \
-	} \
+JAS_FORCE_INLINE
+static int jpc_rawsigpass_step(jpc_fix_t *fp, size_t frowstep, jpc_fix_t *dp, jpc_fix_t oneplushalf, jpc_bitstream_t *in, bool vcausalflag)
+{
+	const jpc_fix_t f = *fp;
+	if ((f & JPC_OTHSIGMSK) && !(f & (JPC_SIG | JPC_VISIT))) {
+		int v;
+		JPC_T1D_RAWGETBIT(in, v, "SIG", "ZC");
+		if (v < 0) {
+			return -1;
+		}
+		if (v) {
+			JPC_T1D_RAWGETBIT(in, v, "SIG", "SC");
+			if (v < 0) {
+				return -1;
+			}
+			JPC_UPDATEFLAGS4(fp, frowstep, v, vcausalflag);
+			*fp |= JPC_SIG;
+			*dp = v ? -oneplushalf : oneplushalf;
+		}
+		*fp |= JPC_VISIT;
+	}
+
+	return 0;
 }
 
 static int dec_rawsigpass(jpc_dec_t *dec, jpc_bitstream_t *in, unsigned bitpos, bool vcausalflag,
@@ -481,8 +485,9 @@ static int dec_rawsigpass(jpc_dec_t *dec, jpc_bitstream_t *in, unsigned bitpos, 
 			unsigned k = vscanlen;
 
 			/* Process first sample in vertical scan. */
-			jpc_rawsigpass_step(fp, frowstep, dp, oneplushalf,
-			  in, vcausalflag);
+			if (jpc_rawsigpass_step(fp, frowstep, dp, oneplushalf, in, vcausalflag))
+				return -1;
+
 			if (--k <= 0) {
 				continue;
 			}
@@ -490,8 +495,9 @@ static int dec_rawsigpass(jpc_dec_t *dec, jpc_bitstream_t *in, unsigned bitpos, 
 			dp += drowstep;
 
 			/* Process second sample in vertical scan. */
-			jpc_rawsigpass_step(fp, frowstep, dp, oneplushalf,
-			  in, 0);
+			if (jpc_rawsigpass_step(fp, frowstep, dp, oneplushalf, in, 0))
+				return -1;
+
 			if (--k <= 0) {
 				continue;
 			}
@@ -499,8 +505,9 @@ static int dec_rawsigpass(jpc_dec_t *dec, jpc_bitstream_t *in, unsigned bitpos, 
 			dp += drowstep;
 
 			/* Process third sample in vertical scan. */
-			jpc_rawsigpass_step(fp, frowstep, dp, oneplushalf,
-			  in, 0);
+			if (jpc_rawsigpass_step(fp, frowstep, dp, oneplushalf, in, 0))
+				return -1;
+
 			if (--k <= 0) {
 				continue;
 			}
@@ -520,17 +527,17 @@ static int dec_rawsigpass(jpc_dec_t *dec, jpc_bitstream_t *in, unsigned bitpos, 
 * Code for refinement pass.
 \******************************************************************************/
 
-#define	jpc_refpass_step(fp, dp, poshalf, neghalf, mqdec) \
-{ \
-	int v; \
-	int t; \
+JAS_FORCE_INLINE
+static void jpc_refpass_step(jpc_fix_t *fp, jpc_fix_t *dp, jpc_fix_t poshalf, jpc_fix_t neghalf, jpc_mqdec_t *mqdec)
+{
 	if (((*(fp)) & (JPC_SIG | JPC_VISIT)) == JPC_SIG) { \
-		jpc_mqdec_setcurctx((mqdec), JPC_GETMAGCTXNO(*(fp))); \
-		JPC_T1D_GETBITNOSKEW((mqdec), v, "REF", "MR"); \
-		t = (v ? (poshalf) : (neghalf)); \
-		*(dp) += (*(dp) < 0) ? (-t) : t; \
-		*(fp) |= JPC_REFINE; \
-	} \
+		jpc_mqdec_setcurctx(mqdec, JPC_GETMAGCTXNO(*fp));
+		int v;
+		JPC_T1D_GETBITNOSKEW(mqdec, v, "REF", "MR");
+		const jpc_fix_t t = v ? poshalf : neghalf;
+		*dp += *dp < 0 ? -t : t;
+		*fp |= JPC_REFINE;
+	}
 }
 
 static int dec_refpass(jpc_dec_t *dec, register jpc_mqdec_t *mqdec, unsigned bitpos,
