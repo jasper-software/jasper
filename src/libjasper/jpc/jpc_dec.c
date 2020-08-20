@@ -1184,7 +1184,7 @@ static int jpc_dec_tiledecode(jpc_dec_t *dec, jpc_dec_tile_t *tile)
 		if (cmpt->sgnd)
 			continue;
 
-		const unsigned adjust = 1 << (cmpt->prec - 1);
+		const jas_seqent_t adjust = (jas_seqent_t)1 << (cmpt->prec - 1);
 		for (jas_matind_t i = 0; i < jas_matrix_numrows(tcomp->data); ++i) {
 			for (jas_matind_t j = 0; j < jas_matrix_numcols(tcomp->data); ++j) {
 				*jas_matrix_getref(tcomp->data, i, j) += adjust;
@@ -1195,11 +1195,12 @@ static int jpc_dec_tiledecode(jpc_dec_t *dec, jpc_dec_tile_t *tile)
 	/* Perform clipping. */
 	for (compno = 0, tcomp = tile->tcomps, cmpt = dec->cmpts; compno <
 	  dec->numcomps; ++compno, ++tcomp, ++cmpt) {
-		jpc_fix_t mn;
-		jpc_fix_t mx;
-		mn = cmpt->sgnd ? (-(1 << (cmpt->prec - 1))) : (0);
-		mx = cmpt->sgnd ? ((1 << (cmpt->prec - 1)) - 1) : ((1 <<
-		  cmpt->prec) - 1);
+		const jas_seqent_t mn = cmpt->sgnd
+			? (-((jpc_fix_t)1 << (cmpt->prec - 1)))
+			: (0);
+		const jas_seqent_t mx = cmpt->sgnd
+			? (((jpc_fix_t)1 << (cmpt->prec - 1)) - 1)
+			: (((jpc_fix_t)1 << cmpt->prec) - 1);
 		jas_matrix_clip(tcomp->data, mn, mx);
 	}
 
