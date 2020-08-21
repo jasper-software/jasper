@@ -57,8 +57,6 @@
 #endif
 #endif
 
-#define ssize_t long long
-
 #endif
 
 #if !defined(JAS_DEC_DEFAULT_MAX_SAMPLES)
