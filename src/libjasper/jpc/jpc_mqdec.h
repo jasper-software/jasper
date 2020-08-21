@@ -238,47 +238,6 @@ static bool jpc_mqdec_lpsexchange(uint_least32_t *areg_p, uint_least32_t delta, 
 	}
 }
 
-#define	jpc_mqdec_renormd(areg, creg, ctreg, in, eof, inbuf) \
-{ \
-	do { \
-		if (!(ctreg)) { \
-			jpc_mqdec_bytein2(creg, ctreg, in, eof, inbuf); \
-		} \
-		(areg) <<= 1; \
-		(creg) <<= 1; \
-		--(ctreg); \
-	} while (!((areg) & 0x8000)); \
-}
-
-#define	jpc_mqdec_bytein2(creg, ctreg, in, eof, inbuf) \
-{ \
-	int c; \
-	unsigned char prevbuf; \
-	if (!(eof)) { \
-		if ((c = jas_stream_getc(in)) == EOF) { \
-			(eof) = true; \
-			c = 0xff; \
-		} \
-		prevbuf = (inbuf); \
-		(inbuf) = c; \
-		if (prevbuf == 0xff) { \
-			if (c > 0x8f) { \
-				(creg) += 0xff00; \
-				(ctreg) = 8; \
-			} else { \
-				(creg) += c << 9; \
-				(ctreg) = 7; \
-			} \
-		} else { \
-			(creg) += c << 8; \
-			(ctreg) = 8; \
-		} \
-	} else { \
-		(creg) += 0xff00; \
-		(ctreg) = 8; \
-	} \
-}
-
 bool jpc_mqdec_getbit_func(jpc_mqdec_t *dec);
 
 #endif
