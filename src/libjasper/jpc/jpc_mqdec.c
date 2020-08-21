@@ -285,6 +285,6 @@ void jpc_mqdec_dump(const jpc_mqdec_t *mqdec, FILE *out)
 	  (unsigned long) mqdec->areg, (unsigned long) mqdec->creg,
 	  (unsigned long) mqdec->ctreg);
 	fprintf(out, "CTX = %" PRIdPTR ", ", mqdec->curctx - mqdec->ctxs);
-	fprintf(out, "IND %" PRIdPTR ", MPS %d, QEVAL %"PRIxFAST16"\n", *mqdec->curctx -
+	fprintf(out, "IND %" PRIdPTR ", MPS %d, QEVAL %"PRIxLEAST16"\n", *mqdec->curctx -
 	  jpc_mqstates, (*mqdec->curctx)->mps, (*mqdec->curctx)->qeval);
 }

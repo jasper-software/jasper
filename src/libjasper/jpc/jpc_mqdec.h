@@ -90,13 +90,13 @@
 typedef struct {
 
 	/* The C register. */
-	uint_fast32_t creg;
+	uint_least32_t creg;
 
 	/* The A register. */
-	uint_fast32_t areg;
+	uint_least32_t areg;
 
 	/* The CT register. */
-	uint_fast32_t ctreg;
+	uint_least32_t ctreg;
 
 	/* The current context. */
 	const jpc_mqstate_t **curctx;
@@ -207,7 +207,7 @@ static bool jpc_mqdec_getbit_macro(jpc_mqdec_t *dec)
 }
 
 JAS_FORCE_INLINE
-static bool jpc_mqdec_mpsexchange(uint_fast32_t areg, uint_fast32_t delta, const jpc_mqstate_t **curctx)
+static bool jpc_mqdec_mpsexchange(uint_least32_t areg, uint_least32_t delta, const jpc_mqstate_t **curctx)
 {
 	if (areg < delta) {
 		const jpc_mqstate_t *state = *curctx;
@@ -223,7 +223,7 @@ static bool jpc_mqdec_mpsexchange(uint_fast32_t areg, uint_fast32_t delta, const
 }
 
 JAS_FORCE_INLINE
-static bool jpc_mqdec_lpsexchange(uint_fast32_t *areg_p, uint_fast32_t delta, const jpc_mqstate_t **curctx)
+static bool jpc_mqdec_lpsexchange(uint_least32_t *areg_p, uint_least32_t delta, const jpc_mqstate_t **curctx)
 {
 	if (*areg_p >= delta) {
 		const jpc_mqstate_t *state = *curctx;

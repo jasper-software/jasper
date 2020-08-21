@@ -101,13 +101,13 @@
 typedef struct {
 
 	/* The C register. */
-	uint_fast32_t creg;
+	uint_least32_t creg;
 
 	/* The A register. */
-	uint_fast32_t areg;
+	uint_least32_t areg;
 
 	/* The CT register. */
-	uint_fast32_t ctreg;
+	uint_least32_t ctreg;
 
 	/* The maximum number of contexts. */
 	unsigned maxctxs;
@@ -122,10 +122,10 @@ typedef struct {
 	jas_stream_t *out;
 
 	/* The byte buffer (i.e., the B variable in the standard). */
-	int_fast16_t outbuf;
+	int_least16_t outbuf;
 
 	/* The last byte output. */
-	int_fast16_t lastbyte;
+	int_least16_t lastbyte;
 
 	/* The error indicator. */
 	bool err;
