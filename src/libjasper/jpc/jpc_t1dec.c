@@ -585,41 +585,18 @@ static int dec_refpass(jpc_mqdec_t *mqdec, unsigned bitpos,
 		for (unsigned j = width; j > 0; --j, ++fvscanstart, ++dvscanstart) {
 			fp = fvscanstart;
 			dp = dvscanstart;
-			unsigned k = vscanlen;
 
-			/* Process first sample in vertical scan. */
-			jpc_refpass_step(fp, dp, poshalf, neghalf, mqdec);
-			if (--k <= 0) {
-				continue;
+			for (unsigned k = 0; k < vscanlen; ++k) {
+				jpc_refpass_step(fp, dp, poshalf, neghalf, mqdec);
+				fp += frowstep;
+				dp += drowstep;
 			}
-			fp += frowstep;
-			dp += drowstep;
-
-			/* Process second sample in vertical scan. */
-			jpc_refpass_step(fp, dp, poshalf, neghalf, mqdec);
-			if (--k <= 0) {
-				continue;
-			}
-			fp += frowstep;
-			dp += drowstep;
-
-			/* Process third sample in vertical scan. */
-			jpc_refpass_step(fp, dp, poshalf, neghalf, mqdec);
-			if (--k <= 0) {
-				continue;
-			}
-			fp += frowstep;
-			dp += drowstep;
-
-			/* Process fourth sample in vertical scan. */
-			jpc_refpass_step(fp, dp, poshalf, neghalf, mqdec);
 		}
 	}
 
 	return 0;
 }
 
-JAS_FORCE_INLINE
 static int jpc_rawrefpass_step(jpc_fix_t *fp, jpc_fix_t *dp, jpc_fix_t poshalf, jpc_fix_t neghalf, jpc_bitstream_t *in)
 {
 	if ((*fp & (JPC_SIG | JPC_VISIT)) == JPC_SIG) {
@@ -667,38 +644,13 @@ static int dec_rawrefpass(jpc_bitstream_t *in, unsigned bitpos,
 		for (unsigned j = width; j > 0; --j, ++fvscanstart, ++dvscanstart) {
 			fp = fvscanstart;
 			dp = dvscanstart;
-			unsigned k = vscanlen;
 
-			/* Process first sample in vertical scan. */
-			if (jpc_rawrefpass_step(fp, dp, poshalf, neghalf, in))
-				return -1;
-			if (--k <= 0) {
-				continue;
+			for (unsigned k = 0; k < vscanlen; ++k) {
+				if (jpc_rawrefpass_step(fp, dp, poshalf, neghalf, in))
+					return -1;
+				fp += frowstep;
+				dp += drowstep;
 			}
-			fp += frowstep;
-			dp += drowstep;
-
-			/* Process second sample in vertical scan. */
-			if (jpc_rawrefpass_step(fp, dp, poshalf, neghalf, in))
-				return -1;
-			if (--k <= 0) {
-				continue;
-			}
-			fp += frowstep;
-			dp += drowstep;
-
-			/* Process third sample in vertical scan. */
-			if (jpc_rawrefpass_step(fp, dp, poshalf, neghalf, in))
-				return -1;
-			if (--k <= 0) {
-				continue;
-			}
-			fp += frowstep;
-			dp += drowstep;
-
-			/* Process fourth sample in vertical scan. */
-			if (jpc_rawrefpass_step(fp, dp, poshalf, neghalf, in))
-				return -1;
 		}
 	}
 	return 0;
