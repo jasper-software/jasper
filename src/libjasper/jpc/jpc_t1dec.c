@@ -197,13 +197,17 @@ static int jpc_dec_decodecblk(jpc_dec_t *dec, jpc_dec_tile_t *tile, jpc_dec_tcom
 	const size_t compno = tcomp - tile->tcomps;
 	const jpc_dec_ccp_t *const ccp = &tile->cp->ccps[compno];
 
-	if (!cblk->flags) {
-		/* Note: matrix is assumed to be zeroed */
-		if (!(cblk->flags = jas_matrix_create(jas_matrix_numrows(cblk->data) +
-		  2, jas_matrix_numcols(cblk->data) + 2))) {
-			return -1;
-		}
-	}
+	/* The MQ decoder. */
+	jpc_mqdec_t *mqdec = NULL;
+
+	/* The raw bit stream decoder. */
+	jpc_bitstream_t *nulldec = NULL;
+
+	/* The per-sample state information for this code block. */
+	/* Note: matrix is assumed to be zeroed */
+	jas_matrix_t *const flags = jas_matrix_create(jas_matrix_numrows(cblk->data) + 2, jas_matrix_numcols(cblk->data) + 2);
+	if (!flags)
+		goto error;
 
 	seg = cblk->segs.head;
 	while (seg && (seg != cblk->curseg || dopartial) && (maxlyrs < 0 ||
@@ -213,19 +217,19 @@ static int jpc_dec_decodecblk(jpc_dec_t *dec, jpc_dec_tile_t *tile, jpc_dec_tcom
 		jas_stream_rewind(seg->stream);
 		jas_stream_setrwcount(seg->stream, 0);
 		if (seg->type == JPC_SEG_MQ) {
-			if (!cblk->mqdec) {
-				if (!(cblk->mqdec = jpc_mqdec_create(JPC_NUMCTXS, 0))) {
-					return -1;
+			if (!mqdec) {
+				if (!(mqdec = jpc_mqdec_create(JPC_NUMCTXS, 0))) {
+					goto error;
 				}
-				jpc_mqdec_setctxs(cblk->mqdec, JPC_NUMCTXS, jpc_mqctxs);
+				jpc_mqdec_setctxs(mqdec, JPC_NUMCTXS, jpc_mqctxs);
 			}
-			jpc_mqdec_setinput(cblk->mqdec, seg->stream);
-			jpc_mqdec_init(cblk->mqdec);
+			jpc_mqdec_setinput(mqdec, seg->stream);
+			jpc_mqdec_init(mqdec);
 		} else {
 			assert(seg->type == JPC_SEG_RAW);
-			if (!cblk->nulldec) {
-				if (!(cblk->nulldec = jpc_bitstream_sopen(seg->stream, "r"))) {
-					assert(0);
+			if (!nulldec) {
+				if (!(nulldec = jpc_bitstream_sopen(seg->stream, "r"))) {
+					goto error;
 				}
 			}
 		}
@@ -251,28 +255,28 @@ if (bpno < 0) {
 			switch (passtype) {
 			case JPC_SIGPASS:
 				ret = (seg->type == JPC_SEG_MQ) ? dec_sigpass(dec,
-				  cblk->mqdec, bpno, band->orient,
+				  mqdec, bpno, band->orient,
 				  (ccp->cblkctx & JPC_COX_VSC) != 0,
-				  cblk->flags, cblk->data) :
-				  dec_rawsigpass(dec, cblk->nulldec, bpno,
+				  flags, cblk->data) :
+				  dec_rawsigpass(dec, nulldec, bpno,
 				  (ccp->cblkctx & JPC_COX_VSC) != 0,
-				  cblk->flags, cblk->data);
+				  flags, cblk->data);
 				break;
 			case JPC_REFPASS:
 				ret = (seg->type == JPC_SEG_MQ) ?
-				  dec_refpass(dec, cblk->mqdec, bpno,
+				  dec_refpass(dec, mqdec, bpno,
 				  (ccp->cblkctx & JPC_COX_VSC) != 0,
-				  cblk->flags, cblk->data) :
-				  dec_rawrefpass(dec, cblk->nulldec, bpno,
+				  flags, cblk->data) :
+				  dec_rawrefpass(dec, nulldec, bpno,
 				  (ccp->cblkctx & JPC_COX_VSC) != 0,
-				  cblk->flags, cblk->data);
+				  flags, cblk->data);
 				break;
 			case JPC_CLNPASS:
 				assert(seg->type == JPC_SEG_MQ);
-				ret = dec_clnpass(dec, cblk->mqdec, bpno,
+				ret = dec_clnpass(dec, mqdec, bpno,
 				  band->orient, (ccp->cblkctx &
 				  JPC_COX_VSC) != 0, (ccp->cblkctx &
-				  JPC_COX_SEGSYM) != 0, cblk->flags,
+				  JPC_COX_SEGSYM) != 0, flags,
 				  cblk->data);
 				break;
 			default:
@@ -281,12 +285,12 @@ if (bpno < 0) {
 			}
 			/* Do we need to reset after each coding pass? */
 			if (ccp->cblkctx & JPC_COX_RESET) {
-				jpc_mqdec_setctxs(cblk->mqdec, JPC_NUMCTXS, jpc_mqctxs);
+				jpc_mqdec_setctxs(mqdec, JPC_NUMCTXS, jpc_mqctxs);
 			}
 
 			if (ret) {
 				jas_eprintf("coding pass failed passtype=%d segtype=%d\n", passtype, seg->type);
-				return -1;
+				goto error;
 			}
 
 		}
@@ -302,14 +306,14 @@ if (bpno < 0) {
 				fillmask = 0;
 				filldata = 0;
 			}
-			if ((ret = jpc_bitstream_inalign(cblk->nulldec, fillmask,
+			if ((ret = jpc_bitstream_inalign(nulldec, fillmask,
 			  filldata)) < 0) {
-				return -1;
+				goto error;
 			} else if (ret > 0) {
 				jas_eprintf("warning: bad termination pattern detected\n");
 			}
-			jpc_bitstream_close(cblk->nulldec);
-			cblk->nulldec = 0;
+			jpc_bitstream_close(nulldec);
+			nulldec = 0;
 		}
 
 		cblk->curseg = seg->next;
@@ -321,7 +325,22 @@ if (bpno < 0) {
 	assert(dopartial ? (!cblk->curseg) : 1);
 
 premature_exit:
+	if (mqdec)
+		jpc_mqdec_destroy(mqdec);
+	if (nulldec)
+		jpc_bitstream_close(nulldec);
+	if (flags)
+		jas_matrix_destroy(flags);
 	return 0;
+
+error:
+	if (mqdec)
+		jpc_mqdec_destroy(mqdec);
+	if (nulldec)
+		jpc_bitstream_close(nulldec);
+	if (flags)
+		jas_matrix_destroy(flags);
+	return -1;
 }
 
 /******************************************************************************\

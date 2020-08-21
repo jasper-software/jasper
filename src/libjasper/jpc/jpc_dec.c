@@ -914,16 +914,12 @@ static int jpc_dec_tileinit(jpc_dec_t *dec, jpc_dec_tile_t *tile)
 							tmpyend = JAS_MIN(cblkyend, prc->yend);
 							if (tmpxend > tmpxstart && tmpyend > tmpystart) {
 								cblk->firstpassno = -1;
-								cblk->mqdec = 0;
-								cblk->nulldec = 0;
-								cblk->flags = 0;
 								cblk->numpasses = 0;
 								cblk->segs.head = 0;
 								cblk->segs.tail = 0;
 								cblk->curseg = 0;
 								cblk->numimsbs = 0;
 								cblk->numlenbits = 3;
-								cblk->flags = 0;
 								if (!(cblk->data = jas_seq2d_create(0, 0, 0,
 								  0))) {
 									return -1;
@@ -1014,15 +1010,6 @@ static int jpc_dec_tilefini(jpc_dec_t *dec, jpc_dec_tile_t *tile)
 									jpc_seg_destroy(seg);
 								}
 								jas_matrix_destroy(cblk->data);
-								if (cblk->mqdec) {
-									jpc_mqdec_destroy(cblk->mqdec);
-								}
-								if (cblk->nulldec) {
-									jpc_bitstream_close(cblk->nulldec);
-								}
-								if (cblk->flags) {
-									jas_matrix_destroy(cblk->flags);
-								}
 							}
 							if (prc->incltagtree) {
 								jpc_tagtree_destroy(prc->incltagtree);
