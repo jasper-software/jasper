@@ -104,35 +104,43 @@ static int dec_clnpass(jpc_mqdec_t *mqdec, unsigned bitpos, enum jpc_tsfb_orient
 static long t1dec_cnt = 0;
 #endif
 
-#ifdef NDEBUG
-#define	JPC_T1D_GETBIT(mqdec, v, passtypename, symtypename) \
-	((v) = jpc_mqdec_getbit(mqdec))
+JAS_FORCE_INLINE
+static bool JPC_T1D_GETBIT(jpc_mqdec_t *mqdec, const char *passtypename, const char *symtypename)
+{
+	bool v = jpc_mqdec_getbit(mqdec);
+#ifndef NDEBUG
+	if (jas_getdbglevel() >= 100) {
+		jas_eprintf("index = %ld; passtype = %s; symtype = %s; sym = %d\n", t1dec_cnt, passtypename, symtypename, v);
+		++t1dec_cnt;
+	}
 #else
-#define	JPC_T1D_GETBIT(mqdec, v, passtypename, symtypename) \
-{ \
-	(v) = jpc_mqdec_getbit(mqdec); \
-	if (jas_getdbglevel() >= 100) { \
-		jas_eprintf("index = %ld; passtype = %s; symtype = %s; sym = %d\n", t1dec_cnt, passtypename, symtypename, v); \
-		++t1dec_cnt; \
-	} \
-}
+	(void)passtypename;
+	(void)symtypename;
 #endif
-#define	JPC_T1D_GETBITNOSKEW(mqdec, v, passtypename, symtypename) \
-	JPC_T1D_GETBIT(mqdec, v, passtypename, symtypename)
+	return v;
+}
 
-#ifdef NDEBUG
-#define	JPC_T1D_RAWGETBIT(bitstream, v, passtypename, symtypename) \
-	((v) = jpc_bitstream_getbit(bitstream))
-#else
-#define	JPC_T1D_RAWGETBIT(bitstream, v, passtypename, symtypename) \
-{ \
-	(v) = jpc_bitstream_getbit(bitstream); \
-	if (jas_getdbglevel() >= 100) { \
-		jas_eprintf("index = %ld; passtype = %s; symtype = %s; sym = %d\n", t1dec_cnt, passtypename, symtypename, v); \
-		++t1dec_cnt; \
-	} \
+JAS_FORCE_INLINE
+static bool JPC_T1D_GETBITNOSKEW(jpc_mqdec_t *mqdec, const char *passtypename, const char *symtypename)
+{
+	return JPC_T1D_GETBIT(mqdec, passtypename, symtypename);
 }
+
+JAS_FORCE_INLINE
+static int JPC_T1D_RAWGETBIT(jpc_bitstream_t *bitstream, const char *passtypename, const char *symtypename)
+{
+	int v = jpc_bitstream_getbit(bitstream);
+#ifndef NDEBUG
+	if (jas_getdbglevel() >= 100) {
+		jas_eprintf("index = %ld; passtype = %s; symtype = %s; sym = %d\n", t1dec_cnt, passtypename, symtypename, v);
+		++t1dec_cnt;
+	}
+#else
+	(void)passtypename;
+	(void)symtypename;
 #endif
+	return v;
+}
 
 /******************************************************************************\
 * Code.
@@ -351,11 +359,9 @@ static void jpc_sigpass_step(jpc_fix_t *fp, size_t frowstep, jpc_fix_t *dp, jpc_
 	if ((f & JPC_OTHSIGMSK) && !(f & (JPC_SIG | JPC_VISIT))) {
 		jpc_mqdec_setcurctx(mqdec, JPC_GETZCCTXNO(f, orient));
 
-		int v;
-		JPC_T1D_GETBIT(mqdec, v, "SIG", "ZC");
-		if (v) {
+		if (JPC_T1D_GETBIT(mqdec, "SIG", "ZC")) {
 			jpc_mqdec_setcurctx(mqdec, JPC_GETSCCTXNO(f));
-			JPC_T1D_GETBIT(mqdec, v, "SIG", "SC");
+			bool v = JPC_T1D_GETBIT(mqdec, "SIG", "SC");
 			v ^= JPC_GETSPB(f);
 			JPC_UPDATEFLAGS4(fp, frowstep, v, vcausalflag);
 			*fp |= JPC_SIG;
@@ -439,13 +445,12 @@ static int jpc_rawsigpass_step(jpc_fix_t *fp, size_t frowstep, jpc_fix_t *dp, jp
 {
 	const jpc_fix_t f = *fp;
 	if ((f & JPC_OTHSIGMSK) && !(f & (JPC_SIG | JPC_VISIT))) {
-		int v;
-		JPC_T1D_RAWGETBIT(in, v, "SIG", "ZC");
+		int v = JPC_T1D_RAWGETBIT(in, "SIG", "ZC");
 		if (v < 0) {
 			return -1;
 		}
 		if (v) {
-			JPC_T1D_RAWGETBIT(in, v, "SIG", "SC");
+			v = JPC_T1D_RAWGETBIT(in, "SIG", "SC");
 			if (v < 0) {
 				return -1;
 			}
@@ -541,8 +546,7 @@ static void jpc_refpass_step(jpc_fix_t *fp, jpc_fix_t *dp, jpc_fix_t poshalf, jp
 {
 	if (((*(fp)) & (JPC_SIG | JPC_VISIT)) == JPC_SIG) { \
 		jpc_mqdec_setcurctx(mqdec, JPC_GETMAGCTXNO(*fp));
-		int v;
-		JPC_T1D_GETBITNOSKEW(mqdec, v, "REF", "MR");
+		const bool v = JPC_T1D_GETBITNOSKEW(mqdec, "REF", "MR");
 		const jpc_fix_t t = v ? poshalf : neghalf;
 		*dp += *dp < 0 ? -t : t;
 		*fp |= JPC_REFINE;
@@ -615,19 +619,20 @@ static int dec_refpass(jpc_mqdec_t *mqdec, unsigned bitpos,
 	return 0;
 }
 
-#define	jpc_rawrefpass_step(fp, dp, poshalf, neghalf, in) \
-{ \
-	jpc_fix_t v; \
-	jpc_fix_t t; \
-	if (((*(fp)) & (JPC_SIG | JPC_VISIT)) == JPC_SIG) { \
-		JPC_T1D_RAWGETBIT(in, v, "REF", "MAGREF"); \
-		if (v < 0) { \
-			return -1; \
-		} \
-		t = (v ? poshalf : neghalf); \
-		*(dp) += (*(dp) < 0) ? (-t) : t; \
-		*(fp) |= JPC_REFINE; \
-	} \
+JAS_FORCE_INLINE
+static int jpc_rawrefpass_step(jpc_fix_t *fp, jpc_fix_t *dp, jpc_fix_t poshalf, jpc_fix_t neghalf, jpc_bitstream_t *in)
+{
+	if ((*fp & (JPC_SIG | JPC_VISIT)) == JPC_SIG) {
+		int v = JPC_T1D_RAWGETBIT(in, "REF", "MAGREF");
+		if (v < 0) {
+			return -1;
+		}
+		jpc_fix_t t = v ? poshalf : neghalf;
+		*dp += *dp < 0 ? -t : t;
+		*fp |= JPC_REFINE;
+	}
+
+	return 0;
 }
 
 static int dec_rawrefpass(jpc_bitstream_t *in, unsigned bitpos,
@@ -665,7 +670,8 @@ static int dec_rawrefpass(jpc_bitstream_t *in, unsigned bitpos,
 			unsigned k = vscanlen;
 
 			/* Process first sample in vertical scan. */
-			jpc_rawrefpass_step(fp, dp, poshalf, neghalf, in);
+			if (jpc_rawrefpass_step(fp, dp, poshalf, neghalf, in))
+				return -1;
 			if (--k <= 0) {
 				continue;
 			}
@@ -673,7 +679,8 @@ static int dec_rawrefpass(jpc_bitstream_t *in, unsigned bitpos,
 			dp += drowstep;
 
 			/* Process second sample in vertical scan. */
-			jpc_rawrefpass_step(fp, dp, poshalf, neghalf, in);
+			if (jpc_rawrefpass_step(fp, dp, poshalf, neghalf, in))
+				return -1;
 			if (--k <= 0) {
 				continue;
 			}
@@ -681,7 +688,8 @@ static int dec_rawrefpass(jpc_bitstream_t *in, unsigned bitpos,
 			dp += drowstep;
 
 			/* Process third sample in vertical scan. */
-			jpc_rawrefpass_step(fp, dp, poshalf, neghalf, in);
+			if (jpc_rawrefpass_step(fp, dp, poshalf, neghalf, in))
+				return -1;
 			if (--k <= 0) {
 				continue;
 			}
@@ -689,7 +697,8 @@ static int dec_rawrefpass(jpc_bitstream_t *in, unsigned bitpos,
 			dp += drowstep;
 
 			/* Process fourth sample in vertical scan. */
-			jpc_rawrefpass_step(fp, dp, poshalf, neghalf, in);
+			if (jpc_rawrefpass_step(fp, dp, poshalf, neghalf, in))
+				return -1;
 		}
 	}
 	return 0;
@@ -701,16 +710,14 @@ static int dec_rawrefpass(jpc_bitstream_t *in, unsigned bitpos,
 
 #define	jpc_clnpass_step(f, fp, frowstep, dp, oneplushalf, orient, mqdec, flabel, plabel, vcausalflag) \
 { \
-	int v; \
 flabel \
 	if (!((f) & (JPC_SIG | JPC_VISIT))) { \
 		jpc_mqdec_setcurctx((mqdec), JPC_GETZCCTXNO((f), (orient))); \
-		JPC_T1D_GETBIT((mqdec), v, "CLN", "ZC"); \
-		if (v) { \
+		if (JPC_T1D_GETBIT((mqdec), "CLN", "ZC")) { \
 plabel \
 			/* Coefficient is significant. */ \
 			jpc_mqdec_setcurctx((mqdec), JPC_GETSCCTXNO(f)); \
-			JPC_T1D_GETBIT((mqdec), v, "CLN", "SC"); \
+			bool v = JPC_T1D_GETBIT((mqdec), "CLN", "SC"); \
 			v ^= JPC_GETSPB(f); \
 			*(dp) = (v) ? (-(jpc_fix_t)(oneplushalf)) : (jpc_fix_t)(oneplushalf); \
 			JPC_UPDATEFLAGS4((fp), (frowstep), v, (vcausalflag)); \
@@ -763,16 +770,12 @@ static int dec_clnpass(jpc_mqdec_t *mqdec, unsigned bitpos, enum jpc_tsfb_orient
 			  !((*fp) & (JPC_SIG | JPC_VISIT | JPC_OTHSIGMSK)))) {
 
 				jpc_mqdec_setcurctx(mqdec, JPC_AGGCTXNO);
-				int v;
-				JPC_T1D_GETBIT(mqdec, v, "CLN", "AGG");
-				if (!v) {
+				if (!JPC_T1D_GETBIT(mqdec, "CLN", "AGG")) {
 					continue;
 				}
 				jpc_mqdec_setcurctx(mqdec, JPC_UCTXNO);
-				JPC_T1D_GETBITNOSKEW(mqdec, v, "CLN", "RL");
-				unsigned runlen = v;
-				JPC_T1D_GETBITNOSKEW(mqdec, v, "CLN", "RL");
-				runlen = (runlen << 1) | v;
+				unsigned runlen = JPC_T1D_GETBITNOSKEW(mqdec, "CLN", "RL");
+				runlen = (runlen << 1) | JPC_T1D_GETBITNOSKEW(mqdec, "CLN", "RL");
 				f = *(fp = fvscanstart + frowstep * runlen);
 				dp = dvscanstart + drowstep * runlen;
 				k = vscanlen - runlen;
@@ -833,15 +836,10 @@ static int dec_clnpass(jpc_mqdec_t *mqdec, unsigned bitpos, enum jpc_tsfb_orient
 	if (segsymflag) {
 		unsigned segsymval = 0;
 		jpc_mqdec_setcurctx(mqdec, JPC_UCTXNO);
-		int v;
-		JPC_T1D_GETBITNOSKEW(mqdec, v, "CLN", "SEGSYM");
-		segsymval = (segsymval << 1) | (v & 1);
-		JPC_T1D_GETBITNOSKEW(mqdec, v, "CLN", "SEGSYM");
-		segsymval = (segsymval << 1) | (v & 1);
-		JPC_T1D_GETBITNOSKEW(mqdec, v, "CLN", "SEGSYM");
-		segsymval = (segsymval << 1) | (v & 1);
-		JPC_T1D_GETBITNOSKEW(mqdec, v, "CLN", "SEGSYM");
-		segsymval = (segsymval << 1) | (v & 1);
+		segsymval = (segsymval << 1) | JPC_T1D_GETBITNOSKEW(mqdec, "CLN", "SEGSYM");
+		segsymval = (segsymval << 1) | JPC_T1D_GETBITNOSKEW(mqdec, "CLN", "SEGSYM");
+		segsymval = (segsymval << 1) | JPC_T1D_GETBITNOSKEW(mqdec, "CLN", "SEGSYM");
+		segsymval = (segsymval << 1) | JPC_T1D_GETBITNOSKEW(mqdec, "CLN", "SEGSYM");
 		if (segsymval != 0xa) {
 			jas_eprintf("warning: bad segmentation symbol\n");
 		}
