@@ -1354,8 +1354,7 @@ static long mem_seek(jas_stream_obj_t *obj, long offset, int origin)
 		newpos = m->pos_ + offset;
 		break;
 	default:
-		abort();
-		break;
+		return -1;
 	}
 	if (newpos < 0) {
 		return -1;
