@@ -501,9 +501,6 @@ typedef struct {
 	/* A stream containing the packed packet header data for this tile. */
 	jas_stream_t *pkthdrstream;
 
-	/* The current position within the packed packet header stream. */
-	long pkthdrstreampos;
-
 	/* The coding parameters for this tile. */
 	jpc_dec_cp_t *cp;
 

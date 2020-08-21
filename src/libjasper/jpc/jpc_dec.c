@@ -1377,7 +1377,6 @@ static int jpc_dec_process_siz(jpc_dec_t *dec, jpc_ms_t *ms)
 		tile->numparts = 0;
 		tile->partno = 0;
 		tile->pkthdrstream = 0;
-		tile->pkthdrstreampos = 0;
 		tile->pptstab = 0;
 		tile->cp = 0;
 		tile->pi = 0;
