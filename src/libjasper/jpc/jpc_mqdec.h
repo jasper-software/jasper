@@ -196,8 +196,8 @@ static bool jpc_mqdec_getbit_macro(jpc_mqdec_t *dec)
 
 	dec->areg -= state->qeval;
 
-	if (dec->creg >> 16 >= state->qeval) {
-		dec->creg -= state->qeval << 16;
+	if (dec->creg >= (uint_least32_t)state->qeval << 16) {
+		dec->creg -= (uint_least32_t)state->qeval << 16;
 		return dec->areg & 0x8000
 			? state->mps
 			: jpc_mqdec_mpsexchrenormd(dec);
