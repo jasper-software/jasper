@@ -193,9 +193,9 @@ static int jpc_dec_decodecblk(jpc_dec_t *dec, jpc_dec_tile_t *tile, jpc_dec_tcom
 	int ret;
 	int filldata;
 	int fillmask;
-	jpc_dec_ccp_t *ccp;
 
-	const unsigned compno = tcomp - tile->tcomps;
+	const size_t compno = tcomp - tile->tcomps;
+	const jpc_dec_ccp_t *const ccp = &tile->cp->ccps[compno];
 
 	if (!cblk->flags) {
 		/* Note: matrix is assumed to be zeroed */
@@ -233,7 +233,6 @@ static int jpc_dec_decodecblk(jpc_dec_t *dec, jpc_dec_tile_t *tile, jpc_dec_tcom
 
 		for (unsigned i = 0; i < seg->numpasses; ++i) {
 			if (cblk->numimsbs > band->numbps) {
-				ccp = &tile->cp->ccps[compno];
 				if (ccp->roishift <= 0) {
 					jas_eprintf("warning: corrupt code stream\n");
 				} else {
@@ -253,26 +252,26 @@ if (bpno < 0) {
 			case JPC_SIGPASS:
 				ret = (seg->type == JPC_SEG_MQ) ? dec_sigpass(dec,
 				  cblk->mqdec, bpno, band->orient,
-				  (tile->cp->ccps[compno].cblkctx & JPC_COX_VSC) != 0,
+				  (ccp->cblkctx & JPC_COX_VSC) != 0,
 				  cblk->flags, cblk->data) :
 				  dec_rawsigpass(dec, cblk->nulldec, bpno,
-				  (tile->cp->ccps[compno].cblkctx & JPC_COX_VSC) != 0,
+				  (ccp->cblkctx & JPC_COX_VSC) != 0,
 				  cblk->flags, cblk->data);
 				break;
 			case JPC_REFPASS:
 				ret = (seg->type == JPC_SEG_MQ) ?
 				  dec_refpass(dec, cblk->mqdec, bpno,
-				  (tile->cp->ccps[compno].cblkctx & JPC_COX_VSC) != 0,
+				  (ccp->cblkctx & JPC_COX_VSC) != 0,
 				  cblk->flags, cblk->data) :
 				  dec_rawrefpass(dec, cblk->nulldec, bpno,
-				  (tile->cp->ccps[compno].cblkctx & JPC_COX_VSC) != 0,
+				  (ccp->cblkctx & JPC_COX_VSC) != 0,
 				  cblk->flags, cblk->data);
 				break;
 			case JPC_CLNPASS:
 				assert(seg->type == JPC_SEG_MQ);
 				ret = dec_clnpass(dec, cblk->mqdec, bpno,
-				  band->orient, (tile->cp->ccps[compno].cblkctx &
-				  JPC_COX_VSC) != 0, (tile->cp->ccps[compno].cblkctx &
+				  band->orient, (ccp->cblkctx &
+				  JPC_COX_VSC) != 0, (ccp->cblkctx &
 				  JPC_COX_SEGSYM) != 0, cblk->flags,
 				  cblk->data);
 				break;
@@ -281,7 +280,7 @@ if (bpno < 0) {
 				JAS_UNREACHABLE();
 			}
 			/* Do we need to reset after each coding pass? */
-			if (tile->cp->ccps[compno].cblkctx & JPC_COX_RESET) {
+			if (ccp->cblkctx & JPC_COX_RESET) {
 				jpc_mqdec_setctxs(cblk->mqdec, JPC_NUMCTXS, jpc_mqctxs);
 			}
 
@@ -296,7 +295,7 @@ if (bpno < 0) {
 /* Note: dont destroy mq decoder because context info will be lost */
 		} else {
 			assert(seg->type == JPC_SEG_RAW);
-			if (tile->cp->ccps[compno].cblkctx & JPC_COX_PTERM) {
+			if (ccp->cblkctx & JPC_COX_PTERM) {
 				fillmask = 0x7f;
 				filldata = 0x2a;
 			} else {
