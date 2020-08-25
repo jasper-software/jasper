@@ -21,20 +21,32 @@ if (DOXYGEN_FOUND)
 	configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/getting_started.dox.in"
 	  "${CMAKE_CURRENT_BINARY_DIR}/src/getting_started.dox" @ONLY)
 
-	add_custom_target(doc ALL
-		${DOXYGEN_EXECUTABLE} "${CMAKE_CURRENT_BINARY_DIR}/Doxyfile"
+	file(GLOB_RECURSE DOXYGEN_DEPENDS "${CMAKE_SOURCE_DIR}/*.[ch]")
+	add_custom_command(OUTPUT "html/index.html" "latex/index.tex"
+		COMMAND ${DOXYGEN_EXECUTABLE} "Doxyfile"
+		BYPRODUCTS "html" "latex"
 		WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+		MAIN_DEPENDENCY "Doxyfile"
+		DEPENDS "${DOXYGEN_DEPENDS}"
 		COMMENT "Generating API documentation with Doxygen" VERBATIM
 	)
 
+	add_custom_target(doc ALL
+		DEPENDS "html/index.html"
+	)
+
 	if (LATEX_FOUND)
-		add_custom_target(manual_pdf ALL
-		  "${PDFLATEX_COMPILER}" refman.tex
+		add_custom_command(OUTPUT "latex/refman.pdf"
+		  COMMAND "${PDFLATEX_COMPILER}" refman.tex
 		  COMMAND "${PDFLATEX_COMPILER}" refman.tex
 		  COMMAND "${PDFLATEX_COMPILER}" refman.tex
 		  COMMAND "${PDFLATEX_COMPILER}" refman.tex
 		  WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/latex"
-		  DEPENDS doc
+		  DEPENDS "latex/index.tex"
+		)
+
+		add_custom_target(manual_pdf ALL
+			DEPENDS "latex/refman.pdf"
 		)
 	endif()
 
