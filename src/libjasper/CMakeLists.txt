@@ -5,6 +5,7 @@ configure_file(
 
 set(libjasper_headers
 	include/jasper/jas_cm.h
+	include/jasper/jas_compiler.h
 	"${CMAKE_CURRENT_BINARY_DIR}/include/jasper/jas_config.h"
 	include/jasper/jas_debug.h
 	include/jasper/jas_dll.h
