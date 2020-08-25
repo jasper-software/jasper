@@ -226,11 +226,6 @@ int main(int argc, char **argv)
 		cmdname = argv[0];
 	}
 
-	/* Initialize the JasPer library. */
-	if (jas_init()) {
-		abort();
-	}
-
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE);
 	glutCreateWindow(cmdname);

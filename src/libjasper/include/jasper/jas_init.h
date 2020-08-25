@@ -73,8 +73,10 @@ extern "C" {
 * Functions.
 \******************************************************************************/
 
+JAS_DEPRECATED
 JAS_DLLEXPORT int jas_init(void);
 
+JAS_DEPRECATED
 JAS_DLLEXPORT void jas_cleanup(void);
 
 #ifdef __cplusplus
