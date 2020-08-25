@@ -83,6 +83,8 @@
 * Code.
 \******************************************************************************/
 
+#ifdef JAS_ENABLE_ENCODER
+
 /* Compute the forward RCT. */
 
 void jpc_rct(jas_matrix_t *c0, jas_matrix_t *c1, jas_matrix_t *c2)
@@ -126,6 +128,8 @@ void jpc_rct(jas_matrix_t *c0, jas_matrix_t *c1, jas_matrix_t *c2)
 		}
 	}
 }
+
+#endif /* JAS_ENABLE_ENCODER */
 
 /* Compute the inverse RCT. */
 
@@ -171,6 +175,8 @@ void jpc_irct(jas_matrix_t *c0, jas_matrix_t *c1, jas_matrix_t *c2)
 	}
 }
 
+#ifdef JAS_ENABLE_ENCODER
+
 void jpc_ict(jas_matrix_t *c0, jas_matrix_t *c1, jas_matrix_t *c2)
 {
 	int numrows;
@@ -211,6 +217,8 @@ void jpc_ict(jas_matrix_t *c0, jas_matrix_t *c1, jas_matrix_t *c2)
 		}
 	}
 }
+
+#endif /* JAS_ENABLE_ENCODER */
 
 void jpc_iict(jas_matrix_t *c0, jas_matrix_t *c1, jas_matrix_t *c2)
 {
