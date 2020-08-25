@@ -1,5 +1,3 @@
-include(JasOpenGL)
-
 set(programs "")
 set(man_pages "")
 

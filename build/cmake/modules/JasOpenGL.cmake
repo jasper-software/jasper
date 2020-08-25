@@ -3,6 +3,7 @@
 ################################################################################
 
 if (JAS_ENABLE_OPENGL)
+	set(OpenGL_GL_PREFERENCE GLVND)
 	find_package(OpenGL ${JAS_REQUIRED})
 	message("OpenGL library found: ${OPENGL_FOUND}")
 else()
