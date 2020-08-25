@@ -259,10 +259,6 @@ endif()
 
 add_definitions("-D_GNU_SOURCE")
 
-if (JAS_MEMORY_LIMIT)
-	add_definitions("-DJAS_MEMORY_LIMIT=${JAS_MEMORY_LIMIT}")
-endif()
-
 ################################################################################
 #
 ################################################################################

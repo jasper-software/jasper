@@ -368,7 +368,7 @@ int jpc_mqenc_flush(jpc_mqenc_t *mqenc, int termmode)
 
 static void jpc_mqenc_setbits(jpc_mqenc_t *mqenc)
 {
-	uint_fast32_t tmp = mqenc->creg + mqenc->areg;
+	uint_least32_t tmp = mqenc->creg + mqenc->areg;
 	mqenc->creg |= 0xffff;
 	if (mqenc->creg >= tmp) {
 		mqenc->creg -= 0x8000;
@@ -379,9 +379,9 @@ static void jpc_mqenc_setbits(jpc_mqenc_t *mqenc)
 
 int jpc_mqenc_dump(const jpc_mqenc_t *mqenc, FILE *out)
 {
-	fprintf(out, "AREG = %08"PRIxFAST32", CREG = %08"PRIxFAST32", CTREG = %"PRIuFAST32"\n",
+	fprintf(out, "AREG = %08"PRIxLEAST32", CREG = %08"PRIxLEAST32", CTREG = %"PRIuLEAST32"\n",
 	  mqenc->areg, mqenc->creg, mqenc->ctreg);
-	fprintf(out, "IND = %02"PRIdPTR", MPS = %d, QEVAL = %04"PRIxFAST16"\n",
+	fprintf(out, "IND = %02"PRIdPTR", MPS = %d, QEVAL = %04"PRIxLEAST16"\n",
 	  *mqenc->curctx - jpc_mqstates, (*mqenc->curctx)->mps,
 	  (*mqenc->curctx)->qeval);
 	return 0;

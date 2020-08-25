@@ -5,14 +5,6 @@
 
 #include <jasper/jas_dll.h>
 
-#define JAS_CONFIGURE
-
-#if defined(_MSC_VER)
-#undef JAS_CONFIGURE
-#endif
-
-#if defined(JAS_CONFIGURE)
-
 /* This preprocessor symbol identifies the version of JasPer. */
 #define	JAS_VERSION "@JAS_VERSION@"
 
@@ -31,22 +23,7 @@
 #cmakedefine JAS_HAVE_GL_GLUT_H 1
 #cmakedefine JAS_HAVE_GLUT_H 1
 
-#define JAS_HAVE_SNPRINTF	1
-
-#else
-
-/* We are not using a configure-based build. */
-/* This probably means we are building with MSVC under Windows. */
-
-#define JAS_VERSION "unknown"
-#define JAS_HAVE_FCNTL_H		1
-#define JAS_HAVE_IO_H			1
-#undef JAS_HAVE_UNISTD_H
-#undef JAS_HAVE_SYS_TIME_H
-#define JAS_HAVE_SYS_TYPES_H	1
-#undef JAS_HAVE_GETTIMEOFDAY
-#undef JAS_HAVE_GETRUSAGE
-
+#ifdef _MSC_VER
 #undef JAS_HAVE_SNPRINTF
 
 // I don't think that this should be needed anymore.
@@ -57,8 +34,8 @@
 #endif
 #endif
 
-#define ssize_t long long
-
+#else
+#define JAS_HAVE_SNPRINTF 1
 #endif
 
 #if !defined(JAS_DEC_DEFAULT_MAX_SAMPLES)
@@ -68,11 +45,17 @@
 #ifdef __GNUC__
 #define JAS_ATTRIBUTE_CONST __attribute__((const))
 #define JAS_ATTRIBUTE_PURE __attribute__((pure))
+#define JAS_FORCE_INLINE inline __attribute__((always_inline))
 #define JAS_UNREACHABLE() __builtin_unreachable()
+#define JAS_LIKELY(x) __builtin_expect (!!(x), 1)
+#define JAS_UNLIKELY(x) __builtin_expect (!!(x), 0)
 #else
 #define JAS_ATTRIBUTE_CONST
 #define JAS_ATTRIBUTE_PURE
+#define JAS_FORCE_INLINE inline
 #define JAS_UNREACHABLE()
+#define JAS_LIKELY(x) (x)
+#define JAS_UNLIKELY(x) (x)
 #endif
 
 #ifdef __clang__
