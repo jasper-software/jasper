@@ -109,10 +109,6 @@ JAS_ENABLE_OPENGL
     Enable the use of the OpenGL and GLUT libraries.
     Valid values: true and false
 
-JAS_ENABLE_STRICT
-    Enable pedantic errors for building the code.
-    Valid values: true or false
-
 JAS_ENABLE_SHARED
     Enable the building of shared libraries.
     Valid values: true or false
