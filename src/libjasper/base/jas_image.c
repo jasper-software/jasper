@@ -717,7 +717,7 @@ const char *jas_image_fmttostr(int fmt)
 
 int jas_image_getfmt(jas_stream_t *in)
 {
-	jas_image_fmtinfo_t *fmtinfo;
+	const jas_image_fmtinfo_t *fmtinfo;
 
 	/* Check for data in each of the supported formats. */
 	unsigned i;
