@@ -38,6 +38,8 @@ if (DOXYGEN_FOUND)
 		)
 	endif()
 
+	set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_CLEAN_FILES "html" "latex")
+
 	# Install the HTML version of the manual.
 	install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/html"
 	  DESTINATION "${CMAKE_INSTALL_DOCDIR}")
