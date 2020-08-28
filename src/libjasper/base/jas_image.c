@@ -117,8 +117,133 @@ static void jas_image_calcbbox2(const jas_image_t *image, jas_image_coord_t *tlx
 * Global data.
 \******************************************************************************/
 
-static unsigned jas_image_numfmts = 0;
-static jas_image_fmtinfo_t jas_image_fmtinfos[JAS_IMAGE_MAXFMTS];
+static const jas_image_fmtinfo_t jas_image_fmtinfos[] = {
+#if !defined(EXCLUDE_MIF_SUPPORT)
+	{
+		JAS_FMT_MIF,
+		"mif", "mif", "My Image Format (MIF)",
+		{
+			mif_decode,
+			mif_encode,
+			mif_validate,
+		},
+	},
+#endif
+
+#if !defined(EXCLUDE_PNM_SUPPORT)
+	{
+		JAS_FMT_PNM,
+		"pnm", "pnm", "Portable Graymap/Pixmap (PNM)",
+		{
+			pnm_decode,
+			pnm_encode,
+			pnm_validate,
+		},
+	},
+
+	{
+		JAS_FMT_PNM,
+		"pnm", "pgm", "Portable Graymap/Pixmap (PNM)",
+		{
+			pnm_decode,
+			pnm_encode,
+			pnm_validate,
+		},
+	},
+
+	{
+		JAS_FMT_PNM,
+		"pnm", "ppm", "Portable Graymap/Pixmap (PNM)",
+		{
+			pnm_decode,
+			pnm_encode,
+			pnm_validate,
+		},
+	},
+#endif
+
+#if !defined(EXCLUDE_BMP_SUPPORT)
+	{
+		JAS_FMT_BMP,
+		"bmp", "bmp", "Microsoft Bitmap (BMP)",
+		{
+			bmp_decode,
+			bmp_encode,
+			bmp_validate,
+		},
+	},
+#endif
+
+#if !defined(EXCLUDE_RAS_SUPPORT)
+	{
+		JAS_FMT_RAS,
+		"ras", "ras", "Sun Rasterfile (RAS)",
+		{
+			ras_decode,
+			ras_encode,
+			ras_validate,
+		},
+	},
+#endif
+
+#if !defined(EXCLUDE_JP2_SUPPORT)
+	{
+		JAS_FMT_JP2,
+		"jp2", "jp2",
+		"JPEG-2000 JP2 File Format Syntax (ISO/IEC 15444-1)",
+		{
+			jp2_decode,
+#ifdef JAS_ENABLE_ENCODER
+			jp2_encode,
+#else
+			NULL,
+#endif
+			jp2_validate,
+		},
+	},
+	{
+		JAS_FMT_JPC,
+		"jpc", "jpc",
+		"JPEG-2000 Code Stream Syntax (ISO/IEC 15444-1)",
+		{
+			jpc_decode,
+#ifdef JAS_ENABLE_ENCODER
+			jpc_encode,
+#else
+			NULL,
+#endif
+			jpc_validate,
+		},
+	},
+#endif
+
+#if !defined(EXCLUDE_JPG_SUPPORT)
+	{
+		JAS_FMT_JPG,
+		"jpg", "jpg", "JPEG (ISO/IEC 10918-1)",
+		{
+			jpg_decode,
+			jpg_encode,
+			jpg_validate,
+		},
+	},
+#endif
+
+#if !defined(EXCLUDE_PGX_SUPPORT)
+	{
+		JAS_FMT_PGX,
+		"pgx", "pgx", "JPEG-2000 VM Format (PGX)",
+		{
+			pgx_decode,
+			pgx_encode,
+			pgx_validate,
+		},
+	},
+#endif
+};
+
+static const unsigned jas_image_numfmts =
+	sizeof(jas_image_fmtinfos) / sizeof(jas_image_fmtinfos[0]);
 
 /******************************************************************************\
 * Create and destroy operations.
@@ -651,50 +776,19 @@ int jas_image_writecmpt(jas_image_t *image, unsigned cmptno, jas_image_coord_t x
 
 void jas_image_clearfmts()
 {
-	jas_image_fmtinfo_t *fmtinfo;
-	for (unsigned i = 0; i < jas_image_numfmts; ++i) {
-		fmtinfo = &jas_image_fmtinfos[i];
-		if (fmtinfo->name) {
-			jas_free(fmtinfo->name);
-			fmtinfo->name = 0;
-		}
-		if (fmtinfo->ext) {
-			jas_free(fmtinfo->ext);
-			fmtinfo->ext = 0;
-		}
-		if (fmtinfo->desc) {
-			jas_free(fmtinfo->desc);
-			fmtinfo->desc = 0;
-		}
-	}
-	jas_image_numfmts = 0;
+	/* deprecated */
 }
 
 int jas_image_addfmt(int id, const char *name, const char *ext, const char *desc,
   const jas_image_fmtops_t *ops)
 {
-	jas_image_fmtinfo_t *fmtinfo;
-	assert(id >= 0 && name && ext && ops);
-	if (jas_image_numfmts >= JAS_IMAGE_MAXFMTS) {
-		return -1;
-	}
-	fmtinfo = &jas_image_fmtinfos[jas_image_numfmts];
-	fmtinfo->id = id;
-	if (!(fmtinfo->name = jas_strdup(name))) {
-		return -1;
-	}
-	if (!(fmtinfo->ext = jas_strdup(ext))) {
-		jas_free(fmtinfo->name);
-		return -1;
-	}
-	if (!(fmtinfo->desc = jas_strdup(desc))) {
-		jas_free(fmtinfo->name);
-		jas_free(fmtinfo->ext);
-		return -1;
-	}
-	fmtinfo->ops = *ops;
-	++jas_image_numfmts;
-	return 0;
+	/* deprecated */
+	(void)id;
+	(void)name;
+	(void)ext;
+	(void)desc;
+	(void)ops;
+	return -1;
 }
 
 int jas_image_strtofmt(const char *name)
@@ -717,7 +811,7 @@ const char *jas_image_fmttostr(int fmt)
 
 int jas_image_getfmt(jas_stream_t *in)
 {
-	jas_image_fmtinfo_t *fmtinfo;
+	const jas_image_fmtinfo_t *fmtinfo;
 
 	/* Check for data in each of the supported formats. */
 	unsigned i;

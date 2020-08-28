@@ -91,89 +91,286 @@ static int jp2_getuint8(jas_stream_t *in, uint_fast8_t *val);
 static int jp2_getuint16(jas_stream_t *in, uint_fast16_t *val);
 static int jp2_getuint32(jas_stream_t *in, uint_fast32_t *val);
 static int jp2_getuint64(jas_stream_t *in, uint_fast64_t *val);
+
+#ifdef JAS_ENABLE_ENCODER
 static int jp2_putuint8(jas_stream_t *out, uint_fast8_t val);
 static int jp2_putuint16(jas_stream_t *out, uint_fast16_t val);
 static int jp2_putuint32(jas_stream_t *out, uint_fast32_t val);
 static int jp2_putuint64(jas_stream_t *out, uint_fast64_t val);
+#endif
 
 static int jp2_getint(jas_stream_t *in, int s, int n, int_fast32_t *val);
 
 static void jp2_box_dump(const jp2_box_t *box, FILE *out);
 
 static int jp2_jp_getdata(jp2_box_t *box, jas_stream_t *in);
-static int jp2_jp_putdata(const jp2_box_t *box, jas_stream_t *out);
 static int jp2_ftyp_getdata(jp2_box_t *box, jas_stream_t *in);
-static int jp2_ftyp_putdata(const jp2_box_t *box, jas_stream_t *out);
 static int jp2_ihdr_getdata(jp2_box_t *box, jas_stream_t *in);
-static int jp2_ihdr_putdata(const jp2_box_t *box, jas_stream_t *out);
 static void jp2_bpcc_destroy(jp2_box_t *box);
 static int jp2_bpcc_getdata(jp2_box_t *box, jas_stream_t *in);
-static int jp2_bpcc_putdata(const jp2_box_t *box, jas_stream_t *out);
 static int jp2_colr_getdata(jp2_box_t *box, jas_stream_t *in);
-static int jp2_colr_putdata(const jp2_box_t *box, jas_stream_t *out);
 static void jp2_colr_dumpdata(const jp2_box_t *box, FILE *out);
 static void jp2_colr_destroy(jp2_box_t *box);
 static void jp2_cdef_destroy(jp2_box_t *box);
 static int jp2_cdef_getdata(jp2_box_t *box, jas_stream_t *in);
-static int jp2_cdef_putdata(const jp2_box_t *box, jas_stream_t *out);
 static void jp2_cdef_dumpdata(const jp2_box_t *box, FILE *out);
 static void jp2_cmap_destroy(jp2_box_t *box);
 static int jp2_cmap_getdata(jp2_box_t *box, jas_stream_t *in);
-static int jp2_cmap_putdata(const jp2_box_t *box, jas_stream_t *out);
 static void jp2_cmap_dumpdata(const jp2_box_t *box, FILE *out);
 static void jp2_pclr_destroy(jp2_box_t *box);
 static int jp2_pclr_getdata(jp2_box_t *box, jas_stream_t *in);
-static int jp2_pclr_putdata(const jp2_box_t *box, jas_stream_t *out);
 static void jp2_pclr_dumpdata(const jp2_box_t *box, FILE *out);
+
+#ifdef JAS_ENABLE_ENCODER
+
+static int jp2_jp_putdata(const jp2_box_t *box, jas_stream_t *out);
+static int jp2_ftyp_putdata(const jp2_box_t *box, jas_stream_t *out);
+static int jp2_ihdr_putdata(const jp2_box_t *box, jas_stream_t *out);
+static int jp2_bpcc_putdata(const jp2_box_t *box, jas_stream_t *out);
+static int jp2_colr_putdata(const jp2_box_t *box, jas_stream_t *out);
+static int jp2_cdef_putdata(const jp2_box_t *box, jas_stream_t *out);
+static int jp2_cmap_putdata(const jp2_box_t *box, jas_stream_t *out);
+static int jp2_pclr_putdata(const jp2_box_t *box, jas_stream_t *out);
+
+#endif /* JAS_ENABLE_ENCODER */
 
 /******************************************************************************\
 * Local data.
 \******************************************************************************/
 
 static const jp2_boxinfo_t jp2_boxinfos[] = {
-	{JP2_BOX_JP, 0, "JP",
-	  {0, 0, jp2_jp_getdata, jp2_jp_putdata, 0}},
-	{JP2_BOX_FTYP, 0, "FTYP",
-	  {0, 0, jp2_ftyp_getdata, jp2_ftyp_putdata, 0}},
-	{JP2_BOX_JP2H, JP2_BOX_SUPER, "JP2H",
-	  {0, 0, 0, 0, 0}},
-	{JP2_BOX_IHDR, 0, "IHDR",
-	  {0, 0, jp2_ihdr_getdata, jp2_ihdr_putdata, 0}},
-	{JP2_BOX_BPCC, 0, "BPCC",
-	  {0, jp2_bpcc_destroy, jp2_bpcc_getdata, jp2_bpcc_putdata, 0}},
-	{JP2_BOX_COLR, 0, "COLR",
-	  {0, jp2_colr_destroy, jp2_colr_getdata, jp2_colr_putdata, jp2_colr_dumpdata}},
-	{JP2_BOX_PCLR, 0, "PCLR",
-	  {0, jp2_pclr_destroy, jp2_pclr_getdata, jp2_pclr_putdata, jp2_pclr_dumpdata}},
-	{JP2_BOX_CMAP, 0, "CMAP",
-	  {0, jp2_cmap_destroy, jp2_cmap_getdata, jp2_cmap_putdata, jp2_cmap_dumpdata}},
-	{JP2_BOX_CDEF, 0, "CDEF",
-	  {0, jp2_cdef_destroy, jp2_cdef_getdata, jp2_cdef_putdata, jp2_cdef_dumpdata}},
-	{JP2_BOX_RES, JP2_BOX_SUPER, "RES",
-	  {0, 0, 0, 0, 0}},
-	{JP2_BOX_RESC, 0, "RESC",
-	  {0, 0, 0, 0, 0}},
-	{JP2_BOX_RESD, 0, "RESD",
-	  {0, 0, 0, 0, 0}},
-	{JP2_BOX_JP2C, JP2_BOX_NODATA, "JP2C",
-	  {0, 0, 0, 0, 0}},
-	{JP2_BOX_JP2I, 0, "JP2I",
-	  {0, 0, 0, 0, 0}},
-	{JP2_BOX_XML, 0, "XML",
-	  {0, 0, 0, 0, 0}},
-	{JP2_BOX_UUID, 0, "UUID",
-	  {0, 0, 0, 0, 0}},
-	{JP2_BOX_UINF, JP2_BOX_SUPER, "UINF",
-	  {0, 0, 0, 0, 0}},
-	{JP2_BOX_ULST, 0, "ULST",
-	  {0, 0, 0, 0, 0}},
-	{JP2_BOX_URL, 0, "URL",
-	  {0, 0, 0, 0, 0}},
-	{0, 0, 0, {0, 0, 0, 0, 0}},
+	{
+		JP2_BOX_JP, 0, "JP",
+		{
+			0, 0,
+			jp2_jp_getdata,
+#ifdef JAS_ENABLE_ENCODER
+			jp2_jp_putdata,
+#endif
+			0,
+		},
+	},
+	{
+		JP2_BOX_FTYP, 0, "FTYP",
+		{
+			0, 0,
+			jp2_ftyp_getdata,
+#ifdef JAS_ENABLE_ENCODER
+			jp2_ftyp_putdata,
+#endif
+			0,
+		},
+	},
+	{
+		JP2_BOX_JP2H, JP2_BOX_SUPER, "JP2H",
+		{
+			0, 0,
+			0,
+#ifdef JAS_ENABLE_ENCODER
+			0,
+#endif
+			0,
+		},
+	},
+	{
+		JP2_BOX_IHDR, 0, "IHDR",
+		{
+			0, 0,
+			jp2_ihdr_getdata,
+#ifdef JAS_ENABLE_ENCODER
+			jp2_ihdr_putdata,
+#endif
+			0,
+		},
+	},
+	{
+		JP2_BOX_BPCC, 0, "BPCC",
+		{
+			0, jp2_bpcc_destroy,
+			jp2_bpcc_getdata,
+#ifdef JAS_ENABLE_ENCODER
+			jp2_bpcc_putdata,
+#endif
+			0,
+		},
+	},
+	{
+		JP2_BOX_COLR, 0, "COLR",
+		{
+			0, jp2_colr_destroy,
+			jp2_colr_getdata,
+#ifdef JAS_ENABLE_ENCODER
+			jp2_colr_putdata,
+#endif
+			jp2_colr_dumpdata,
+		},
+	},
+	{
+		JP2_BOX_PCLR, 0, "PCLR",
+		{
+			0, jp2_pclr_destroy,
+			jp2_pclr_getdata,
+#ifdef JAS_ENABLE_ENCODER
+			jp2_pclr_putdata,
+#endif
+			jp2_pclr_dumpdata,
+		},
+	},
+	{
+		JP2_BOX_CMAP, 0, "CMAP",
+		{
+			0, jp2_cmap_destroy,
+			jp2_cmap_getdata,
+#ifdef JAS_ENABLE_ENCODER
+			jp2_cmap_putdata,
+#endif
+			jp2_cmap_dumpdata,
+		},
+	},
+	{
+		JP2_BOX_CDEF, 0, "CDEF",
+		{
+			0, jp2_cdef_destroy,
+			jp2_cdef_getdata,
+#ifdef JAS_ENABLE_ENCODER
+			jp2_cdef_putdata,
+#endif
+			jp2_cdef_dumpdata,
+		},
+	},
+	{
+		JP2_BOX_RES, JP2_BOX_SUPER, "RES",
+		{
+			0, 0,
+			0,
+#ifdef JAS_ENABLE_ENCODER
+			0,
+#endif
+			0,
+		},
+	},
+	{
+		JP2_BOX_RESC, 0, "RESC",
+		{
+			0, 0,
+			0,
+#ifdef JAS_ENABLE_ENCODER
+			0,
+#endif
+			0,
+		},
+	},
+	{
+		JP2_BOX_RESD, 0, "RESD",
+		{
+			0, 0,
+			0,
+#ifdef JAS_ENABLE_ENCODER
+			0,
+#endif
+			0,
+		},
+	},
+	{
+		JP2_BOX_JP2C, JP2_BOX_NODATA, "JP2C",
+		{
+			0, 0,
+			0,
+#ifdef JAS_ENABLE_ENCODER
+			0,
+#endif
+			0,
+		},
+	},
+	{
+		JP2_BOX_JP2I, 0, "JP2I",
+		{
+			0, 0,
+			0,
+#ifdef JAS_ENABLE_ENCODER
+			0,
+#endif
+			0,
+		},
+	},
+	{
+		JP2_BOX_XML, 0, "XML",
+		{
+			0, 0,
+			0,
+#ifdef JAS_ENABLE_ENCODER
+			0,
+#endif
+			0,
+		},
+	},
+	{
+		JP2_BOX_UUID, 0, "UUID",
+		{
+			0, 0,
+			0,
+#ifdef JAS_ENABLE_ENCODER
+			0,
+#endif
+			0,
+		},
+	},
+	{
+		JP2_BOX_UINF, JP2_BOX_SUPER, "UINF",
+		{
+			0, 0,
+			0,
+#ifdef JAS_ENABLE_ENCODER
+			0,
+#endif
+			0,
+		},
+	},
+	{
+		JP2_BOX_ULST, 0, "ULST",
+		{
+			0, 0,
+			0,
+#ifdef JAS_ENABLE_ENCODER
+			0,
+#endif
+			0,
+		},
+	},
+	{
+		JP2_BOX_URL, 0, "URL",
+		{
+			0, 0,
+			0,
+#ifdef JAS_ENABLE_ENCODER
+			0,
+#endif
+			0,
+		},
+	},
+	{
+		0, 0, 0,
+		{
+			0, 0,
+			0,
+#ifdef JAS_ENABLE_ENCODER
+			0,
+#endif
+			0,
+		},
+	},
 };
 
 static const jp2_boxinfo_t jp2_boxinfo_unk = {
-	0, 0, "Unknown", {0, 0, 0, 0, 0}
+	0, 0, "Unknown",
+	{
+		0, 0,
+		0,
+#ifdef JAS_ENABLE_ENCODER
+		0,
+#endif
+		0,
+	}
 };
 
 /******************************************************************************\
@@ -192,6 +389,8 @@ static jp2_box_t *jp2_box_create0(void)
 	box->ops = &jp2_boxinfo_unk.ops;
 	return box;
 }
+
+#ifdef JAS_ENABLE_ENCODER
 
 jp2_box_t *jp2_box_create(int type)
 {
@@ -212,6 +411,8 @@ jp2_box_t *jp2_box_create(int type)
 	box->ops = &boxinfo->ops;
 	return box;
 }
+
+#endif
 
 /******************************************************************************\
 * Box destructor.
@@ -521,6 +722,8 @@ static int jp2_cdef_getdata(jp2_box_t *box, jas_stream_t *in)
 * Box output.
 \******************************************************************************/
 
+#ifdef JAS_ENABLE_ENCODER
+
 int jp2_box_put(jp2_box_t *box, jas_stream_t *out)
 {
 	jas_stream_t *tmpstream;
@@ -664,6 +867,8 @@ static int jp2_cdef_putdata(const jp2_box_t *box, jas_stream_t *out)
 	return 0;
 }
 
+#endif /* JAS_ENABLE_ENCODER */
+
 /******************************************************************************\
 * Input operations for primitive types.
 \******************************************************************************/
@@ -722,6 +927,8 @@ static int jp2_getuint64(jas_stream_t *in, uint_fast64_t *val)
 * Output operations for primitive types.
 \******************************************************************************/
 
+#ifdef JAS_ENABLE_ENCODER
+
 static int jp2_putuint8(jas_stream_t *out, uint_fast8_t val)
 {
 	if (jas_stream_putc(out, val & 0xff) == EOF) {
@@ -758,6 +965,8 @@ static int jp2_putuint64(jas_stream_t *out, uint_fast64_t val)
 	}
 	return 0;
 }
+
+#endif
 
 /******************************************************************************\
 * Miscellaneous code.
@@ -815,6 +1024,8 @@ static int jp2_cmap_getdata(jp2_box_t *box, jas_stream_t *in)
 	return 0;
 }
 
+#ifdef JAS_ENABLE_ENCODER
+
 static int jp2_cmap_putdata(const jp2_box_t *box, jas_stream_t *out)
 {
 	/* Eliminate compiler warning about unused variables. */
@@ -823,6 +1034,8 @@ static int jp2_cmap_putdata(const jp2_box_t *box, jas_stream_t *out)
 
 	return -1;
 }
+
+#endif
 
 static void jp2_cmap_dumpdata(const jp2_box_t *box, FILE *out)
 {
@@ -891,6 +1104,8 @@ static int jp2_pclr_getdata(jp2_box_t *box, jas_stream_t *in)
 	return 0;
 }
 
+#ifdef JAS_ENABLE_ENCODER
+
 static int jp2_pclr_putdata(const jp2_box_t *box, jas_stream_t *out)
 {
 #if 0
@@ -901,6 +1116,8 @@ static int jp2_pclr_putdata(const jp2_box_t *box, jas_stream_t *out)
 	(void)out;
 	return -1;
 }
+
+#endif
 
 static void jp2_pclr_dumpdata(const jp2_box_t *box, FILE *out)
 {

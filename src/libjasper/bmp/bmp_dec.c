@@ -102,7 +102,7 @@ typedef enum {
 \******************************************************************************/
 
 static int bmp_gethdr(jas_stream_t *in, bmp_hdr_t *hdr);
-static bmp_info_t *bmp_getinfo(jas_stream_t *in);
+static bmp_info_t *bmp_getinfo(jas_stream_t *in, const bmp_dec_importopts_t *opts);
 static int bmp_getdata(jas_stream_t *in, bmp_info_t *info, jas_image_t *image);
 static int bmp_getint16(jas_stream_t *in, int_fast16_t *val);
 static int bmp_getint32(jas_stream_t *in, int_fast32_t *val);
@@ -187,7 +187,7 @@ jas_image_t *bmp_decode(jas_stream_t *in, const char *optstr)
 	  ));
 
 	/* Read the bitmap information. */
-	if (!(info = bmp_getinfo(in))) {
+	if (!(info = bmp_getinfo(in, &opts))) {
 		jas_eprintf("cannot get info\n");
 		goto error;
 	}
@@ -323,7 +323,7 @@ static int bmp_gethdr(jas_stream_t *in, bmp_hdr_t *hdr)
 	return 0;
 }
 
-static bmp_info_t *bmp_getinfo(jas_stream_t *in)
+static bmp_info_t *bmp_getinfo(jas_stream_t *in, const bmp_dec_importopts_t *opts)
 {
 	bmp_info_t *info;
 	int i;
@@ -367,7 +367,8 @@ static bmp_info_t *bmp_getinfo(jas_stream_t *in)
 		goto error;
 	}
 
-	if (!jas_safe_size_mul(info->width, info->height, &num_pixels)) {
+	if (!jas_safe_size_mul(info->width, info->height, &num_pixels) ||
+	    (opts->max_samples > 0 && num_pixels > opts->max_samples)) {
 		jas_eprintf("image dimensions too large\n");
 		goto error;
 	}

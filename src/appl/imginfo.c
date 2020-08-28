@@ -143,10 +143,6 @@ int main(int argc, char **argv)
 	char optstr[32];
 	char dec_opt_spec[256];
 
-	if (jas_init()) {
-		abort();
-	}
-
 	cmdname = argv[0];
 
 	max_samples = 0;
@@ -264,7 +260,6 @@ int main(int argc, char **argv)
 	  JAS_CAST(long, jas_image_rawsize(image)));
 
 	jas_image_destroy(image);
-	jas_image_clearfmts();
 
 	return EXIT_SUCCESS;
 }

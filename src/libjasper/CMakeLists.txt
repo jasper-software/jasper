@@ -5,6 +5,7 @@ configure_file(
 
 set(libjasper_headers
 	include/jasper/jas_cm.h
+	include/jasper/jas_compiler.h
 	"${CMAKE_CURRENT_BINARY_DIR}/include/jasper/jas_config.h"
 	include/jasper/jas_debug.h
 	include/jasper/jas_dll.h
@@ -51,30 +52,35 @@ set(libjasper_bmp_sources
 set(libjasper_jp2_sources
 	jp2/jp2_cod.c
 	jp2/jp2_dec.c
-	jp2/jp2_enc.c
 )
 
 set(libjasper_jpc_sources
 	jpc/jpc_bs.c
 	jpc/jpc_cs.c
 	jpc/jpc_dec.c
-	jpc/jpc_enc.c
 	jpc/jpc_math.c
 	jpc/jpc_mct.c
 	jpc/jpc_mqcod.c
 	jpc/jpc_mqdec.c
-	jpc/jpc_mqenc.c
 	jpc/jpc_qmfb.c
 	jpc/jpc_t1cod.c
 	jpc/jpc_t1dec.c
-	jpc/jpc_t1enc.c
 	jpc/jpc_t2cod.c
 	jpc/jpc_t2dec.c
-	jpc/jpc_t2enc.c
 	jpc/jpc_tagtree.c
 	jpc/jpc_tsfb.c
 	jpc/jpc_util.c
-)
+	)
+
+if(JAS_ENABLE_ENCODER)
+	list(APPEND libjasper_jp2_sources jp2/jp2_enc.c)
+	list(APPEND libjasper_jpc_sources
+		jpc/jpc_enc.c
+		jpc/jpc_mqenc.c
+		jpc/jpc_t1enc.c
+		jpc/jpc_t2enc.c
+		)
+endif()
 
 set(libjasper_jpg_sources
 	jpg/jpg_val.c

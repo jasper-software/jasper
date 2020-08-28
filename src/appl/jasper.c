@@ -166,10 +166,6 @@ int main(int argc, char **argv)
 		cmdname = argv[0];
 	}
 
-	if (jas_init()) {
-		abort();
-	}
-
 	/* Parse the command line options. */
 	if (!(cmdopts = cmdopts_parse(argc, argv))) {
 		fprintf(stderr, "error: cannot parse command line\n");
@@ -297,7 +293,6 @@ int main(int argc, char **argv)
 
 	cmdopts_destroy(cmdopts);
 	jas_image_destroy(image);
-	jas_image_clearfmts();
 
 	/* Success at last! :-) */
 	return EXIT_SUCCESS;
