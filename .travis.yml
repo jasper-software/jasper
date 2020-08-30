@@ -75,5 +75,4 @@ jobs:
         github_token: $GITHUB_TOKEN
         keep_history: true
         on:
-          # FIXME: Change from feature branch to master
-          branch: feature-deploy-manual
+          branch: master
