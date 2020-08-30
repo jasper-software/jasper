@@ -1,42 +1,79 @@
+# NOTE: Do not perform Windows builds (at least for now) since this
+# feature is only in beta release and apparently secret environment
+# variables might not always be masked.  (At least some warnings
+# observed suggest this.)
+
+################################################################################
+# Specify notifications.
+################################################################################
+
+notifications:
+  email:
+    on_success: change
+    on_failure: always
+
+################################################################################
+# Specify the build matrix.
+################################################################################
+
 language: c
+
+os:
+  - linux
+  - osx
 
 # Trusty Tahr release date: April 17, 2014
 dist: trusty
 sudo: required
-#sudo: false
-##group: beta
-
-# Precise Pangolin release date: April 26, 2012
-#dist: precise
-#sudo: required
-
-os:
-    - linux
-    - osx
-
-#osx_image:
-#    - xcode7.3
-#    #- xcode8
 
 compiler:
-    - clang
-    - gcc
+  - clang
+  - gcc
 
-before_install:
-    - build/travis/prebuild
-#    - bash --version
-#    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install freeglut; fi
-#    - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; fi
-#    - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew outdated bash || brew upgrade bash; fi
-#    - bash --version
+arch:
+  - amd64
+  #- arm64
 
-#install:
+################################################################################
+# Specify extra packages needed.
+################################################################################
+
+addons:
+  apt:
+    packages:
+      - doxygen
+      - freeglut3-dev
+      - freeglut3
+      - libjpeg-turbo8
+      - libjpeg-turbo8-dev
+
+################################################################################
+# Specify build script.
+################################################################################
 
 script:
-    - build/travis/build
+  - build/travis/build -t /tmp/jasper
 
-notifications:
-    email:
-        on_success: change
-        on_failure: always
+################################################################################
+# Specify deployment.
+################################################################################
 
+jobs:
+  include:
+    - stage: deploy
+      script:
+        - build/travis/build -t /tmp/jasper
+      os: linux
+      dist: xenial
+      compiler: gcc
+      deploy:
+        provider: pages
+        repo: jasper-software/jasper-manual
+        target_branch: gh-pages
+        local_dir: /tmp/jasper/static/install/share/doc/JasPer/html
+        skip_cleanup: true
+        github_token: $GITHUB_TOKEN
+        keep_history: true
+        on:
+          # FIXME: Change from feature branch to master
+          branch: feature-deploy-manual
