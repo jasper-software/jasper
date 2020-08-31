@@ -61,10 +61,9 @@
  * __END_OF_JASPER_LICENSE__
  */
 
-/*
- * Image Class
- *
- * $Id$
+/*!
+ * @file jas_image.h
+ * @brief JasPer Image Class
  */
 
 #ifndef JAS_IMAGE_H

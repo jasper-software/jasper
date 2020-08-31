@@ -61,10 +61,9 @@
  * __END_OF_JASPER_LICENSE__
  */
 
-/*
- * Command Line Option Parsing Code
- *
- * $Id$
+/*!
+ * @file jas_getopt.h
+ * @brief Command Line Option Parsing Code
  */
 
 #ifndef JAS_GETOPT_H

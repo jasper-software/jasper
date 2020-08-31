@@ -59,6 +59,11 @@
  * __END_OF_JASPER_LICENSE__
  */
 
+/*!
+ * @file jasper.h
+ * @brief JasPer Main Header
+ */
+
 #ifndef JAS_JASPER_H
 #define JAS_JASPER_H
 

@@ -59,6 +59,11 @@
  * __END_OF_JASPER_LICENSE__
  */
 
+/*!
+ * @file jas_tmr.h
+ * @brief Timer Code
+ */
+
 #ifndef JAS_TMR_H
 #define JAS_TMR_H
 

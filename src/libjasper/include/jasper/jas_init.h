@@ -59,6 +59,11 @@
  * __END_OF_JASPER_LICENSE__
  */
 
+/*!
+ * @file jas_init.h
+ * @brief JasPer Initialization/Cleanup Code
+ */
+
 #ifndef JAS_INIT_H
 #define JAS_INIT_H
 

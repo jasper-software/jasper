@@ -59,6 +59,11 @@
  * __END_OF_JASPER_LICENSE__
  */
 
+/*!
+ * @file jas_icc.h
+ * @brief ICC Profile
+ */
+
 #ifndef JAS_ICC_H
 #define	JAS_ICC_H
 
