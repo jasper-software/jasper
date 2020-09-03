@@ -188,6 +188,10 @@ int main(int argc, char **argv)
 	size_t max_mem = JAS_DEFAULT_MAX_MEM_USAGE;
 #endif
 
+	if (jas_init()) {
+		abort();
+	}
+
 	cmdname = argv[0];
 
 	/* Parse the command line options. */
@@ -382,6 +386,7 @@ int main(int argc, char **argv)
 
 	jas_image_destroy(origimage);
 	jas_image_destroy(reconimage);
+	jas_image_clearfmts();
 
 	return EXIT_SUCCESS;
 }

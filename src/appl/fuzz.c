@@ -79,6 +79,10 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size);
 
 int LLVMFuzzerInitialize(int *argc, char ***argv)
 {
+	if (jas_init()) {
+		abort();
+	}
+
 	return 0;
 }
 

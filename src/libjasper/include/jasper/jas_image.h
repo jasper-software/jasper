@@ -254,39 +254,8 @@ typedef struct {
 * File format related classes.
 \******************************************************************************/
 
-/* these enum values can change depending on the options used to build
-   JasPer, so they are not part of the libJasPer ABI - do not use in
-   applications unless you link JasPer statically! */
-typedef enum {
-#if !defined(EXCLUDE_MIF_SUPPORT)
-	JAS_FMT_MIF,
-#endif
-
-#if !defined(EXCLUDE_PNM_SUPPORT)
-	JAS_FMT_PNM,
-#endif
-
-#if !defined(EXCLUDE_BMP_SUPPORT)
-	JAS_FMT_BMP,
-#endif
-
-#if !defined(EXCLUDE_RAS_SUPPORT)
-	JAS_FMT_RAS,
-#endif
-
-#if !defined(EXCLUDE_JP2_SUPPORT)
-	JAS_FMT_JP2,
-	JAS_FMT_JPC,
-#endif
-
-#if !defined(EXCLUDE_JPG_SUPPORT)
-	JAS_FMT_JPG,
-#endif
-
-#if !defined(EXCLUDE_PGX_SUPPORT)
-	JAS_FMT_PGX,
-#endif
-} jas_fmt_t;
+#define	JAS_IMAGE_MAXFMTS	32
+/* The maximum number of image data formats supported. */
 
 /* Image format-dependent operations. */
 
@@ -310,13 +279,13 @@ typedef struct {
 	int id;
 	/* The ID for this format. */
 
-	const char *name;
+	char *name;
 	/* The name by which this format is identified. */
 
-	const char *ext;
+	char *ext;
 	/* The file name extension associated with this format. */
 
-	const char *desc;
+	char *desc;
 	/* A brief description of the format. */
 
 	jas_image_fmtops_t ops;
@@ -515,11 +484,9 @@ JAS_DLLEXPORT int jas_image_getcmptbytype(const jas_image_t *image, jas_image_cm
 \******************************************************************************/
 
 /* Clear the table of image formats. */
-JAS_DEPRECATED
 JAS_DLLEXPORT void jas_image_clearfmts(void);
 
 /* Add entry to table of image formats. */
-JAS_DEPRECATED
 JAS_DLLEXPORT int jas_image_addfmt(int id, const char *name, const char *ext, const char *desc,
   const jas_image_fmtops_t *ops);
 
