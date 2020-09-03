@@ -90,7 +90,6 @@ cmake_policy(SET CMP0012 NEW)
 option(JAS_ENABLE_SHARED "Enable building of shared library" true)
 option(JAS_ENABLE_HIDDEN "Hide internal symbols" false)
 option(JAS_ENABLE_32BIT "Use 32 bit integers on 64 bit CPUs" false)
-option(JAS_ENABLE_ENCODER "Enable the JPEG-2000 encoder" true)
 option(JAS_ENABLE_LIBJPEG "Enable the use of the JPEG Library" true)
 option(JAS_ENABLE_OPENGL "Enable the use of the OpenGL/GLUT Library" true)
 option(JAS_ENABLE_AUTOMATIC_DEPENDENCIES "Enable automatic dependencies" true)
@@ -317,7 +316,7 @@ install(FILES "README" DESTINATION "${CMAKE_INSTALL_DOCDIR}")
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/test/bin/wrapper.in"
   "${CMAKE_CURRENT_BINARY_DIR}/test/bin/wrapper" @ONLY)
 
-if (BASH_PROGRAM AND JAS_ENABLE_ENCODER)
+if (BASH_PROGRAM)
 	add_test(run_test_1
 	  "${BASH_PROGRAM}" "${CMAKE_CURRENT_BINARY_DIR}/test/bin/wrapper"
 	  "${CMAKE_CURRENT_SOURCE_DIR}/test/bin/run_test_1")

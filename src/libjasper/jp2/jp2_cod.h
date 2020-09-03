@@ -269,9 +269,7 @@ typedef struct jp2_boxops_s {
 	void (*init)(jp2_box_t *box);
 	void (*destroy)(jp2_box_t *box);
 	int (*getdata)(jp2_box_t *box, jas_stream_t *in);
-#ifdef JAS_ENABLE_ENCODER
 	int (*putdata)(const jp2_box_t *box, jas_stream_t *out);
-#endif
 	void (*dumpdata)(const jp2_box_t *box, FILE *out);
 } jp2_boxops_t;
 
@@ -290,16 +288,10 @@ typedef struct jp2_boxinfo_s {
 * Box class.
 \******************************************************************************/
 
-#ifdef JAS_ENABLE_ENCODER
 jp2_box_t *jp2_box_create(int type);
-#endif
-
 void jp2_box_destroy(jp2_box_t *box);
 jp2_box_t *jp2_box_get(jas_stream_t *in);
-
-#ifdef JAS_ENABLE_ENCODER
 int jp2_box_put(jp2_box_t *box, jas_stream_t *out);
-#endif
 
 JAS_ATTRIBUTE_CONST
 static inline uint_least8_t JP2_DTYPETOBPC(uint_least8_t dtype)

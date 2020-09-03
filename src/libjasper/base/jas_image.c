@@ -193,11 +193,7 @@ static const jas_image_fmtinfo_t jas_image_fmtinfos[] = {
 		"JPEG-2000 JP2 File Format Syntax (ISO/IEC 15444-1)",
 		{
 			jp2_decode,
-#ifdef JAS_ENABLE_ENCODER
 			jp2_encode,
-#else
-			NULL,
-#endif
 			jp2_validate,
 		},
 	},
@@ -207,11 +203,7 @@ static const jas_image_fmtinfo_t jas_image_fmtinfos[] = {
 		"JPEG-2000 Code Stream Syntax (ISO/IEC 15444-1)",
 		{
 			jpc_decode,
-#ifdef JAS_ENABLE_ENCODER
 			jpc_encode,
-#else
-			NULL,
-#endif
 			jpc_validate,
 		},
 	},

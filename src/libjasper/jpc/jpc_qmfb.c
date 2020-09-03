@@ -92,27 +92,21 @@
 #define QMFB_SPLITBUFSIZE	4096
 #define	QMFB_JOINBUFSIZE	4096
 
-#ifdef JAS_ENABLE_ENCODER
 static int jpc_ft_analyze(jpc_fix_t *a, int xstart, int ystart, int width, int height,
   int stride);
-#endif
 static int jpc_ft_synthesize(jpc_fix_t *a, int xstart, int ystart, int width, int height,
   int stride);
 
-#ifdef JAS_ENABLE_ENCODER
 static int jpc_ns_analyze(jpc_fix_t *a, int xstart, int ystart, int width, int height,
   int stride);
-#endif
 static int jpc_ns_synthesize(jpc_fix_t *a, int xstart, int ystart, int width,
   int height, int stride);
 
-#ifdef JAS_ENABLE_ENCODER
 static void jpc_ft_fwdlift_row(jpc_fix_t *a, unsigned numcols, bool parity);
 static void jpc_ft_fwdlift_colgrp(jpc_fix_t *a, unsigned numrows, unsigned stride,
   bool parity);
 static void jpc_ft_fwdlift_colres(jpc_fix_t *a, unsigned numrows, unsigned numcols,
   unsigned stride, bool parity);
-#endif
 
 static void jpc_ft_invlift_row(jpc_fix_t *a, unsigned numcols, bool parity);
 static void jpc_ft_invlift_colgrp(jpc_fix_t *a, unsigned numrows, unsigned stride,
@@ -120,23 +114,19 @@ static void jpc_ft_invlift_colgrp(jpc_fix_t *a, unsigned numrows, unsigned strid
 static void jpc_ft_invlift_colres(jpc_fix_t *a, unsigned numrows, unsigned numcols,
   unsigned stride, bool parity);
 
-#ifdef JAS_ENABLE_ENCODER
 static void jpc_ns_fwdlift_row(jpc_fix_t *a, unsigned numcols, bool parity);
 static void jpc_ns_fwdlift_colgrp(jpc_fix_t *a, unsigned numrows, unsigned stride, bool parity);
 static void jpc_ns_fwdlift_colres(jpc_fix_t *a, unsigned numrows, unsigned numcols, unsigned stride,
   bool parity);
-#endif
 static void jpc_ns_invlift_row(jpc_fix_t *a, unsigned numcols, bool parity);
 static void jpc_ns_invlift_colgrp(jpc_fix_t *a, unsigned numrows, unsigned stride, bool parity);
 static void jpc_ns_invlift_colres(jpc_fix_t *a, unsigned numrows, unsigned numcols, unsigned stride,
   bool parity);
 
-#ifdef JAS_ENABLE_ENCODER
 static void jpc_qmfb_split_row(jpc_fix_t *a, unsigned numrows, bool parity);
 static void jpc_qmfb_split_colgrp(jpc_fix_t *a, unsigned numrows, unsigned stride, bool parity);
 static void jpc_qmfb_split_colres(jpc_fix_t *a, unsigned numrows, unsigned numcols, unsigned stride,
   bool parity);
-#endif
 
 static void jpc_qmfb_join_row(jpc_fix_t *a, unsigned numcols, bool parity);
 static void jpc_qmfb_join_colgrp(jpc_fix_t *a, unsigned numrows, unsigned stride, bool parity);
@@ -287,18 +277,14 @@ static const double jpc_ns_hpenergywts[32] = {
 };
 
 const jpc_qmfb2d_t jpc_ft_qmfb2d = {
-#ifdef JAS_ENABLE_ENCODER
 	jpc_ft_analyze,
-#endif
 	jpc_ft_synthesize,
 	jpc_ft_lpenergywts,
 	jpc_ft_hpenergywts
 };
 
 const jpc_qmfb2d_t jpc_ns_qmfb2d = {
-#ifdef JAS_ENABLE_ENCODER
 	jpc_ns_analyze,
-#endif
 	jpc_ns_synthesize,
 	jpc_ns_lpenergywts,
 	jpc_ns_hpenergywts
@@ -307,8 +293,6 @@ const jpc_qmfb2d_t jpc_ns_qmfb2d = {
 /******************************************************************************\
 * generic
 \******************************************************************************/
-
-#ifdef JAS_ENABLE_ENCODER
 
 static void jpc_qmfb_split_row(jpc_fix_t *a, unsigned numcols, bool parity)
 {
@@ -517,8 +501,6 @@ static void jpc_qmfb_split_colres(jpc_fix_t *a, unsigned numrows, unsigned numco
 
 }
 
-#endif /* JAS_ENABLE_ENCODER */
-
 void jpc_qmfb_join_row(jpc_fix_t *a, unsigned numcols, bool parity)
 {
 
@@ -718,8 +700,6 @@ static void jpc_qmfb_join_colres(jpc_fix_t *a, unsigned numrows, unsigned numcol
 /******************************************************************************\
 * 5/3 transform
 \******************************************************************************/
-
-#ifdef JAS_ENABLE_ENCODER
 
 static void jpc_ft_fwdlift_row(jpc_fix_t *a, unsigned numcols, bool parity)
 {
@@ -981,8 +961,6 @@ static void jpc_ft_fwdlift_colres(jpc_fix_t *a, unsigned numrows, unsigned numco
 
 }
 
-#endif /* JAS_ENABLE_ENCODER */
-
 static void jpc_ft_invlift_row(jpc_fix_t *a, unsigned numcols, bool parity)
 {
 
@@ -1243,8 +1221,6 @@ static void jpc_ft_invlift_colres(jpc_fix_t *a, unsigned numrows, unsigned numco
 
 }
 
-#ifdef JAS_ENABLE_ENCODER
-
 int jpc_ft_analyze(jpc_fix_t *a, int xstart, int ystart, int width, int height,
   int stride)
 {
@@ -1278,8 +1254,6 @@ int jpc_ft_analyze(jpc_fix_t *a, int xstart, int ystart, int width, int height,
 	return 0;
 
 }
-
-#endif /* JAS_ENABLE_ENCODER */
 
 int jpc_ft_synthesize(jpc_fix_t *a, int xstart, int ystart, int width, int height,
   int stride)
@@ -1326,8 +1300,6 @@ int jpc_ft_synthesize(jpc_fix_t *a, int xstart, int ystart, int width, int heigh
 #define DELTA (0.443506852043971)
 #define LGAIN (1.0 / 1.23017410558578)
 #define HGAIN (1.0 / 1.62578613134411)
-
-#ifdef JAS_ENABLE_ENCODER
 
 static void jpc_ns_fwdlift_row(jpc_fix_t *a, unsigned numcols, bool parity)
 {
@@ -1846,8 +1818,6 @@ static void jpc_ns_fwdlift_colres(jpc_fix_t *a, unsigned numrows, unsigned numco
 
 }
 
-#endif /* JAS_ENABLE_ENCODER */
-
 #ifdef _MSC_VER
 /* MSVC doesn't support C99 "restrict" */
 #define restrict
@@ -2167,8 +2137,6 @@ static void jpc_ns_invlift_colres(jpc_fix_t *a, unsigned numrows, unsigned numco
 
 }
 
-#ifdef JAS_ENABLE_ENCODER
-
 int jpc_ns_analyze(jpc_fix_t *a, int xstart, int ystart, int width, int height,
   int stride)
 {
@@ -2203,8 +2171,6 @@ int jpc_ns_analyze(jpc_fix_t *a, int xstart, int ystart, int width, int height,
 	return 0;
 
 }
-
-#endif /* JAS_ENABLE_ENCODER */
 
 int jpc_ns_synthesize(jpc_fix_t *a, int xstart, int ystart, int width,
   int height, int stride)
