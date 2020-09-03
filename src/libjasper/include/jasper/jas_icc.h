@@ -306,9 +306,9 @@ typedef struct {
 	void (*destroy)(struct jas_iccattrval_s *);
 	int (*copy)(struct jas_iccattrval_s *, const struct jas_iccattrval_s *);
 	int (*input)(struct jas_iccattrval_s *, jas_stream_t *, unsigned);
-#ifdef JAS_ENABLE_ENCODER
+//#ifdef JAS_ENABLE_ENCODER
 	int (*output)(struct jas_iccattrval_s *, jas_stream_t *);
-#endif
+//#endif
 	unsigned (*getsize)(const struct jas_iccattrval_s *);
 	void (*dump)(const struct jas_iccattrval_s *, FILE *);
 } jas_iccattrvalops_t;
