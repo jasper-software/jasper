@@ -670,8 +670,8 @@ void jas_image_clearfmts()
 	jas_image_numfmts = 0;
 }
 
-int jas_image_addfmt(int id, const char *name, const char *ext, const char *desc,
-  const jas_image_fmtops_t *ops)
+int jas_image_addfmt(int id, const char *name, const char *ext,
+  const char *desc, const jas_image_fmtops_t *ops)
 {
 	jas_image_fmtinfo_t *fmtinfo;
 	assert(id >= 0 && name && ext && ops);
@@ -696,6 +696,27 @@ int jas_image_addfmt(int id, const char *name, const char *ext, const char *desc
 	++jas_image_numfmts;
 	return 0;
 }
+
+/* This is for future consideration for addition to the library API. */
+#if 0
+JAS_DLLEXPORT
+int jas_image_delfmt(int fmtid)
+{
+	if (fmtid < 0 || fmtid >= JAS_CAST(int, jas_image_numfmts)) {
+		return -1;
+	}
+	const jas_image_fmtinfo_t *fmtinfo;
+	if (!(fmtinfo = jas_image_lookupfmtbyid(fmtid))) {
+		return -1;
+	}
+	for (int i = fmtinfo - jas_image_fmtinfos; i < JAS_CAST(int,
+	  jas_image_numfmts) - 1; ++i) {
+		jas_image_fmtinfos[i] = jas_image_fmtinfos[i + 1];
+	}
+	--jas_image_numfmts;
+	return 0;
+}
+#endif
 
 int jas_image_strtofmt(const char *name)
 {
@@ -863,10 +884,6 @@ const jas_image_fmtinfo_t *jas_image_lookupfmtbyname(const char *name)
 	}
 	return 0;
 }
-
-
-
-
 
 static uint_fast32_t inttobits(jas_seqent_t v, unsigned prec, bool sgnd)
 {

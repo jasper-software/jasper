@@ -62,6 +62,9 @@
 #ifndef JAS_COMPILER_H
 #define JAS_COMPILER_H
 
+/* The configuration header file should be included first. */
+#include <jasper/jas_config.h>
+
 #ifdef _MSC_VER
 #ifndef __cplusplus
 #undef inline

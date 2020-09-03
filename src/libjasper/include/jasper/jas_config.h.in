@@ -24,6 +24,24 @@
 #cmakedefine JAS_HAVE_GL_GLUT_H 1
 #cmakedefine JAS_HAVE_GLUT_H 1
 
+#cmakedefine JAS_INCLUDE_PNM_CODEC 1
+#cmakedefine JAS_INCLUDE_BMP_CODEC 1
+#cmakedefine JAS_INCLUDE_RAS_CODEC 1
+#cmakedefine JAS_INCLUDE_JP2_CODEC 1
+#cmakedefine JAS_INCLUDE_JPC_CODEC 1
+#cmakedefine JAS_INCLUDE_JPG_CODEC 1
+#cmakedefine JAS_INCLUDE_PGX_CODEC 1
+#cmakedefine JAS_INCLUDE_MIF_CODEC 1
+#cmakedefine JAS_ENABLE_MIF_CODEC 1
+
+#if !defined(JAS_INCLUDE_MIF_CODEC) && defined(JAS_ENABLE_MIF_CODEC)
+#undef JAS_ENABLE_MIF_CODEC
+#endif
+
+#if defined(JAS_INCLUDE_JP2_CODEC) && !defined(JAS_INCLUDE_JPC_CODEC)
+#undef JAS_INCLUDE_JPC_CODEC
+#endif
+
 #ifdef _MSC_VER
 #undef JAS_HAVE_SNPRINTF
 #else

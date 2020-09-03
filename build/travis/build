@@ -104,6 +104,7 @@ else
 		cmake_opts+=(-G "$cmake_generator")
 		cmake_opts+=(-DCMAKE_INSTALL_PREFIX="$install_dir")
 		cmake_opts+=(-DJAS_ENABLE_SHARED="$enable_shared")
+		#cmake_opts+=(-DJAS_INCLUDE_MIF_CODEC=1 -DJAS_ENABLE_MIF_CODEC=1)
 		cmake_opts+=(-H. -B"$build_dir")
 		cmake_opts+=("$@")
 		echo "Running cmake ${cmake_opts[@]}"
@@ -171,6 +172,7 @@ fi
 		cmake_opts+=(-G "Unix Makefiles")
 		cmake_opts+=(-DJASPER_LIBRARIES="-L$install_dir/lib -ljasper")
 		cmake_opts+=(-DJASPER_INCLUDE_DIR="$install_dir/include")
+		cmake_opts+=(-DJAS_INCLUDE_MIF_CODEC=1 -DJAS_ENABLE_MIF_CODEC=1)
 		cmake "${cmake_opts[@]}" || panic "cmake failed"
 		for target in clean all; do
 			(cd "$test_dir" && make "$target" VERBOSE=1) || \

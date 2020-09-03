@@ -62,6 +62,9 @@
 #ifndef JAS_DLL_H
 #define JAS_DLL_H
 
+/* The configuration header file should be included first. */
+#include <jasper/jas_config.h>
+
 #if defined(JAS_DLL)
 	#if defined(_WIN32)
 		#if defined(JAS_BUILDING_DLL)

@@ -96,6 +96,16 @@ option(JAS_ENABLE_AUTOMATIC_DEPENDENCIES "Enable automatic dependencies" true)
 option(JAS_ENABLE_DOC "Enable building of the documentation" true)
 option(JAS_ENABLE_PROGRAMS "Enable building of the programs" true)
 
+option(JAS_INCLUDE_PNM_CODEC "Include PNM codec support" true)
+option(JAS_INCLUDE_BMP_CODEC "Include BMP codec support" true)
+option(JAS_INCLUDE_RAS_CODEC "Include RAS codec support" true)
+option(JAS_INCLUDE_JP2_CODEC "Include JP2 codec support" true)
+option(JAS_INCLUDE_JPC_CODEC "Include JPC codec support" true)
+option(JAS_INCLUDE_JPG_CODEC "Include JPG codec support" true)
+option(JAS_INCLUDE_PGX_CODEC "Include PGX codec support" true)
+option(JAS_INCLUDE_MIF_CODEC "Include MIF codec support" true)
+option(JAS_ENABLE_MIF_CODEC "Enable MIF codec support" false)
+
 ################################################################################
 #
 ################################################################################
