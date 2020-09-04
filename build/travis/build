@@ -30,9 +30,12 @@ if [ "$in_source_build" -ne 0 ]; then
 
 	echo "In-source build"
 
+	cmake_opts=()
+	cmake_opts+=(-DJAS_INCLUDE_MIF_CODEC=1 -DJAS_ENABLE_MIF_CODEC=1)
 	(cd "$source_dir" && \
 	  cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$install_dir" \
-	  -DALLOW_IN_SOURCE_BUILD=true .) || panic "cmake failed"
+	  -DALLOW_IN_SOURCE_BUILD=true "${cmake_opts[@]}" .) || \
+	  panic "cmake failed"
 
 	(cd "$source_dir" && make clean && make all) || \
 	  panic "make clean/all failed"
@@ -104,7 +107,7 @@ else
 		cmake_opts+=(-G "$cmake_generator")
 		cmake_opts+=(-DCMAKE_INSTALL_PREFIX="$install_dir")
 		cmake_opts+=(-DJAS_ENABLE_SHARED="$enable_shared")
-		#cmake_opts+=(-DJAS_INCLUDE_MIF_CODEC=1 -DJAS_ENABLE_MIF_CODEC=1)
+		cmake_opts+=(-DJAS_INCLUDE_MIF_CODEC=1 -DJAS_ENABLE_MIF_CODEC=1)
 		cmake_opts+=(-H. -B"$build_dir")
 		cmake_opts+=("$@")
 		echo "Running cmake ${cmake_opts[@]}"
@@ -139,23 +142,23 @@ else
 			cmake_opts+=("${build_opts[@]}")
 			echo "Running cmake ${cmake_opts[@]}"
 			(cmake "${cmake_opts[@]}") || panic "build of $target failed"
-if [ "$verbose" -ge 1 ]; then
-			for dir in src/appl src/libjasper test/bin; do
-				echo "Listing directory $build_dir/$dir"
-				(cd "$build_dir" && ls -alR "$dir")
-			done
-fi
-if [ "$verbose" -ge 1 ]; then
-			for dir in "$install_dir"; do
-				if [ -d "$dir" ]; then
-					echo "Listing directory $dir"
-					(cd "$dir" && ls -alR) || \
-					  panic "cannot list directory $dir"
-				else
-					echo "Directory not found $dir"
-				fi
-			done
-fi
+			if [ "$verbose" -ge 1 ]; then
+				for dir in src/appl src/libjasper test/bin; do
+					echo "Listing directory $build_dir/$dir"
+					(cd "$build_dir" && ls -alR "$dir")
+				done
+			fi
+			if [ "$verbose" -ge 1 ]; then
+				for dir in "$install_dir"; do
+					if [ -d "$dir" ]; then
+						echo "Listing directory $dir"
+						(cd "$dir" && ls -alR) || \
+						  panic "cannot list directory $dir"
+					else
+						echo "Directory not found $dir"
+					fi
+				done
+			fi
 		done
 
 		echo "########################################"
