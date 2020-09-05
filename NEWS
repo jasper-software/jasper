@@ -1,7 +1,16 @@
-2.0.19 (not yet released)
-=========================
+2.0.20 (2020-09-05)
+===================
 
 * fixed several ISO/IEC 15444-4 conformance bugs
+
+* fixed new variant of CVE-2016-9398
+
+* disabled the MIF codec by default for security reasons (but it is still
+  included in the library);
+  in a future release, the MIF codec may also be excluded from the
+  library by default
+
+* added documentation for the I/O streams library API
 
 2.0.19 (2020-07-11)
 ===================
