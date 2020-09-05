@@ -43,75 +43,107 @@ set(libjasper_base_sources
 	base/jas_version.c
 )
 
-set(libjasper_bmp_sources
-	bmp/bmp_cod.c
-	bmp/bmp_dec.c
-	bmp/bmp_enc.c
-)
-
-set(libjasper_jp2_sources
-	jp2/jp2_cod.c
-	jp2/jp2_dec.c
-	jp2/jp2_enc.c
-)
-
-set(libjasper_jpc_sources
-	jpc/jpc_bs.c
-	jpc/jpc_cs.c
-	jpc/jpc_dec.c
-	jpc/jpc_enc.c
-	jpc/jpc_math.c
-	jpc/jpc_mct.c
-	jpc/jpc_mqcod.c
-	jpc/jpc_mqdec.c
-	jpc/jpc_mqenc.c
-	jpc/jpc_qmfb.c
-	jpc/jpc_t1cod.c
-	jpc/jpc_t1dec.c
-	jpc/jpc_t1enc.c
-	jpc/jpc_t2cod.c
-	jpc/jpc_t2dec.c
-	jpc/jpc_t2enc.c
-	jpc/jpc_tagtree.c
-	jpc/jpc_tsfb.c
-	jpc/jpc_util.c
-)
-
-set(libjasper_jpg_sources
-	jpg/jpg_val.c
-)
-if(JAS_HAVE_LIBJPEG)
-	list(APPEND libjasper_jpg_sources
-		jpg/jpg_dec.c
-		jpg/jpg_enc.c
+if (JAS_INCLUDE_BMP_CODEC)
+	set(libjasper_bmp_sources
+		bmp/bmp_cod.c
+		bmp/bmp_dec.c
+		bmp/bmp_enc.c
 	)
 else()
-	list(APPEND libjasper_jpg_sources
-		jpg/jpg_dummy.c
-	)
+	set(libjasper_bmp_sources "")
 endif()
 
-set(libjasper_mif_sources
-	mif/mif_cod.c
-)
+if (JAS_INCLUDE_JP2_CODEC)
+	set(libjasper_jp2_sources
+		jp2/jp2_cod.c
+		jp2/jp2_dec.c
+		jp2/jp2_enc.c
+	)
+else()
+	set(libjasper_jp2_sources "")
+endif()
 
-set(libjasper_pgx_sources
-	pgx/pgx_cod.c
-	pgx/pgx_dec.c
-	pgx/pgx_enc.c
-)
+if (JAS_INCLUDE_JPC_CODEC)
+	set(libjasper_jpc_sources
+		jpc/jpc_bs.c
+		jpc/jpc_cs.c
+		jpc/jpc_dec.c
+		jpc/jpc_enc.c
+		jpc/jpc_math.c
+		jpc/jpc_mct.c
+		jpc/jpc_mqcod.c
+		jpc/jpc_mqdec.c
+		jpc/jpc_mqenc.c
+		jpc/jpc_qmfb.c
+		jpc/jpc_t1cod.c
+		jpc/jpc_t1dec.c
+		jpc/jpc_t1enc.c
+		jpc/jpc_t2cod.c
+		jpc/jpc_t2dec.c
+		jpc/jpc_t2enc.c
+		jpc/jpc_tagtree.c
+		jpc/jpc_tsfb.c
+		jpc/jpc_util.c
+	)
+else()
+	set(libjasper_jpc_sources "")
+endif()
 
-set(libjasper_pnm_sources
-	pnm/pnm_cod.c
-	pnm/pnm_dec.c
-	pnm/pnm_enc.c
-)
+if (JAS_INCLUDE_JPG_CODEC)
+	set(libjasper_jpg_sources
+		jpg/jpg_val.c
+	)
+	if(JAS_HAVE_LIBJPEG)
+		list(APPEND libjasper_jpg_sources
+			jpg/jpg_dec.c
+			jpg/jpg_enc.c
+		)
+	else()
+		list(APPEND libjasper_jpg_sources
+			jpg/jpg_dummy.c
+		)
+	endif()
+else()
+	set(libjasper_jpg_sources "")
+endif()
 
-set(libjasper_ras_sources
-	ras/ras_cod.c
-	ras/ras_dec.c
-	ras/ras_enc.c
-)
+if (JAS_INCLUDE_MIF_CODEC)
+	set(libjasper_mif_sources
+		mif/mif_cod.c
+	)
+else()
+	set(libjasper_mif_sources "")
+endif()
+
+if (JAS_INCLUDE_PGX_CODEC)
+	set(libjasper_pgx_sources
+		pgx/pgx_cod.c
+		pgx/pgx_dec.c
+		pgx/pgx_enc.c
+	)
+else()
+	set(libjasper_pgx_sources "")
+endif()
+
+if (JAS_INCLUDE_PNM_CODEC)
+	set(libjasper_pnm_sources
+		pnm/pnm_cod.c
+		pnm/pnm_dec.c
+		pnm/pnm_enc.c
+	)
+else()
+	set(libjasper_pnm_sources "")
+endif()
+
+if (JAS_INCLUDE_RAS_CODEC)
+	set(libjasper_ras_sources
+		ras/ras_cod.c
+		ras/ras_dec.c
+		ras/ras_enc.c
+	)
+else()
+	set(libjasper_ras_sources "")
+endif()
 
 if (JAS_ENABLE_SHARED)
 	set(libjasper_type SHARED)

@@ -104,7 +104,13 @@ option(JAS_INCLUDE_JPC_CODEC "Include JPC codec support" true)
 option(JAS_INCLUDE_JPG_CODEC "Include JPG codec support" true)
 option(JAS_INCLUDE_PGX_CODEC "Include PGX codec support" true)
 option(JAS_INCLUDE_MIF_CODEC "Include MIF codec support" true)
-option(JAS_ENABLE_MIF_CODEC "Enable MIF codec support" false)
+
+# WARNING: THE FOLLOWING OPTION SHOULD ONLY BE ENABLED BY THE JASPER SOFTWARE
+# DEVELOPMENT TEAM.  IT IS NECESSARY FOR INTERNAL TESTING PURPOSES AND POSES
+# SIGNIFICANT SECURITY RISKS IF ENABLED.
+option(JAS_ENABLE_DANGEROUS_INTERNAL_TESTING_MODE
+  "DO NOT ENABLE FOR SECURITY REASONS! (For internal use by JasPer development team only"
+  false)
 
 ################################################################################
 #
@@ -210,6 +216,14 @@ check_include_files(sys/types.h JAS_HAVE_SYS_TYPES_H)
 check_function_exists(gettimeofday JAS_HAVE_GETTIMEOFDAY)
 check_function_exists(getrusage JAS_HAVE_GETRUSAGE)
 check_function_exists(mkostemp JAS_HAVE_MKOSTEMP)
+
+################################################################################
+# Check for invalid codec combinations.
+################################################################################
+
+if (JAS_INCLUDE_JP2_CODEC AND NOT JAS_INCLUDE_JPC_CODEC)
+	message(FATAL_ERROR "The JPC codec must be included in order to include the JP2 codec.")
+endif()
 
 ################################################################################
 # Check for the JPEG library.
