@@ -372,6 +372,9 @@ jas_image_t *jp2_decode(jas_stream_t *in, const char *optstr)
 			if (cmapent->map == JP2_CMAP_DIRECT) {
 				dec->chantocmptlut[channo] = channo;
 			} else if (cmapent->map == JP2_CMAP_PALETTE) {
+				if (!pclrd->numlutents) {
+					goto error;
+				}
 				lutents = jas_alloc2(pclrd->numlutents, sizeof(int_fast32_t));
 				if (!lutents) {
 					goto error;
