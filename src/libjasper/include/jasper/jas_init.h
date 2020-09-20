@@ -74,13 +74,41 @@
 extern "C" {
 #endif
 
+/*!
+ * @addtogroup init
+ * @{
+ */
+
 /******************************************************************************\
 * Functions.
 \******************************************************************************/
 
-JAS_DLLEXPORT int jas_init(void);
+/*!
+@brief Initialize the JasPer library.
 
-JAS_DLLEXPORT void jas_cleanup(void);
+@details
+This function must be called before any other code in the JasPer library
+is invoked.
+This function registers the codecs that are enabled by default.
+
+@returns
+If successful, zero is returned; otherwise, a nonzero value is returned.
+*/
+JAS_DLLEXPORT
+int jas_init(void);
+
+/*!
+@brief Perform any clean up for the JasPer library.
+
+@details
+This function performs any clean up for the JasPer library.
+*/
+JAS_DLLEXPORT
+void jas_cleanup(void);
+
+/*!
+ * @}
+ */
 
 #ifdef __cplusplus
 }

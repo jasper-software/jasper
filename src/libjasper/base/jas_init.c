@@ -73,6 +73,7 @@
 \******************************************************************************/
 
 /* Initialize the image format table. */
+JAS_DLLEXPORT
 int jas_init()
 {
 	jas_image_fmtops_t fmtops;
@@ -159,6 +160,7 @@ int jas_init()
 	return 0;
 }
 
+JAS_DLLEXPORT
 void jas_cleanup()
 {
 	jas_image_clearfmts();

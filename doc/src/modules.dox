@@ -1,5 +1,8 @@
 /*!
 
+@defgroup init Initialization and Clean Up
+@brief Initialization and Clean Up
+
 @defgroup iostreams I/O Streams
 @brief I/O streams
 
