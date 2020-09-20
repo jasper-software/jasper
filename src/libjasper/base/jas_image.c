@@ -1040,6 +1040,7 @@ int jas_image_depalettize(jas_image_t *image, unsigned cmptno, unsigned numluten
 			if (v < 0) {
 				v = 0;
 			} else if ((unsigned)v >= numlutents) {
+				assert(numlutents > 0);
 				v = numlutents - 1;
 			}
 			jas_image_writecmptsample(image, newcmptno, i, j,
