@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <jasper.h>
+#include <jasper/jasper.h>
 
 #define	FAILED	2
 
