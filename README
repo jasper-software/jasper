@@ -41,6 +41,11 @@ doc.  The manual is provided in two formats:
 The old reference manual (which is still useful) can be found in:
     doc/jasper.pdf
 
+The version of the reference manual corresponding to the most recent
+commit on the master branch of the JasPer Git repository can be found at:
+
+    https://jasper-software.github.io/jasper-manual
+
 All bug reports should be submitted via the issue-tracking system
 provided by GitHub.  To submit a bug report, go the the following
 URL and click on the "New issue" button:
