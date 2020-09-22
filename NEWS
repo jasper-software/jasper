@@ -2,8 +2,10 @@
 ===================
 
 * Fix ZDI-15-529
+  https://github.com/jasper-software/jasper/pull/245
 
-* Fix CVE-2018-19541
+* Fix CVE-2018-19541 in decoder
+  https://github.com/jasper-software/jasper/pull/244
 
 2.0.20 (2020-09-05)
 ===================
@@ -28,7 +30,7 @@
   https://github.com/jasper-software/jasper/issues/175
   https://github.com/jasper-maint/jasper/issues/8
 
-* Fix CVE-2018-19541
+* Fix CVE-2018-19541 in encoder
   https://github.com/jasper-software/jasper/pull/199
   https://github.com/jasper-maint/jasper/issues/6
 
