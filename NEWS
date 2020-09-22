@@ -1,23 +1,25 @@
 2.0.21 (2020-09-20)
 ===================
 
-* fixed ZDI-15-529
+* Fix ZDI-15-529
+  https://github.com/jasper-software/jasper/pull/245
 
-* fixed CVE-2018-19541
+* Fix CVE-2018-19541 in decoder
+  https://github.com/jasper-software/jasper/pull/244
 
 2.0.20 (2020-09-05)
 ===================
 
-* fixed several ISO/IEC 15444-4 conformance bugs
+* Fix several ISO/IEC 15444-4 conformance bugs
 
-* fixed new variant of CVE-2016-9398
+* Fix new variant of CVE-2016-9398
 
-* disabled the MIF codec by default for security reasons (but it is still
+* Disable the MIF codec by default for security reasons (but it is still
   included in the library);
   in a future release, the MIF codec may also be excluded from the
   library by default
 
-* added documentation for the I/O streams library API
+* Add documentation for the I/O streams library API
 
 2.0.19 (2020-07-11)
 ===================
@@ -28,7 +30,7 @@
   https://github.com/jasper-software/jasper/issues/175
   https://github.com/jasper-maint/jasper/issues/8
 
-* Fix CVE-2018-19541
+* Fix CVE-2018-19541 in encoder
   https://github.com/jasper-software/jasper/pull/199
   https://github.com/jasper-maint/jasper/issues/6
 
