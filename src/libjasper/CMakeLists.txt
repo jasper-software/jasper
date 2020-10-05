@@ -92,17 +92,9 @@ endif()
 if (JAS_INCLUDE_JPG_CODEC)
 	set(libjasper_jpg_sources
 		jpg/jpg_val.c
+		jpg/jpg_dec.c
+		jpg/jpg_enc.c
 	)
-	if(JAS_HAVE_LIBJPEG)
-		list(APPEND libjasper_jpg_sources
-			jpg/jpg_dec.c
-			jpg/jpg_enc.c
-		)
-	else()
-		list(APPEND libjasper_jpg_sources
-			jpg/jpg_dummy.c
-		)
-	endif()
 else()
 	set(libjasper_jpg_sources "")
 endif()

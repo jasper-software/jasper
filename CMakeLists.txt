@@ -266,6 +266,9 @@ else()
 	set(JPEG_INCLUDE_DIR "")
 	set(JPEG_LIBRARIES "")
 endif()
+if (NOT JAS_HAVE_LIBJPEG)
+	set(JAS_INCLUDE_JPG_CODEC 0)
+endif()
 
 ################################################################################
 # Check for the Math library.
