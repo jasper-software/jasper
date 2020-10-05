@@ -79,8 +79,6 @@ include(CheckCSourceCompiles)
 include(CTest)
 include(Sanitizers)
 
-include(JasOpenGL)
-
 cmake_policy(SET CMP0012 NEW)
 
 ################################################################################
@@ -204,6 +202,8 @@ endif()
 ################################################################################
 # Perform plaform checks.
 ################################################################################
+
+include(JasOpenGL)
 
 find_program(BASH_PROGRAM bash)
 
