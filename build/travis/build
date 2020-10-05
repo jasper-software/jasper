@@ -42,7 +42,10 @@ if [ "$in_source_build" -ne 0 ]; then
 
 	(cd "$source_dir" && make install) || panic "make install failed"
 
-	(cd "$source_dir" && CTEST_OUTPUT_ON_FAILURE=TRUE make test ARGS="-V") || \
+	(cd "$source_dir" && \
+	  JAS_INTERNAL_TESTING_MODE=1 \
+	  CTEST_OUTPUT_ON_FAILURE=TRUE \
+	  make test ARGS="-V") || \
 	  panic "make test failed"
 
 else
@@ -197,6 +200,7 @@ else
 			ctest_opts+=(--output-on-failure)
 			echo "Running ctest ${ctest_opts[@]}"
 			(cd "$build_dir" && \
+			  JAS_INTERNAL_TESTING_MODE=1 \
 			  ctest "${ctest_opts[@]}") || panic "ctest failed"
 		fi
 

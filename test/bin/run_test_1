@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /usr/bin/env bash
 # Copyright (c) 2016 Michael David Adams
 ################################################################################
 
@@ -25,6 +25,8 @@ jasper="$abs_top_builddir/src/appl/jasper"
 
 ################################################################################
 
+internal_testing_mode="${JAS_INTERNAL_TESTING_MODE:-0}"
+
 verbose=0
 if [ $# -ge 1 ]; then
 	verbose=1
@@ -33,10 +35,34 @@ fi
 ################################################################################
 
 # Decoder tests for valid data.
-good_list=("$data_dir"/test/good/*.*)
+good_list=()
+for file in "$data_dir"/test/good/*.*; do
+	skip=0
+	if [ "$internal_testing_mode" -eq 0 ]; then
+		case "$file" in
+		*.mif)
+			skip=1;;
+		esac
+	fi
+	if [ "$skip" -eq 0 ]; then
+		good_list+=("$file")
+	fi
+done
 
 # Decoder tests for invalid data.
-bad_list=("$data_dir"/test/bad/*.*)
+bad_list=()
+for file in "$data_dir"/test/bad/*.*; do
+	skip=0
+	if [ "$internal_testing_mode" -eq 0 ]; then
+		case "$file" in
+		*.mif)
+			skip=1;;
+		esac
+	fi
+	if [ "$skip" -eq 0 ]; then
+		bad_list+=("$file")
+	fi
+done
 
 # Encoder tests that should fail.
 enc_list=()

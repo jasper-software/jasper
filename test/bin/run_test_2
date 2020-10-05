@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /usr/bin/env bash
 # Copyright (c) 2016 Michael David Adams
 ################################################################################
 
@@ -24,6 +24,8 @@ export IMGINFO_COMMAND="$abs_top_builddir/src/appl/imginfo"
 jasper="$abs_top_builddir/src/appl/jasper"
 imgcmp="$abs_top_builddir/src/appl/imgcmp"
 jiv="$abs_top_builddir/src/appl/jiv"
+
+internal_testing_mode="${JAS_INTERNAL_TESTING_MODE:-0}"
 
 debug=0
 
@@ -52,7 +54,9 @@ image_formats+=(jpc)
 image_formats+=(pgx)
 image_formats+=(pnm)
 image_formats+=(ras)
-image_formats+=(mif)
+if [ "$internal_testing_mode" -eq 1 ]; then
+	image_formats+=(mif)
+fi
 # NOTE: Since the test requires lossless coding, we cannot use JPEG format.
 #image_formats+=(jpg)
 
