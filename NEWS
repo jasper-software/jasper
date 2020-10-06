@@ -1,3 +1,14 @@
+2.0.22 (2020-10-05)
+===================
+
+* Update manual
+
+* Remove JPEG dummy codec. Jasper needs libjpeg for JPEG support
+
+* Fix test suite build failure regarding disabled MIF codec (#249)
+
+* Fix OpenGL/glut detection (#247)
+
 2.0.21 (2020-09-20)
 ===================
 
