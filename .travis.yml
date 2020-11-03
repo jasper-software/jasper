@@ -32,8 +32,8 @@ compiler:
 
 arch:
   - amd64
+  - arm64
   - ppc64le
-  #- arm64
 
 ################################################################################
 # Specify extra packages needed.
