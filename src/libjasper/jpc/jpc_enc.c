@@ -509,6 +509,11 @@ static jpc_enc_cp_t *cp_create(const char *optstr, jas_image_t *image)
 			break;
 		case OPT_MAXRLVLS:
 			tccp->maxrlvls = atoi(jas_tvparser_getval(tvp));
+			if (tccp->maxrlvls > JPC_MAXRLVLS) {
+				jas_eprintf("number of resolution levels exceeds maximum %d\n",
+				  JPC_MAXRLVLS);
+				goto error;
+			}
 			break;
 		case OPT_SOP:
 			cp->tcp.csty |= JPC_COD_SOP;
