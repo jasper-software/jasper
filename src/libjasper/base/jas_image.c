@@ -516,6 +516,16 @@ int jas_image_readcmpt(jas_image_t *image, unsigned cmptno, jas_image_coord_t x,
 
 	dr = jas_matrix_getref(data, 0, 0);
 	const uint_least32_t drs = jas_matrix_rowstep(data);
+
+#ifdef _MSC_VER
+	jas_uchar *stack_buffer;
+	if (cps == 1 && !sgnd && width <= 16384) {
+		/* can't use variable-length arrays here because MSVC
+		   doesn't support this C99 feature */
+		stack_buffer = _alloca(width);
+	}
+#endif
+
 	for (i = 0; i < height; ++i, dr += drs) {
 		d = dr;
 		if (jas_stream_seek(stream, (cmpt_width * (y + i) + x)
@@ -528,10 +538,7 @@ int jas_image_readcmpt(jas_image_t *image, unsigned cmptno, jas_image_coord_t x,
 			   unsigned with bulk reads */
 
 #ifdef _MSC_VER
-			/* can't use variable-length arrays here
-			   because MSVC doesn't support this C99
-			   feature */
-			jas_uchar *buffer = _alloca(width);
+			jas_uchar *buffer = stack_buffer;
 #else
 			jas_uchar buffer[width];
 #endif
@@ -602,6 +609,16 @@ int jas_image_writecmpt(jas_image_t *image, unsigned cmptno, jas_image_coord_t x
 
 	const jas_seqent_t *dr = jas_matrix_getref(data, 0, 0);
 	const uint_least32_t drs = jas_matrix_rowstep(data);
+
+#ifdef _MSC_VER
+	jas_uchar *stack_buffer;
+	if (cps == 1 && !sgnd && width <= 16384) {
+		/* can't use variable-length arrays here because MSVC
+		   doesn't support this C99 feature */
+		stack_buffer = _alloca(width);
+	}
+#endif
+
 	for (i = 0; i < height; ++i, dr += drs) {
 		const jas_seqent_t *d = dr;
 		if (jas_stream_seek(stream, (cmpt_width * (y + i) + x)
@@ -614,10 +631,7 @@ int jas_image_writecmpt(jas_image_t *image, unsigned cmptno, jas_image_coord_t x
 			   unsigned with bulk writes */
 
 #ifdef _MSC_VER
-			/* can't use variable-length arrays here
-			   because MSVC doesn't support this C99
-			   feature */
-			jas_uchar *buffer = _alloca(width);
+			jas_uchar *buffer = stack_buffer;
 #else
 			jas_uchar buffer[width];
 #endif
