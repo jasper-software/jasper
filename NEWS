@@ -3,6 +3,8 @@
 
 * Add JAS_VERSION_MAJOR, JAS_VERSION_MINOR, JAS_VERSION_PATCH
   for easier access to the JasPer version.
+* Fixes stack overflow bug on Windows, where variable-length
+  arrays are not available. (#256)
 
 2.0.23 (2020-12-08)
 ===================
