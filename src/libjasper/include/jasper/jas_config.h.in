@@ -8,6 +8,9 @@
 
 /* This preprocessor symbol identifies the version of JasPer. */
 #define	JAS_VERSION "@JAS_VERSION@"
+#define JAS_VERSION_MAJOR @JAS_VERSION_MAJOR@
+#define JAS_VERSION_MINOR @JAS_VERSION_MINOR@
+#define JAS_VERSION_PATCH @JAS_VERSION_PATCH@
 
 #cmakedefine JAS_ENABLE_32BIT 1
 
