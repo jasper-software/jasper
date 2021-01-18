@@ -1386,20 +1386,13 @@ and other characteristics */
 			tile->lyrsizes[lyrno] = tile->rawsize * jpc_fixtodbl(
 			  cp->tcp.ilyrrates[lyrno]);
 		}
-#if !defined(__clang__)
-		// WARNING:
-		// Some versions of Clang (e.g., 3.7.1 and 3.8.1) appear to generate
-		// incorrect code for the following line.
-		tile->lyrsizes[tile->numlyrs - 1] =
-		  (cp->totalsize != UINT_FAST32_MAX) ?
-		  (rho * enc->mainbodysize) : UINT_FAST32_MAX;
-#else
+
 		if (cp->totalsize != UINT_FAST32_MAX) {
 			tile->lyrsizes[tile->numlyrs - 1] = (rho * enc->mainbodysize);
 		} else {
 			tile->lyrsizes[tile->numlyrs - 1] = UINT_FAST32_MAX;
 		}
-#endif
+
 //jas_eprintf("TESTING %ld %ld\n", cp->totalsize != UINT_FAST32_MAX, tile->lyrsizes[0]);
 		for (unsigned lyrno = 0; lyrno < tile->numlyrs; ++lyrno) {
 			if (tile->lyrsizes[lyrno] != UINT_FAST32_MAX) {
