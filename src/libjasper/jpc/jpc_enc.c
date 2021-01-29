@@ -390,6 +390,7 @@ static jpc_enc_cp_t *cp_create(const char *optstr, jas_image_t *image)
 	cp->tilewidth = 0;
 	cp->tileheight = 0;
 	cp->numcmpts = jas_image_numcmpts(image);
+	cp->tcp.ilyrrates = NULL;
 
 	hsteplcm = 1;
 	vsteplcm = 1;
