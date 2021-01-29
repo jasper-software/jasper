@@ -713,8 +713,6 @@ static jas_cmpxform_t *jas_cmpxform_create0()
 	if (!(pxform = jas_malloc(sizeof(jas_cmpxform_t))))
 		return 0;
 	memset(pxform, 0, sizeof(jas_cmpxform_t));
-	pxform->refcnt = 0;
-	pxform->ops = 0;
 	return pxform;
 }
 
