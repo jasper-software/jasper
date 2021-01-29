@@ -316,9 +316,6 @@ static jas_cmprof_t *jas_cmprof_create()
 	if (!(prof = jas_malloc(sizeof(jas_cmprof_t))))
 		return 0;
 	memset(prof, 0, sizeof(jas_cmprof_t));
-	prof->iccprof = 0;
-	for (unsigned i = 0; i < JAS_CMPROF_NUMPXFORMSEQS; ++i)
-		prof->pxformseqs[i] = 0;
 	return prof;
 }
 
