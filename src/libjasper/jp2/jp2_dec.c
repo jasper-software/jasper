@@ -232,7 +232,8 @@ jas_image_t *jp2_decode(jas_stream_t *in, const char *optstr)
 	  the value specified in the code stream? */
 	if (dec->ihdr->data.ihdr.numcmpts != JAS_CAST(jas_uint,
 	  jas_image_numcmpts(dec->image))) {
-		jas_eprintf("warning: number of components mismatch\n");
+		jas_eprintf("error: number of components mismatch (IHDR)\n");
+		goto error;
 	}
 
 	/* At least one component must be present. */
@@ -255,7 +256,8 @@ jas_image_t *jp2_decode(jas_stream_t *in, const char *optstr)
 	  with the data in the code stream? */
 	if ((samedtype && dec->ihdr->data.ihdr.bpc != JP2_DTYPETOBPC(dtype)) ||
 	  (!samedtype && dec->ihdr->data.ihdr.bpc != JP2_IHDR_BPCNULL)) {
-		jas_eprintf("warning: component data type mismatch (IHDR)\n");
+		jas_eprintf("error: component data type mismatch (IHDR)\n");
+		goto error;
 	}
 
 	/* Is the compression type supported? */
@@ -267,9 +269,10 @@ jas_image_t *jp2_decode(jas_stream_t *in, const char *optstr)
 	if (dec->bpcc) {
 		/* Is the number of components indicated in the BPCC box
 		  consistent with the code stream data? */
-		if (dec->bpcc->data.bpcc.numcmpts != JAS_CAST(jas_uint, jas_image_numcmpts(
-		  dec->image))) {
-			jas_eprintf("warning: number of components mismatch\n");
+		if (dec->bpcc->data.bpcc.numcmpts !=
+		  JAS_CAST(jas_uint, jas_image_numcmpts(dec->image))) {
+			jas_eprintf("error: number of components mismatch (BPCC)\n");
+			goto error;
 		}
 		/* Is the component data type information indicated in the BPCC
 		  box consistent with the code stream data? */
@@ -278,7 +281,8 @@ jas_image_t *jp2_decode(jas_stream_t *in, const char *optstr)
 			  ++i) {
 				if (jas_image_cmptdtype(dec->image, i) !=
 				  JP2_BPCTODTYPE(dec->bpcc->data.bpcc.bpcs[i])) {
-					jas_eprintf("warning: component data type mismatch (BPCC)\n");
+					jas_eprintf("error: component data type mismatch (BPCC)\n");
+						goto error;
 				}
 			}
 		} else {
