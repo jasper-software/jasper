@@ -3,6 +3,7 @@
 
 * Fix memory-related bugs in the JPEG-2000 codec resulting from
   attempting to decode invalid code streams. (#264, #265)
+  This fix is associated with CVE-2021-26926.
 * Fix wrong return value under some compilers (#260)
 * Fix CVE-2021-3272 heap buffer overflow in jp2_decode (#259) 
 
