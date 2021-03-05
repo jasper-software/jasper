@@ -1,3 +1,9 @@
+2.0.26 (2021-03-05)
+===================
+
+* Fix JP2 decoder bug that can cause a null pointer dereference for
+  some invalid CDEF boxes. (#268)
+
 2.0.25 (2021-02-07)
 ===================
 
