@@ -430,13 +430,21 @@ jas_image_t *jp2_decode(jas_stream_t *in, const char *optstr)
 	/* Determine the type of each component. */
 	if (dec->cdef) {
 		for (i = 0; i < dec->cdef->data.cdef.numchans; ++i) {
+			uint_fast16_t channo = dec->cdef->data.cdef.ents[i].channo;
 			/* Is the channel number reasonable? */
-			if (dec->cdef->data.cdef.ents[i].channo >= dec->numchans) {
-				jas_eprintf("error: invalid channel number in CDEF box\n");
+			if (channo >= dec->numchans) {
+				jas_eprintf("error: invalid channel number in CDEF box (%d)\n",
+				  channo);
 				goto error;
 			}
-			jas_image_setcmpttype(dec->image,
-			  dec->chantocmptlut[dec->cdef->data.cdef.ents[i].channo],
+			unsigned compno = dec->chantocmptlut[channo];
+			if (compno >= jas_image_numcmpts(dec->image)) {
+				jas_eprintf(
+				  "error: invalid component reference in CDEF box (%d)\n",
+				  compno);
+				goto error;
+			}
+			jas_image_setcmpttype(dec->image, compno,
 			  jp2_getct(jas_image_clrspc(dec->image),
 			  dec->cdef->data.cdef.ents[i].type,
 			  dec->cdef->data.cdef.ents[i].assoc));
