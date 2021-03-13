@@ -180,6 +180,10 @@ jas_image_t *pgx_decode(jas_stream_t *in, const char *optstr)
 		jas_eprintf("image too large\n");
 		goto error;
 	}
+	if (!num_samples) {
+		jas_eprintf("image has no samples\n");
+		goto error;
+	}
 	if (opts.max_samples > 0 && num_samples > opts.max_samples) {
 		jas_eprintf(
 		  "maximum number of samples would be exceeded (%zu > %zu)\n",
