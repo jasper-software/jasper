@@ -451,7 +451,13 @@ jas_image_t *jp2_decode(jas_stream_t *in, const char *optstr)
 		}
 	} else {
 		for (i = 0; i < dec->numchans; ++i) {
-			jas_image_setcmpttype(dec->image, dec->chantocmptlut[i],
+			unsigned compno = dec->chantocmptlut[i];
+			if (compno >= jas_image_numcmpts(dec->image)) {
+				jas_eprintf(
+				  "error: invalid component reference (%d)\n", compno);
+				goto error;
+			}
+			jas_image_setcmpttype(dec->image, compno,
 			  jp2_getct(jas_image_clrspc(dec->image), 0, i + 1));
 		}
 	}
