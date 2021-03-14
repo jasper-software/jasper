@@ -142,3 +142,23 @@
 * Fix various memory leaks
 
 * Plenty of code cleanups, and performance improvements
+
+* Some macros were changed to inline functions.  This has to potential to
+  impact some code that made assumptions about the implementation.  Some
+  potentially impacted macros include:
+      jas_matrix_numrows, jas_matrix_numcols
+      jas_matrix_get
+      jas_seq_get, jas_seq_start, jas_seq_end
+      jpc_ms_gettype
+      jas_matrix_set and jas_seq_set is affected differently; the old macro was
+      an actual expression returning the value, while the new function does not.
+  The following macros have been changed, too, but are likely not
+  affected, since they have been an rvalue-expression anyway:
+      JP2_DTYPETOBPC, JP2_BPCTODTYPE
+      JAS_IMAGE_CDT_{SETSGND,GETSGND,SETPREC,GETPREC}
+      jas_image_cmptdtype
+      macros from here
+      jas_matrix_setv, jas_matrix_getvref
+      jas_matrix_bind{row,col}
+      the jpc_fix_ family
+      the JPC_QCX and JPC_COX families
