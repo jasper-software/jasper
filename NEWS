@@ -1,3 +1,15 @@
+2.0.27 (2021-03-18)
+===================
+
+* Check for an image containing no samples in the PGX
+  decoder. (#271, #272, #273, #274, #275, #276, #281)
+* Check for dimensions of zero in the JPC and JPEG decoders.
+* Fix an arguably incorrect type for an integer literal
+  in the PGX decoder. (#270)
+* Check for an invalid component reference in the
+  JP2 decoder. (#269)
+* Check on integer size in JP2 decoder. (#278)
+
 2.0.26 (2021-03-05)
 ===================
 
