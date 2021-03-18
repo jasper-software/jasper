@@ -362,7 +362,7 @@ static int_fast32_t pgx_getword(jas_stream_t *in, bool bigendian, int prec)
 		j = bigendian ? (wordsize - 1 - i) : i;
 		val = val | ((c & 0xffU) << (8 * j));
 	}
-	val &= (1 << prec) - 1;
+	val &= (JAS_CAST(uint_fast32_t, 1) << prec) - 1;
 	return val;
 
 error:
