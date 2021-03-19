@@ -86,8 +86,7 @@
 static inline uint_fast32_t ones(int n)
 {
 	assert(n >= 0);
-	return (((uint_fast32_t) 1) << n) - 1;
-	//return ((1 << (n)) - 1);
+	return (JAS_CAST(uint_fast32_t, 1) << n) - 1;
 }
 
 static const jp2_boxinfo_t *jp2_boxinfolookup(int type);
@@ -931,7 +930,8 @@ static int jp2_getint(jas_stream_t *in, int s, int n, int_fast32_t *val)
 
 	m = (n + 7) / 8;
 
-	if (n < 0 || n > JAS_CAST(int, 8 * sizeof(int_fast32_t))) {
+	// Ensure that the integer to be read has a valid size.
+	if (n < 0 || n > 32) {
 		jas_eprintf("jp2_getint: invalid integer size (%d bits)\n", n);
 		return -1;
 	}
