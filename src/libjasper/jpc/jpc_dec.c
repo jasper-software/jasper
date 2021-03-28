@@ -2007,7 +2007,15 @@ static void jpc_dequantize(jas_matrix_t *x, jpc_fix_t absstepsize)
 	// a reconstruction parameter defined in E 1.1.2 of the ISO/IEC 15444-1
 	jpc_fix_t recparam = JPC_FIX_HALF;
 
-	assert(absstepsize >= 0);
+	// Note:
+	// Should anything special be done to handle the error case of
+	// absstepsize < 0 (which can arise due to numerical overflow).
+	// Using an assert is not appropriate, since this results in program
+	// termination when this type of error occurs.
+	// Simply allowing a decoded image with very high distortion would appear
+	// to be consistent with the policy adopted elsewhere in the codec.
+	// assert(absstepsize >= 0);
+
 	if (absstepsize == jpc_inttofix(1)) {
 		return;
 	}
