@@ -67,29 +67,30 @@ if [ -e "$tmp_dir" ]; then
 	rm -rf "$tmp_dir" || panic "cannot remove directory $tmp_dir"
 fi
 
-opts=()
-opts+=(-B"$build_dir")
-opts+=(-H"$source_dir")
+configure_opts=()
+configure_opts+=(-B"$build_dir")
+configure_opts+=(-H"$source_dir")
 #if [ -n "$sde_top_dir" ]; then
-#	opts+=("-DCMAKE_C_COMPILER=$sde_gcc")
+#	configure_opts+=("-DCMAKE_C_COMPILER=$sde_gcc")
 #fi
-opts+=("-DCMAKE_INSTALL_PREFIX=$install_dir")
-opts+=("-DJAS_ENABLE_STRICT=true")
+configure_opts+=("-DCMAKE_INSTALL_PREFIX=$install_dir")
+configure_opts+=("-DJAS_ENABLE_STRICT=true")
 if [ "$enable_debug" -ne 0 ]; then
-	opts+=("-DCMAKE_BUILD_TYPE=Debug")
-	opts+=("-DJAS_ENABLE_SHARED=false")
+	configure_opts+=("-DCMAKE_BUILD_TYPE=Debug")
+	configure_opts+=("-DJAS_ENABLE_SHARED=false")
 else
-	opts+=("-DCMAKE_BUILD_TYPE=Release")
+	configure_opts+=("-DCMAKE_BUILD_TYPE=Release")
 fi
 if [ "$enable_asan" -ne 0 ]; then
-	opts+=("-DJAS_ENABLE_ASAN=true")
+	configure_opts+=("-DJAS_ENABLE_ASAN=true")
 fi
 if [ "$enable_usan" -ne 0 ]; then
-	opts+=("-DJAS_ENABLE_USAN=true")
+	configure_opts+=("-DJAS_ENABLE_USAN=true")
 fi
-opts+=("$@")
-echo "Running cmake ${opts[@]}"
-cmake "${opts[@]}" || panic "cmake failed"
+configure_opts+=("-DJAS_ENABLE_DANGEROUS_INTERNAL_TESTING_MODE=true")
+configure_opts+=("$@")
+echo "Running cmake ${configure_opts[@]}"
+cmake "${configure_opts[@]}" || panic "cmake failed"
 
 make_opts=()
 if [ "$verbose" -ne 0 ]; then
