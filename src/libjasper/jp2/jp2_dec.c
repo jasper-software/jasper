@@ -368,6 +368,12 @@ jas_image_t *jp2_decode(jas_stream_t *in, const char *optstr)
 			dec->chantocmptlut[i] = i;
 		}
 	} else {
+		/* Check to ensure that CMAP/PCLR/CDEF were initialized. */
+		if (!dec->cmap || !dec->pclr || !dec->cdef) {
+			jas_eprintf("missing CMAP/PCLR/CDEF box\n");
+			goto error;
+		}
+
 		cmapd = &dec->cmap->data.cmap;
 		pclrd = &dec->pclr->data.pclr;
 		cdefd = &dec->cdef->data.cdef;
@@ -379,17 +385,21 @@ jas_image_t *jp2_decode(jas_stream_t *in, const char *optstr)
 				if (!pclrd->numlutents) {
 					goto error;
 				}
-				lutents = jas_alloc2(pclrd->numlutents, sizeof(int_fast32_t));
-				if (!lutents) {
+				if (!(lutents = jas_alloc2(pclrd->numlutents,
+				  sizeof(int_fast32_t)))) {
 					goto error;
 				}
 				for (i = 0; i < pclrd->numlutents; ++i) {
 					lutents[i] = pclrd->lutdata[cmapent->pcol + i * pclrd->numchans];
 				}
 				newcmptno = jas_image_numcmpts(dec->image);
-				jas_image_depalettize(dec->image, cmapent->cmptno,
+				if (jas_image_depalettize(dec->image, cmapent->cmptno,
 				  pclrd->numlutents, lutents,
-				  JP2_BPCTODTYPE(pclrd->bpc[cmapent->pcol]), newcmptno);
+				  JP2_BPCTODTYPE(pclrd->bpc[cmapent->pcol]), newcmptno)) {
+					jas_eprintf("jas_image_depalettize failed\n");
+					jas_free(lutents);
+					goto error;
+				}
 				dec->chantocmptlut[channo] = newcmptno;
 				jas_free(lutents);
 #if 0
@@ -487,6 +497,9 @@ jas_eprintf("no of components is %d\n", jas_image_numcmpts(dec->image));
 	return image;
 
 error:
+	if (image) {
+		jas_image_destroy(image);
+	}
 	if (box) {
 		jp2_box_destroy(box);
 	}
