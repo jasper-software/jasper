@@ -98,19 +98,16 @@ if [ "$verbose" -ne 0 ]; then
 	build_opts+=(--verbose)
 	install_opts+=(--verbose)
 fi
-cmake --build "$build_dir" --clean-first --target "$target" \
+cmake --build "$build_dir" --clean-first \
   "${build_opts[@]}" || \
-  panic "make $target failed"
+  panic "cmake build failed"
 
 cmake --build "$build_dir" --target install \
   "${install_opts[@]}" || \
-  panic "make $target failed"
+  panic "cmake install failed"
 
 test_opts=()
-if [ "$verbose" -ne 0 ]; then
-	test_opts+=("ARGS=-V")
-fi
+test_opts+=(--output-on-failure)
 if [ "$do_make_test" -ne 0 ]; then
-	(cd "$build_dir" && make test "${test_opts[@]}") || \
-	  panic "make test failed"
+	(cd "$build_dir" && ctest "${test_opts[@]}") || panic "ctest failed"
 fi
