@@ -107,7 +107,10 @@ jas_image_t *jp2_decode(jas_stream_t *in, const char *optstr)
 	unsigned int i;
 	jp2_cmap_t *cmapd;
 	jp2_pclr_t *pclrd;
+#if 0
+	/* The following code appears to no longer be needed. */
 	jp2_cdef_t *cdefd;
+#endif
 	unsigned int channo;
 	int newcmptno;
 	int_fast32_t *lutents;
@@ -368,15 +371,18 @@ jas_image_t *jp2_decode(jas_stream_t *in, const char *optstr)
 			dec->chantocmptlut[i] = i;
 		}
 	} else {
-		/* Check to ensure that CMAP/PCLR/CDEF were initialized. */
-		if (!dec->cmap || !dec->pclr || !dec->cdef) {
-			jas_eprintf("missing CMAP/PCLR/CDEF box\n");
+		/* Check to ensure that CMAP/PCLR were initialized. */
+		if (!dec->cmap || !dec->pclr) {
+			jas_eprintf("missing CMAP/PCLR box\n");
 			goto error;
 		}
 
 		cmapd = &dec->cmap->data.cmap;
 		pclrd = &dec->pclr->data.pclr;
+#if 0
+		/* The following code appears to no longer be needed. */
 		cdefd = &dec->cdef->data.cdef;
+#endif
 		for (channo = 0; channo < cmapd->numchans; ++channo) {
 			cmapent = &cmapd->ents[channo];
 			if (cmapent->map == JP2_CMAP_DIRECT) {
@@ -403,6 +409,7 @@ jas_image_t *jp2_decode(jas_stream_t *in, const char *optstr)
 				dec->chantocmptlut[channo] = newcmptno;
 				jas_free(lutents);
 #if 0
+				/* The following code appears to no longer be needed. */
 				if (dec->cdef) {
 					cdefent = jp2_cdef_lookup(cdefd, channo);
 					if (!cdefent) {
@@ -412,9 +419,6 @@ jas_image_t *jp2_decode(jas_stream_t *in, const char *optstr)
 				} else {
 				jas_image_setcmpttype(dec->image, newcmptno, jp2_getct(jas_image_clrspc(dec->image), 0, channo + 1));
 				}
-#else
-				/* suppress -Wunused-but-set-variable */
-				(void)cdefd;
 #endif
 			} else {
 				jas_eprintf("error: invalid MTYP in CMAP box\n");
@@ -423,6 +427,8 @@ jas_image_t *jp2_decode(jas_stream_t *in, const char *optstr)
 		}
 	}
 
+#if 0
+	/* The following code appears to no longer be needed. */
 	/* Ensure that the number of channels being used by the decoder
 	  matches the number of image components. */
 	if (dec->numchans != jas_image_numcmpts(dec->image)) {
@@ -430,6 +436,7 @@ jas_image_t *jp2_decode(jas_stream_t *in, const char *optstr)
 		  dec->numchans, jas_image_numcmpts(dec->image));
 		goto error;
 	}
+#endif
 
 	/* Mark all components as being of unknown type. */
 
@@ -484,9 +491,6 @@ jas_image_t *jp2_decode(jas_stream_t *in, const char *optstr)
 		jas_eprintf("error: no components\n");
 		goto error;
 	}
-#if 0
-jas_eprintf("no of components is %d\n", jas_image_numcmpts(dec->image));
-#endif
 
 	/* Prevent the image from being destroyed later. */
 	image = dec->image;
