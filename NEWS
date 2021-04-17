@@ -1,3 +1,9 @@
+2.0.29 (2021-04-16)
+===================
+
+* Loosen some overly tight restrictions on JP2 codestreams, which caused
+  some valid codestreams to be rejected. (#289)
+
 2.0.28 (2021-03-29)
 ===================
 
