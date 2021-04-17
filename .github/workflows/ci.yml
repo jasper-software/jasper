@@ -1,0 +1,11 @@
+name: ci
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: testing
+      run: build/my_build -A -U -d -t
