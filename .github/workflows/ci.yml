@@ -7,9 +7,12 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
+        compiler: [gcc, clang]
       fail-fast: false
     runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v2
     - name: testing
+      env:
+        CC: ${{ matrix.compiler }}
       run: build/my_build -A -U -d -t
