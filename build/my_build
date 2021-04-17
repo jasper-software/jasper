@@ -92,26 +92,25 @@ configure_opts+=("$@")
 echo "Running cmake ${configure_opts[@]}"
 cmake "${configure_opts[@]}" || panic "cmake failed"
 
-make_opts=()
+build_opts=()
+install_opts=()
 if [ "$verbose" -ne 0 ]; then
-	make_opts+=("VERBOSE=1")
+	build_opts+=(--verbose)
+	install_opts+=(--verbose)
 fi
-targets=()
-targets+=(clean)
-targets+=(all)
-if [ "$do_install" -ne 0 ]; then
-	targets+=(install)
-fi
-for target in "${targets[@]}"; do
-	(cd "$build_dir" && make "$target" "${make_opts[@]}") || \
-	  panic "make $target failed"
-done
+cmake --build "$build_dir" --clean-first --target "$target" \
+  "${build_opts[@]}" || \
+  panic "make $target failed"
 
-make_opts=()
+cmake --build "$build_dir" --target install \
+  "${install_opts[@]}" || \
+  panic "make $target failed"
+
+test_opts=()
 if [ "$verbose" -ne 0 ]; then
-	make_opts+=("ARGS=-V")
+	test_opts+=("ARGS=-V")
 fi
 if [ "$do_make_test" -ne 0 ]; then
-	(cd "$build_dir" && make test "${make_opts[@]}") || \
+	(cd "$build_dir" && make test "${test_opts[@]}") || \
 	  panic "make test failed"
 fi
