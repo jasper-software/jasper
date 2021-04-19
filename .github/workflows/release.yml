@@ -11,9 +11,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+      - name: Prepare
+        run: build/make_release -r ${{github.ref}} -w ${{github.workspace}} -t ${{runner.temp}}/tmp -o ${{runner.temp}}/out
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          body_path: NEWS
+          files: |
+            ${{runner.temp}}/out/jasper.tar.gz
+          body_path: ${{runner.temp}}/out/release_notes.txt
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}

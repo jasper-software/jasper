@@ -1,0 +1,151 @@
+#! /usr/bin/env bash
+
+cmd_dir="$(dirname "$0")" || panic
+
+panic()
+{
+	echo "ERROR: $@"
+	exit 1
+}
+
+warn()
+{
+	echo "WARNING: $@"
+}
+
+usage()
+{
+	echo "bad usage: $@"
+	exit 2
+}
+
+tmp_dir=
+workspace_dir=
+out_dir=
+github_ref=
+
+while getopts t:w:o:r: opt; do
+	case "$opt" in
+	w)
+		workspace_dir="$OPTARG";;
+	t)
+		tmp_dir="$OPTARG";;
+	o)
+		out_dir="$OPTARG";;
+	r)
+		github_ref="$OPTARG";;
+	\?)
+		usage "invalid option $opt"
+		break;;
+	esac
+done
+shift $((OPTIND - 1))
+
+
+if [ -z "$github_ref" ]; then
+	usage "no GitHub ref specified"
+fi
+if [ -z "$out_dir" ]; then
+	usage "no output directory specified"
+fi
+if [ -z "$workspace_dir" ]; then
+	usage "no workspace directory specified"
+fi
+if [ -z "$tmp_dir" ]; then
+	usage "no temporary directory specified"
+fi
+
+# Ensure an absolute pathname.
+workspace_dir="$(readlink -f "$workspace_dir")" || \
+  panic "cannot get absolute pathname"
+
+if [ ! -d "$workspace_dir" ]; then
+	panic "no such directory $workspace_dir"
+fi
+
+echo "temporary directory: $tmp_dir"
+echo "workspace directory: $workspace_dir"
+echo "GitHub ref: $github_ref"
+
+commit="$(git -C "$workspace_dir" rev-parse HEAD)" || \
+  panic "cannot get commit"
+#tag="$(git -C "$workspace_dir" describe "$commit")" || \
+#  panic "cannot get tag"
+tag="$(awk -v FS="/" '{print $3;}' <<< "$github_ref")" || \
+  panic "cannot get tag"
+version="$(awk -v FS="-" '{print $2;}' <<< "$tag")" || \
+  panic "cannot get version"
+name="jasper-$version"
+
+source_dir="$tmp_dir/$name"
+build_dir="$tmp_dir/build"
+install_dir="$tmp_dir/install"
+news_file="$workspace_dir/NEWS"
+changelog_file="$source_dir/ChangeLog"
+release_notes_file="$out_dir/release_notes.txt"
+archive_file="$out_dir/jasper.tar.gz"
+
+echo "name: $name"
+echo "commit: $commit"
+echo "tag: $tag"
+echo "version: $version"
+
+for dir in "$tmp_dir" "$out_dir" "$build_dir" "$source_dir" "$install_dir"; do
+	if [ ! -d "$dir" ]; then
+		mkdir -p "$dir" || panic "cannot make directory $dir"
+	fi
+done
+
+cp -a "$workspace_dir/." "$source_dir" || \
+  panic "cannot copy"
+#(cd "$workspace_dir" && tar -cf - . ) | (cd "$source_dir" && tar -xf -) || \
+#  panic "cannot copy"
+rm -rf "$source_dir/.git" || \
+  panic "cannot remove .git directory"
+
+git -C "$workspace_dir" log --stat -M -C --name-status --no-color | \
+  fmt --split-only > "$changelog_file" || \
+  panic "cannot generate changelog"
+
+"$cmd_dir"/extract_release_notes < "$news_file" > "$release_notes_file" || \
+  panic
+
+cmake \
+  -G "Unix Makefiles" \
+  -DCMAKE_INSTALL_PREFIX="$install_dir" \
+  -DJAS_ENABLE_DOC=false \
+  -DJAS_ENABLE_OPENGL=false \
+  -H"$source_dir" -B"$build_dir" || \
+  panic "cmake failed"
+
+cmake --build "$build_dir" --clean-first || \
+  panic "make clean/all failed"
+
+#mv "$build_dir/doc/html" "$source_dir/doc/html" || \
+#  panic "cannot move html"
+
+#mv "$build_dir/doc/latex/refman.pdf" "$source_dir/doc/manual.pdf" || \
+#  panic "cannot move manual.pdf"
+
+remove_list=()
+remove_list+=(appveyor.yml)
+remove_list+=(.github)
+remove_list+=(.travis.yml)
+remove_list+=(.gitignore)
+remove_list+=(.gitattributes)
+remove_list+=(build/my_build)
+remove_list+=(build/appveyor)
+remove_list+=(build/travis)
+remove_list+=(build/make_dist)
+remove_list+=(data/test/bad/1_crash.jpg)
+for file in "${remove_list[@]}"; do
+	if [ ! -e "$source_dir/$file" ]; then
+		warn "missing file/directory $file"
+	fi
+	rm -rf "$source_dir/$file" || \
+	  panic "cannot remove file/directory $file"
+done
+
+tar -C "$tmp_dir" -czf - "$name" > "$archive_file" || \
+  panic "cannot make archive"
+
