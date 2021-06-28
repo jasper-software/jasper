@@ -73,6 +73,7 @@
 
 #include "ras_cod.h"
 
+#include "jasper/jas_conf.h"
 #include "jasper/jas_stream.h"
 #include "jasper/jas_image.h"
 #include "jasper/jas_debug.h"
@@ -124,7 +125,7 @@ static int ras_dec_parseopts(const char *optstr, ras_dec_importopts_t *opts)
 {
 	jas_tvparser_t *tvp;
 
-	opts->max_samples = JAS_DEC_DEFAULT_MAX_SAMPLES;
+	opts->max_samples = jas_get_conf_ptr()->dec_default_max_samples;
 	opts->allow_trunc = 0;
 
 	if (!(tvp = jas_tvparser_create(optstr ? optstr : ""))) {

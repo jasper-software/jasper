@@ -71,6 +71,7 @@
 * Includes.
 \******************************************************************************/
 
+#include "jasper/jas_conf.h"
 #include "jasper/jas_image.h"
 #include "jasper/jas_types.h"
 #include "jasper/jas_stream.h"
@@ -121,7 +122,7 @@ static int bmp_dec_parseopts(const char *optstr, bmp_dec_importopts_t *opts)
 {
 	jas_tvparser_t *tvp;
 
-	opts->max_samples = JAS_DEC_DEFAULT_MAX_SAMPLES;
+	opts->max_samples = jas_get_conf_ptr()->dec_default_max_samples;
 
 	if (!(tvp = jas_tvparser_create(optstr ? optstr : ""))) {
 		return -1;

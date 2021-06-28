@@ -3,6 +3,9 @@
 @defgroup init Initialization and Clean Up
 @brief Initialization and Clean Up
 
+@defgroup malloc Memory Allocation
+@brief Memory Allocation
+
 @defgroup iostreams I/O Streams
 @brief I/O streams
 

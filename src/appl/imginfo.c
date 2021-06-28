@@ -142,13 +142,11 @@ int main(int argc, char **argv)
 	bool max_samples_valid;
 	char optstr[32];
 	char dec_opt_spec[256];
-
-	if (jas_init()) {
-		abort();
-	}
+	int verbose;
 
 	cmdname = argv[0];
 
+	verbose = 0;
 	max_samples = 0;
 	max_samples_valid = false;
 	infile = 0;
@@ -162,7 +160,7 @@ int main(int argc, char **argv)
 	while ((id = jas_getopt(argc, argv, opts)) >= 0) {
 		switch (id) {
 		case OPT_VERBOSE:
-			/* not used - can we remove this option? */
+			++verbose;
 			break;
 		case OPT_VERSION:
 			printf("%s\n", JAS_VERSION);
@@ -195,6 +193,32 @@ int main(int argc, char **argv)
 		default:
 			usage();
 			break;
+		}
+	}
+
+	{
+		int status;
+#if defined(JAS_USE_DEFAULT_ALLOCATOR)
+		status = jas_init();
+		if (verbose >= 1) {
+			fprintf(stderr, "using default allocator\n");
+		}
+#else
+		jas_allocator_t allocator = {
+			.alloc = jas_bma_alloc,
+			.free = jas_bma_free,
+			.realloc = jas_bma_realloc
+		};
+		jas_conf_t conf;
+		conf.dec_default_max_samples = JAS_DEC_DEFAULT_MAX_SAMPLES;
+		status = jas_init_custom(&allocator, &conf);
+		if (verbose >= 1) {
+			fprintf(stderr, "using explicitly-specified allocator\n");
+		}
+#endif
+		if (status) {
+			fprintf(stderr, "cannot initialize JasPer library\n");
+			exit(EXIT_FAILURE);
 		}
 	}
 

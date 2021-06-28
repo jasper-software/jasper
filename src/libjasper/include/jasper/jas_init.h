@@ -69,6 +69,8 @@
 
 /* The configuration header file should be included first. */
 #include <jasper/jas_config.h>
+#include <jasper/jas_conf.h>
+#include <jasper/jas_malloc.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -96,6 +98,26 @@ If successful, zero is returned; otherwise, a nonzero value is returned.
 */
 JAS_DLLEXPORT
 int jas_init(void);
+
+/*!
+@brief Initialize the JasPer library with a custom memory allocator.
+
+@details
+This function initializes the JasPer library, specifying that a custom
+memory allocator should be used by the library.
+
+@param allocator
+The memory allocator to be used by the library.
+
+@param conf
+Some configuration settings for the library.
+
+@returns
+If successful, zero is returned; otherwise, a nonzero value is returned.
+*/
+JAS_DLLEXPORT
+int jas_init_custom(const jas_allocator_t *allocator,
+  const jas_conf_t *conf);
 
 /*!
 @brief Perform any clean up for the JasPer library.

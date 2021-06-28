@@ -1,3 +1,10 @@
+?.?.?? (????-??-??)
+===================
+
+* Add support for use of custom memory allocator and allow setting of
+  some library configuration parameters at run time.
+  See jas_init_custom.
+
 2.0.32 (2021-04-18)
 ===================
 

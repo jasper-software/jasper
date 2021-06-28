@@ -78,6 +78,7 @@
 #include "jpc_t1dec.h"
 #include "jpc_math.h"
 
+#include "jasper/jas_conf.h"
 #include "jasper/jas_types.h"
 #include "jasper/jas_math.h"
 #include "jasper/jas_tvp.h"
@@ -327,7 +328,7 @@ static jpc_dec_importopts_t *jpc_dec_opts_create(const char *optstr)
 	opts->debug = 0;
 	opts->maxlyrs = JPC_MAXLYRS;
 	opts->maxpkts = -1;
-	opts->max_samples = JAS_DEC_DEFAULT_MAX_SAMPLES;
+	opts->max_samples = jas_get_conf_ptr()->dec_default_max_samples;
 
 	if (!(tvp = jas_tvparser_create(optstr ? optstr : ""))) {
 		goto error;

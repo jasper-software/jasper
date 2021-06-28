@@ -227,8 +227,24 @@ int main(int argc, char **argv)
 	}
 
 	/* Initialize the JasPer library. */
-	if (jas_init()) {
-		abort();
+	{
+		int status;
+#if defined(JAS_USE_DEFAULT_ALLOCATOR)
+		status = jas_init();
+#else
+		jas_allocator_t allocator = {
+			.alloc = jas_bma_alloc,
+			.free = jas_bma_free,
+			.realloc = jas_bma_realloc
+		};
+		jas_conf_t conf;
+		conf.dec_default_max_samples = JAS_DEC_DEFAULT_MAX_SAMPLES;
+		status = jas_init_custom(&allocator, &conf);
+#endif
+		if (status) {
+			fprintf(stderr, "cannot initialize JasPer library\n");
+			exit(EXIT_FAILURE);
+		}
 	}
 
 	glutInit(&argc, argv);

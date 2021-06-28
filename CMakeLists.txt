@@ -103,6 +103,20 @@ option(JAS_INCLUDE_JPG_CODEC "Include JPG codec support" true)
 option(JAS_INCLUDE_PGX_CODEC "Include PGX codec support" true)
 option(JAS_INCLUDE_MIF_CODEC "Include MIF codec support" true)
 
+option(JAS_USE_DEFAULT_ALLOCATOR
+  "Enable default allocator (used only for testing)"
+  false)
+
+if (JAS_USE_DEFAULT_ALLOCATOR)
+	add_definitions(-DJAS_USE_DEFAULT_ALLOCATOR)
+endif()
+
+set(JAS_ENABLE_DEFAULT_MAX_MEM_USAGE
+  "1073741824"
+  CACHE STRING
+  "Set memory usage limit in bytes"
+)
+
 # WARNING: THE FOLLOWING OPTION SHOULD ONLY BE ENABLED BY THE JASPER SOFTWARE
 # DEVELOPMENT TEAM.  IT IS NECESSARY FOR INTERNAL TESTING PURPOSES AND POSES
 # SIGNIFICANT SECURITY RISKS IF ENABLED.

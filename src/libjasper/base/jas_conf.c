@@ -1,4 +1,6 @@
 /*
+ * Copyright (c) 1999-2000 Image Power, Inc. and the University of
+ *   British Columbia.
  * Copyright (c) 2001-2002 Michael David Adams.
  * All rights reserved.
  */
@@ -59,126 +61,47 @@
  * __END_OF_JASPER_LICENSE__
  */
 
+/*
+ * Configuration
+ */
+
 /******************************************************************************\
 * Includes.
 \******************************************************************************/
 
 #include "jasper/jas_conf.h"
-#include "jasper/jas_init.h"
-#include "jasper/jas_image.h"
-#include "jasper/jas_malloc.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 
+/* We need the prototype for memset. */
+#include <string.h>
+
 /******************************************************************************\
-* Code.
 \******************************************************************************/
 
-static void jas_init_codecs(void);
+/*
+Various user-configurable settings.
+*/
+jas_conf_t jas_conf;
 
-JAS_DLLEXPORT
-int jas_init()
+JAS_DLLEXPORT void jas_set_conf(const jas_conf_t* conf)
 {
-	return jas_init_custom(0, 0);
+	if (!conf) {
+		jas_conf_t tmp_conf;
+		tmp_conf.dec_default_max_samples = JAS_DEC_DEFAULT_MAX_SAMPLES;
+	} else {
+		jas_conf = *conf;
+	}
 }
 
-JAS_DLLEXPORT
-int jas_init_custom(const jas_allocator_t* allocator, const jas_conf_t* conf)
+JAS_DLLEXPORT void jas_get_conf(jas_conf_t* conf)
 {
-	jas_set_allocator(allocator);
-	jas_set_conf(conf);
-	jas_init_codecs();
-
-	/* We must not register the JasPer library exit handler until after
-	at least one memory allocation is performed.  This is desirable
-	as it ensures that the JasPer exit handler is called before the
-	debug memory allocator exit handler. */
-	atexit(jas_cleanup);
-
-	return 0;
+	*conf = jas_conf;
 }
 
-/* Initialize the image format table. */
-static void jas_init_codecs()
+/* For internal library use only. */
+jas_conf_t *jas_get_conf_ptr()
 {
-	jas_image_fmtops_t fmtops;
-	int fmtid;
-
-	fmtid = 0;
-
-#if defined(JAS_INCLUDE_MIF_CODEC) && defined(JAS_ENABLE_MIF_CODEC)
-	fmtops.decode = mif_decode;
-	fmtops.encode = mif_encode;
-	fmtops.validate = mif_validate;
-	jas_image_addfmt(fmtid, "mif", "mif", "My Image Format (MIF)", &fmtops);
-	++fmtid;
-#endif
-
-#if defined(JAS_INCLUDE_PNM_CODEC)
-	fmtops.decode = pnm_decode;
-	fmtops.encode = pnm_encode;
-	fmtops.validate = pnm_validate;
-	jas_image_addfmt(fmtid, "pnm", "pnm", "Portable Graymap/Pixmap (PNM)",
-	  &fmtops);
-	jas_image_addfmt(fmtid, "pnm", "pgm", "Portable Graymap/Pixmap (PNM)",
-	  &fmtops);
-	jas_image_addfmt(fmtid, "pnm", "ppm", "Portable Graymap/Pixmap (PNM)",
-	  &fmtops);
-	++fmtid;
-#endif
-
-#if defined(JAS_INCLUDE_BMP_CODEC)
-	fmtops.decode = bmp_decode;
-	fmtops.encode = bmp_encode;
-	fmtops.validate = bmp_validate;
-	jas_image_addfmt(fmtid, "bmp", "bmp", "Microsoft Bitmap (BMP)", &fmtops);
-	++fmtid;
-#endif
-
-#if defined(JAS_INCLUDE_RAS_CODEC)
-	fmtops.decode = ras_decode;
-	fmtops.encode = ras_encode;
-	fmtops.validate = ras_validate;
-	jas_image_addfmt(fmtid, "ras", "ras", "Sun Rasterfile (RAS)", &fmtops);
-	++fmtid;
-#endif
-
-#if defined(JAS_INCLUDE_JP2_CODEC)
-	fmtops.decode = jp2_decode;
-	fmtops.encode = jp2_encode;
-	fmtops.validate = jp2_validate;
-	jas_image_addfmt(fmtid, "jp2", "jp2",
-	  "JPEG-2000 JP2 File Format Syntax (ISO/IEC 15444-1)", &fmtops);
-	++fmtid;
-#endif
-#if defined(JAS_INCLUDE_JPC_CODEC) || defined(JAS_INCLUDE_JP2_CODEC)
-	fmtops.decode = jpc_decode;
-	fmtops.encode = jpc_encode;
-	fmtops.validate = jpc_validate;
-	jas_image_addfmt(fmtid, "jpc", "jpc",
-	  "JPEG-2000 Code Stream Syntax (ISO/IEC 15444-1)", &fmtops);
-	++fmtid;
-#endif
-
-#if defined(JAS_INCLUDE_JPG_CODEC)
-	fmtops.decode = jpg_decode;
-	fmtops.encode = jpg_encode;
-	fmtops.validate = jpg_validate;
-	jas_image_addfmt(fmtid, "jpg", "jpg", "JPEG (ISO/IEC 10918-1)", &fmtops);
-	++fmtid;
-#endif
-
-#if defined(JAS_INCLUDE_PGX_CODEC)
-	fmtops.decode = pgx_decode;
-	fmtops.encode = pgx_encode;
-	fmtops.validate = pgx_validate;
-	jas_image_addfmt(fmtid, "pgx", "pgx", "JPEG-2000 VM Format (PGX)", &fmtops);
-	++fmtid;
-#endif
-}
-
-JAS_DLLEXPORT
-void jas_cleanup()
-{
-	jas_image_clearfmts();
+	return &jas_conf;
 }

@@ -83,39 +83,135 @@
 extern "C" {
 #endif
 
+/*!
+ * @addtogroup malloc
+ * @{
+ */
+
+/*!
+@brief A memory allocator.
+*/
+typedef struct {
+
+	/*!
+	Function to allocate memory.
+	This function should have behavior similar to malloc.
+	*/
+	void *(*alloc)(size_t);
+
+	/*!
+	Function to deallocate memory.
+	This function should have behavior similar to free.
+	*/
+	void (*free)(void*);
+
+	/*!
+	Function to reallocate memory.
+	This function should have behavior similar to realloc.
+	*/
+	void *(*realloc)(void*, size_t);
+
+	/*! For future use. */
+	void (*(reserved[5]))();
+
+} jas_allocator_t;
+
 /******************************************************************************\
 * Functions.
 \******************************************************************************/
 
-/* Allocate memory. */
-JAS_DLLEXPORT void *jas_malloc(size_t size);
+/*
+This function is for internal library use only.
+It should never be called directly by a library user.
+*/
+void jas_set_allocator(const jas_allocator_t* allocator);
 
-/* Free memory. */
-JAS_DLLEXPORT void jas_free(void *ptr);
+/*!
+@brief
+Get the memory allocator being used by the library.
 
-/* Resize a block of allocated memory. */
-JAS_DLLEXPORT void *jas_realloc(void *ptr, size_t size);
+@param allocator
+a pointer to a buffer to hold the allocator information
+*/
+JAS_DLLEXPORT
+void jas_get_allocator(jas_allocator_t* allocator);
 
-/* Allocate a block of memory and initialize the contents to zero. */
-JAS_DLLEXPORT void *jas_calloc(size_t num_elements, size_t element_size);
+/*!
+@brief
+Allocate memory.
+*/
+JAS_DLLEXPORT
+void *jas_malloc(size_t size);
 
-/* Allocate array (with overflow checking) . */
+/*!
+@brief
+Free memory.
+*/
+JAS_DLLEXPORT
+void jas_free(void *ptr);
+
+/*!
+@brief
+Resize a block of allocated memory.
+*/
+JAS_DLLEXPORT
+void *jas_realloc(void *ptr, size_t size);
+
+/*!
+@brief
+Allocate a block of memory and initialize the contents to zero.
+*/
+JAS_DLLEXPORT
+void *jas_calloc(size_t num_elements, size_t element_size);
+
+/*!
+@brief
+Allocate array (with overflow checking).
+*/
 JAS_DLLEXPORT void *jas_alloc2(size_t num_elements, size_t element_size);
 
-/* Allocate array of arrays (with overflow checking) . */
+/*!
+@brief
+Allocate array of arrays (with overflow checking).
+*/
 JAS_DLLEXPORT void *jas_alloc3(size_t num_arrays, size_t array_size, size_t element_size);
 
-/* Resize a block of allocated memory (with overflow checking) . */
+/*!
+@brief
+Resize a block of allocated memory (with overflow checking).
+*/
 JAS_DLLEXPORT void *jas_realloc2(void *ptr, size_t num_elements, size_t element_size);
-
-#if defined(JAS_DEFAULT_MAX_MEM_USAGE)
 
 JAS_DLLEXPORT void jas_set_max_mem_usage(size_t max_mem);
 
 JAS_ATTRIBUTE_PURE
-JAS_DLLEXPORT size_t jas_get_mem_usage();
+JAS_DLLEXPORT
+size_t jas_get_mem_usage(void);
 
-#endif
+/*
+Basic memory allocator (BMA).
+Allocate memory.
+*/
+JAS_DLLEXPORT
+void *jas_bma_alloc(size_t size);
+
+/*
+Basic memory allocator (BMA).
+Deallocate memory.
+*/
+JAS_DLLEXPORT
+void jas_bma_free(void *ptr);
+
+/*
+Basic memory allocator (BMA).
+Reallocate memory.
+*/
+JAS_DLLEXPORT
+void *jas_bma_realloc(void *ptr, size_t size);
+
+/*!
+ * @}
+ */
 
 #ifdef __cplusplus
 }
