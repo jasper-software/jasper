@@ -87,7 +87,9 @@
 
 /* The memory allocator object to be used for all memory allocation. */
 static jas_allocator_t jas_allocator = {
-	0, 0, 0
+	.alloc = 0,
+	.free = 0,
+	.realloc = 0
 };
 
 static jas_allocator_t jas_bma_allocator = {
@@ -282,7 +284,6 @@ JAS_DLLEXPORT
 void jas_bma_free(void *ptr)
 {
 	jas_mb_t *mb;
-	size_t mem;
 	size_t size;
 	JAS_DBGLOG(100, ("jas_bma_free(%p)\n", ptr));
 	if (ptr) {

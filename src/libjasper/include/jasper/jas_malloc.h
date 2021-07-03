@@ -112,7 +112,7 @@ typedef struct {
 	void *(*realloc)(void*, size_t);
 
 	/*! For future use. */
-	void (*(reserved[5]))();
+	void (*(reserved[5]))(void);
 
 } jas_allocator_t;
 

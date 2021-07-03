@@ -88,8 +88,7 @@ jas_conf_t jas_conf;
 JAS_DLLEXPORT void jas_set_conf(const jas_conf_t* conf)
 {
 	if (!conf) {
-		jas_conf_t tmp_conf;
-		tmp_conf.dec_default_max_samples = JAS_DEC_DEFAULT_MAX_SAMPLES;
+		jas_conf.dec_default_max_samples = JAS_DEC_DEFAULT_MAX_SAMPLES;
 	} else {
 		jas_conf = *conf;
 	}
