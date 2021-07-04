@@ -63,12 +63,16 @@
 * Includes.
 \******************************************************************************/
 
+#define JAS_INTERNAL_USE_ONLY
+
 #include "jasper/jas_conf.h"
 #include "jasper/jas_init.h"
 #include "jasper/jas_image.h"
 #include "jasper/jas_malloc.h"
+#include "jasper/jas_debug.h"
 
 #include <stdlib.h>
+#include <stdbool.h>
 
 /******************************************************************************\
 * Code.
@@ -89,11 +93,19 @@ int jas_init_custom(const jas_allocator_t* allocator, const jas_conf_t* conf)
 	jas_set_conf(conf);
 	jas_init_codecs();
 
-	/* We must not register the JasPer library exit handler until after
-	at least one memory allocation is performed.  This is desirable
-	as it ensures that the JasPer exit handler is called before the
-	debug memory allocator exit handler. */
-	atexit(jas_cleanup);
+	/*
+	If an allocator is specified, the library user is responsible for
+	invoking jas_cleanup.
+	*/
+	if (!allocator) {
+		/*
+		We must not register the JasPer library exit handler until after
+		at least one memory allocation is performed.  This is desirable
+		as it ensures that the JasPer exit handler is called before the
+		debug memory allocator exit handler.
+		*/
+		atexit(jas_cleanup);
+	}
 
 	return 0;
 }
@@ -180,5 +192,14 @@ static void jas_init_codecs()
 JAS_DLLEXPORT
 void jas_cleanup()
 {
+	JAS_DBGLOG(10, ("jas_cleanup invoked\n"));
+
 	jas_image_clearfmts();
+
+	memset(&jas_allocator, 0, sizeof(jas_allocator_t));
+	jas_allocator.alloc = 0;
+	jas_allocator.free = 0;
+	jas_allocator.realloc = 0;
+
+	JAS_DBGLOG(10, ("jas_cleanup returning\n"));
 }

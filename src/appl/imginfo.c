@@ -198,7 +198,7 @@ int main(int argc, char **argv)
 
 	{
 		int status;
-#if defined(JAS_USE_DEFAULT_ALLOCATOR)
+#if defined(JAS_USE_JAS_INIT)
 		status = jas_init();
 		if (verbose >= 1) {
 			fprintf(stderr, "using default allocator\n");
@@ -215,6 +215,7 @@ int main(int argc, char **argv)
 		if (verbose >= 1) {
 			fprintf(stderr, "using explicitly-specified allocator\n");
 		}
+		atexit(jas_cleanup);
 #endif
 		if (status) {
 			fprintf(stderr, "cannot initialize JasPer library\n");

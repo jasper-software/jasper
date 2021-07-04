@@ -168,7 +168,7 @@ int main(int argc, char **argv)
 
 	{
 		int status;
-#if defined(JAS_USE_DEFAULT_ALLOCATOR)
+#if defined(JAS_USE_JAS_INIT)
 		status = jas_init();
 #else
 		jas_allocator_t allocator = {
@@ -179,6 +179,7 @@ int main(int argc, char **argv)
 		jas_conf_t conf;
 		conf.dec_default_max_samples = JAS_DEC_DEFAULT_MAX_SAMPLES;
 		status = jas_init_custom(&allocator, &conf);
+		atexit(jas_cleanup);
 #endif
 		if (status) {
 			fprintf(stderr, "cannot initialize JasPer library\n");

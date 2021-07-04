@@ -103,12 +103,15 @@ option(JAS_INCLUDE_JPG_CODEC "Include JPG codec support" true)
 option(JAS_INCLUDE_PGX_CODEC "Include PGX codec support" true)
 option(JAS_INCLUDE_MIF_CODEC "Include MIF codec support" true)
 
-option(JAS_USE_DEFAULT_ALLOCATOR
-  "Enable default allocator (used only for testing)"
+option(JAS_USE_STD_ALLOCATOR_BY_DEFAULT
+  "Enable standard allocator by default (should be false, except for testing)"
+  false)
+option(JAS_USE_JAS_INIT
+  "Use jas_init instead of jas_init_custom for initialization (should be false, except for testing)"
   false)
 
-if (JAS_USE_DEFAULT_ALLOCATOR)
-	add_definitions(-DJAS_USE_DEFAULT_ALLOCATOR)
+if (JAS_USE_JAS_INIT)
+	add_definitions(-DJAS_USE_JAS_INIT)
 endif()
 
 set(JAS_ENABLE_DEFAULT_MAX_MEM_USAGE
@@ -127,6 +130,8 @@ option(JAS_ENABLE_DANGEROUS_INTERNAL_TESTING_MODE
 ################################################################################
 #
 ################################################################################
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS true)
 
 set(CMAKE_C_STANDARD 11)
 

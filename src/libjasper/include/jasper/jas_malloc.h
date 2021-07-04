@@ -120,11 +120,13 @@ typedef struct {
 * Functions.
 \******************************************************************************/
 
+#if defined(JAS_INTERNAL_USE_ONLY)
 /*
 This function is for internal library use only.
 It should never be called directly by a library user.
 */
 void jas_set_allocator(const jas_allocator_t* allocator);
+#endif
 
 /*!
 @brief
@@ -208,6 +210,10 @@ Reallocate memory.
 */
 JAS_DLLEXPORT
 void *jas_bma_realloc(void *ptr, size_t size);
+
+#if defined(JAS_INTERNAL_USE_ONLY)
+extern jas_allocator_t jas_allocator;
+#endif
 
 /*!
  * @}

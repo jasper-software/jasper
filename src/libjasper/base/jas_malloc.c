@@ -71,6 +71,8 @@
 * Includes.
 \******************************************************************************/
 
+#define JAS_INTERNAL_USE_ONLY
+
 #include "jasper/jas_malloc.h"
 #include "jasper/jas_debug.h"
 #include "jasper/jas_math.h"
@@ -86,22 +88,26 @@
 \******************************************************************************/
 
 /* The memory allocator object to be used for all memory allocation. */
-static jas_allocator_t jas_allocator = {
+jas_allocator_t jas_allocator = {
 	.alloc = 0,
 	.free = 0,
 	.realloc = 0
 };
 
-static jas_allocator_t jas_bma_allocator = {
-	.alloc = jas_bma_alloc,
-	.free = jas_bma_free,
-	.realloc = jas_bma_realloc
-};
-
 void jas_set_allocator(const jas_allocator_t *allocator)
 {
+	assert(!jas_allocator.alloc && !jas_allocator.free &&
+	  !jas_allocator.realloc);
 	if (!allocator) {
-		jas_allocator = jas_bma_allocator;
+#if defined(JAS_USE_STD_ALLOCATOR_BY_DEFAULT)
+		jas_allocator.alloc = malloc;
+		jas_allocator.free = free;
+		jas_allocator.realloc = realloc;
+#else
+		jas_allocator.alloc = jas_bma_alloc;
+		jas_allocator.free = jas_bma_free;
+		jas_allocator.realloc = jas_bma_realloc;
+#endif
 	} else {
 		jas_allocator = *allocator;
 	}
@@ -157,7 +163,10 @@ static size_t jas_max_mem = JAS_DEFAULT_MAX_MEM_USAGE;
 static size_t jas_max_mem = 0;
 #endif
 
+#define JAS_BMA_MAGIC 0xdeadbeefULL
+
 typedef struct {
+	unsigned long long magic;
 	size_t size;
 } jas_mb_t;
 
@@ -165,17 +174,35 @@ typedef struct {
   ((sizeof(jas_mb_t) + sizeof(max_align_t) - 1) / sizeof(max_align_t))
 #define JAS_MB_SIZE (JAS_MB_ADJUST * sizeof(max_align_t))
 
-jas_mb_t *jas_get_mb(void *ptr);
-void *jas_mb_get_data(jas_mb_t *mb);
+//static jas_mb_t *jas_get_mb(void *ptr);
+//static void *jas_mb_get_data(jas_mb_t *mb);
 
-jas_mb_t *jas_get_mb(void *ptr)
+static void jas_mb_init(jas_mb_t *mb, size_t size)
 {
-	return JAS_CAST(jas_mb_t *, JAS_CAST(max_align_t *, ptr) - JAS_MB_ADJUST);
+	mb->magic = JAS_BMA_MAGIC;
+	mb->size = size;
 }
 
-void *jas_mb_get_data(jas_mb_t *mb)
+static void jas_mb_destroy(jas_mb_t *mb)
 {
+	mb->magic = 0;
+	mb->size = 0;
+}
+
+static void *jas_mb_get_data(jas_mb_t *mb)
+{
+	assert(mb->magic == JAS_BMA_MAGIC);
 	return JAS_CAST(void *, JAS_CAST(max_align_t *, mb) + JAS_MB_ADJUST);
+}
+
+static jas_mb_t *jas_get_mb(void *ptr)
+{
+	jas_mb_t *mb = JAS_CAST(jas_mb_t *,
+	  JAS_CAST(max_align_t *, ptr) - JAS_MB_ADJUST);
+	assert(mb->magic == JAS_BMA_MAGIC);
+	/* This is one check that I do not want disabled with NDEBUG. */
+	if (mb->magic != JAS_BMA_MAGIC) {abort();}
+	return mb;
 }
 
 void jas_set_max_mem_usage(size_t max_mem)
@@ -215,8 +242,8 @@ void *jas_bma_alloc(size_t size)
 	} else {
 		JAS_DBGLOG(100, ("jas_bma_alloc: ext_size=%zu\n", ext_size));
 		if ((mb = malloc(ext_size))) {
+			jas_mb_init(mb, size); /* mb->size = size; */
 			result = jas_mb_get_data(mb);
-			mb->size = size;
 			jas_mem = mem;
 		} else {
 			result = 0;
@@ -254,7 +281,8 @@ void *jas_bma_realloc(void *ptr, size_t size)
 	JAS_DBGLOG(101, ("jas_bma_realloc: old_mb=%p; old_size=%zu\n", old_mb,
 	  old_size));
 	if (size > old_size) {
-		if (!jas_safe_size_add(jas_mem, ext_size, &mem) || mem > jas_max_mem) {
+		if (!jas_safe_size_add(jas_mem, size - old_size, &mem) ||
+		  mem > jas_max_mem) {
 			jas_eprintf("maximum memory limit (%zu) would be exceeded\n",
 			  jas_max_mem);
 			return 0;
@@ -267,11 +295,12 @@ void *jas_bma_realloc(void *ptr, size_t size)
 	}
 	JAS_DBGLOG(100, ("jas_bma_realloc: realloc(%p, %zu)\n", old_mb,
 	  ext_size));
+	jas_mb_destroy(old_mb);
 	if (!(mb = realloc(old_mb, ext_size))) {
 		result = 0;
 	} else {
+		jas_mb_init(mb, size); /* mb->size = size; */
 		result = jas_mb_get_data(mb);
-		mb->size = size;
 		jas_mem = mem;
 	}
 	JAS_DBGLOG(100, ("jas_bma_realloc(%p, %zu) -> %p (%p)\n", ptr, size,
@@ -296,6 +325,7 @@ void jas_bma_free(void *ptr)
 			abort();
 		}
 		JAS_DBGLOG(100, ("jas_bma_free: free(%p)\n", mb));
+		jas_mb_destroy(mb);
 		free(mb);
 	}
 	JAS_DBGLOG(102, ("max_mem=%zu; mem=%zu\n", jas_max_mem, jas_mem));
