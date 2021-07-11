@@ -76,6 +76,8 @@
 
 /* The configuration header file should be included first. */
 #include <jasper/jas_config.h>
+#include <jasper/jas_image.h>
+#include <jasper/jas_malloc.h>
 
 #include <stdio.h>
 
@@ -88,16 +90,42 @@ extern "C" {
 User-configurable settings for library.
 */
 typedef struct {
+
+	/*!
+	The image format table to be used for initializing the library.
+	*/
+	jas_image_fmttab_t image_fmttab;
+
+	/*!
+	The allocator to be used by the library.
+	*/
+	jas_allocator_t allocator;
 	
 	/*! The maximum number of samples allowable in an image to be decoded. */
 	size_t dec_default_max_samples;
+
+	/*!
+	The maximum amount of memory to be used by the library if the BMA
+	allocator is used.
+	*/
+	size_t max_mem;
+
+	/*!
+	A flag indicating if atexit should be used to force jas_cleanup to
+	be invoked upon exit.
+	Enabling this flag is not recommended.
+	*/
+	bool atexit_cleanup;
 
 	/*! Reserved for future use. */
 	unsigned char reserved[256];
 
 } jas_conf_t;
 
+/*
+NOTE: NOT NEEDED
 JAS_DLLEXPORT void jas_get_conf(jas_conf_t* conf);
+*/
 
 /* This is for internal library use only. */
 void jas_set_conf(const jas_conf_t* conf);

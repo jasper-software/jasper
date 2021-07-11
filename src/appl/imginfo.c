@@ -210,8 +210,8 @@ int main(int argc, char **argv)
 			.realloc = jas_bma_realloc
 		};
 		jas_conf_t conf;
-		conf.dec_default_max_samples = JAS_DEC_DEFAULT_MAX_SAMPLES;
-		status = jas_init_custom(&allocator, &conf);
+		jas_get_default_conf(&conf);
+		status = jas_init_custom(&conf);
 		if (verbose >= 1) {
 			fprintf(stderr, "using explicitly-specified allocator\n");
 		}

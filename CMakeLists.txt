@@ -15,9 +15,9 @@ include(CheckCCompilerFlag)
 ################################################################################
 
 # The major, minor, and micro version numbers of the project.
-set(JAS_VERSION_MAJOR 2)
+set(JAS_VERSION_MAJOR 3)
 set(JAS_VERSION_MINOR 0)
-set(JAS_VERSION_PATCH 32)
+set(JAS_VERSION_PATCH 0)
 
 # The project version.
 set(JAS_VERSION

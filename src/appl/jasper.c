@@ -177,8 +177,8 @@ int main(int argc, char **argv)
 			.realloc = jas_bma_realloc
 		};
 		jas_conf_t conf;
-		conf.dec_default_max_samples = JAS_DEC_DEFAULT_MAX_SAMPLES;
-		status = jas_init_custom(&allocator, &conf);
+		jas_get_default_conf(&conf);
+		status = jas_init_custom(&conf);
 		atexit(jas_cleanup);
 #endif
 		if (status) {
@@ -527,8 +527,6 @@ static const char *const helpinfo[] = {
 
 void cmdusage()
 {
-	int fmtid;
-	const jas_image_fmtinfo_t *fmtinfo;
 	const char *s;
 	int i;
 	cmdinfo();
@@ -537,6 +535,9 @@ void cmdusage()
 		fprintf(stderr, "%s", s);
 	}
 	fprintf(stderr, "The following formats are supported:\n");
+#if 0
+	int fmtid;
+	const jas_image_fmtinfo_t *fmtinfo;
 	for (fmtid = 0;; ++fmtid) {
 		if (!(fmtinfo = jas_image_lookupfmtbyid(fmtid))) {
 			break;
@@ -544,6 +545,14 @@ void cmdusage()
 		fprintf(stderr, "    %-5s    %s\n", fmtinfo->name,
 		  fmtinfo->desc);
 	}
+#else
+	const jas_image_fmttab_t *fmttab = jas_get_image_fmttab();
+	const jas_image_fmt_t *fmt;
+	for (fmt = fmttab->entries, i = 0; i < JAS_CAST(int, fmttab->num_entries);
+	  ++fmt, ++i) {
+		fprintf(stderr, "    %-5s    %s\n", fmt->name, fmt->desc);
+	}
+#endif
 	exit(EXIT_FAILURE);
 }
 

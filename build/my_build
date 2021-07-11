@@ -14,14 +14,17 @@ enable_debug=0
 do_make_test=0
 verbose=0
 enable_asan=0
+enable_lsan=0
 enable_usan=0
 sde_top_dir="$HOME/public/sde"
 #sde_top_dir=""
 
-while getopts E:AUditv opt; do
+while getopts E:AULditv opt; do
 	case $opt in
 	A)
 		enable_asan=1;;
+	L)
+		enable_lsan=1;;
 	U)
 		enable_usan=1;;
 	i)
@@ -41,10 +44,11 @@ while getopts E:AUditv opt; do
 done
 shift $((OPTIND - 1))
 
-if [ "$enable_debug" -ne 0 ]; then
-	enable_asan=1
-	enable_usan=1
-fi
+#if [ "$enable_debug" -ne 0 ]; then
+#	enable_asan=1
+#	enable_lsan=1
+#	enable_usan=1
+#fi
 
 source_dir="$abs_cmd_dir/.."
 tmp_dir="$source_dir/tmp_cmake"
@@ -83,6 +87,9 @@ else
 fi
 if [ "$enable_asan" -ne 0 ]; then
 	configure_opts+=("-DJAS_ENABLE_ASAN=true")
+fi
+if [ "$enable_lsan" -ne 0 ]; then
+	configure_opts+=("-DJAS_ENABLE_LSAN=true")
 fi
 if [ "$enable_usan" -ne 0 ]; then
 	configure_opts+=("-DJAS_ENABLE_USAN=true")

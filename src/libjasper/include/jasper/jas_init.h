@@ -106,18 +106,14 @@ int jas_init(void);
 This function initializes the JasPer library, specifying that a custom
 memory allocator should be used by the library.
 
-@param allocator
-The memory allocator to be used by the library.
-
 @param conf
-Some configuration settings for the library.
+The configuration settings for the library.
 
 @returns
 If successful, zero is returned; otherwise, a nonzero value is returned.
 */
 JAS_DLLEXPORT
-int jas_init_custom(const jas_allocator_t *allocator,
-  const jas_conf_t *conf);
+int jas_init_custom(const jas_conf_t *conf);
 
 /*!
 @brief Perform any clean up for the JasPer library.
@@ -127,6 +123,20 @@ This function performs any clean up for the JasPer library.
 */
 JAS_DLLEXPORT
 void jas_cleanup(void);
+
+/*!
+@brief Get the default values for the configuration parameters (which
+were established when the library was built).
+
+@details
+The configuration parameters are copied into the buffer supplied by the
+caller.
+
+@param conf
+A pointer to a buffer to hold the configuration parameters.
+*/
+JAS_DLLEXPORT
+void jas_get_default_conf(jas_conf_t *conf);
 
 /*!
  * @}

@@ -315,6 +315,56 @@ typedef struct {
 
 } jas_image_fmtinfo_t;
 
+/*!
+@brief Entry in image format table.
+*/
+typedef struct {
+
+	/*!
+	A unique name identifying the format.
+	*/
+	const char *name;
+
+	/*!
+	A short description of the format.
+	*/
+	const char *desc;
+
+	/*!
+	A whitespace delimited list of file extensions associated with the format.
+	*/
+	const char *exts;
+
+	/*!
+	The operations for the format (e.g., encode, decode, and validate).
+	*/
+	const jas_image_fmtops_t ops;
+
+} jas_image_fmt_t;
+
+/*!
+@brief Image format table.
+*/
+typedef struct {
+
+	/*!
+	A pointer to the start of the array of table entries.
+	*/
+	const jas_image_fmt_t *entries;
+
+	/*!
+	The number of entries in the table.
+	*/
+	size_t num_entries;
+
+} jas_image_fmttab_t;
+
+/*!
+@brief Get the image format table (generated when the library was built).
+*/
+JAS_DLLEXPORT
+const jas_image_fmttab_t *jas_get_image_fmttab(void);
+
 /******************************************************************************\
 * Image operations.
 \******************************************************************************/

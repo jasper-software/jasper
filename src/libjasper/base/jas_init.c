@@ -70,6 +70,7 @@
 #include "jasper/jas_image.h"
 #include "jasper/jas_malloc.h"
 #include "jasper/jas_debug.h"
+#include "jasper/jas_string.h"
 
 #include <stdlib.h>
 #include <stdbool.h>
@@ -78,27 +79,163 @@
 * Code.
 \******************************************************************************/
 
+static const jas_image_fmt_t jas_image_fmts[] = {
+
+#if defined(JAS_INCLUDE_MIF_CODEC) && defined(JAS_ENABLE_MIF_CODEC)
+	{
+		"mif",
+		"My Image Format (MIF)",
+		"mif",
+		{
+			.decode = mif_decode,
+			.encode = mif_encode,
+			.validate = mif_validate
+		}
+	},
+#endif
+
+#if defined(JAS_INCLUDE_PNM_CODEC)
+	{
+		"pnm",
+		"Portable Graymap/Pixmap (PNM)",
+		"pnm pbm pgm ppm",
+		{
+			.decode = pnm_decode,
+			.encode = pnm_encode,
+			.validate = pnm_validate
+		}
+	},
+#endif
+
+#if defined(JAS_INCLUDE_BMP_CODEC)
+	{
+		"bmp",
+		"Microsoft Bitmap (BMP)",
+		"bmp",
+		{
+			.decode = bmp_decode,
+			.encode = bmp_encode,
+			.validate = bmp_validate
+		}
+	},
+#endif
+
+#if defined(JAS_INCLUDE_RAS_CODEC)
+	{
+		"ras",
+		"Sun Rasterfile (RAS)",
+		"ras",
+		{
+			.decode = ras_decode,
+			.encode = ras_encode,
+			.validate = ras_validate
+		}
+	},
+#endif
+
+#if defined(JAS_INCLUDE_JP2_CODEC)
+	{
+		"jp2",
+		"JPEG-2000 JP2 File Format Syntax (ISO/IEC 15444-1)",
+		"jp2",
+		{
+			.decode = jp2_decode,
+			.encode = jp2_encode,
+			.validate = jp2_validate
+		}
+	},
+#endif
+
+#if defined(JAS_INCLUDE_JPC_CODEC) || defined(JAS_INCLUDE_JP2_CODEC)
+	{
+		"jpc",
+		"JPEG-2000 Code Stream Syntax (ISO/IEC 15444-1)",
+		"jpc",
+		{
+			.decode = jpc_decode,
+			.encode = jpc_encode,
+			.validate = jpc_validate
+		}
+	},
+#endif
+
+#if defined(JAS_INCLUDE_JPG_CODEC)
+	{
+		"jpg",
+		"JPEG (ISO/IEC 10918-1)",
+		"jpg",
+		{
+			.decode = jpg_decode,
+			.encode = jpg_encode,
+			.validate = jpg_validate
+		}
+	},
+#endif
+
+#if defined(JAS_INCLUDE_PGX_CODEC)
+	{
+		"pgx",
+		"JPEG-2000 VM Format (PGX)",
+		"pgx",
+		{
+			.decode = pgx_decode,
+			.encode = pgx_encode,
+			.validate = pgx_validate
+		}
+	},
+#endif
+
+};
+
+static const jas_image_fmttab_t jas_image_fmttab = {
+	.num_entries = sizeof(jas_image_fmts) / sizeof(jas_image_fmt_t),
+	.entries = jas_image_fmts
+};
+
+JAS_DLLEXPORT
+const jas_image_fmttab_t *jas_get_image_fmttab()
+{
+	return &jas_image_fmttab;
+}
+
+/******************************************************************************\
+* Code.
+\******************************************************************************/
+
 static void jas_init_codecs(void);
+
+JAS_DLLEXPORT
+void jas_get_default_conf(jas_conf_t *conf)
+{
+	memset(conf, 0, sizeof(jas_conf_t));
+	conf->image_fmttab = jas_image_fmttab;
+	conf->allocator.alloc = jas_bma_alloc;
+	conf->allocator.free = jas_bma_free;
+	conf->allocator.realloc = jas_bma_realloc;
+	conf->max_mem = JAS_DEFAULT_MAX_MEM_USAGE;
+	conf->dec_default_max_samples = JAS_DEC_DEFAULT_MAX_SAMPLES;
+	conf->atexit_cleanup = false;
+}
 
 JAS_DLLEXPORT
 int jas_init()
 {
-	return jas_init_custom(0, 0);
+	jas_conf_t conf;
+	jas_get_default_conf(&conf);
+	conf.atexit_cleanup = true;
+	return jas_init_custom(&conf);
 }
 
 JAS_DLLEXPORT
-int jas_init_custom(const jas_allocator_t* allocator, const jas_conf_t* conf)
+int jas_init_custom(const jas_conf_t* conf)
 {
-	jas_set_allocator(allocator);
+	jas_set_allocator(&conf->allocator);
 	jas_set_conf(conf);
 	jas_init_codecs();
 
-	/*
-	If an allocator is specified, the library user is responsible for
-	invoking jas_cleanup.
-	*/
-	if (!allocator) {
+	if (conf->atexit_cleanup) {
 		/*
+		Note:
 		We must not register the JasPer library exit handler until after
 		at least one memory allocation is performed.  This is desirable
 		as it ensures that the JasPer exit handler is called before the
@@ -115,78 +252,27 @@ static void jas_init_codecs()
 {
 	jas_image_fmtops_t fmtops;
 	int fmtid;
+	const char delim[] = " \t";
 
+	const jas_image_fmttab_t *fmttab = jas_get_image_fmttab();
+	const jas_image_fmt_t *fmt;
+	size_t i;
 	fmtid = 0;
-
-#if defined(JAS_INCLUDE_MIF_CODEC) && defined(JAS_ENABLE_MIF_CODEC)
-	fmtops.decode = mif_decode;
-	fmtops.encode = mif_encode;
-	fmtops.validate = mif_validate;
-	jas_image_addfmt(fmtid, "mif", "mif", "My Image Format (MIF)", &fmtops);
-	++fmtid;
-#endif
-
-#if defined(JAS_INCLUDE_PNM_CODEC)
-	fmtops.decode = pnm_decode;
-	fmtops.encode = pnm_encode;
-	fmtops.validate = pnm_validate;
-	jas_image_addfmt(fmtid, "pnm", "pnm", "Portable Graymap/Pixmap (PNM)",
-	  &fmtops);
-	jas_image_addfmt(fmtid, "pnm", "pgm", "Portable Graymap/Pixmap (PNM)",
-	  &fmtops);
-	jas_image_addfmt(fmtid, "pnm", "ppm", "Portable Graymap/Pixmap (PNM)",
-	  &fmtops);
-	++fmtid;
-#endif
-
-#if defined(JAS_INCLUDE_BMP_CODEC)
-	fmtops.decode = bmp_decode;
-	fmtops.encode = bmp_encode;
-	fmtops.validate = bmp_validate;
-	jas_image_addfmt(fmtid, "bmp", "bmp", "Microsoft Bitmap (BMP)", &fmtops);
-	++fmtid;
-#endif
-
-#if defined(JAS_INCLUDE_RAS_CODEC)
-	fmtops.decode = ras_decode;
-	fmtops.encode = ras_encode;
-	fmtops.validate = ras_validate;
-	jas_image_addfmt(fmtid, "ras", "ras", "Sun Rasterfile (RAS)", &fmtops);
-	++fmtid;
-#endif
-
-#if defined(JAS_INCLUDE_JP2_CODEC)
-	fmtops.decode = jp2_decode;
-	fmtops.encode = jp2_encode;
-	fmtops.validate = jp2_validate;
-	jas_image_addfmt(fmtid, "jp2", "jp2",
-	  "JPEG-2000 JP2 File Format Syntax (ISO/IEC 15444-1)", &fmtops);
-	++fmtid;
-#endif
-#if defined(JAS_INCLUDE_JPC_CODEC) || defined(JAS_INCLUDE_JP2_CODEC)
-	fmtops.decode = jpc_decode;
-	fmtops.encode = jpc_encode;
-	fmtops.validate = jpc_validate;
-	jas_image_addfmt(fmtid, "jpc", "jpc",
-	  "JPEG-2000 Code Stream Syntax (ISO/IEC 15444-1)", &fmtops);
-	++fmtid;
-#endif
-
-#if defined(JAS_INCLUDE_JPG_CODEC)
-	fmtops.decode = jpg_decode;
-	fmtops.encode = jpg_encode;
-	fmtops.validate = jpg_validate;
-	jas_image_addfmt(fmtid, "jpg", "jpg", "JPEG (ISO/IEC 10918-1)", &fmtops);
-	++fmtid;
-#endif
-
-#if defined(JAS_INCLUDE_PGX_CODEC)
-	fmtops.decode = pgx_decode;
-	fmtops.encode = pgx_encode;
-	fmtops.validate = pgx_validate;
-	jas_image_addfmt(fmtid, "pgx", "pgx", "JPEG-2000 VM Format (PGX)", &fmtops);
-	++fmtid;
-#endif
+	for (fmt = fmttab->entries, i = 0; i < fmttab->num_entries; ++fmt, ++i) {
+		char *buf = jas_strdup(fmt->exts);
+		bool first = true;
+		for (;;) {
+			char *ext;
+			if (!(ext = strtok(first ? buf : NULL, delim))) {
+				break;
+			}
+			JAS_DBGLOG(10, ("adding image format %s %s\n", fmt->name, ext));
+			jas_image_addfmt(fmtid, fmt->name, ext, fmt->desc, &fmt->ops);
+			++fmtid;
+			first = false;
+		}
+		jas_free(buf);
+	}
 }
 
 JAS_DLLEXPORT

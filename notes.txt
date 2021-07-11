@@ -1,0 +1,51 @@
+Only the following functions may be called before the JasPer library is
+initialized:
+
+jas_get_default_conf
+jas_get_image_fmttab
+
+The JasPer library is initialized by calling exactly one of the following
+functions exactly once:
+
+jas_init
+jas_init_custom
+
+The type jas_conf_t is used to specify configuration parameters for
+the library.
+The library has a notion of default values for these parameters that
+are established when the library is built.
+These default values can be obtained via the
+jas_get_default_conf function.
+
+Initialization would typically be performed using code resembling
+
+jas_conf_t conf;
+
+/* Get the default configuration parameters that were selected at
+when the library was built. */
+jas_get_default_conf(&conf);
+
+/*
+Change any configuration parameters for which defaults are not suitable
+by modifying the variable conf.
+This might necessitate calling jas_get_image_fmttab if the image_fmttab
+configuration parameter is being changed.
+For example, the library user might choose to generate their own table
+of image formats that included only a subset of the codecs included in
+the library.
+*/
+
+/* Initialize the JasPer library. */
+if (jas_init_custom(&conf)) {
+	/* handle initialization error */
+}
+
+Some examples of using the jas_init and jas_init_custom functions can be
+found in the source code for the application programs jasper, imginfo, and
+imgcmp.
+
+Cleanup of the library is performed by calling the function jas_cleanup
+exactly once.
+
+A description of the jas_conf_t type can be found in the JasPer Reference
+Manual.
