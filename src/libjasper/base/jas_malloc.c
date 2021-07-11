@@ -155,12 +155,12 @@ void jas_free(void *ptr)
 * Memory Allocator That Tracks Memory Usage.
 \******************************************************************************/
 
-static size_t jas_mem = 0;
+static size_t jas_bma_mem = 0;
 
 #if defined(JAS_DEFAULT_MAX_MEM_USAGE)
-static size_t jas_max_mem = JAS_DEFAULT_MAX_MEM_USAGE;
+static size_t jas_bma_max_mem = JAS_DEFAULT_MAX_MEM_USAGE;
 #else
-static size_t jas_max_mem = 0;
+static size_t jas_bma_max_mem = 0;
 #endif
 
 #define JAS_BMA_MAGIC 0xdeadbeefULL
@@ -207,12 +207,12 @@ static jas_mb_t *jas_get_mb(void *ptr)
 
 void jas_set_max_mem_usage(size_t max_mem)
 {
-	jas_max_mem = max_mem;
+	jas_bma_max_mem = max_mem;
 }
 
 size_t jas_get_mem_usage()
 {
-	return jas_mem;
+	return jas_bma_mem;
 }
 
 JAS_DLLEXPORT
@@ -233,10 +233,10 @@ void *jas_bma_alloc(size_t size)
 		jas_eprintf("requested memory size is too large\n");
 		result = 0;
 		mb = 0;
-	} else if (!jas_safe_size_add(jas_mem, size, &mem) ||
-	  mem > jas_max_mem) {
+	} else if (!jas_safe_size_add(jas_bma_mem, size, &mem) ||
+	  mem > jas_bma_max_mem) {
 		jas_eprintf("maximum memory limit (%zu) would be exceeded\n",
-		  jas_max_mem);
+		  jas_bma_max_mem);
 		result = 0;
 		mb = 0;
 	} else {
@@ -244,14 +244,14 @@ void *jas_bma_alloc(size_t size)
 		if ((mb = malloc(ext_size))) {
 			jas_mb_init(mb, size); /* mb->size = size; */
 			result = jas_mb_get_data(mb);
-			jas_mem = mem;
+			jas_bma_mem = mem;
 		} else {
 			result = 0;
 		}
 	}
 	JAS_DBGLOG(99, ("jas_bma_alloc(%zu) -> %p (mb=%p)\n", size, result,
 	  mb));
-	JAS_DBGLOG(102, ("max_mem=%zu; mem=%zu\n", jas_max_mem, jas_mem));
+	JAS_DBGLOG(102, ("max_mem=%zu; mem=%zu\n", jas_bma_max_mem, jas_bma_mem));
 	return result;
 }
 
@@ -281,14 +281,14 @@ void *jas_bma_realloc(void *ptr, size_t size)
 	JAS_DBGLOG(101, ("jas_bma_realloc: old_mb=%p; old_size=%zu\n", old_mb,
 	  old_size));
 	if (size > old_size) {
-		if (!jas_safe_size_add(jas_mem, size - old_size, &mem) ||
-		  mem > jas_max_mem) {
+		if (!jas_safe_size_add(jas_bma_mem, size - old_size, &mem) ||
+		  mem > jas_bma_max_mem) {
 			jas_eprintf("maximum memory limit (%zu) would be exceeded\n",
-			  jas_max_mem);
+			  jas_bma_max_mem);
 			return 0;
 		}
 	} else {
-		if (!jas_safe_size_sub(jas_mem, old_size - size, &jas_mem)) {
+		if (!jas_safe_size_sub(jas_bma_mem, old_size - size, &jas_bma_mem)) {
 			jas_eprintf("heap corruption detected\n");
 			abort();
 		}
@@ -301,11 +301,11 @@ void *jas_bma_realloc(void *ptr, size_t size)
 	} else {
 		jas_mb_init(mb, size); /* mb->size = size; */
 		result = jas_mb_get_data(mb);
-		jas_mem = mem;
+		jas_bma_mem = mem;
 	}
 	JAS_DBGLOG(100, ("jas_bma_realloc(%p, %zu) -> %p (%p)\n", ptr, size,
 	  result, mb));
-	JAS_DBGLOG(102, ("max_mem=%zu; mem=%zu\n", jas_max_mem, jas_mem));
+	JAS_DBGLOG(102, ("max_mem=%zu; mem=%zu\n", jas_bma_max_mem, jas_bma_mem));
 	return result;
 }
 
@@ -320,7 +320,7 @@ void jas_bma_free(void *ptr)
 		size = mb->size;
 		JAS_DBGLOG(101, ("jas_bma_free(%p) (mb=%p; size=%zu)\n", ptr, mb,
 		  size));
-		if (!jas_safe_size_sub(jas_mem, size, &jas_mem)) {
+		if (!jas_safe_size_sub(jas_bma_mem, size, &jas_bma_mem)) {
 			jas_eprintf("heap corruption detected\n");
 			abort();
 		}
@@ -328,7 +328,7 @@ void jas_bma_free(void *ptr)
 		jas_mb_destroy(mb);
 		free(mb);
 	}
-	JAS_DBGLOG(102, ("max_mem=%zu; mem=%zu\n", jas_max_mem, jas_mem));
+	JAS_DBGLOG(102, ("max_mem=%zu; mem=%zu\n", jas_bma_max_mem, jas_bma_mem));
 }
 
 /******************************************************************************\
