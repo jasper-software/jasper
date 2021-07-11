@@ -205,6 +205,12 @@ static void jpc_dec_opts_destroy(jpc_dec_importopts_t *opts);
 
 static const jpc_dec_mstabent_t *jpc_dec_mstab_lookup(uint_fast16_t id);
 
+static void jpc_rlvl_init(jpc_dec_rlvl_t *rlvl);
+static void jpc_band_init(jpc_dec_band_t *band);
+static void jpc_prc_init(jpc_dec_prc_t *prc);
+static void jpc_cblk_init(jpc_dec_cblk_t *cblk);
+static void jpc_seglist_init(jpc_dec_seglist_t *seglist);
+
 /******************************************************************************\
 * Global data.
 \******************************************************************************/
@@ -742,7 +748,11 @@ static int jpc_dec_tileinit(jpc_dec_t *dec, jpc_dec_tile_t *tile)
 		}
 		for (rlvlno = 0, rlvl = tcomp->rlvls; rlvlno < tcomp->numrlvls;
 		  ++rlvlno, ++rlvl) {
+#if 0
 			rlvl->bands = NULL;
+#else
+			jpc_rlvl_init(rlvl);
+#endif
 		}
 		if (!(tcomp->data = jas_seq2d_create(JPC_CEILDIV(tile->xstart,
 		  cmpt->hstep), JPC_CEILDIV(tile->ystart, cmpt->vstep),
@@ -844,6 +854,12 @@ static int jpc_dec_tileinit(jpc_dec_t *dec, jpc_dec_tile_t *tile)
 				goto done;
 			}
 			unsigned bandno;
+#if 1
+			for (bandno = 0, band = rlvl->bands;
+			  bandno < rlvl->numbands; ++bandno, ++band) {
+				jpc_band_init(band);
+			}
+#endif
 			for (bandno = 0, band = rlvl->bands;
 			  bandno < rlvl->numbands; ++bandno, ++band) {
 				unsigned bndno = (!rlvlno) ? 0 : (3 * (rlvlno - 1) +
@@ -892,6 +908,12 @@ static int jpc_dec_tileinit(jpc_dec_t *dec, jpc_dec_tile_t *tile)
 				cbgxstart = tlcbgxstart;
 				cbgystart = tlcbgystart;
 				unsigned prccnt;
+#if 1
+				for (prccnt = rlvl->numprcs, prc = band->prcs;
+				  prccnt > 0; --prccnt, ++prc) {
+					jpc_prc_init(prc);
+				}
+#endif
 				for (prccnt = rlvl->numprcs, prc = band->prcs;
 				  prccnt > 0; --prccnt, ++prc) {
 					if (jas_getdbglevel() >= 10) {
@@ -949,6 +971,12 @@ static int jpc_dec_tileinit(jpc_dec_t *dec, jpc_dec_tile_t *tile)
 						cblkxstart = cbgxstart;
 						cblkystart = cbgystart;
 						unsigned cblkcnt;
+#if 1
+						for (cblkcnt = prc->numcblks, cblk = prc->cblks;
+						  cblkcnt > 0; ++cblk, --cblkcnt) {
+							jpc_cblk_init(cblk);
+						}
+#endif
 						for (cblkcnt = prc->numcblks, cblk = prc->cblks;
 						  cblkcnt > 0;) {
 							if (jas_getdbglevel() >= 10000) {
@@ -1070,7 +1098,13 @@ static int jpc_dec_tilefini(jpc_dec_t *dec, jpc_dec_tile_t *tile)
 									jpc_seglist_remove(&cblk->segs, seg);
 									jpc_seg_destroy(seg);
 								}
+#if 0
 								jas_matrix_destroy(cblk->data);
+#else
+								if (cblk->data) {
+									jas_matrix_destroy(cblk->data);
+								}
+#endif
 							}
 							if (prc->incltagtree) {
 								jpc_tagtree_destroy(prc->incltagtree);
@@ -2576,4 +2610,76 @@ static void jpc_ppxstabent_destroy(jpc_ppxstabent_t *ent)
 		jas_free(ent->data);
 	}
 	jas_free(ent);
+}
+
+static void jpc_cblk_init(jpc_dec_cblk_t *cblk)
+{
+#if 1
+	memset(cblk, 0, sizeof(jpc_dec_cblk_t));
+	cblk->numpasses = 0;
+	jpc_seglist_init(&cblk->segs);
+	cblk->curseg = 0;
+	cblk->numimsbs = 0;
+	cblk->numlenbits = 0;
+	cblk->firstpassno = 0;
+	cblk->data = 0;
+#endif
+}
+
+static void jpc_prc_init(jpc_dec_prc_t *prc)
+{
+#if 1
+	memset(prc, 0, sizeof(jpc_dec_prc_t));
+	prc->xstart = 0;
+	prc->ystart = 0;
+	prc->xend = 0;
+	prc->yend = 0;
+	prc->numhcblks = 0;
+	prc->numvcblks = 0;
+	prc->cblks = 0;
+	prc->incltagtree = 0;
+	prc->numimsbstagtree = 0;
+#endif
+}
+
+static void jpc_band_init(jpc_dec_band_t *band)
+{
+#if 1
+	memset(band, 0, sizeof(jpc_dec_band_t));
+	band->prcs = 0;
+	band->data = 0;
+	band->orient = 0;
+	band->stepsize = 0;
+	band->absstepsize = 0;
+	band->numbps = 0;
+	band->analgain = 0;
+	band->roishift = 0;
+#endif
+}
+
+static void jpc_rlvl_init(jpc_dec_rlvl_t *rlvl)
+{
+#if 1
+	memset(rlvl, 0, sizeof(jpc_dec_rlvl_t));
+	rlvl->numbands = 0;
+	rlvl->bands = 0;
+	rlvl->xstart = 0;
+	rlvl->ystart = 0;
+	rlvl->xend = 0;
+	rlvl->yend = 0;
+	rlvl->prcwidthexpn = 0;
+	rlvl->prcheightexpn = 0;
+	rlvl->numhprcs = 0;
+	rlvl->numvprcs = 0;
+	rlvl->numprcs = 0;
+	rlvl->cbgwidthexpn = 0;
+	rlvl->cblkheightexpn = 0;
+#endif
+}
+
+static void jpc_seglist_init(jpc_dec_seglist_t *seglist)
+{
+	memset(seglist, 0, sizeof(jpc_dec_seglist_t));
+	seglist->head = 0;
+	seglist->tail = 0;
 }
