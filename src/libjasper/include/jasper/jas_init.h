@@ -100,14 +100,19 @@ JAS_DLLEXPORT
 int jas_init(void);
 
 /*!
-@brief Initialize the JasPer library with a custom memory allocator.
-
-@details
-This function initializes the JasPer library, specifying that a custom
-memory allocator should be used by the library.
+@brief Initialize the JasPer library with custom values for various
+configuration settings.
 
 @param conf
-The configuration settings for the library.
+A pointer to the data structure that specifies the configuration settings
+to be used for the library.
+
+@details
+This function initializes the JasPer library, setting the values
+of various configuration parameters for the library to those specified
+by @c conf.
+Any information needed by the library that is specified in the structure
+pointed to by @c conf is copied before the function returns.
 
 @returns
 If successful, zero is returned; otherwise, a nonzero value is returned.
