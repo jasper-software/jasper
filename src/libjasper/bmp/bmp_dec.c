@@ -71,7 +71,7 @@
 * Includes.
 \******************************************************************************/
 
-#include "jasper/jas_conf.h"
+#include "jasper/jas_init.h"
 #include "jasper/jas_image.h"
 #include "jasper/jas_types.h"
 #include "jasper/jas_stream.h"

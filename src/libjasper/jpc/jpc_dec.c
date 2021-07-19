@@ -78,7 +78,7 @@
 #include "jpc_t1dec.h"
 #include "jpc_math.h"
 
-#include "jasper/jas_conf.h"
+#include "jasper/jas_init.h"
 #include "jasper/jas_types.h"
 #include "jasper/jas_math.h"
 #include "jasper/jas_tvp.h"

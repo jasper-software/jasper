@@ -65,7 +65,6 @@
 
 #define JAS_INTERNAL_USE_ONLY
 
-#include "jasper/jas_conf.h"
 #include "jasper/jas_init.h"
 #include "jasper/jas_image.h"
 #include "jasper/jas_malloc.h"
@@ -78,6 +77,11 @@
 /******************************************************************************\
 * Code.
 \******************************************************************************/
+
+/*
+Various user-configurable settings.
+*/
+jas_conf_t jas_conf;
 
 static const jas_image_fmt_t jas_image_fmts[] = {
 
@@ -288,4 +292,30 @@ void jas_cleanup()
 	jas_allocator.realloc = 0;
 
 	JAS_DBGLOG(10, ("jas_cleanup returning\n"));
+}
+
+/******************************************************************************\
+\******************************************************************************/
+
+JAS_DLLEXPORT
+void jas_set_conf(const jas_conf_t* conf)
+{
+	if (!conf) {
+		jas_conf.dec_default_max_samples = JAS_DEC_DEFAULT_MAX_SAMPLES;
+		jas_set_max_mem_usage(JAS_DEFAULT_MAX_MEM_USAGE);
+	} else {
+		jas_conf = *conf;
+		jas_set_max_mem_usage(conf->max_mem);
+	}
+}
+
+JAS_DLLEXPORT void jas_get_conf(jas_conf_t* conf)
+{
+	*conf = jas_conf;
+}
+
+/* For internal library use only. */
+jas_conf_t *jas_get_conf_ptr()
+{
+	return &jas_conf;
 }
