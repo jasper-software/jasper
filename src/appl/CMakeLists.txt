@@ -53,3 +53,27 @@ install(TARGETS ${programs} DESTINATION "${CMAKE_INSTALL_BINDIR}")
 
 # Install the manual pages for the programs that were built.
 install(FILES ${man_pages} DESTINATION "${CMAKE_INSTALL_MANDIR}/man1")
+
+################################################################################
+# Test suite
+################################################################################
+
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/../../test/bin/wrapper.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/../../test/bin/wrapper" @ONLY)
+
+if (BASH_PROGRAM)
+	add_test(run_test_1
+	  "${BASH_PROGRAM}" "${CMAKE_CURRENT_BINARY_DIR}/../../test/bin/wrapper"
+	  "${CMAKE_CURRENT_SOURCE_DIR}/../../test/bin/run_test_1")
+	add_test(run_test_2
+	  "${BASH_PROGRAM}" "${CMAKE_CURRENT_BINARY_DIR}/../../test/bin/wrapper"
+	  "${CMAKE_CURRENT_SOURCE_DIR}/../../test/bin/run_test_2")
+	add_test(run_test_3
+	  "${BASH_PROGRAM}" "${CMAKE_CURRENT_BINARY_DIR}/../../test/bin/wrapper"
+	  "${CMAKE_CURRENT_SOURCE_DIR}/../../test/bin/run_test_3")
+	add_test(run_test_4
+	  "${BASH_PROGRAM}" "${CMAKE_CURRENT_BINARY_DIR}/../../test/bin/wrapper"
+	  "${CMAKE_CURRENT_SOURCE_DIR}/../../test/bin/run_test_4")
+	add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS
+	  ${programs} "${CMAKE_CURRENT_BINARY_DIR}/../../test/bin/wrapper") 
+endif()

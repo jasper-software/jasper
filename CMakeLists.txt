@@ -354,25 +354,3 @@ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/build/jasper.pc"
   DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
 
 install(FILES "README" DESTINATION "${CMAKE_INSTALL_DOCDIR}")
-
-################################################################################
-# Test suite
-################################################################################
-
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/test/bin/wrapper.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/test/bin/wrapper" @ONLY)
-
-if (BASH_PROGRAM)
-	add_test(run_test_1
-	  "${BASH_PROGRAM}" "${CMAKE_CURRENT_BINARY_DIR}/test/bin/wrapper"
-	  "${CMAKE_CURRENT_SOURCE_DIR}/test/bin/run_test_1")
-	add_test(run_test_2
-	  "${BASH_PROGRAM}" "${CMAKE_CURRENT_BINARY_DIR}/test/bin/wrapper"
-	  "${CMAKE_CURRENT_SOURCE_DIR}/test/bin/run_test_2")
-	add_test(run_test_3
-	  "${BASH_PROGRAM}" "${CMAKE_CURRENT_BINARY_DIR}/test/bin/wrapper"
-	  "${CMAKE_CURRENT_SOURCE_DIR}/test/bin/run_test_3")
-	add_test(run_test_4
-	  "${BASH_PROGRAM}" "${CMAKE_CURRENT_BINARY_DIR}/test/bin/wrapper"
-	  "${CMAKE_CURRENT_SOURCE_DIR}/test/bin/run_test_4")
-endif()

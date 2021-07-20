@@ -9,7 +9,7 @@ panic()
 cmd_dir=$(dirname "$0") || exit 1
 abs_cmd_dir=$(readlink -f "$cmd_dir") || panic
 
-do_install=0
+enable_install=0
 enable_debug=0
 do_make_test=0
 verbose=0
@@ -18,17 +18,30 @@ enable_lsan=0
 enable_usan=0
 sde_top_dir="$HOME/public/sde"
 #sde_top_dir=""
+configure_only=0
+enable_doc=1
 
-while getopts E:AULditv opt; do
+while getopts ZE:AULditvCD opt; do
 	case $opt in
+	Z)
+		enable_asan=1
+		enable_lsan=1
+		enable_usan=1
+		enable_doc=0
+		enable_debug=1
+		;;
 	A)
 		enable_asan=1;;
 	L)
 		enable_lsan=1;;
 	U)
 		enable_usan=1;;
+	C)
+		configure_only=1;;
+	D)
+		enable_doc=0;;
 	i)
-		do_install=1;;
+		enable_install=1;;
 	d)
 		enable_debug=1;;
 	t)
@@ -95,9 +108,18 @@ if [ "$enable_usan" -ne 0 ]; then
 	configure_opts+=("-DJAS_ENABLE_USAN=true")
 fi
 configure_opts+=("-DJAS_ENABLE_DANGEROUS_INTERNAL_TESTING_MODE=true")
+if [ "$enable_doc" -ne 0 ]; then
+	configure_opts+=("-DJAS_ENABLE_DOC=true")
+else
+	configure_opts+=("-DJAS_ENABLE_DOC=false")
+fi
 configure_opts+=("$@")
 echo "Running cmake ${configure_opts[@]}"
 cmake "${configure_opts[@]}" || panic "cmake failed"
+
+if [ "$configure_only" -ne 0 ]; then
+	exit
+fi
 
 build_opts=()
 install_opts=()
@@ -109,9 +131,11 @@ cmake --build "$build_dir" --clean-first \
   "${build_opts[@]}" || \
   panic "cmake build failed"
 
-cmake --build "$build_dir" --target install \
-  "${install_opts[@]}" || \
-  panic "cmake install failed"
+if [ "$enable_install" -ne 0 ]; then
+	cmake --build "$build_dir" --target install \
+	  "${install_opts[@]}" || \
+	  panic "cmake install failed"
+fi
 
 test_opts=()
 test_opts+=(--output-on-failure)
