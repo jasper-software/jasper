@@ -255,7 +255,7 @@ void jas_conf_set_dec_default_max_samples(size_t n)
 
 static int jas_init_codecs(void);
 
-static JAS_DLLEXPORT int jas_init_helper();
+static int jas_init_helper(void);
 
 JAS_DLLEXPORT
 int jas_init()

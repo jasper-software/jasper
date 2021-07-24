@@ -298,7 +298,6 @@ size_t jas_get_mem_usage()
 	return result;
 }
 
-JAS_DLLEXPORT
 void jas_basic_allocator_init(jas_basic_allocator_t *allocator,
   jas_allocator_t *delegate, size_t max_mem)
 {
