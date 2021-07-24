@@ -125,6 +125,10 @@
 /* NOTE: This could underestimate the size on some exotic architectures. */
 #define JAS_UINTFAST32_NUMBITS (8 * sizeof(uint_fast32_t))
 
+#ifdef _MSC_VER
+typedef long double max_align_t;
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif

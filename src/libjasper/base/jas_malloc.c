@@ -73,6 +73,7 @@
 
 #define JAS_INTERNAL_USE_ONLY
 
+#include "jasper/jas_types.h"
 #include "jasper/jas_malloc.h"
 #include "jasper/jas_debug.h"
 #include "jasper/jas_math.h"
