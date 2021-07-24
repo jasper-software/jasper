@@ -79,6 +79,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stddef.h>
 
 /* We need the prototype for memset. */
 #include <string.h>
