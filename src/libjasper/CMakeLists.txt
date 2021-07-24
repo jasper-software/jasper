@@ -20,6 +20,7 @@ set(libjasper_headers
 	include/jasper/jas_seq.h
 	include/jasper/jas_stream.h
 	include/jasper/jas_string.h
+	include/jasper/jas_thread.h
 	include/jasper/jas_tmr.h
 	include/jasper/jas_tvp.h
 	include/jasper/jas_types.h

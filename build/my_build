@@ -19,7 +19,7 @@ enable_usan=0
 sde_top_dir="$HOME/public/sde"
 #sde_top_dir=""
 configure_only=0
-enable_doc=1
+enable_doc=0
 
 while getopts ZE:AULditvCD opt; do
 	case $opt in
@@ -39,7 +39,7 @@ while getopts ZE:AULditvCD opt; do
 	C)
 		configure_only=1;;
 	D)
-		enable_doc=0;;
+		enable_doc=1;;
 	i)
 		enable_install=1;;
 	d)
@@ -127,18 +127,33 @@ if [ "$verbose" -ne 0 ]; then
 	build_opts+=(--verbose)
 	install_opts+=(--verbose)
 fi
-cmake --build "$build_dir" --clean-first \
-  "${build_opts[@]}" || \
+command=(cmake)
+command+=(--build "$build_dir")
+command+=(--clean-first)
+command+=("${build_opts[@]}")
+echo "============================================================"
+echo "RUNNING: ${command[@]}"
+echo "============================================================"
+"${command[@]}" || \
   panic "cmake build failed"
 
 if [ "$enable_install" -ne 0 ]; then
-	cmake --build "$build_dir" --target install \
-	  "${install_opts[@]}" || \
+	command=(cmake)
+	command+=(--build "$build_dir")
+	command+=(--target install)
+	command+=("${install_opts[@]}")
+	echo "============================================================"
+	echo "RUNNING: ${command[@]}"
+	echo "============================================================"
+	"${command[@]}" || \
 	  panic "cmake install failed"
 fi
 
 test_opts=()
 test_opts+=(--output-on-failure)
 if [ "$do_make_test" -ne 0 ]; then
+	echo "============================================================"
+	echo "Testing"
+	echo "============================================================"
 	(cd "$build_dir" && ctest "${test_opts[@]}") || panic "ctest failed"
 fi

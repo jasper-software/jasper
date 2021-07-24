@@ -1,51 +1,120 @@
-Only the following functions may be called before the JasPer library is
-initialized:
+Library Configuration and Initialization
+========================================
 
-jas_get_default_conf
-jas_get_image_fmttab
+There are two stages in the setup of the JasPer library at run time:
+1) configuration and 2) initialization.
 
-The JasPer library is initialized by calling exactly one of the following
-functions exactly once:
+The configuration stage initializes the current configuration settings
+for the library.
+The configuration settings are initialized to their default values
+(which are set at library build time) using the jas_conf_clear function.
+The initialization stage initializes the library using the current
+configuration settings.
+The jas_initialize function performs initialization (not configuration).
+The library must be both configured and initialized (in that order)
+before most code in the library can be used.
+For backward compatibility with older versions of the library,
+the jas_init function performs both configuration and initialization
+of the library.
+(The jas_init function internally calls jas_conf_clear to initialize the
+configuration settings with their default values.)
+The library is cleaned up by invoking the jas_cleanup function.
+The library cannot be re-initialized.
+For example, calling jas_init or jas_initialize without an intervening
+call to jas_cleanup is forbidden.
 
-jas_init
-jas_init_custom
+No code in the library can be invoked prior to initialization of the
+library (via jas_init or jas_initialize), with the exception
+of the functions identified below.
 
-The type jas_conf_t is used to specify configuration parameters for
-the library.
-The library has a notion of default values for these parameters that
-are established when the library is built.
-These default values can be obtained via the
-jas_get_default_conf function.
+The following functions may be called before the JasPer library is
+configured (via jas_conf_clear):
 
-Initialization would typically be performed using code resembling
+jas_std_allocator_init
 
-jas_conf_t conf;
+The following functions may be called after the JasPer library is
+configured by before it is initialized (via jas_init or jas_initialize):
 
-/* Get the default configuration parameters that were selected at
-when the library was built. */
-jas_get_default_conf(&conf);
+the jas_conf_* family of functions, including functions such as:
+
+    void jas_conf_clear();
+    void jas_conf_set_allocator(jas_allocator_t *allocator);
+    void jas_conf_set_allocator_wrapper(bool enable);
+    void jas_conf_set_debug_level(int debug_level);
+    void jas_conf_set_mem_limit(size_t max_mem);
+    void jas_conf_set_dec_default_max_samples(size_t max_samples);
+
+Example of Code for Library Setup
+=================================
+
+Setup of the library would typically be performed using code resembling
+the following:
+
+/*
+Configure the library using the default configuration settings.
+*/
+jas_conf_clear();
 
 /*
 Change any configuration parameters for which defaults are not suitable
-by modifying the variable conf.
-This might necessitate calling jas_get_image_fmttab if the image_fmttab
-configuration parameter is being changed.
-For example, the library user might choose to generate their own table
-of image formats that included only a subset of the codecs included in
-the library.
+by using the jas_conf_* family of functions.
 */
 
-/* Initialize the JasPer library. */
-if (jas_init_custom(&conf)) {
+static jas_std_allocator_t allocator;
+jas_conf_set_allocator(JAS_CAST(std_allocator_t *, &allocator));
+jas_conf_set_max_mem(10000000);
+
+/*
+Initialize the JasPer library.
+*/
+if (jas_initialize()) {
 	/* handle initialization error */
 }
 
-Some examples of using the jas_init and jas_init_custom functions can be
-found in the source code for the application programs jasper, imginfo, and
-imgcmp.
+Example of Code for Library Setup (Legacy Approach)
+===================================================
 
-Cleanup of the library is performed by calling the function jas_cleanup
-exactly once.
+Alternatively, the setup of the library can be performed using code resembling
+the following, if the library configuration parameters do not need to be
+changed from their defaults:
 
-A description of the jas_conf_t type can be found in the JasPer Reference
-Manual.
+if (jas_init()) {
+	/* handle initialization error */
+}
+
+/* Use the library. */
+
+/* Clean up the library. */
+jas_cleanup();
+
+Additional Examples of Library Setup
+====================================
+
+Some additional examples of using the jas_conf_clear, jas_initialize,
+and jas_init functions can be found in the source code for the application
+programs jasper, imginfo, and imgcmp.
+
+Memory Allocators and the Allocator Wrapper
+===========================================
+
+The library provides a simple interface for memory allocators.
+This is provided through the jas_allocator_t type.
+An allocator object is resides in memory managed by the
+library user.
+If the library user invokes jas_cleanup via atexit, then
+the allocator should obviously not be allocated on the stack.
+
+The jas_std_allocator_init function provides a way to create
+an allocator that uses malloc and related functions from the
+C standard library.
+
+As long as the allocator wrapper functionality is enabled, the
+JasPer library will track how much memory is being used by
+the allocator in order to allow a limit to be imposed on
+memory usage.
+The allocator wrapper composes with the allocator selected by
+the library user.
+So, this memory limiting functionality is available even when the
+library user provides a custom allocator that does not itself
+track memory usage.
+

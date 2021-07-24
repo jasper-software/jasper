@@ -73,15 +73,11 @@
 
 #include <stdlib.h>
 #include <stdbool.h>
+#include <stddef.h>
 
 /******************************************************************************\
 * Code.
 \******************************************************************************/
-
-/*
-Various user-configurable settings.
-*/
-jas_conf_t jas_conf;
 
 static const jas_image_fmt_t jas_image_fmts[] = {
 
@@ -202,42 +198,110 @@ const jas_image_fmttab_t *jas_get_image_fmttab()
 	return &jas_image_fmttab;
 }
 
+/*
+Various user-configurable settings.
+*/
+static jas_conf_t jas_conf = {
+	.initialized = 0,
+};
+
 /******************************************************************************\
 * Code.
 \******************************************************************************/
 
-static void jas_init_codecs(void);
+JAS_DLLEXPORT
+void jas_conf_clear()
+{
+	memset(&jas_conf, 0, sizeof(jas_conf_t));
+	jas_conf.initialized = 1;
+	jas_conf.image_fmttab = jas_image_fmttab;
+	jas_conf.allocator = 0;
+	jas_conf.enable_allocator_wrapper = 1;
+	jas_conf.max_mem = JAS_DEFAULT_MAX_MEM_USAGE;
+	jas_conf.dec_default_max_samples = JAS_DEC_DEFAULT_MAX_SAMPLES;
+	jas_conf.debug_level = 0;
+	jas_conf.enable_atexit_cleanup = 0;
+}
 
 JAS_DLLEXPORT
-void jas_get_default_conf(jas_conf_t *conf)
+void jas_conf_set_allocator(jas_allocator_t *allocator)
 {
-	memset(conf, 0, sizeof(jas_conf_t));
-	conf->image_fmttab = jas_image_fmttab;
-	conf->allocator.alloc = jas_bma_alloc;
-	conf->allocator.free = jas_bma_free;
-	conf->allocator.realloc = jas_bma_realloc;
-	conf->max_mem = JAS_DEFAULT_MAX_MEM_USAGE;
-	conf->dec_default_max_samples = JAS_DEC_DEFAULT_MAX_SAMPLES;
-	conf->atexit_cleanup = false;
+	jas_conf.allocator = allocator;
 }
+
+JAS_DLLEXPORT
+void jas_conf_set_allocator_wrapper(bool enable)
+{
+	jas_conf.enable_allocator_wrapper = enable;
+}
+
+JAS_DLLEXPORT
+void jas_conf_set_debug_level(int debug_level)
+{
+	jas_conf.debug_level = debug_level;
+}
+
+JAS_DLLEXPORT
+void jas_conf_set_max_mem(size_t max_mem)
+{
+	jas_conf.max_mem = max_mem;
+}
+
+JAS_DLLEXPORT
+void jas_conf_set_dec_default_max_samples(size_t n)
+{
+	jas_conf.dec_default_max_samples = n;
+}
+
+static int jas_init_codecs(void);
+
+static JAS_DLLEXPORT int jas_init_helper();
 
 JAS_DLLEXPORT
 int jas_init()
 {
-	jas_conf_t conf;
-	jas_get_default_conf(&conf);
-	conf.atexit_cleanup = true;
-	return jas_init_custom(&conf);
+	jas_conf_clear();
+	jas_conf.enable_atexit_cleanup = 1;
+	return jas_init_helper();
 }
 
 JAS_DLLEXPORT
-int jas_init_custom(const jas_conf_t* conf)
+int jas_initialize()
 {
-	jas_set_allocator(&conf->allocator);
-	jas_set_conf(conf);
-	jas_init_codecs();
+	assert(jas_conf.initialized);
+	return jas_init_helper();
+}
 
-	if (conf->atexit_cleanup) {
+static int jas_init_helper()
+{
+	if (jas_conf.enable_allocator_wrapper) {
+		jas_allocator_t *delegate;
+		if (!jas_conf.allocator) {
+			jas_std_allocator_init(&jas_std_allocator);
+			delegate = &jas_std_allocator.base;
+		} else {
+			delegate = jas_conf.allocator;
+		}
+		jas_basic_allocator_init(&jas_basic_allocator, delegate,
+		  jas_conf.max_mem);
+		jas_allocator = &jas_basic_allocator.base;
+	} else {
+		if (!jas_conf.allocator) {
+			jas_std_allocator_init(&jas_std_allocator);
+			jas_allocator = &jas_std_allocator.base;
+		} else {
+			jas_allocator = jas_conf.allocator;
+		}
+	}
+
+	jas_conf.dec_default_max_samples = JAS_DEC_DEFAULT_MAX_SAMPLES;
+	jas_setdbglevel(jas_conf.debug_level);
+
+	if (jas_init_codecs()) {
+		return -1;
+	}
+
+	if (jas_conf.enable_atexit_cleanup) {
 		/*
 		Note:
 		We must not register the JasPer library exit handler until after
@@ -252,7 +316,7 @@ int jas_init_custom(const jas_conf_t* conf)
 }
 
 /* Initialize the image format table. */
-static void jas_init_codecs()
+static int jas_init_codecs()
 {
 	jas_image_fmtops_t fmtops;
 	int fmtid;
@@ -277,6 +341,7 @@ static void jas_init_codecs()
 		}
 		jas_free(buf);
 	}
+	return 0;
 }
 
 JAS_DLLEXPORT
@@ -285,34 +350,15 @@ void jas_cleanup()
 	JAS_DBGLOG(10, ("jas_cleanup invoked\n"));
 
 	jas_image_clearfmts();
-
-	memset(&jas_allocator, 0, sizeof(jas_allocator_t));
-	jas_allocator.alloc = 0;
-	jas_allocator.free = 0;
-	jas_allocator.realloc = 0;
+	assert(jas_allocator);
+	jas_allocator_cleanup(jas_allocator);
+	jas_allocator = 0;
 
 	JAS_DBGLOG(10, ("jas_cleanup returning\n"));
 }
 
 /******************************************************************************\
 \******************************************************************************/
-
-JAS_DLLEXPORT
-void jas_set_conf(const jas_conf_t* conf)
-{
-	if (!conf) {
-		jas_conf.dec_default_max_samples = JAS_DEC_DEFAULT_MAX_SAMPLES;
-		jas_set_max_mem_usage(JAS_DEFAULT_MAX_MEM_USAGE);
-	} else {
-		jas_conf = *conf;
-		jas_set_max_mem_usage(conf->max_mem);
-	}
-}
-
-JAS_DLLEXPORT void jas_get_conf(jas_conf_t* conf)
-{
-	*conf = jas_conf;
-}
 
 /* For internal library use only. */
 jas_conf_t *jas_get_conf_ptr()

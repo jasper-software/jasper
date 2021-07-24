@@ -3,19 +3,19 @@ set(man_pages "")
 
 # The jasper program
 add_executable(jasper jasper.c)
-target_link_libraries(jasper libjasper ${JPEG_LIBRARIES} ${MATH_LIBRARY})
+target_link_libraries(jasper libjasper ${JPEG_LIBRARIES} ${MATH_LIBRARY} ${THREAD_LIBRARY})
 set(programs "${programs}" jasper)
 set(man_pages "${man_pages}" jasper.1)
 
 # The imginfo program
 add_executable(imginfo imginfo.c)
-target_link_libraries(imginfo libjasper ${JPEG_LIBRARIES} ${MATH_LIBRARY})
+target_link_libraries(imginfo libjasper ${JPEG_LIBRARIES} ${MATH_LIBRARY} ${THREAD_LIBRARY})
 set(programs "${programs}" imginfo)
 set(man_pages "${man_pages}" imginfo.1)
 
 # The imgcmp program
 add_executable(imgcmp imgcmp.c)
-target_link_libraries(imgcmp libjasper ${JPEG_LIBRARIES} ${MATH_LIBRARY})
+target_link_libraries(imgcmp libjasper ${JPEG_LIBRARIES} ${MATH_LIBRARY} ${THREAD_LIBRARY})
 set(programs "${programs}" imgcmp)
 set(man_pages "${man_pages}" imgcmp.1)
 
@@ -25,7 +25,7 @@ if(JAS_HAVE_OPENGL)
 	target_include_directories(jiv PUBLIC
 	  ${GLUT_INCLUDE_DIR} ${OPENGL_INCLUDE_DIR})
 	target_link_libraries(jiv libjasper ${JPEG_LIBRARIES} ${GLUT_LIBRARIES}
-	  ${OPENGL_LIBRARIES} ${MATH_LIBRARY})
+	  ${OPENGL_LIBRARIES} ${MATH_LIBRARY} ${THREAD_LIBRARY})
 	set(programs "${programs}" jiv)
 	set(man_pages "${man_pages}" jiv.1)
 else()
@@ -34,7 +34,8 @@ endif()
 
 if (JAS_ENABLE_FUZZER)
 	add_executable(fuzz fuzz.c)
-	target_link_libraries(fuzz libjasper ${JPEG_LIBRARIES} ${MATH_LIBRARY})
+	target_link_libraries(fuzz libjasper ${JPEG_LIBRARIES} ${MATH_LIBRARY}
+	  ${THREAD_LIBRARY})
 	set(programs "${programs}" fuzz)
 	set_target_properties(fuzz PROPERTIES COMPILE_FLAGS "-fsanitize=fuzzer")
 	set_target_properties(fuzz PROPERTIES LINK_FLAGS "-fsanitize=fuzzer")
@@ -64,16 +65,16 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/../../test/bin/wrapper.in"
 if (BASH_PROGRAM)
 	add_test(run_test_1
 	  "${BASH_PROGRAM}" "${CMAKE_CURRENT_BINARY_DIR}/../../test/bin/wrapper"
-	  "${CMAKE_CURRENT_SOURCE_DIR}/../../test/bin/run_test_1")
+	  "${CMAKE_CURRENT_SOURCE_DIR}/../../test/bin/run_test_1" -v)
 	add_test(run_test_2
 	  "${BASH_PROGRAM}" "${CMAKE_CURRENT_BINARY_DIR}/../../test/bin/wrapper"
-	  "${CMAKE_CURRENT_SOURCE_DIR}/../../test/bin/run_test_2")
+	  "${CMAKE_CURRENT_SOURCE_DIR}/../../test/bin/run_test_2" -v)
 	add_test(run_test_3
 	  "${BASH_PROGRAM}" "${CMAKE_CURRENT_BINARY_DIR}/../../test/bin/wrapper"
-	  "${CMAKE_CURRENT_SOURCE_DIR}/../../test/bin/run_test_3")
+	  "${CMAKE_CURRENT_SOURCE_DIR}/../../test/bin/run_test_3" -v)
 	add_test(run_test_4
 	  "${BASH_PROGRAM}" "${CMAKE_CURRENT_BINARY_DIR}/../../test/bin/wrapper"
-	  "${CMAKE_CURRENT_SOURCE_DIR}/../../test/bin/run_test_4")
+	  "${CMAKE_CURRENT_SOURCE_DIR}/../../test/bin/run_test_4" -v)
 	add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS
 	  ${programs} "${CMAKE_CURRENT_BINARY_DIR}/../../test/bin/wrapper") 
 endif()

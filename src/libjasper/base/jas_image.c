@@ -433,18 +433,23 @@ jas_image_t *jas_image_decode(jas_stream_t *in, int fmt, const char *optstr)
 		goto error;
 
 	/* Decode the image. */
-	if (!(image = (*fmtinfo->ops.decode)(in, optstr)))
+	if (!(image = (*fmtinfo->ops.decode)(in, optstr))) {
+		jas_eprintf("jas_image_decode: decode operation failed\n");
 		goto error;
+	}
 
 	/* Create a color profile if needed. */
 	if (!jas_clrspc_isunknown(image->clrspc_) &&
 	  !jas_clrspc_isgeneric(image->clrspc_) && !image->cmprof_) {
 		if (!(image->cmprof_ =
-		  jas_cmprof_createfromclrspc(jas_image_clrspc(image))))
+		  jas_cmprof_createfromclrspc(jas_image_clrspc(image)))) {
+			jas_eprintf("jas_image_decode: cannot create CM profile\n");
 			goto error;
+		}
 	}
 
 	return image;
+
 error:
 	if (image)
 		jas_image_destroy(image);

@@ -69,6 +69,8 @@
 * Includes.
 \******************************************************************************/
 
+#define JAS_INTERNAL_USE_ONLY
+
 #include "jpc_dec.h"
 #include "jpc_fix.h"
 #include "jpc_cs.h"

@@ -71,6 +71,8 @@
 * Includes.
 \******************************************************************************/
 
+#define JAS_INTERNAL_USE_ONLY
+
 #include "pnm_cod.h"
 
 #include "jasper/jas_init.h"

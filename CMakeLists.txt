@@ -93,6 +93,7 @@ option(JAS_ENABLE_OPENGL "Enable the use of the OpenGL/GLUT Library" true)
 option(JAS_ENABLE_AUTOMATIC_DEPENDENCIES "Enable automatic dependencies" true)
 option(JAS_ENABLE_DOC "Enable building of the documentation" true)
 option(JAS_ENABLE_PROGRAMS "Enable building of the programs" true)
+option(JAS_ENABLE_MULTITHREADING_SUPPORT "Enable multithreading support" false)
 
 option(JAS_INCLUDE_PNM_CODEC "Include PNM codec support" true)
 option(JAS_INCLUDE_BMP_CODEC "Include BMP codec support" true)
@@ -103,9 +104,6 @@ option(JAS_INCLUDE_JPG_CODEC "Include JPG codec support" true)
 option(JAS_INCLUDE_PGX_CODEC "Include PGX codec support" true)
 option(JAS_INCLUDE_MIF_CODEC "Include MIF codec support" true)
 
-option(JAS_USE_STD_ALLOCATOR_BY_DEFAULT
-  "Enable standard allocator by default (should be false, except for testing)"
-  false)
 option(JAS_USE_JAS_INIT
   "Use jas_init instead of jas_init_custom for initialization (should be false, except for testing)"
   false)
@@ -242,6 +240,15 @@ check_function_exists(mkostemp JAS_HAVE_MKOSTEMP)
 
 if (JAS_INCLUDE_JP2_CODEC AND NOT JAS_INCLUDE_JPC_CODEC)
 	message(FATAL_ERROR "The JPC codec must be included in order to include the JP2 codec.")
+endif()
+
+################################################################################
+#
+################################################################################
+
+if (JAS_ENABLE_MULTITHREADING_SUPPORT)
+	find_package(Threads REQUIRED)
+	set(THREAD_LIBRARY "Threads::Threads")
 endif()
 
 ################################################################################

@@ -71,6 +71,8 @@
 * Includes.
 \******************************************************************************/
 
+#define JAS_INTERNAL_USE_ONLY
+
 #include "ras_cod.h"
 
 #include "jasper/jas_init.h"

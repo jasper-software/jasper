@@ -166,26 +166,25 @@ int main(int argc, char **argv)
 		cmdname = argv[0];
 	}
 
-	{
-		int status;
 #if defined(JAS_USE_JAS_INIT)
-		status = jas_init();
-#else
-		jas_allocator_t allocator = {
-			.alloc = jas_bma_alloc,
-			.free = jas_bma_free,
-			.realloc = jas_bma_realloc
-		};
-		jas_conf_t conf;
-		jas_get_default_conf(&conf);
-		status = jas_init_custom(&conf);
-		atexit(jas_cleanup);
-#endif
-		if (status) {
-			fprintf(stderr, "cannot initialize JasPer library\n");
-			exit(EXIT_FAILURE);
-		}
+	if (jas_init()) {
+		fprintf(stderr, "cannot initialize JasPer library\n");
+		exit(EXIT_FAILURE);
 	}
+	jas_set_max_mem_usage(cmdopts->max_mem);
+#else
+	jas_conf_clear();
+	static jas_std_allocator_t allocator;
+	jas_std_allocator_init(&allocator);
+	jas_conf_set_allocator(&allocator.base);
+	//jas_conf_set_debug_level(debug);
+	//jas_conf_set_max_mem(max_mem);
+	if (jas_initialize()) {
+		fprintf(stderr, "cannot initialize JasPer library\n");
+		exit(EXIT_FAILURE);
+	}
+	atexit(jas_cleanup);
+#endif
 
 	/* Parse the command line options. */
 	if (!(cmdopts = cmdopts_parse(argc, argv))) {
@@ -200,9 +199,6 @@ int main(int argc, char **argv)
 	}
 
 	jas_setdbglevel(cmdopts->debug);
-#if defined(JAS_DEFAULT_MAX_MEM_USAGE)
-	jas_set_max_mem_usage(cmdopts->max_mem);
-#endif
 
 	if (cmdopts->verbose) {
 		cmdinfo();

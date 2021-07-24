@@ -81,92 +81,107 @@ extern "C" {
  * @{
  */
 
-/*!
-@brief
+#if defined(JAS_INTERNAL_USE_ONLY)
+/*
 User-configurable settings for library.
+This is for internal library use only.
 */
 typedef struct {
 
-	/*!
+	/*
+	A boolean flag indicating if the library has been configured
+	by invoking the jas_conf_clear function.
+	*/
+	bool initialized;
+
+	/*
 	The image format table to be used for initializing the library.
 	*/
 	jas_image_fmttab_t image_fmttab;
 
-	/*!
+	/*
 	The allocator to be used by the library.
 	*/
-	jas_allocator_t allocator;
+	jas_allocator_t *allocator;
 	
-	/*! The maximum number of samples allowable in an image to be decoded. */
+	/* The maximum number of samples allowable in an image to be decoded. */
 	size_t dec_default_max_samples;
 
-	/*!
+	/*
 	The maximum amount of memory to be used by the library if the BMA
 	allocator is used.
 	*/
 	size_t max_mem;
 
-	/*!
-	A flag indicating if atexit should be used to force jas_cleanup to
-	be invoked upon exit.
-	Enabling this flag is not recommended.
+	/*
+	The level of debugging checks/output enabled by the library.
+	A larger value corresponds to a greater level of debugging checks/output.
 	*/
-	bool atexit_cleanup;
+	int debug_level;
 
-	/*! Reserved for future use. */
+	/*
+	The jas_cleanup function should be invoked via atexit.
+	It is not recommended that this be used, as it can cause many problems.
+	*/
+	bool enable_atexit_cleanup;
+
+	/*
+	A boolean flag indicating if the allocator should be accessed through
+	a wrapper that allows memory usage to be tracked and limited.
+	*/
+	bool enable_allocator_wrapper;
+
+	/*
+	Reserved for future use.
+	*/
 	unsigned char reserved[256];
 
 } jas_conf_t;
+#endif
 
-/*
-NOTE: NOT NEEDED
-JAS_DLLEXPORT void jas_get_conf(jas_conf_t* conf);
-*/
-
-/* This is for internal library use only. */
-void jas_set_conf(const jas_conf_t* conf);
-
+#if defined(JAS_INTERNAL_USE_ONLY)
 /* This is for internal library use only. */
 jas_conf_t *jas_get_conf_ptr(void);
+#endif
 
 /******************************************************************************\
 * Functions.
 \******************************************************************************/
 
 /*!
-@brief Initialize the JasPer library.
+@brief Initialize the JasPer library with the current configuration settings.
 
 @details
-This function must be called before any other code in the JasPer library
-is invoked.
-This function registers the codecs that are enabled by default.
+The library must be configured by invoking the @c jas_conf_clear function
+prior to calling @c jas_initialize.
 
 @returns
-If successful, zero is returned; otherwise, a nonzero value is returned.
+If the initialization of the library is successful, zero is returned;
+otherwise, a nonzero value is returned.
+*/
+JAS_DLLEXPORT
+int jas_initialize(void);
+
+/*!
+@brief Configure and initialize the JasPer library using the default
+configuration settings.
+
+@details
+The @c jas_init function initializes the JasPer library.
+The library must be initialized before most code in the library can be used.
+
+The @ jas_init function exists only for reasons of backward compatibility
+with earlier versions of the library.
+It is recommended that this function not be used.
+Instead, the @c jas_conf_clear and @c jas_initialize functions should be used
+to configure and initialize the library.
+
+@returns
+If the library is succesfully initialized, zero is returned;
+otherwise, a nonzero value is returned.
 */
 JAS_DLLEXPORT
 int jas_init(void);
-
-/*!
-@brief Initialize the JasPer library with custom values for various
-configuration settings.
-
-@param conf
-A pointer to the data structure that specifies the configuration settings
-to be used for the library.
-
-@details
-This function initializes the JasPer library, setting the values
-of various configuration parameters for the library to those specified
-by @c conf.
-Any information needed by the library that is specified in the structure
-pointed to by @c conf is copied before the function returns.
-
-@returns
-If successful, zero is returned; otherwise, a nonzero value is returned.
-*/
-JAS_DLLEXPORT
-int jas_init_custom(const jas_conf_t *conf);
 
 /*!
 @brief Perform any clean up for the JasPer library.
@@ -178,18 +193,69 @@ JAS_DLLEXPORT
 void jas_cleanup(void);
 
 /*!
-@brief Get the default values for the configuration parameters (which
-were established when the library was built).
+@brief Configure the JasPer library with the default configuration settings.
 
 @details
-The configuration parameters are copied into the buffer supplied by the
-caller.
-
-@param conf
-A pointer to a buffer to hold the configuration parameters.
+This function configures the JasPer library with the default configuration
+settings.
+These settings may be change via the @c jas_conf_* family of function
+prior to invoking @c jas_initialize.
 */
 JAS_DLLEXPORT
-void jas_get_default_conf(jas_conf_t *conf);
+void jas_conf_clear(void);
+
+/*!
+@brief Set the memory allocator to be used by the library.
+
+@details
+The object referenced by @c allocator must have a live at least
+until @c jas_cleanup is invoked.
+How the memory in which @c *allocator reside is allocated is the
+responsibility of the caller.
+*/
+JAS_DLLEXPORT
+void jas_conf_set_allocator(jas_allocator_t *allocator);
+
+/*!
+@brief Set the memory allocator wrapper enabled flag.
+
+@details
+This function sets the value of the allocator wrapper enabled flag.
+Setting this flag to true shall invoke the wrath of all of the world's
+most-evil hackers.
+It is strongly recommended that the allocator wrapper not be disabled
+unless the memory allocator being used imposes an upper bound on memory
+usage.
+Not placing a bound on the amount of memory used by the JasPer library
+would have many severe negative security implications.
+*/
+JAS_DLLEXPORT
+void jas_conf_set_allocator_wrapper(bool enable);
+
+/*!
+@brief Set the initial debug level for the library.
+@details
+*/
+JAS_DLLEXPORT
+void jas_conf_set_debug_level(int debug_level);
+
+/*!
+@brief Set the maximum amount of memory that can be used by the library
+(assuming the allocator wrapper is not disabled).
+
+@details
+*/
+JAS_DLLEXPORT
+void jas_conf_set_max_mem(size_t max_mem);
+
+/*!
+@brief Set the default value for the maximum number of samples that is
+allowed in an image to be decoded.
+
+@details
+*/
+JAS_DLLEXPORT
+void jas_conf_set_dec_default_max_samples(size_t max_samples);
 
 /*!
  * @}

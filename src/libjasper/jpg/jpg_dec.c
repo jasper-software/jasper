@@ -63,6 +63,8 @@
 * Includes.
 \******************************************************************************/
 
+#define JAS_INTERNAL_USE_ONLY
+
 #include "jpg_jpeglib.h"
 
 #include "jasper/jas_init.h"

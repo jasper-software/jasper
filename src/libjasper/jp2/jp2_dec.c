@@ -71,6 +71,8 @@
 * Includes.
 \******************************************************************************/
 
+#define JAS_INTERNAL_USE_ONLY
+
 #include "jp2_dec.h"
 #include "jp2_cod.h"
 
