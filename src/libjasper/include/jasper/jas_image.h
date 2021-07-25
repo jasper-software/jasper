@@ -343,27 +343,10 @@ typedef struct {
 } jas_image_fmt_t;
 
 /*!
-@brief Image format table.
-*/
-typedef struct {
-
-	/*!
-	A pointer to the start of the array of table entries.
-	*/
-	const jas_image_fmt_t *entries;
-
-	/*!
-	The number of entries in the table.
-	*/
-	size_t num_entries;
-
-} jas_image_fmttab_t;
-
-/*!
 @brief Get the image format table (generated when the library was built).
 */
 JAS_DLLEXPORT
-const jas_image_fmttab_t *jas_get_image_fmttab(void);
+void jas_get_image_format_table(const jas_image_fmt_t**, size_t *);
 
 /******************************************************************************\
 * Image operations.

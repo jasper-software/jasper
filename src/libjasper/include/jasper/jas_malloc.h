@@ -255,13 +255,22 @@ JAS_DLLEXPORT void *jas_realloc2(void *ptr, size_t num_elements, size_t element_
 @brief
 Set the maximum memory usage allowed by the allocator wrapper.
 
+@param max_mem
+The maximum amount of memory (in bytes) that the allocator can use.
+
+
 @details
-This function sets the maximum amount of memory that the allocator wrapper
-will allow to be used.
+This function sets the maximum amount of memory (in bytes) that the
+allocator wrapper is permitted to use to @c max_mem.
+If @c max_mem is zero, no limit is imposed on the amount of memory used by
+allocator.
 This function can only be called if the use of the allocator wrapper
 is enabled.
 Calling this function if the allocator wrapper is not enabled results
 in undefined behavior.
+The limit on the amount of memory that the allocator can use should
+never be set to a value less than the amount of memory currently being
+used by the allocator (as doing so results in undefined behavior).
 */
 JAS_DLLEXPORT void jas_set_max_mem_usage(size_t max_mem);
 

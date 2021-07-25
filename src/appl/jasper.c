@@ -96,6 +96,7 @@ typedef struct {
 	const char *infile;
 	/* The input image file. */
 
+	const char *infmt_str;
 	int infmt;
 	/* The input image file format. */
 
@@ -105,6 +106,7 @@ typedef struct {
 	const char *outfile;
 	/* The output image file. */
 
+	const char *outfmt_str;
 	int outfmt;
 
 	char *outopts;
@@ -166,26 +168,6 @@ int main(int argc, char **argv)
 		cmdname = argv[0];
 	}
 
-#if defined(JAS_USE_JAS_INIT)
-	if (jas_init()) {
-		fprintf(stderr, "cannot initialize JasPer library\n");
-		exit(EXIT_FAILURE);
-	}
-	jas_set_max_mem_usage(cmdopts->max_mem);
-#else
-	jas_conf_clear();
-	static jas_std_allocator_t allocator;
-	jas_std_allocator_init(&allocator);
-	jas_conf_set_allocator(&allocator.base);
-	//jas_conf_set_debug_level(debug);
-	//jas_conf_set_max_mem(max_mem);
-	if (jas_initialize()) {
-		fprintf(stderr, "cannot initialize JasPer library\n");
-		exit(EXIT_FAILURE);
-	}
-	atexit(jas_cleanup);
-#endif
-
 	/* Parse the command line options. */
 	if (!(cmdopts = cmdopts_parse(argc, argv))) {
 		fprintf(stderr, "error: cannot parse command line\n");
@@ -198,7 +180,41 @@ int main(int argc, char **argv)
 		exit(EXIT_SUCCESS);
 	}
 
+#if defined(JAS_USE_JAS_INIT)
+	if (jas_init()) {
+		fprintf(stderr, "cannot initialize JasPer library\n");
+		exit(EXIT_FAILURE);
+	}
+	jas_set_max_mem_usage(cmdopts->max_mem);
 	jas_setdbglevel(cmdopts->debug);
+#else
+	jas_conf_clear();
+	static jas_std_allocator_t allocator;
+	jas_std_allocator_init(&allocator);
+	jas_conf_set_allocator(&allocator.base);
+	jas_conf_set_debug_level(cmdopts->debug);
+	jas_conf_set_max_mem(cmdopts->max_mem);
+	if (jas_initialize()) {
+		fprintf(stderr, "cannot initialize JasPer library\n");
+		exit(EXIT_FAILURE);
+	}
+	atexit(jas_cleanup);
+#endif
+
+	if (cmdopts->infmt_str) {
+		if ((cmdopts->infmt = jas_image_strtofmt(cmdopts->infmt_str)) < 0) {
+			fprintf(stderr, "warning: ignoring invalid input format %s\n",
+			  cmdopts->infmt_str);
+			cmdopts->infmt = -1;
+		}
+	} else {
+		cmdopts->infmt = -1;
+	}
+	if ((cmdopts->outfmt = jas_image_strtofmt(cmdopts->outfmt_str)) < 0) {
+		fprintf(stderr, "error: invalid output format %s\n",
+		cmdopts->outfmt_str);
+		badusage();
+	}
 
 	if (cmdopts->verbose) {
 		cmdinfo();
@@ -370,10 +386,12 @@ cmdopts_t *cmdopts_parse(int argc, char **argv)
 
 	cmdopts->infile = 0;
 	cmdopts->infmt = -1;
+	cmdopts->infmt_str = 0;
 	cmdopts->inopts = 0;
 	cmdopts->inoptsbuf[0] = '\0';
 	cmdopts->outfile = 0;
 	cmdopts->outfmt = -1;
+	cmdopts->outfmt_str = 0;
 	cmdopts->outopts = 0;
 	cmdopts->outoptsbuf[0] = '\0';
 	cmdopts->verbose = 0;
@@ -403,11 +421,15 @@ cmdopts_t *cmdopts_parse(int argc, char **argv)
 			cmdopts->infile = jas_optarg;
 			break;
 		case CMDOPT_INFMT:
+#if 0
 			if ((cmdopts->infmt = jas_image_strtofmt(jas_optarg)) < 0) {
 				fprintf(stderr, "warning: ignoring invalid input format %s\n",
 				  jas_optarg);
 				cmdopts->infmt = -1;
 			}
+#else
+			cmdopts->infmt_str= jas_optarg;
+#endif
 			break;
 		case CMDOPT_INOPT:
 			addopt(cmdopts->inoptsbuf, OPTSMAX, jas_optarg);
@@ -417,10 +439,14 @@ cmdopts_t *cmdopts_parse(int argc, char **argv)
 			cmdopts->outfile = jas_optarg;
 			break;
 		case CMDOPT_OUTFMT:
+#if 0
 			if ((cmdopts->outfmt = jas_image_strtofmt(jas_optarg)) < 0) {
 				fprintf(stderr, "error: invalid output format %s\n", jas_optarg);
 				badusage();
 			}
+#else
+			cmdopts->outfmt_str = jas_optarg;
+#endif
 			break;
 		case CMDOPT_OUTOPT:
 			addopt(cmdopts->outoptsbuf, OPTSMAX, jas_optarg);
@@ -459,10 +485,17 @@ cmdopts_t *cmdopts_parse(int argc, char **argv)
 		}
 	}
 
+#if 0
 	if (cmdopts->outfmt < 0) {
 		fprintf(stderr, "error: no output format specified\n");
 		badusage();
 	}
+#else
+	if (!cmdopts->outfmt_str) {
+		fprintf(stderr, "error: no output format specified\n");
+		badusage();
+	}
+#endif
 
 done:
 	return cmdopts;
@@ -542,10 +575,11 @@ void cmdusage()
 		  fmtinfo->desc);
 	}
 #else
-	const jas_image_fmttab_t *fmttab = jas_get_image_fmttab();
+	const jas_image_fmt_t *formats;
+	size_t num_formats;
+	jas_get_image_format_table(&formats, &num_formats);
 	const jas_image_fmt_t *fmt;
-	for (fmt = fmttab->entries, i = 0; i < JAS_CAST(int, fmttab->num_entries);
-	  ++fmt, ++i) {
+	for (fmt = formats, i = 0; i < JAS_CAST(int, num_formats); ++fmt, ++i) {
 		fprintf(stderr, "    %-5s    %s\n", fmt->name, fmt->desc);
 	}
 #endif

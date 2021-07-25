@@ -74,7 +74,10 @@
 /* The configuration header file should be included first. */
 #include <jasper/jas_config.h>
 
+#include "jasper/jas_thread.h"
+
 #include <stdio.h>
+#include <stdarg.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -103,6 +106,9 @@ JAS_DLLEXPORT int jas_setdbglevel(int dbglevel);
 /* Perform formatted output to standard error. */
 JAS_DLLEXPORT int jas_eprintf(const char *fmt, ...);
 
+int jas_eprintf_impl(const char *fmt, va_list ap);
+int jas_eprintf_discard_impl(const char *fmt, va_list ap);
+
 /* Dump memory to a stream. */
 JAS_DLLEXPORT int jas_memdump(FILE *out, const void *data, size_t len);
 
@@ -114,6 +120,10 @@ JAS_DLLEXPORT void jas_deprecated(const char *s);
 
 /* Convert to a string literal after macro expansion */
 #define JAS_STRINGIFYX(x) JAS_STRINGIFY(x)
+
+#if defined(JAS_INTERNAL_USE_ONLY)
+extern jas_mutex_t jas_eprintf_mutex;
+#endif
 
 #ifdef __cplusplus
 }

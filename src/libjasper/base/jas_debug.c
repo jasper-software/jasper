@@ -63,6 +63,9 @@
 * Includes.
 \******************************************************************************/
 
+#define JAS_INTERNAL_USE_ONLY
+
+#include "jasper/jas_init.h"
 #include "jasper/jas_debug.h"
 #include "jasper/jas_types.h"
 
@@ -112,9 +115,26 @@ int jas_eprintf(const char *fmt, ...)
 	va_list ap;
 
 	va_start(ap, fmt);
-	ret = vfprintf(stderr, fmt, ap);
+	ret = (jas_conf.eprintf)(fmt, ap);
 	va_end(ap);
 	return ret;
+}
+
+jas_mutex_t jas_eprintf_mutex;
+
+/* Perform formatted output to standard error. */
+int jas_eprintf_impl(const char *fmt, va_list ap)
+{
+	jas_mutex_lock(&jas_eprintf_mutex);
+	int result = vfprintf(stderr, fmt, ap);
+	jas_mutex_unlock(&jas_eprintf_mutex);
+	return result;
+}
+
+/* Perform formatted output to standard error. */
+int jas_eprintf_discard_impl(const char *fmt, va_list ap)
+{
+	return 0;
 }
 
 /* Dump memory to a stream. */

@@ -97,7 +97,8 @@ typedef struct {
 	/*
 	The image format table to be used for initializing the library.
 	*/
-	jas_image_fmttab_t image_fmttab;
+	const jas_image_fmt_t *image_formats;
+	size_t num_image_formats;
 
 	/*
 	The allocator to be used by the library.
@@ -132,6 +133,11 @@ typedef struct {
 	bool enable_allocator_wrapper;
 
 	/*
+	The function used to output error/warning/informational messages.
+	*/
+	int (*eprintf)(const char *format, va_list ap);
+
+	/*
 	Reserved for future use.
 	*/
 	unsigned char reserved[256];
@@ -142,6 +148,7 @@ typedef struct {
 #if defined(JAS_INTERNAL_USE_ONLY)
 /* This is for internal library use only. */
 jas_conf_t *jas_get_conf_ptr(void);
+extern jas_conf_t jas_conf;
 #endif
 
 /******************************************************************************\
@@ -256,6 +263,27 @@ allowed in an image to be decoded.
 */
 JAS_DLLEXPORT
 void jas_conf_set_dec_default_max_samples(size_t max_samples);
+
+/*!
+@brief Set the function used by the library to output error, warning, and
+informational messages.
+
+@details
+*/
+JAS_DLLEXPORT
+void jas_conf_set_eprintf(int (*eprintf)(const char *, va_list));
+
+/*!
+@brief Set the image-format table to be used to initialize the library.
+
+@details
+The entries for the image-format table that reside in the array pointed to
+by @c formats must have a lifetime that includes the point at which the
+JasPer library is cleaned up (via @c jas_cleanup).
+*/
+JAS_DLLEXPORT
+void jas_conf_set_image_format_table(const jas_image_fmt_t *,
+  size_t num_formats);
 
 /*!
  * @}

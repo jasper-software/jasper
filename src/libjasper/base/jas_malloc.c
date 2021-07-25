@@ -277,7 +277,8 @@ void jas_set_max_mem_usage(size_t max_mem)
 #if defined(JAS_ENABLE_MULTITHREADING_SUPPORT)
 	jas_mutex_lock(&allocator->mutex);
 #endif
-	allocator->max_mem = max_mem;
+	allocator->max_mem = (!max_mem || allocator->mem <= max_mem) ? max_mem :
+	  allocator->mem;
 #if defined(JAS_ENABLE_MULTITHREADING_SUPPORT)
 	jas_mutex_unlock(&allocator->mutex);
 #endif

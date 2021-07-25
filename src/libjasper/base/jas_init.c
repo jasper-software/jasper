@@ -187,21 +187,18 @@ static const jas_image_fmt_t jas_image_fmts[] = {
 
 };
 
-static const jas_image_fmttab_t jas_image_fmttab = {
-	.num_entries = sizeof(jas_image_fmts) / sizeof(jas_image_fmt_t),
-	.entries = jas_image_fmts
-};
-
 JAS_DLLEXPORT
-const jas_image_fmttab_t *jas_get_image_fmttab()
+void jas_get_image_format_table(const jas_image_fmt_t** formats,
+  size_t *num_formats)
 {
-	return &jas_image_fmttab;
+	*formats = jas_image_fmts;
+	*num_formats = sizeof(jas_image_fmts) / sizeof(jas_image_fmt_t);
 }
 
 /*
 Various user-configurable settings.
 */
-static jas_conf_t jas_conf = {
+jas_conf_t jas_conf = {
 	.initialized = 0,
 };
 
@@ -214,13 +211,17 @@ void jas_conf_clear()
 {
 	memset(&jas_conf, 0, sizeof(jas_conf_t));
 	jas_conf.initialized = 1;
-	jas_conf.image_fmttab = jas_image_fmttab;
 	jas_conf.allocator = 0;
 	jas_conf.enable_allocator_wrapper = 1;
 	jas_conf.max_mem = JAS_DEFAULT_MAX_MEM_USAGE;
 	jas_conf.dec_default_max_samples = JAS_DEC_DEFAULT_MAX_SAMPLES;
 	jas_conf.debug_level = 0;
 	jas_conf.enable_atexit_cleanup = 0;
+	jas_conf.eprintf = jas_eprintf_impl;
+	//jas_conf.eprintf = jas_eprintf_discard_impl;
+	jas_conf.num_image_formats = sizeof(jas_image_fmts) /
+	  sizeof(jas_image_fmt_t);
+	jas_conf.image_formats = jas_image_fmts;
 }
 
 JAS_DLLEXPORT
@@ -251,6 +252,20 @@ JAS_DLLEXPORT
 void jas_conf_set_dec_default_max_samples(size_t n)
 {
 	jas_conf.dec_default_max_samples = n;
+}
+
+JAS_DLLEXPORT
+void jas_conf_set_eprintf(int (*eprintf)(const char *, va_list))
+{
+	jas_conf.eprintf = eprintf;
+}
+
+JAS_DLLEXPORT
+void jas_conf_set_image_format_table(const jas_image_fmt_t *formats,
+  size_t num_formats)
+{
+	jas_conf.image_formats = formats;
+	jas_conf.num_image_formats = num_formats;
 }
 
 static int jas_init_codecs(void);
@@ -312,6 +327,8 @@ static int jas_init_helper()
 		atexit(jas_cleanup);
 	}
 
+	jas_mutex_init(&jas_eprintf_mutex);
+
 	return 0;
 }
 
@@ -322,11 +339,11 @@ static int jas_init_codecs()
 	int fmtid;
 	const char delim[] = " \t";
 
-	const jas_image_fmttab_t *fmttab = jas_get_image_fmttab();
 	const jas_image_fmt_t *fmt;
 	size_t i;
 	fmtid = 0;
-	for (fmt = fmttab->entries, i = 0; i < fmttab->num_entries; ++fmt, ++i) {
+	for (fmt = jas_conf.image_formats, i = 0; i < jas_conf.num_image_formats;
+	  ++fmt, ++i) {
 		char *buf = jas_strdup(fmt->exts);
 		bool first = true;
 		for (;;) {
@@ -353,6 +370,8 @@ void jas_cleanup()
 	assert(jas_allocator);
 	jas_allocator_cleanup(jas_allocator);
 	jas_allocator = 0;
+
+	jas_mutex_cleanup(&jas_eprintf_mutex);
 
 	JAS_DBGLOG(10, ("jas_cleanup returning\n"));
 }
