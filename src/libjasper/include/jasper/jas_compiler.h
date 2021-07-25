@@ -100,4 +100,10 @@
 #define JAS_ATTRIBUTE_DISABLE_USAN
 #endif
 
+#ifdef __has_builtin
+#define jas_has_builtin(x) __has_builtin(x)
+#else
+#define jas_has_builtin(x) 0
+#endif
+
 #endif
