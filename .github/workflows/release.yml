@@ -17,7 +17,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            ${{runner.temp}}/out/jasper.tar.gz
+            ${{runner.temp}}/out/jasper*.tar.gz
           body_path: ${{runner.temp}}/out/release_notes.txt
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
