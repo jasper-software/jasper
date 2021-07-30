@@ -78,20 +78,25 @@
 #include "jasper/jas_math.h"
 
 #include <assert.h>
+
 #if defined(JAS_HAVE_FCNTL_H)
 #include <fcntl.h>
 #endif
+
 #include <stdlib.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+
 #if defined(JAS_HAVE_UNISTD_H)
 #include <unistd.h>
 #endif
+
 #if defined(WIN32) || defined(JAS_HAVE_IO_H)
 #include <io.h>
 #endif
+
 #ifdef _WIN32
 #include <windows.h> // for GetTempPathA()
 #endif

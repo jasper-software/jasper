@@ -69,8 +69,11 @@
 
 /* The configuration header file should be included first. */
 #include <jasper/jas_config.h>
+
 #include <jasper/jas_malloc.h>
 #include <jasper/jas_image.h>
+
+#include <stdarg.h>
 
 #ifdef __cplusplus
 extern "C" {
