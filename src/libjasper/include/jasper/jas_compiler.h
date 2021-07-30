@@ -77,7 +77,11 @@
 #define JAS_ATTRIBUTE_CONST __attribute__((const))
 #define JAS_ATTRIBUTE_PURE __attribute__((pure))
 #define JAS_FORCE_INLINE inline __attribute__((always_inline))
+#if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 5)
 #define JAS_UNREACHABLE() __builtin_unreachable()
+#else
+#define JAS_UNREACHABLE()
+#endif
 #define JAS_LIKELY(x) __builtin_expect (!!(x), 1)
 #define JAS_UNLIKELY(x) __builtin_expect (!!(x), 0)
 #else
