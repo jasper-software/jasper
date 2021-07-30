@@ -133,7 +133,7 @@ static int pnm_dec_parseopts(const char *optstr, pnm_dec_importopts_t *opts)
 {
 	jas_tvparser_t *tvp;
 
-	opts->max_samples = jas_get_conf_ptr()->dec_default_max_samples;
+	opts->max_samples = jas_get_ctx()->dec_default_max_samples;
 	opts->allow_trunc = 0;
 
 	if (!(tvp = jas_tvparser_create(optstr ? optstr : ""))) {

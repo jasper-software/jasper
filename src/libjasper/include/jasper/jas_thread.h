@@ -72,24 +72,91 @@
 /* The configuration header file should be included first. */
 #include <jasper/jas_config.h>
 
+#include "jasper/jas_compiler.h"
+
 #if defined(JAS_ENABLE_MULTITHREADING_SUPPORT)
+#ifndef __STDC_NO_THREADS__
 #include <threads.h>
+#endif
 #endif
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef struct {
 #if defined(JAS_ENABLE_MULTITHREADING_SUPPORT)
+
+#if defined(JAS_THREADS_C11)
+
+/******************************************************************************\
+* Thread Support Based on the C11 Standard
+\******************************************************************************/
+
+#define JAS_ONCE_FLAG_INIT ONCE_FLAG_INIT
+
+typedef once_flag jas_once_flag_t;
+
+typedef struct {
 	mtx_t mutex;
-#endif
-#if !defined(JAS_ENABLE_MULTITHREADING_SUPPORT)
-	char unused;
-#endif
 } jas_mutex_t;
 
-#if defined(JAS_ENABLE_MULTITHREADING_SUPPORT)
+typedef struct {
+	tss_t value;
+} jas_tss_t;
+
+typedef thrd_t jas_thread_id_t;
+
+typedef struct {
+	thrd_t thread;
+} jas_thread_t;
+
+static inline
+int jas_tss_create(jas_tss_t *id, void (*destructor)(void *))
+{
+	return tss_create(&id->value, destructor) == thrd_success ? 0 : -1;
+}
+
+static inline
+void *jas_tss_get(jas_tss_t id)
+{
+	return tss_get(id.value);
+}
+
+static inline
+int jas_tss_set(jas_tss_t id, void *value)
+{
+	return tss_set(id.value, value) == thrd_success ? 0 : -1;
+}
+
+static inline
+void jas_tss_delete(jas_tss_t id)
+{
+	tss_delete(id.value);
+}
+
+static inline
+int jas_thread_create(jas_thread_t *thread, int (*func)(void *), void *arg)
+{
+	return thrd_create(&thread->thread, func, arg) == thrd_success ? 0 : -1;
+}
+
+static inline
+int jas_thread_join(jas_thread_t thread, int *result)
+{
+	return thrd_join(thread.thread, result) == thrd_success ? 0 : -1;
+}
+
+static inline
+void jas_thread_exit(int result)
+{
+	thrd_exit(result);
+}
+
+static inline
+jas_thread_id_t jas_thread_current(void)
+{
+	return thrd_current();
+}
 
 static inline int jas_mutex_init(jas_mutex_t *mtx)
 {
@@ -111,30 +178,18 @@ static inline int jas_mutex_unlock(jas_mutex_t *mtx)
 	return mtx_unlock(&mtx->mutex);
 }
 
+static inline void jas_call_once(jas_once_flag_t *flag, void (*func)(void))
+{
+	call_once(flag, func);
+}
+
+#endif
+
 #else
 
-static inline int jas_mutex_init(jas_mutex_t *mtx)
-{
-	JAS_CAST(void, mtx);
-	return 0;
-}
-
-static inline void jas_mutex_cleanup(jas_mutex_t *mtx)
-{
-	JAS_CAST(void, mtx);
-}
-
-static inline int jas_mutex_lock(jas_mutex_t *mtx)
-{
-	JAS_CAST(void, mtx);
-	return 0;
-}
-
-static inline int jas_mutex_unlock(jas_mutex_t *mtx)
-{
-	JAS_CAST(void, mtx);
-	return 0;
-}
+/******************************************************************************\
+* No Threading Support.
+\******************************************************************************/
 
 #endif
 

@@ -116,8 +116,6 @@ static uint_least8_t jpc_getscctxno(unsigned f);
 JAS_ATTRIBUTE_CONST
 static uint_least8_t jpc_getmagctxno(unsigned f);
 
-static void jpc_initmqctxs(void);
-
 /******************************************************************************\
 * Code.
 \******************************************************************************/
@@ -239,9 +237,6 @@ void jpc_initluts()
 	float v;
 	float t;
 
-/* XXX - hack */
-jpc_initmqctxs();
-
 	for (unsigned orient = 0; orient < 4; ++orient) {
 		for (unsigned i = 0; i < 256; ++i) {
 			jpc_zcctxnolut[(orient << 8) | i] = jpc_getzcctxno(i, orient);
@@ -266,18 +261,26 @@ jpc_initmqctxs();
 		t = i * jpc_pow2i(-JPC_NMSEDEC_FRACBITS);
 		u = t;
 		v = t - 1.5f;
-		jpc_signmsedec[i] = jpc_dbltofix(floor((u * u - v * v) * jpc_pow2i(JPC_NMSEDEC_FRACBITS) + 0.5) / jpc_pow2i(JPC_NMSEDEC_FRACBITS));
+		jpc_signmsedec[i] = jpc_dbltofix(floor((u * u - v * v) *
+		  jpc_pow2i(JPC_NMSEDEC_FRACBITS) + 0.5) /
+		  jpc_pow2i(JPC_NMSEDEC_FRACBITS));
 /* XXX - this calc is not correct */
-		jpc_signmsedec0[i] = jpc_dbltofix(floor((u * u) * jpc_pow2i(JPC_NMSEDEC_FRACBITS) + 0.5) / jpc_pow2i(JPC_NMSEDEC_FRACBITS));
+		jpc_signmsedec0[i] = jpc_dbltofix(floor((u * u) *
+		  jpc_pow2i(JPC_NMSEDEC_FRACBITS) + 0.5) /
+		  jpc_pow2i(JPC_NMSEDEC_FRACBITS));
 		u = t - 1.0f;
 		if (i & (1 << (JPC_NMSEDEC_BITS - 1))) {
 			v = t - 1.5f;
 		} else {
 			v = t - 0.5f;
 		}
-		jpc_refnmsedec[i] = jpc_dbltofix(floor((u * u - v * v) * jpc_pow2i(JPC_NMSEDEC_FRACBITS) + 0.5) / jpc_pow2i(JPC_NMSEDEC_FRACBITS));
+		jpc_refnmsedec[i] = jpc_dbltofix(floor((u * u - v * v) *
+		  jpc_pow2i(JPC_NMSEDEC_FRACBITS) + 0.5) /
+		  jpc_pow2i(JPC_NMSEDEC_FRACBITS));
 /* XXX - this calc is not correct */
-		jpc_refnmsedec0[i] = jpc_dbltofix(floor((u * u) * jpc_pow2i(JPC_NMSEDEC_FRACBITS) + 0.5) / jpc_pow2i(JPC_NMSEDEC_FRACBITS));
+		jpc_refnmsedec0[i] = jpc_dbltofix(floor((u * u) *
+		  jpc_pow2i(JPC_NMSEDEC_FRACBITS) + 0.5) /
+		  jpc_pow2i(JPC_NMSEDEC_FRACBITS));
 	}
 }
 
@@ -463,7 +466,7 @@ static void jpc_initctxs(jpc_mqctx_t *ctxs)
 	}
 }
 
-static void jpc_initmqctxs()
+void jpc_initmqctxs()
 {
 	jpc_initctxs(jpc_mqctxs);
 }

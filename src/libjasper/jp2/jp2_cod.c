@@ -83,12 +83,6 @@
 * Function prototypes.
 \******************************************************************************/
 
-static inline uint_fast32_t ones(int n)
-{
-	assert(n >= 0);
-	return (JAS_CAST(uint_fast32_t, 1) << n) - 1;
-}
-
 static const jp2_boxinfo_t *jp2_boxinfolookup(int type);
 
 static int jp2_getuint8(jas_stream_t *in, uint_fast8_t *val);
@@ -129,6 +123,15 @@ static void jp2_pclr_destroy(jp2_box_t *box);
 static int jp2_pclr_getdata(jp2_box_t *box, jas_stream_t *in);
 static int jp2_pclr_putdata(const jp2_box_t *box, jas_stream_t *out);
 static void jp2_pclr_dumpdata(const jp2_box_t *box, FILE *out);
+
+/******************************************************************************\
+\******************************************************************************/
+
+static inline uint_fast32_t ones(int n)
+{
+	assert(n >= 0);
+	return (JAS_CAST(uint_fast32_t, 1) << n) - 1;
+}
 
 /******************************************************************************\
 * Local data.
@@ -777,10 +780,6 @@ static const jp2_boxinfo_t *jp2_boxinfolookup(int type)
 	}
 	return &jp2_boxinfo_unk;
 }
-
-
-
-
 
 static void jp2_cmap_destroy(jp2_box_t *box)
 {

@@ -86,11 +86,32 @@
 #include <string.h>
 
 /******************************************************************************\
-* Memory Allocator Configuration.
+* Data.
 \******************************************************************************/
 
 /* The memory allocator object to be used for all memory allocation. */
 jas_allocator_t *jas_allocator = 0;
+
+jas_std_allocator_t jas_std_allocator = {
+	.base = {
+		.cleanup = 0,
+		.alloc = 0,
+		.free = 0,
+		.realloc = 0,
+	},
+};
+
+jas_basic_allocator_t jas_basic_allocator = {
+	.base = {
+		.cleanup = 0,
+		.alloc = 0,
+		.free = 0,
+		.realloc = 0,
+	},
+	.delegate = 0,
+	.mem = 0,
+	.max_mem = 0,
+};
 
 /******************************************************************************\
 * Basic memory allocation and deallocation primitives.
@@ -120,10 +141,10 @@ void *jas_realloc(void *ptr, size_t size)
 	if (!ptr && !size) {
 #if defined(JAS_MALLOC_RETURN_NULL_PTR_FOR_ZERO_SIZE)
 		result = 0;
-		JAS_DBGLOG(100, ("jas_realloc: no-op -> %p\n", result));
+		JAS_DBGLOG(101, ("jas_realloc: no-op -> %p\n", result));
 #else
 		result = (jas_allocator->alloc)(jas_allocator, 1);
-		JAS_DBGLOG(100, ("jas_realloc: alloc(%p, %p, %zu) -> %p\n",
+		JAS_DBGLOG(101, ("jas_realloc: alloc(%p, %p, %zu) -> %p\n",
 		  jas_allocator, ptr, size, result));
 #endif
 	} else {
@@ -143,6 +164,53 @@ void jas_free(void *ptr)
 }
 
 /******************************************************************************\
+* Additional memory allocation and deallocation primitives
+* (mainly for overflow checking).
+\******************************************************************************/
+
+void *jas_calloc(size_t num_elements, size_t element_size)
+{
+	void *ptr;
+	size_t size;
+	if (!jas_safe_size_mul(num_elements, element_size, &size)) {
+		return 0;
+	}
+	if (!(ptr = jas_malloc(size))) {
+		return 0;
+	}
+	memset(ptr, 0, size);
+	return ptr;
+}
+
+void *jas_alloc2(size_t num_elements, size_t element_size)
+{
+	size_t size;
+	if (!jas_safe_size_mul(num_elements, element_size, &size)) {
+		return 0;
+	}
+	return jas_malloc(size);
+}
+
+void *jas_alloc3(size_t num_arrays, size_t array_size, size_t element_size)
+{
+	size_t size;
+	if (!jas_safe_size_mul(array_size, element_size, &size) ||
+	  !jas_safe_size_mul(size, num_arrays, &size)) {
+		return 0;
+	}
+	return jas_malloc(size);
+}
+
+void *jas_realloc2(void *ptr, size_t num_elements, size_t element_size)
+{
+	size_t size;
+	if (!jas_safe_size_mul(num_elements, element_size, &size)) {
+		return 0;
+	}
+	return jas_realloc(ptr, size);
+}
+
+/******************************************************************************\
 \******************************************************************************/
 
 JAS_DLLEXPORT
@@ -153,20 +221,15 @@ void jas_allocator_cleanup(jas_allocator_t *allocator)
 	}
 }
 
+/******************************************************************************\
+\******************************************************************************/
+
 JAS_DLLEXPORT
 void *jas_std_alloc(jas_allocator_t *allocator, size_t size);
 JAS_DLLEXPORT
 void *jas_std_realloc(jas_allocator_t *allocator, void *ptr, size_t size);
 JAS_DLLEXPORT
 void jas_std_free(jas_allocator_t *allocator, void *ptr);
-
-jas_std_allocator_t jas_std_allocator = {
-	.base = {
-		.alloc = 0,
-		.free = 0,
-		.realloc = 0,
-	},
-};
 
 JAS_DLLEXPORT
 void jas_std_allocator_init(jas_std_allocator_t *allocator)
@@ -182,9 +245,9 @@ JAS_DLLEXPORT
 void *jas_std_alloc(jas_allocator_t *allocator, size_t size)
 {
 	JAS_CAST(void, allocator);
-	JAS_DBGLOG(101, ("jas_std_alloc(%zu)\n", size));
+	JAS_DBGLOG(111, ("jas_std_alloc(%zu)\n", size));
 	void* result = malloc(size);
-	JAS_DBGLOG(100, ("jas_std_alloc(%zu) -> %p\n", size, result));
+	JAS_DBGLOG(110, ("jas_std_alloc(%zu) -> %p\n", size, result));
 	return result;
 }
 
@@ -192,9 +255,9 @@ JAS_DLLEXPORT
 void *jas_std_realloc(jas_allocator_t *allocator, void *ptr, size_t size)
 {
 	JAS_CAST(void, allocator);
-	JAS_DBGLOG(101, ("jas_std_realloc(%p, %zu)\n", allocator, size));
+	JAS_DBGLOG(111, ("jas_std_realloc(%p, %zu)\n", allocator, size));
 	void *result = realloc(ptr, size);
-	JAS_DBGLOG(100, ("jas_std_realloc(%zu) -> %p\n", size, result));
+	JAS_DBGLOG(110, ("jas_std_realloc(%zu) -> %p\n", size, result));
 	return result;
 }
 
@@ -202,24 +265,12 @@ JAS_DLLEXPORT
 void jas_std_free(jas_allocator_t *allocator, void *ptr)
 {
 	JAS_CAST(void, allocator);
-	JAS_DBGLOG(101, ("jas_std_free(%p, %p)\n", allocator, ptr));
+	JAS_DBGLOG(111, ("jas_std_free(%p, %p)\n", allocator, ptr));
 	free(ptr);
 }
 
 /******************************************************************************\
 \******************************************************************************/
-
-jas_basic_allocator_t jas_basic_allocator = {
-	.base = {
-		.cleanup = 0,
-		.alloc = 0,
-		.free = 0,
-		.realloc = 0,
-	},
-	.delegate = 0,
-	.mem = 0,
-	.max_mem = 0,
-};
 
 JAS_DLLEXPORT
 void *jas_basic_alloc(jas_allocator_t *allocator, size_t size);
@@ -480,12 +531,12 @@ void jas_basic_free(jas_allocator_t *allocator, void *ptr)
 	size_t size;
 	jas_basic_allocator_t *a = JAS_CAST(jas_basic_allocator_t *, allocator);
 
-#if defined(JAS_ENABLE_MULTITHREADING_SUPPORT)
-	jas_mutex_lock(&a->mutex);
-#endif
 
 	JAS_DBGLOG(100, ("jas_basic_free(%p)\n", ptr));
 	if (ptr) {
+#if defined(JAS_ENABLE_MULTITHREADING_SUPPORT)
+		jas_mutex_lock(&a->mutex);
+#endif
 		mb = jas_get_mb(ptr);
 		size = mb->size;
 		JAS_DBGLOG(101, ("jas_basic_free(%p, %p) (mb=%p; size=%zu)\n",
@@ -497,57 +548,10 @@ void jas_basic_free(jas_allocator_t *allocator, void *ptr)
 		JAS_DBGLOG(100, ("jas_basic_free: free(%p, %p)\n", a->delegate, mb));
 		jas_mb_destroy(mb);
 		(a->delegate->free)(a->delegate, mb);
+#if defined(JAS_ENABLE_MULTITHREADING_SUPPORT)
+		jas_mutex_unlock(&a->mutex);
+#endif
 	}
 	JAS_DBGLOG(102, ("max_mem=%zu; mem=%zu\n", a->max_mem, a->mem));
 
-#if defined(JAS_ENABLE_MULTITHREADING_SUPPORT)
-	jas_mutex_unlock(&a->mutex);
-#endif
-}
-
-/******************************************************************************\
-* Additional memory allocation and deallocation primitives
-* (mainly for overflow checking).
-\******************************************************************************/
-
-void *jas_calloc(size_t num_elements, size_t element_size)
-{
-	void *ptr;
-	size_t size;
-	if (!jas_safe_size_mul(num_elements, element_size, &size)) {
-		return 0;
-	}
-	if (!(ptr = jas_malloc(size))) {
-		return 0;
-	}
-	memset(ptr, 0, size);
-	return ptr;
-}
-
-void *jas_alloc2(size_t num_elements, size_t element_size)
-{
-	size_t size;
-	if (!jas_safe_size_mul(num_elements, element_size, &size)) {
-		return 0;
-	}
-	return jas_malloc(size);
-}
-
-void *jas_alloc3(size_t num_arrays, size_t array_size, size_t element_size)
-{
-	size_t size;
-	if (!jas_safe_size_mul(array_size, element_size, &size) ||
-	  !jas_safe_size_mul(size, num_arrays, &size)) {
-		return 0;
-	}
-	return jas_malloc(size);
-}
-
-void *jas_realloc2(void *ptr, size_t num_elements, size_t element_size)
-{
-	size_t size;
-	if (!jas_safe_size_mul(num_elements, element_size, &size)) {
-		return 0;
-	}
-	return jas_realloc(ptr, size);
 }

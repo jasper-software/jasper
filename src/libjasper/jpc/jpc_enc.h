@@ -76,6 +76,7 @@
 #include "jasper/jas_seq.h"
 #include "jasper/jas_stream.h"
 
+#include "jpc_cod.h"
 #include "jpc_t1cod.h"
 #include "jpc_t2cod.h"
 #include "jpc_mqenc.h"

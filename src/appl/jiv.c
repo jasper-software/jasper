@@ -305,6 +305,12 @@ int main(int argc, char **argv)
 		fprintf(stderr, "cannot initialize JasPer library\n");
 		exit(EXIT_FAILURE);
 	}
+	jas_context_t context;
+	if (!(context = jas_context_create())) {
+		fprintf(stderr, "cannot create context\n");
+		exit(EXIT_FAILURE);
+	}
+	jas_set_context(context);
 	atexit(jas_cleanup);
 #endif
 

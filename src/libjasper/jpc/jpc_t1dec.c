@@ -77,6 +77,7 @@
 #include "jpc_t1cod.h"
 #include "jpc_dec.h"
 
+#include "jasper/jas_thread.h"
 #include "jasper/jas_stream.h"
 #include "jasper/jas_math.h"
 #include "jasper/jas_debug.h"
@@ -100,22 +101,23 @@ static int dec_rawrefpass(jpc_bitstream_t *in, unsigned bitpos,
 static int dec_clnpass(jpc_mqdec_t *mqdec, unsigned bitpos, enum jpc_tsfb_orient orient,
   bool vcausalflag, bool segsymflag, jas_matrix_t *flags, jas_matrix_t *data);
 
-#ifndef NDEBUG
-static long t1dec_cnt = 0;
+#if defined(JAS_ENABLE_NON_THREAD_SAFE_DEBUGGING)
+static size_t t1dec_cnt = 0;
 #endif
 
 JAS_FORCE_INLINE
 static bool JPC_T1D_GETBIT(jpc_mqdec_t *mqdec, const char *passtypename, const char *symtypename)
 {
 	bool v = jpc_mqdec_getbit(mqdec);
-#ifndef NDEBUG
+#if defined(JAS_ENABLE_NON_THREAD_SAFE_DEBUGGING)
 	if (jas_getdbglevel() >= 100) {
-		jas_eprintf("index = %ld; passtype = %s; symtype = %s; sym = %d\n", t1dec_cnt, passtypename, symtypename, v);
+		jas_eprintf("index = %zu; passtype = %s; symtype = %s; sym = %d\n",
+		  t1dec_cnt, passtypename, symtypename, v);
 		++t1dec_cnt;
 	}
 #else
-	(void)passtypename;
-	(void)symtypename;
+	JAS_UNUSED(passtypename);
+	JAS_UNUSED(symtypename);
 #endif
 	return v;
 }
@@ -130,14 +132,14 @@ JAS_FORCE_INLINE
 static int JPC_T1D_RAWGETBIT(jpc_bitstream_t *bitstream, const char *passtypename, const char *symtypename)
 {
 	int v = jpc_bitstream_getbit(bitstream);
-#ifndef NDEBUG
+#if defined(JAS_ENABLE_NON_THREAD_SAFE_DEBUGGING)
 	if (jas_getdbglevel() >= 100) {
 		jas_eprintf("index = %ld; passtype = %s; symtype = %s; sym = %d\n", t1dec_cnt, passtypename, symtypename, v);
 		++t1dec_cnt;
 	}
 #else
-	(void)passtypename;
-	(void)symtypename;
+	JAS_UNUSED(passtypename);
+	JAS_UNUSED(symtypename);
 #endif
 	return v;
 }

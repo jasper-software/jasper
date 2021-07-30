@@ -118,6 +118,10 @@
 #define	JPC_POW2(n)	\
   (1 << (n))
 
+/******************************************************************************\
+* Local prototypes.
+\******************************************************************************/
+
 static jpc_enc_tile_t *jpc_enc_tile_create(jpc_enc_cp_t *cp, jas_image_t *image, int tileno);
 static void jpc_enc_tile_destroy(jpc_enc_tile_t *tile);
 
@@ -140,10 +144,6 @@ static int ratestrtosize(const char *s, uint_fast32_t rawsize, uint_fast32_t *si
 static void pass_destroy(jpc_enc_pass_t *pass);
 static void jpc_enc_dump(jpc_enc_t *enc);
 
-/******************************************************************************\
-* Local prototypes.
-\******************************************************************************/
-
 static void calcrdslopes(jpc_enc_cblk_t *cblk);
 static void dump_layeringinfo(jpc_enc_t *enc);
 static void jpc_quantize(jas_matrix_t *data, jpc_fix_t stepsize);
@@ -157,31 +157,9 @@ static jpc_enc_cp_t *cp_create(const char *optstr, jas_image_t *image);
 static void jpc_enc_cp_destroy(jpc_enc_cp_t *cp);
 static uint_fast32_t jpc_abstorelstepsize(jpc_fix_t absdelta, int scaleexpn);
 
-/**
- * @return UINT_FAST32_MAX on error
- */
-static uint_fast32_t jpc_abstorelstepsize(jpc_fix_t absdelta, int scaleexpn)
-{
-	int p;
-	uint_fast32_t mant;
-	uint_fast32_t expn;
-	int n;
-
-	if (absdelta < 0) {
-		return UINT_FAST32_MAX;
-	}
-
-	p = jpc_fix_firstone(absdelta) - JPC_FIX_FRACBITS;
-	n = 11 - jpc_fix_firstone(absdelta);
-	mant = ((n < 0) ? (absdelta >> (-n)) : (absdelta << n)) & 0x7ff;
-	expn = scaleexpn - p;
-	if (scaleexpn < p) {
-		return UINT_FAST32_MAX;
-	}
-	if (expn >= 0x1f)
-		return UINT_FAST32_MAX;
-	return JPC_QCX_EXPN(expn) | JPC_QCX_MANT(mant);
-}
+/******************************************************************************\
+* Types.
+\******************************************************************************/
 
 typedef enum {
 	OPT_DEBUG,
@@ -212,6 +190,20 @@ typedef enum {
 	OPT_ILYRRATES,
 	OPT_JP2OVERHEAD
 } optid_t;
+
+typedef enum {
+	PO_L = 0,
+	PO_R
+} poid_t;
+
+typedef enum {
+	MODE_INT,
+	MODE_REAL
+} modeid_t;
+
+/******************************************************************************\
+* Data.
+\******************************************************************************/
 
 static const jas_taginfo_t encopts[] = {
 	{OPT_DEBUG, "debug"},
@@ -244,12 +236,6 @@ static const jas_taginfo_t encopts[] = {
 	{-1, 0}
 };
 
-typedef enum {
-	PO_L = 0,
-	PO_R
-} poid_t;
-
-
 static const jas_taginfo_t prgordtab[] = {
 	{JPC_COD_LRCPPRG, "lrcp"},
 	{JPC_COD_RLCPPRG, "rlcp"},
@@ -259,16 +245,40 @@ static const jas_taginfo_t prgordtab[] = {
 	{-1, 0}
 };
 
-typedef enum {
-	MODE_INT,
-	MODE_REAL
-} modeid_t;
-
 static const jas_taginfo_t modetab[] = {
 	{MODE_INT, "int"},
 	{MODE_REAL, "real"},
 	{-1, 0}
 };
+
+/******************************************************************************\
+\******************************************************************************/
+
+/**
+ * @return UINT_FAST32_MAX on error
+ */
+static uint_fast32_t jpc_abstorelstepsize(jpc_fix_t absdelta, int scaleexpn)
+{
+	int p;
+	uint_fast32_t mant;
+	uint_fast32_t expn;
+	int n;
+
+	if (absdelta < 0) {
+		return UINT_FAST32_MAX;
+	}
+
+	p = jpc_fix_firstone(absdelta) - JPC_FIX_FRACBITS;
+	n = 11 - jpc_fix_firstone(absdelta);
+	mant = ((n < 0) ? (absdelta >> (-n)) : (absdelta << n)) & 0x7ff;
+	expn = scaleexpn - p;
+	if (scaleexpn < p) {
+		return UINT_FAST32_MAX;
+	}
+	if (expn >= 0x1f)
+		return UINT_FAST32_MAX;
+	return JPC_QCX_EXPN(expn) | JPC_QCX_MANT(mant);
+}
 
 /******************************************************************************\
 * The main encoder entry point.
@@ -282,7 +292,7 @@ int jpc_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 	enc = 0;
 	cp = 0;
 
-	jpc_initluts();
+	jpc_init();
 
 	if (!(cp = cp_create(optstr, image))) {
 		jas_eprintf("invalid JP encoder options\n");

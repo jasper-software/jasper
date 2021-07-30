@@ -75,6 +75,7 @@
 #include <jasper/jas_config.h>
 
 #include "jasper/jas_thread.h"
+#include "jasper/jas_init.h"
 
 #include <stdio.h>
 #include <stdarg.h>
@@ -96,34 +97,71 @@ extern "C" {
 #define	JAS_DBGLOG(n, x)
 #endif
 
-/* Get the library debug level. */
-JAS_ATTRIBUTE_CONST
-JAS_DLLEXPORT int jas_getdbglevel(void);
+/*
+@brief
+Get the library debug level.
+*/
+static inline
+int jas_getdbglevel(void)
+{
+	return jas_get_ctx()->debug_level;
+}
 
-/* Set the library debug level. */
-JAS_DLLEXPORT int jas_setdbglevel(int dbglevel);
+/*
+@brief
+Set the library debug level.
+*/
+JAS_DLLEXPORT
+int jas_setdbglevel(int dbglevel);
 
-/* Perform formatted output to standard error. */
-JAS_DLLEXPORT int jas_eprintf(const char *fmt, ...);
+/*
+@brief
+Output a log message (for an error, a warning, or other information).
+*/
+JAS_DLLEXPORT
+int jas_eprintf(const char *fmt, ...);
 
-int jas_eprintf_impl(const char *fmt, va_list ap);
-int jas_eprintf_discard_impl(const char *fmt, va_list ap);
+/*!
+@brief
+Output a log message to standard error.
+@details
+*/
+JAS_DLLEXPORT
+int jas_veprintf_stderr(const char *fmt, va_list ap);
 
-/* Dump memory to a stream. */
-JAS_DLLEXPORT int jas_memdump(FILE *out, const void *data, size_t len);
+/*!
+@brief
+Output a log message to nowhere (i.e., discard the message).
+@details
+*/
+JAS_DLLEXPORT
+int jas_veprintf_discard(const char *fmt, va_list ap);
 
-/* Warn about use of deprecated functionality. */
-JAS_DLLEXPORT void jas_deprecated(const char *s);
+/*!
+@brief
+Dump memory to a stream.
+*/
+JAS_DLLEXPORT
+int jas_memdump(FILE *out, const void *data, size_t len);
 
-/* Convert to a string literal */
+/*!
+@brief
+Warn about the use of deprecated functionality.
+*/
+JAS_DLLEXPORT
+void jas_deprecated(const char *s);
+
+/*!
+@brief
+Convert to a string literal.
+*/
 #define JAS_STRINGIFY(x) #x
 
-/* Convert to a string literal after macro expansion */
+/*!
+@brief
+Convert to a string literal after macro expansion.
+*/
 #define JAS_STRINGIFYX(x) JAS_STRINGIFY(x)
-
-#if defined(JAS_INTERNAL_USE_ONLY)
-extern jas_mutex_t jas_eprintf_mutex;
-#endif
 
 #ifdef __cplusplus
 }

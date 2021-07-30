@@ -259,7 +259,8 @@ jas_image_t *jpc_decode(jas_stream_t *in, const char *optstr)
 		goto error;
 	}
 
-	jpc_initluts();
+	jpc_init();
+	//jpc_initluts();
 
 	if (!(dec = jpc_dec_create(opts, in))) {
 		goto error;
@@ -336,7 +337,7 @@ static jpc_dec_importopts_t *jpc_dec_opts_create(const char *optstr)
 	opts->debug = 0;
 	opts->maxlyrs = JPC_MAXLYRS;
 	opts->maxpkts = -1;
-	opts->max_samples = jas_get_conf_ptr()->dec_default_max_samples;
+	opts->max_samples = jas_get_ctx()->dec_default_max_samples;
 
 	if (!(tvp = jas_tvparser_create(optstr ? optstr : ""))) {
 		goto error;

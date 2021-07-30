@@ -68,11 +68,15 @@
 #ifndef JPC_COD_H
 #define JPC_COD_H
 
+#include "jpc_t1cod.h"
+
 /******************************************************************************\
 * Constants.
 \******************************************************************************/
 
 /* The nominal word size used by this implementation. */
 #define	JPC_PREC	32
+
+void jpc_init(void);
 
 #endif

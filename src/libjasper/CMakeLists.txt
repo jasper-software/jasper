@@ -68,6 +68,7 @@ if (JAS_INCLUDE_JPC_CODEC)
 	set(libjasper_jpc_sources
 		jpc/jpc_bs.c
 		jpc/jpc_cs.c
+		jpc/jpc_cod.c
 		jpc/jpc_dec.c
 		jpc/jpc_enc.c
 		jpc/jpc_math.c

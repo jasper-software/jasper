@@ -95,36 +95,9 @@ typedef struct {
 	bool initialized;
 
 	/*
-	The image format table to be used for initializing the library.
-	*/
-	const jas_image_fmt_t *image_formats;
-	size_t num_image_formats;
-
-	/*
 	The allocator to be used by the library.
 	*/
 	jas_allocator_t *allocator;
-	
-	/* The maximum number of samples allowable in an image to be decoded. */
-	size_t dec_default_max_samples;
-
-	/*
-	The maximum amount of memory to be used by the library if the BMA
-	allocator is used.
-	*/
-	size_t max_mem;
-
-	/*
-	The level of debugging checks/output enabled by the library.
-	A larger value corresponds to a greater level of debugging checks/output.
-	*/
-	int debug_level;
-
-	/*
-	The jas_cleanup function should be invoked via atexit.
-	It is not recommended that this be used, as it can cause many problems.
-	*/
-	bool enable_atexit_cleanup;
 
 	/*
 	A boolean flag indicating if the allocator should be accessed through
@@ -133,14 +106,42 @@ typedef struct {
 	bool enable_allocator_wrapper;
 
 	/*
-	The function used to output error/warning/informational messages.
+	The maximum amount of memory to be used by the library if the
+	allocator wrapper is used.
 	*/
-	int (*eprintf)(const char *format, va_list ap);
+	size_t max_mem;
 
 	/*
-	Reserved for future use.
+	The jas_cleanup function should be invoked via atexit.
+	It is not recommended that this be used, as it can cause many problems.
 	*/
-	unsigned char reserved[256];
+	bool enable_atexit_cleanup;
+
+	/*
+	The image format information to be used to populate the image format
+	table in newly created contexts.
+	*/
+	const jas_image_fmt_t *image_formats;
+	size_t num_image_formats;
+	
+	/*
+	The maximum number of samples allowable in an image to be decoded to be
+	used in newly created contexts.
+	*/
+	size_t dec_default_max_samples;
+
+	/*
+	The level of debugging checks/output enabled by the library for newly
+	created contexts.
+	A larger value corresponds to a greater level of debugging checks/output.
+	*/
+	int debug_level;
+
+	/*
+	The function used to output error/warning/informational messages
+	for newly created contexts.
+	*/
+	int (*veprintf)(const char *format, va_list ap);
 
 } jas_conf_t;
 #endif
@@ -150,6 +151,37 @@ typedef struct {
 jas_conf_t *jas_get_conf_ptr(void);
 extern jas_conf_t jas_conf;
 #endif
+
+typedef struct {
+
+	/* The maximum number of samples allowable in an image to be decoded. */
+	size_t dec_default_max_samples;
+
+	/*
+	The level of debugging checks/output enabled by the library.
+	A larger value corresponds to a greater level of debugging checks/output.
+	*/
+	int debug_level;
+
+	/*
+	The function used to output error/warning/informational messages.
+	*/
+	int (*veprintf)(const char *format, va_list ap);
+
+	/*
+	The image format information to be used to populate the image format
+	table.
+	*/
+	size_t image_numfmts;
+	jas_image_fmtinfo_t image_fmtinfos[JAS_IMAGE_MAXFMTS];
+
+} jas_ctx_t;
+
+/*!
+@brief
+An opaque handle type used to represent a JasPer library context.
+*/
+typedef void *jas_context_t;
 
 /******************************************************************************\
 * Functions.
@@ -271,7 +303,7 @@ informational messages.
 @details
 */
 JAS_DLLEXPORT
-void jas_conf_set_eprintf(int (*eprintf)(const char *, va_list));
+void jas_conf_set_veprintf(int (*func)(const char *, va_list));
 
 /*!
 @brief Set the image-format table to be used to initialize the library.
@@ -284,6 +316,72 @@ JasPer library is cleaned up (via @c jas_cleanup).
 JAS_DLLEXPORT
 void jas_conf_set_image_format_table(const jas_image_fmt_t *,
   size_t num_formats);
+
+/*!
+@brief
+@details
+*/
+JAS_DLLEXPORT
+jas_context_t jas_context_create(void);
+
+/*!
+The context being destroyed must not be the current context.
+*/
+JAS_DLLEXPORT
+void jas_context_destroy(jas_context_t context);
+
+/*!
+@brief
+Get the current context for the calling thread.
+@details
+*/
+JAS_DLLEXPORT
+jas_context_t jas_get_context(void);
+
+/*!
+@brief
+Set the current context for the calling thread.
+@details
+*/
+JAS_DLLEXPORT
+void jas_set_context(jas_context_t context);
+
+//#if defined(JAS_INTERNAL_USE_ONLY)
+/* This function is only for internal use by the library. */
+static inline jas_ctx_t *jas_get_ctx(void)
+{
+	return JAS_CAST(jas_ctx_t *, jas_get_context());
+}
+//#endif
+
+/*!
+@brief
+Set the debug level for a particular context.
+@details
+*/
+JAS_DLLEXPORT
+int jas_context_set_debug_level(jas_context_t context, int debug_level);
+
+/*!
+@brief
+Set the default maximum number of samples that a decoder is permitted to
+process.
+
+@details
+*/
+JAS_DLLEXPORT
+void jas_context_set_dec_default_max_samples(jas_context_t context,
+  size_t max_samples);
+
+/*!
+@brief
+Set the function to be used for log messages.
+
+@details
+*/
+JAS_DLLEXPORT
+void jas_context_set_veprintf(jas_context_t context,
+  int (*func)(const char *, va_list));
 
 /*!
  * @}

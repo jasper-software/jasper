@@ -272,7 +272,8 @@ The limit on the amount of memory that the allocator can use should
 never be set to a value less than the amount of memory currently being
 used by the allocator (as doing so results in undefined behavior).
 */
-JAS_DLLEXPORT void jas_set_max_mem_usage(size_t max_mem);
+JAS_DLLEXPORT
+void jas_set_max_mem_usage(size_t max_mem);
 
 /*!
 @brief

@@ -83,6 +83,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+/******************************************************************************\
+* Function prototypes.
+\******************************************************************************/
+
 static uint_fast32_t jp2_gettypeasoc(int colorspace, int ctype);
 static int clrspctojp2(jas_clrspc_t clrspc);
 

@@ -41,6 +41,8 @@
 
 #cmakedefine JAS_ENABLE_MULTITHREADING_SUPPORT 1
 
+#cmakedefine JAS_ENABLE_NON_THREAD_SAFE_DEBUGGING 1
+
 #if defined(__STDC_NO_THREADS__)
 #undef JAS_ENABLE_MULTITHREADING_SUPPORT
 #endif
@@ -72,9 +74,7 @@
 #endif
 
 #if defined(JAS_ENABLE_MULTITHREADING_SUPPORT)
-#define jas_atomic _Atomic
-#else
-#define jas_atomic
+#define JAS_THREADS_C11
 #endif
 
 #endif

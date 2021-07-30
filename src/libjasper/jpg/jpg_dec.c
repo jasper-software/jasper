@@ -163,7 +163,7 @@ static int jpg_dec_parseopts(const char *optstr, jpg_dec_importopts_t *opts)
 {
 	jas_tvparser_t *tvp;
 
-	opts->max_samples = jas_get_conf_ptr()->dec_default_max_samples;
+	opts->max_samples = jas_get_ctx()->dec_default_max_samples;
 	opts->print_version = false;
 
 	if (!(tvp = jas_tvparser_create(optstr ? optstr : ""))) {

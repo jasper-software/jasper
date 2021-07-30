@@ -311,5 +311,4 @@ static inline uint_least8_t JP2_BPCTODTYPE(uint_least8_t bpc)
 
 const jp2_cdefchan_t *jp2_cdef_lookup(jp2_cdef_t *cdef, int channo);
 
-
 #endif

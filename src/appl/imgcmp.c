@@ -251,6 +251,14 @@ int main(int argc, char **argv)
 		fprintf(stderr, "cannot initialize JasPer library\n");
 		exit(EXIT_FAILURE);
 	}
+
+	jas_context_t context;
+	if (!(context = jas_context_create())) {
+		fprintf(stderr, "cannot create context\n");
+		exit(EXIT_FAILURE);
+	}
+	jas_set_context(context);
+
 	atexit(jas_cleanup);
 #endif
 
@@ -398,7 +406,20 @@ int main(int argc, char **argv)
 
 	jas_image_destroy(origimage);
 	jas_image_destroy(reconimage);
+	/*
+	The following function call is not needed.
+	It is only here for testing backward compatibility.
+	*/
 	jas_image_clearfmts();
+
+#if !defined(JAS_USE_JAS_INIT)
+	/*
+	Stop using the context that is about to be destroyed.
+	Then, destroy the context.
+	*/
+	jas_set_context(0);
+	jas_context_destroy(context);
+#endif
 
 	return EXIT_SUCCESS;
 }

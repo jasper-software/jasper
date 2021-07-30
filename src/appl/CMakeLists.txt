@@ -1,5 +1,6 @@
 set(programs "")
 set(man_pages "")
+set(extra_programs "")
 
 # The jasper program
 add_executable(jasper jasper.c)
@@ -30,6 +31,14 @@ if(JAS_HAVE_OPENGL)
 	set(man_pages "${man_pages}" jiv.1)
 else()
 	message("GLUT library not found; skipping build of jiv program")
+endif()
+
+if (JAS_ENABLE_MULTITHREADING_SUPPORT)
+	# The multithread program
+	add_executable(multithread multithread.c)
+	target_link_libraries(multithread libjasper ${JPEG_LIBRARIES}
+	  ${MATH_LIBRARY} ${THREAD_LIBRARY})
+	set(programs "${programs}" multithread)
 endif()
 
 if (JAS_ENABLE_FUZZER)
@@ -75,6 +84,13 @@ if (BASH_PROGRAM)
 	add_test(run_test_4
 	  "${BASH_PROGRAM}" "${CMAKE_CURRENT_BINARY_DIR}/../../test/bin/wrapper"
 	  "${CMAKE_CURRENT_SOURCE_DIR}/../../test/bin/run_test_4" -v)
+	if (JAS_ENABLE_MULTITHREADING_SUPPORT)
+		add_test(run_test_5
+		  "${BASH_PROGRAM}" "${CMAKE_CURRENT_BINARY_DIR}/../../test/bin/wrapper"
+		  "${CMAKE_CURRENT_SOURCE_DIR}/../../test/bin/run_test_5" -v)
+		set(extra_programs "${extra_programs} multithread")
+	endif()
 	add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS
-	  ${programs} "${CMAKE_CURRENT_BINARY_DIR}/../../test/bin/wrapper") 
+	  ${programs} ${extra_programs}
+	  "${CMAKE_CURRENT_BINARY_DIR}/../../test/bin/wrapper") 
 endif()

@@ -81,6 +81,10 @@
 
 #include <stdlib.h>
 
+/******************************************************************************\
+* Function prototypes.
+\******************************************************************************/
+
 static int jpc_tsfb_analyze2(jpc_tsfb_t *tsfb, jpc_fix_t *a, int xstart, int ystart,
   unsigned width, unsigned height, unsigned stride, unsigned numlvls);
 

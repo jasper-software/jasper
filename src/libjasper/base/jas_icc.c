@@ -59,6 +59,10 @@
  * __END_OF_JASPER_LICENSE__
  */
 
+/******************************************************************************\
+* Includes.
+\******************************************************************************/
+
 #include "jasper/jas_icc.h"
 #include "jasper/jas_types.h"
 #include "jasper/jas_malloc.h"
@@ -71,6 +75,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+
+/******************************************************************************\
+*
+\******************************************************************************/
 
 #define	jas_iccputuint8(out, val)	jas_iccputuint(out, 1, val)
 #define	jas_iccputuint16(out, val)	jas_iccputuint(out, 2, val)
@@ -86,15 +94,11 @@ static int jas_iccgetuint16(jas_stream_t *in, jas_iccuint16_t *val);
 static int jas_iccgetsint32(jas_stream_t *in, jas_iccsint32_t *val);
 static int jas_iccgetuint32(jas_stream_t *in, jas_iccuint32_t *val);
 static int jas_iccgetuint64(jas_stream_t *in, jas_iccuint64_t *val);
-//#ifdef JAS_ENABLE_ENCODER
 static int jas_iccputuint(jas_stream_t *out, unsigned n, jas_ulonglong val);
 static int jas_iccputsint(jas_stream_t *out, unsigned n, jas_longlong val);
-//#endif /* JAS_ENABLE_ENCODER */
 static jas_iccprof_t *jas_iccprof_create(void);
 static int jas_iccprof_readhdr(jas_stream_t *in, jas_icchdr_t *hdr);
-//#ifdef JAS_ENABLE_ENCODER
 static int jas_iccprof_writehdr(jas_stream_t *out, const jas_icchdr_t *hdr);
-//#endif
 static int jas_iccprof_gettagtab(jas_stream_t *in, jas_icctagtab_t *tagtab);
 static void jas_iccprof_sorttagtab(jas_icctagtab_t *tagtab);
 static int jas_iccattrtab_lookup(const jas_iccattrtab_t *attrtab, jas_iccuint32_t name);
@@ -110,9 +114,7 @@ static int jas_icccurv_copy(jas_iccattrval_t *attrval,
 static int jas_icccurv_input(jas_iccattrval_t *attrval, jas_stream_t *in,
   unsigned cnt);
 static unsigned jas_icccurv_getsize(const jas_iccattrval_t *attrval);
-//#ifdef JAS_ENABLE_ENCODER
 static int jas_icccurv_output(jas_iccattrval_t *attrval, jas_stream_t *out);
-//#endif
 static void jas_icccurv_dump(const jas_iccattrval_t *attrval, FILE *out);
 
 static void jas_icctxtdesc_destroy(jas_iccattrval_t *attrval);
@@ -121,9 +123,7 @@ static int jas_icctxtdesc_copy(jas_iccattrval_t *attrval,
 static int jas_icctxtdesc_input(jas_iccattrval_t *attrval, jas_stream_t *in,
   unsigned cnt);
 static unsigned jas_icctxtdesc_getsize(const jas_iccattrval_t *attrval);
-//#ifdef JAS_ENABLE_ENCODER
 static int jas_icctxtdesc_output(jas_iccattrval_t *attrval, jas_stream_t *out);
-//#endif
 static void jas_icctxtdesc_dump(const jas_iccattrval_t *attrval, FILE *out);
 
 static void jas_icctxt_destroy(jas_iccattrval_t *attrval);
@@ -132,17 +132,13 @@ static int jas_icctxt_copy(jas_iccattrval_t *attrval,
 static int jas_icctxt_input(jas_iccattrval_t *attrval, jas_stream_t *in,
   unsigned cnt);
 static unsigned jas_icctxt_getsize(const jas_iccattrval_t *attrval);
-//#ifdef JAS_ENABLE_ENCODER
 static int jas_icctxt_output(jas_iccattrval_t *attrval, jas_stream_t *out);
-//#endif
 static void jas_icctxt_dump(const jas_iccattrval_t *attrval, FILE *out);
 
 static int jas_iccxyz_input(jas_iccattrval_t *attrval, jas_stream_t *in,
   unsigned cnt);
 static unsigned jas_iccxyz_getsize(const jas_iccattrval_t *attrval);
-//#ifdef JAS_ENABLE_ENCODER
 static int jas_iccxyz_output(jas_iccattrval_t *attrval, jas_stream_t *out);
-//#endif
 static void jas_iccxyz_dump(const jas_iccattrval_t *attrval, FILE *out);
 
 static jas_iccattrtab_t *jas_iccattrtab_create(void);
@@ -153,12 +149,10 @@ static int jas_iccattrtab_add(jas_iccattrtab_t *attrtab, int i,
 static int jas_iccattrtab_replace(jas_iccattrtab_t *attrtab, unsigned i,
   jas_iccuint32_t name, jas_iccattrval_t *val);
 static void jas_iccattrtab_delete(jas_iccattrtab_t *attrtab, unsigned i);
-//#ifdef JAS_ENABLE_ENCODER
 static unsigned jas_iccpadtomult(unsigned x, unsigned y);
 static int jas_iccattrtab_get(jas_iccattrtab_t *attrtab, unsigned i,
   jas_iccattrname_t *name, jas_iccattrval_t **val);
 static int jas_iccprof_puttagtab(jas_stream_t *out, const jas_icctagtab_t *tagtab);
-//#endif /* JAS_ENABLE_ENCODER */
 
 static void jas_icclut16_destroy(jas_iccattrval_t *attrval);
 static int jas_icclut16_copy(jas_iccattrval_t *attrval,
@@ -166,9 +160,7 @@ static int jas_icclut16_copy(jas_iccattrval_t *attrval,
 static int jas_icclut16_input(jas_iccattrval_t *attrval, jas_stream_t *in,
   unsigned cnt);
 static unsigned jas_icclut16_getsize(const jas_iccattrval_t *attrval);
-//#ifdef JAS_ENABLE_ENCODER
 static int jas_icclut16_output(jas_iccattrval_t *attrval, jas_stream_t *out);
-//#endif
 static void jas_icclut16_dump(const jas_iccattrval_t *attrval, FILE *out);
 
 static void jas_icclut8_destroy(jas_iccattrval_t *attrval);
@@ -177,20 +169,19 @@ static int jas_icclut8_copy(jas_iccattrval_t *attrval,
 static int jas_icclut8_input(jas_iccattrval_t *attrval, jas_stream_t *in,
   unsigned cnt);
 static unsigned jas_icclut8_getsize(const jas_iccattrval_t *attrval);
-//#ifdef JAS_ENABLE_ENCODER
 static int jas_icclut8_output(jas_iccattrval_t *attrval, jas_stream_t *out);
-//#endif /* JAS_ENABLE_ENCODER */
 static void jas_icclut8_dump(const jas_iccattrval_t *attrval, FILE *out);
 
-//#ifdef JAS_ENABLE_ENCODER
 static int jas_iccputtime(jas_stream_t *out, const jas_icctime_t *ctime);
 static int jas_iccputxyz(jas_stream_t *out, const jas_iccxyz_t *xyz);
-//#endif /* JAS_ENABLE_ENCODER */
 
 static unsigned jas_iccpowi(unsigned x, unsigned n);
 
 static char *jas_iccsigtostr(unsigned sig, char *buf);
 
+/******************************************************************************\
+* Data.
+\******************************************************************************/
 
 static const jas_iccattrvalinfo_t jas_iccattrvalinfos[] = {
 	{
@@ -198,9 +189,7 @@ static const jas_iccattrvalinfo_t jas_iccattrvalinfos[] = {
 			jas_icccurv_destroy,
 			jas_icccurv_copy,
 			jas_icccurv_input,
-//#ifdef JAS_ENABLE_ENCODER
 			jas_icccurv_output,
-//#endif
 			jas_icccurv_getsize,
 			jas_icccurv_dump,
 		},
@@ -211,9 +200,7 @@ static const jas_iccattrvalinfo_t jas_iccattrvalinfos[] = {
 			0,
 			0,
 			jas_iccxyz_input,
-//#ifdef JAS_ENABLE_ENCODER
 			jas_iccxyz_output,
-//#endif
 			jas_iccxyz_getsize,
 			jas_iccxyz_dump,
 		},
@@ -224,9 +211,7 @@ static const jas_iccattrvalinfo_t jas_iccattrvalinfos[] = {
 			jas_icctxtdesc_destroy,
 			jas_icctxtdesc_copy,
 			jas_icctxtdesc_input,
-//#ifdef JAS_ENABLE_ENCODER
 			jas_icctxtdesc_output,
-//#endif
 			jas_icctxtdesc_getsize,
 			jas_icctxtdesc_dump,
 		},
@@ -237,9 +222,7 @@ static const jas_iccattrvalinfo_t jas_iccattrvalinfos[] = {
 			jas_icctxt_destroy,
 			jas_icctxt_copy,
 			jas_icctxt_input,
-//#ifdef JAS_ENABLE_ENCODER
 			jas_icctxt_output,
-//#endif
 			jas_icctxt_getsize,
 			jas_icctxt_dump,
 		},
@@ -250,9 +233,7 @@ static const jas_iccattrvalinfo_t jas_iccattrvalinfos[] = {
 			jas_icclut8_destroy,
 			jas_icclut8_copy,
 			jas_icclut8_input,
-//#ifdef JAS_ENABLE_ENCODER
 			jas_icclut8_output,
-//#endif
 			jas_icclut8_getsize,
 			jas_icclut8_dump,
 		},
@@ -262,9 +243,7 @@ static const jas_iccattrvalinfo_t jas_iccattrvalinfos[] = {
 			jas_icclut16_destroy,
 			jas_icclut16_copy,
 			jas_icclut16_input,
-//#ifdef JAS_ENABLE_ENCODER
 			jas_icclut16_output,
-//#endif
 			jas_icclut16_getsize,
 			jas_icclut16_dump,
 		},
@@ -275,9 +254,7 @@ static const jas_iccattrvalinfo_t jas_iccattrvalinfos[] = {
 			0,
 			0,
 			0,
-//#ifdef JAS_ENABLE_ENCODER
 			0,
-//#endif
 			0,
 			0,
 		},
@@ -440,7 +417,6 @@ error:
 
 int jas_iccprof_save(jas_iccprof_t *prof, jas_stream_t *out)
 {
-//#ifdef JAS_ENABLE_ENCODER
 	long curoff;
 	long reloff;
 	long newoff;
@@ -523,14 +499,8 @@ int jas_iccprof_save(jas_iccprof_t *prof, jas_stream_t *out)
 	return 0;
 error:
 	/* XXX - need to free some resources here */
-//#else
-//	(void)prof;
-//	(void)out;
-//#endif /* JAS_ENABLE_ENCODER */
 	return -1;
 }
-
-//#ifdef JAS_ENABLE_ENCODER
 
 static int jas_iccprof_writehdr(jas_stream_t *out, const jas_icchdr_t *hdr)
 {
@@ -571,8 +541,6 @@ static int jas_iccprof_puttagtab(jas_stream_t *out, const jas_icctagtab_t *tagta
 error:
 	return -1;
 }
-
-//#endif
 
 static int jas_iccprof_readhdr(jas_stream_t *in, jas_icchdr_t *hdr)
 {
@@ -685,8 +653,10 @@ static void jas_iccprof_sorttagtab(jas_icctagtab_t *tagtab)
 
 static int jas_icctagtabent_cmp(const void *src, const void *dst)
 {
-	const jas_icctagtabent_t *srctagtabent = JAS_CAST(const jas_icctagtabent_t *, src);
-	const jas_icctagtabent_t *dsttagtabent = JAS_CAST(const jas_icctagtabent_t *, dst);
+	const jas_icctagtabent_t *srctagtabent =
+	  JAS_CAST(const jas_icctagtabent_t *, src);
+	const jas_icctagtabent_t *dsttagtabent =
+	  JAS_CAST(const jas_icctagtabent_t *, dst);
 	if (srctagtabent->off > dsttagtabent->off) {
 		return 1;
 	} else if (srctagtabent->off < dsttagtabent->off) {
@@ -729,8 +699,6 @@ static int jas_iccgetxyz(jas_stream_t *in, jas_iccxyz_t *xyz)
 	return 0;
 }
 
-//#ifdef JAS_ENABLE_ENCODER
-
 static int jas_iccputtime(jas_stream_t *out, const jas_icctime_t *time)
 {
 	jas_iccputuint16(out, time->year);
@@ -749,8 +717,6 @@ static int jas_iccputxyz(jas_stream_t *out, const jas_iccxyz_t *xyz)
 	jas_iccputuint32(out, xyz->z);
 	return 0;
 }
-
-//#endif /* JAS_ENABLE_ENCODER */
 
 /******************************************************************************\
 * attribute table class
@@ -891,7 +857,6 @@ static void jas_iccattrtab_delete(jas_iccattrtab_t *attrtab, unsigned i)
 	--attrtab->numattrs;
 }
 
-//#ifdef JAS_ENABLE_ENCODER
 static int jas_iccattrtab_get(jas_iccattrtab_t *attrtab, unsigned i,
   jas_iccattrname_t *name, jas_iccattrval_t **val)
 {
@@ -906,7 +871,6 @@ static int jas_iccattrtab_get(jas_iccattrtab_t *attrtab, unsigned i,
 error:
 	return -1;
 }
-//#endif /* JAS_ENABLE_ENCODER */
 
 static int jas_iccattrtab_lookup(const jas_iccattrtab_t *attrtab,
   jas_iccuint32_t name)
@@ -1025,7 +989,6 @@ static int jas_iccxyz_input(jas_iccattrval_t *attrval, jas_stream_t *in,
 	return jas_iccgetxyz(in, &attrval->data.xyz);
 }
 
-//#ifdef JAS_ENABLE_ENCODER
 static int jas_iccxyz_output(jas_iccattrval_t *attrval, jas_stream_t *out)
 {
 	const jas_iccxyz_t *xyz = &attrval->data.xyz;
@@ -1035,7 +998,6 @@ static int jas_iccxyz_output(jas_iccattrval_t *attrval, jas_stream_t *out)
 		return -1;
 	return 0;
 }
-//#endif /* JAS_ENABLE_ENCODER */
 
 static unsigned jas_iccxyz_getsize(const jas_iccattrval_t *attrval)
 {
@@ -1108,7 +1070,6 @@ static unsigned jas_icccurv_getsize(const jas_iccattrval_t *attrval)
 	return 4 + 2 * curv->numents;
 }
 
-//#ifdef JAS_ENABLE_ENCODER
 static int jas_icccurv_output(jas_iccattrval_t *attrval, jas_stream_t *out)
 {
 	const jas_icccurv_t *curv = &attrval->data.curv;
@@ -1123,7 +1084,6 @@ static int jas_icccurv_output(jas_iccattrval_t *attrval, jas_stream_t *out)
 error:
 	return -1;
 }
-//#endif /* JAS_ENABLE_ENCODER */
 
 static void jas_icccurv_dump(const jas_iccattrval_t *attrval, FILE *out)
 {
@@ -1231,7 +1191,6 @@ static unsigned jas_icctxtdesc_getsize(const jas_iccattrval_t *attrval)
 	return strlen(txtdesc->ascdata) + 1 + txtdesc->uclen * 2 + 15 + 67;
 }
 
-//#ifdef JAS_ENABLE_ENCODER
 static int jas_icctxtdesc_output(jas_iccattrval_t *attrval, jas_stream_t *out)
 {
 	const jas_icctxtdesc_t *txtdesc = &attrval->data.txtdesc;
@@ -1255,7 +1214,6 @@ static int jas_icctxtdesc_output(jas_iccattrval_t *attrval, jas_stream_t *out)
 error:
 	return -1;
 }
-//#endif /* JAS_ENABLE_ENCODER */
 
 static void jas_icctxtdesc_dump(const jas_iccattrval_t *attrval, FILE *out)
 {
@@ -1314,7 +1272,6 @@ static unsigned jas_icctxt_getsize(const jas_iccattrval_t *attrval)
 	return strlen(txt->string) + 1;
 }
 
-//#ifdef JAS_ENABLE_ENCODER
 static int jas_icctxt_output(jas_iccattrval_t *attrval, jas_stream_t *out)
 {
 	const jas_icctxt_t *txt = &attrval->data.txt;
@@ -1323,7 +1280,6 @@ static int jas_icctxt_output(jas_iccattrval_t *attrval, jas_stream_t *out)
 		return -1;
 	return 0;
 }
-//#endif /* JAS_ENABLE_ENCODER */
 
 static void jas_icctxt_dump(const jas_iccattrval_t *attrval, FILE *out)
 {
@@ -1444,7 +1400,6 @@ static unsigned jas_icclut8_getsize(const jas_iccattrval_t *attrval)
 	  jas_iccpowi(lut8->clutlen, lut8->numinchans) * lut8->numoutchans;
 }
 
-//#ifdef JAS_ENABLE_ENCODER
 static int jas_icclut8_output(jas_iccattrval_t *attrval, jas_stream_t *out)
 {
 	jas_icclut8_t *lut8 = &attrval->data.lut8;
@@ -1483,7 +1438,6 @@ static int jas_icclut8_output(jas_iccattrval_t *attrval, jas_stream_t *out)
 error:
 	return -1;
 }
-//#endif /* JAS_ENABLE_ENCODER */
 
 static void jas_icclut8_dump(const jas_iccattrval_t *attrval, FILE *out)
 {
@@ -1614,7 +1568,6 @@ static unsigned jas_icclut16_getsize(const jas_iccattrval_t *attrval)
 	  jas_iccpowi(lut16->clutlen, lut16->numinchans) * lut16->numoutchans);
 }
 
-//#ifdef JAS_ENABLE_ENCODER
 static int jas_icclut16_output(jas_iccattrval_t *attrval, jas_stream_t *out)
 {
 	const jas_icclut16_t *lut16 = &attrval->data.lut16;
@@ -1648,7 +1601,6 @@ static int jas_icclut16_output(jas_iccattrval_t *attrval, jas_stream_t *out)
 error:
 	return -1;
 }
-//#endif /* JAS_ENABLE_ENCODER */
 
 static void jas_icclut16_dump(const jas_iccattrval_t *attrval, FILE *out)
 {
@@ -1729,8 +1681,6 @@ static int jas_iccgetuint64(jas_stream_t *in, jas_iccuint64_t *val)
 	return 0;
 }
 
-//#ifdef JAS_ENABLE_ENCODER
-
 static int jas_iccputuint(jas_stream_t *out, unsigned n, jas_ulonglong val)
 {
 	int c;
@@ -1749,8 +1699,6 @@ static int jas_iccputsint(jas_stream_t *out, unsigned n, jas_longlong val)
 	tmp = (val < 0) ? 0 : val;
 	return jas_iccputuint(out, n, tmp);
 }
-
-//#endif /* JAS_ENABLE_ENCODER */
 
 /******************************************************************************\
 *
@@ -1772,12 +1720,10 @@ static char *jas_iccsigtostr(unsigned sig, char *buf)
 	return buf;
 }
 
-//#ifdef JAS_ENABLE_ENCODER
 static unsigned jas_iccpadtomult(unsigned x, unsigned y)
 {
 	return ((x + y - 1) / y) * y;
 }
-//#endif /* JAS_ENABLE_ENCODER */
 
 static unsigned jas_iccpowi(unsigned x, unsigned n)
 {

@@ -15,18 +15,20 @@ do_make_test=0
 verbose=0
 enable_asan=0
 enable_lsan=0
-enable_usan=0
+enable_ubsan=0
+enable_tsan=0
 sde_top_dir="$HOME/public/sde"
 #sde_top_dir=""
 configure_only=0
 enable_doc=0
 
-while getopts ZE:AULditvCD opt; do
+while getopts ZE:AULTditvCD opt; do
 	case $opt in
 	Z)
+		enable_tsan=1
 		enable_asan=1
 		enable_lsan=1
-		enable_usan=1
+		enable_ubsan=1
 		enable_doc=0
 		enable_debug=1
 		;;
@@ -35,7 +37,9 @@ while getopts ZE:AULditvCD opt; do
 	L)
 		enable_lsan=1;;
 	U)
-		enable_usan=1;;
+		enable_ubsan=1;;
+	T)
+		enable_tsan=1;;
 	C)
 		configure_only=1;;
 	D)
@@ -60,7 +64,7 @@ shift $((OPTIND - 1))
 #if [ "$enable_debug" -ne 0 ]; then
 #	enable_asan=1
 #	enable_lsan=1
-#	enable_usan=1
+#	enable_ubsan=1
 #fi
 
 source_dir="$abs_cmd_dir/.."
@@ -101,10 +105,13 @@ fi
 if [ "$enable_asan" -ne 0 ]; then
 	configure_opts+=("-DJAS_ENABLE_ASAN=true")
 fi
+if [ "$enable_tsan" -ne 0 ]; then
+	configure_opts+=("-DJAS_ENABLE_TSAN=true")
+fi
 if [ "$enable_lsan" -ne 0 ]; then
 	configure_opts+=("-DJAS_ENABLE_LSAN=true")
 fi
-if [ "$enable_usan" -ne 0 ]; then
+if [ "$enable_ubsan" -ne 0 ]; then
 	configure_opts+=("-DJAS_ENABLE_USAN=true")
 fi
 configure_opts+=("-DJAS_ENABLE_DANGEROUS_INTERNAL_TESTING_MODE=true")

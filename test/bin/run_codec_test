@@ -287,7 +287,8 @@ for test in "${tests[@]}"; do
 	if [ $rate = 0 ]; then
 		target_size=0
 	else
-		target_size=$(evalexpr "$image_size * $rate + 1" | realtoint) || panic
+		target_size=$(evalexpr "$image_size * $rate + 1" | realtoint) || \
+		  panic "calculation failed"
 	fi
 
 	enc_file="$TMPDIR/test.$enc_fmt"
@@ -377,7 +378,8 @@ for test in "${tests[@]}"; do
 
 	FILE0=$(pnutod $in_file)
 	FILE1=$(pnutod $dec_file)
-	PAE=$($IMGCMP -f $FILE0 -F $FILE1 -m pae --max 2> /dev/null) || panic
+	PAE=$($IMGCMP -f $FILE0 -F $FILE1 -m pae --max 2> /dev/null) || \
+	  panic "image comparison failed"
 	if [ -z "$PAE" ]; then
 		echo "cannot get PAE $FILE0 $FILE1"
 		exit 1

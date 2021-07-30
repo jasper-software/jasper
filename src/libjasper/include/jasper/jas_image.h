@@ -229,7 +229,7 @@ typedef struct {
 
 	jas_cmprof_t *cmprof_;
 
-//	bool inmem_;
+	//bool inmem_;
 
 } jas_image_t;
 
@@ -634,12 +634,23 @@ int jas_image_getcmptbytype(const jas_image_t *image, jas_image_cmpttype_t ctype
 JAS_DLLEXPORT
 void jas_image_clearfmts(void);
 
+#if defined(JAS_INTERNAL_USE_ONLY)
+void jas_image_clearfmts_internal(jas_image_fmtinfo_t *image_fmtinfos,
+  size_t *image_numfmts);
+#endif
+
 /*!
 @brief Add entry to table of image formats.
 */
 JAS_DLLEXPORT
 int jas_image_addfmt(int id, const char *name, const char *ext,
   const char *desc, const jas_image_fmtops_t *ops);
+
+#if defined(JAS_INTERNAL_USE_ONLY)
+int jas_image_addfmt_internal(jas_image_fmtinfo_t *image_fmtinfos,
+  size_t *image_numfmts, int id, const char *name, const char *ext,
+  const char *desc, const jas_image_fmtops_t *ops);
+#endif
 
 /*!
 @brief Get the ID for the image format with the specified name.
@@ -690,7 +701,8 @@ int jas_image_getfmt(jas_stream_t *in);
 #define	jas_image_cmprof(image)	((image)->cmprof_)
 
 /*!
-@brief ???
+@brief
+Test if the sampling of the image is homogeneous.
 */
 JAS_ATTRIBUTE_PURE
 JAS_DLLEXPORT

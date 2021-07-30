@@ -104,19 +104,23 @@ option(JAS_INCLUDE_JPG_CODEC "Include JPG codec support" true)
 option(JAS_INCLUDE_PGX_CODEC "Include PGX codec support" true)
 option(JAS_INCLUDE_MIF_CODEC "Include MIF codec support" true)
 
-option(JAS_USE_JAS_INIT
-  "Use jas_init instead of jas_init_custom for initialization (should be false, except for testing)"
-  false)
-
-if (JAS_USE_JAS_INIT)
-	add_definitions(-DJAS_USE_JAS_INIT)
-endif()
-
 set(JAS_ENABLE_DEFAULT_MAX_MEM_USAGE
   "1073741824"
   CACHE STRING
   "Set memory usage limit in bytes"
 )
+
+# The following options are for testing/debugging and should normally only
+# be changed by the developers of JasPer.
+option(JAS_USE_JAS_INIT
+  "Use jas_init instead of jas_init_custom for initialization (should be false, except for testing)"
+  false)
+option(JAS_ENABLE_NON_THREAD_SAFE_DEBUGGING
+  "Enable non-thread safe debug code" false)
+
+if (JAS_USE_JAS_INIT)
+	add_definitions(-DJAS_USE_JAS_INIT)
+endif()
 
 # WARNING: THE FOLLOWING OPTION SHOULD ONLY BE ENABLED BY THE JASPER SOFTWARE
 # DEVELOPMENT TEAM.  IT IS NECESSARY FOR INTERNAL TESTING PURPOSES AND POSES

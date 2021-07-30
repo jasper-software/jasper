@@ -73,13 +73,6 @@
 #include <stdio.h>
 
 /******************************************************************************\
-* Local data.
-\******************************************************************************/
-
-static int jas_dbglevel = 0;
-/* The debug level. */
-
-/******************************************************************************\
 * Code for getting/setting the debug level.
 \******************************************************************************/
 
@@ -88,20 +81,16 @@ int jas_setdbglevel(int dbglevel)
 {
 	int olddbglevel;
 
+	jas_ctx_t *ctx = jas_get_ctx();
+
 	/* Save the old debug level. */
-	olddbglevel = jas_dbglevel;
+	olddbglevel = ctx->debug_level;
 
 	/* Change the debug level. */
-	jas_dbglevel = dbglevel;
+	ctx->debug_level = dbglevel;
 
 	/* Return the old debug level. */
 	return olddbglevel;
-}
-
-/* Get the library debug level. */
-int jas_getdbglevel()
-{
-	return jas_dbglevel;
 }
 
 /******************************************************************************\
@@ -114,26 +103,28 @@ int jas_eprintf(const char *fmt, ...)
 	int ret;
 	va_list ap;
 
+	jas_ctx_t *ctx = jas_get_ctx();
+
 	va_start(ap, fmt);
-	ret = (jas_conf.eprintf)(fmt, ap);
+	ret = (ctx->veprintf)(fmt, ap);
 	va_end(ap);
 	return ret;
 }
 
-jas_mutex_t jas_eprintf_mutex;
-
 /* Perform formatted output to standard error. */
-int jas_eprintf_impl(const char *fmt, va_list ap)
+JAS_DLLEXPORT
+int jas_veprintf_stderr(const char *fmt, va_list ap)
 {
-	jas_mutex_lock(&jas_eprintf_mutex);
 	int result = vfprintf(stderr, fmt, ap);
-	jas_mutex_unlock(&jas_eprintf_mutex);
 	return result;
 }
 
 /* Perform formatted output to standard error. */
-int jas_eprintf_discard_impl(const char *fmt, va_list ap)
+JAS_DLLEXPORT
+int jas_veprintf_discard(const char *fmt, va_list ap)
 {
+	JAS_CAST(void, fmt);
+	JAS_CAST(void, ap);
 	return 0;
 }
 
@@ -171,5 +162,4 @@ void jas_deprecated(const char *s)
 	;
 	jas_eprintf("%s", message);
 	jas_eprintf("The specific problem is as follows:\n%s\n", s);
-	//abort();
 }

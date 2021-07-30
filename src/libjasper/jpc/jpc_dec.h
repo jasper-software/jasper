@@ -77,6 +77,7 @@
 #include "jasper/jas_stream.h"
 #include "jasper/jas_image.h"
 
+#include "jpc_cod.h"
 #include "jpc_tsfb.h"
 #include "jpc_tagtree.h"
 #include "jpc_cs.h"

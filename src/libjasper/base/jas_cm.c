@@ -133,9 +133,13 @@ static jas_cmpxform_t *jas_cmpxform_create0(void);
 static jas_cmpxform_t *jas_cmpxform_createshapmat(void);
 static void jas_cmshapmatlut_init(jas_cmshapmatlut_t *lut);
 static int jas_cmshapmatlut_set(jas_cmshapmatlut_t *lut, const jas_icccurv_t *curv);
+static jas_cmprof_t *jas_cmprof_createsycc(void);
+
+/******************************************************************************\
+*
+\******************************************************************************/
 
 static const jas_cmpxformops_t shapmat_ops = {jas_cmshapmat_destroy, jas_cmshapmat_apply, 0};
-static jas_cmprof_t *jas_cmprof_createsycc(void);
 
 /******************************************************************************\
 * Color profile class.

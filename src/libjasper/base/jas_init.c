@@ -76,7 +76,19 @@
 #include <stddef.h>
 
 /******************************************************************************\
-* Code.
+* Function prototypes.
+\******************************************************************************/
+
+void jas_context_init(jas_ctx_t *ctx);
+
+static int jas_init_codecs(jas_ctx_t *ctx);
+
+static int jas_init_helper(void);
+
+void jas_context_cleanup(jas_ctx_t *ctx);
+
+/******************************************************************************\
+* Data.
 \******************************************************************************/
 
 static const jas_image_fmt_t jas_image_fmts[] = {
@@ -187,14 +199,6 @@ static const jas_image_fmt_t jas_image_fmts[] = {
 
 };
 
-JAS_DLLEXPORT
-void jas_get_image_format_table(const jas_image_fmt_t** formats,
-  size_t *num_formats)
-{
-	*formats = jas_image_fmts;
-	*num_formats = sizeof(jas_image_fmts) / sizeof(jas_image_fmt_t);
-}
-
 /*
 Various user-configurable settings.
 */
@@ -202,9 +206,25 @@ jas_conf_t jas_conf = {
 	.initialized = 0,
 };
 
+#if defined(JAS_ENABLE_MULTITHREADING_SUPPORT)
+static jas_tss_t jas_tss;
+#endif
+
+static jas_ctx_t *jas_global_ctx = 0;
+
+static jas_ctx_t jas_global_ctx_buf;
+
 /******************************************************************************\
 * Code.
 \******************************************************************************/
+
+JAS_DLLEXPORT
+void jas_get_image_format_table(const jas_image_fmt_t** formats,
+  size_t *num_formats)
+{
+	*formats = jas_image_fmts;
+	*num_formats = sizeof(jas_image_fmts) / sizeof(jas_image_fmt_t);
+}
 
 JAS_DLLEXPORT
 void jas_conf_clear()
@@ -217,8 +237,8 @@ void jas_conf_clear()
 	jas_conf.dec_default_max_samples = JAS_DEC_DEFAULT_MAX_SAMPLES;
 	jas_conf.debug_level = 0;
 	jas_conf.enable_atexit_cleanup = 0;
-	jas_conf.eprintf = jas_eprintf_impl;
-	//jas_conf.eprintf = jas_eprintf_discard_impl;
+	jas_conf.veprintf = jas_veprintf_stderr;
+	//jas_conf.veprintf = jas_veprintf_discard_impl;
 	jas_conf.num_image_formats = sizeof(jas_image_fmts) /
 	  sizeof(jas_image_fmt_t);
 	jas_conf.image_formats = jas_image_fmts;
@@ -255,9 +275,9 @@ void jas_conf_set_dec_default_max_samples(size_t n)
 }
 
 JAS_DLLEXPORT
-void jas_conf_set_eprintf(int (*eprintf)(const char *, va_list))
+void jas_conf_set_veprintf(int (*func)(const char *, va_list))
 {
-	jas_conf.eprintf = eprintf;
+	jas_conf.veprintf = func;
 }
 
 JAS_DLLEXPORT
@@ -267,10 +287,6 @@ void jas_conf_set_image_format_table(const jas_image_fmt_t *formats,
 	jas_conf.image_formats = formats;
 	jas_conf.num_image_formats = num_formats;
 }
-
-static int jas_init_codecs(void);
-
-static int jas_init_helper(void);
 
 JAS_DLLEXPORT
 int jas_init()
@@ -289,6 +305,18 @@ int jas_initialize()
 
 static int jas_init_helper()
 {
+#if defined(JAS_ENABLE_MULTITHREADING_SUPPORT)
+	memset(&jas_tss, 0, sizeof(jas_tss_t));
+#endif
+
+	/*
+	The initialization of the global context must be performed first.
+	The memory allocator uses information from the context in order to
+	handle log messages.
+	*/
+	jas_context_init(&jas_global_ctx_buf);
+	jas_global_ctx = &jas_global_ctx_buf;
+
 	if (jas_conf.enable_allocator_wrapper) {
 		jas_allocator_t *delegate;
 		if (!jas_conf.allocator) {
@@ -309,10 +337,17 @@ static int jas_init_helper()
 		}
 	}
 
-	jas_conf.dec_default_max_samples = JAS_DEC_DEFAULT_MAX_SAMPLES;
-	jas_setdbglevel(jas_conf.debug_level);
+#if defined(JAS_ENABLE_MULTITHREADING_SUPPORT)
+	if (jas_tss_create(&jas_tss, 0)) {
+		return -1;
+	}
+#endif
 
-	if (jas_init_codecs()) {
+	jas_global_ctx->dec_default_max_samples = jas_conf.dec_default_max_samples;
+	jas_global_ctx->debug_level = jas_conf.debug_level;
+	//jas_setdbglevel(jas_conf.debug_level);
+
+	if (jas_init_codecs(jas_global_ctx)) {
 		return -1;
 	}
 
@@ -327,15 +362,12 @@ static int jas_init_helper()
 		atexit(jas_cleanup);
 	}
 
-	jas_mutex_init(&jas_eprintf_mutex);
-
 	return 0;
 }
 
 /* Initialize the image format table. */
-static int jas_init_codecs()
+static int jas_init_codecs(jas_ctx_t *ctx)
 {
-	jas_image_fmtops_t fmtops;
 	int fmtid;
 	const char delim[] = " \t";
 
@@ -347,12 +379,14 @@ static int jas_init_codecs()
 		char *buf = jas_strdup(fmt->exts);
 		bool first = true;
 		for (;;) {
+			char *saveptr;
 			char *ext;
-			if (!(ext = strtok(first ? buf : NULL, delim))) {
+			if (!(ext = jas_strtok(first ? buf : NULL, delim, &saveptr))) {
 				break;
 			}
 			JAS_DBGLOG(10, ("adding image format %s %s\n", fmt->name, ext));
-			jas_image_addfmt(fmtid, fmt->name, ext, fmt->desc, &fmt->ops);
+			jas_image_addfmt_internal(ctx->image_fmtinfos, &ctx->image_numfmts,
+			  fmtid, fmt->name, ext, fmt->desc, &fmt->ops);
 			++fmtid;
 			first = false;
 		}
@@ -366,14 +400,19 @@ void jas_cleanup()
 {
 	JAS_DBGLOG(10, ("jas_cleanup invoked\n"));
 
-	jas_image_clearfmts();
+	jas_global_ctx = &jas_global_ctx_buf;
+	jas_context_cleanup(&jas_global_ctx_buf);
+	jas_context_set_debug_level(&jas_global_ctx_buf, 0);
+
 	assert(jas_allocator);
 	jas_allocator_cleanup(jas_allocator);
 	jas_allocator = 0;
 
-	jas_mutex_cleanup(&jas_eprintf_mutex);
-
 	JAS_DBGLOG(10, ("jas_cleanup returning\n"));
+
+#if defined(JAS_ENABLE_MULTITHREADING_SUPPORT)
+	jas_tss_delete(jas_tss);
+#endif
 }
 
 /******************************************************************************\
@@ -383,4 +422,90 @@ void jas_cleanup()
 jas_conf_t *jas_get_conf_ptr()
 {
 	return &jas_conf;
+}
+
+void jas_context_init(jas_ctx_t *ctx)
+{
+	memset(ctx, 0, sizeof(jas_ctx_t));
+	ctx->dec_default_max_samples = jas_conf.dec_default_max_samples;
+	ctx->debug_level = jas_conf.debug_level;
+	ctx->veprintf = jas_conf.veprintf;
+	ctx->image_numfmts = 0;
+}
+
+JAS_DLLEXPORT
+jas_context_t jas_context_create()
+{
+	jas_ctx_t *ctx;
+	if (!(ctx = jas_malloc(sizeof(jas_ctx_t)))) {
+		return 0;
+	}
+	jas_context_init(ctx);
+	jas_init_codecs(ctx);
+	return JAS_CAST(jas_context_t, ctx);
+}
+
+void jas_context_cleanup(jas_ctx_t *ctx)
+{
+	jas_image_clearfmts_internal(ctx->image_fmtinfos, &ctx->image_numfmts);
+}
+
+JAS_DLLEXPORT
+void jas_context_destroy(jas_context_t context)
+{
+	jas_context_cleanup(JAS_CAST(jas_ctx_t *, context));
+	jas_free(context);
+}
+
+JAS_DLLEXPORT
+jas_context_t jas_get_context()
+{
+#if defined(JAS_ENABLE_MULTITHREADING_SUPPORT)
+	jas_ctx_t *ctx = JAS_CAST(jas_context_t, jas_tss_get(jas_tss));
+	if (!ctx) {
+		ctx = jas_global_ctx;
+	}
+	return JAS_CAST(jas_context_t, ctx);
+#else
+	return JAS_CAST(jas_context_t, (jas_global_ctx) ? jas_global_ctx :
+	  &jas_global_ctx_buf);
+#endif
+}
+
+JAS_DLLEXPORT
+void jas_set_context(jas_context_t context)
+{
+#if defined(JAS_ENABLE_MULTITHREADING_SUPPORT)
+	if (jas_tss_set(jas_tss, JAS_CAST(void *, context))) {
+		assert(0);
+		abort();
+	}
+#else
+	jas_global_ctx = JAS_CAST(jas_ctx_t *, context);
+#endif
+}
+
+JAS_DLLEXPORT
+int jas_context_set_debug_level(jas_context_t context, int debug_level)
+{
+	jas_ctx_t *ctx = JAS_CAST(jas_ctx_t *, context);
+	int old = ctx->debug_level;
+	ctx->debug_level = debug_level;
+	return old;
+}
+
+JAS_DLLEXPORT
+void jas_context_set_dec_default_max_samples(jas_context_t context,
+  size_t max_samples)
+{
+	jas_ctx_t *ctx = JAS_CAST(jas_ctx_t *, context);
+	ctx->dec_default_max_samples = max_samples;
+}
+
+JAS_DLLEXPORT
+void jas_context_set_veprintf(jas_context_t context,
+  int (*func)(const char *, va_list))
+{
+	jas_ctx_t *ctx = JAS_CAST(jas_ctx_t *, context);
+	ctx->veprintf = func;
 }

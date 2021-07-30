@@ -294,6 +294,8 @@ static inline void JPC_UPDATEFLAGS4(jpc_fix_t *fp, unsigned rowstep, bool s, boo
 /* Initialize the lookup tables used by the codec. */
 void jpc_initluts(void);
 
+void jpc_initmqctxs(void);
+
 /* Get the nominal gain associated with a particular band. */
 JAS_ATTRIBUTE_CONST
 unsigned JPC_NOMINALGAIN(unsigned qmfbid, unsigned numlvls, unsigned lvlno, enum jpc_tsfb_orient orient);
