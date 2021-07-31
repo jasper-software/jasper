@@ -229,6 +229,8 @@ int main(int argc, char **argv)
 		}
 	}
 
+	fprintf(stderr, "THREADS: %s\n", JAS_THREADS_IMPL);
+
 	job_t *job = jobs;
 	num_jobs = 0;
 	int i = optind;
@@ -303,7 +305,7 @@ int main(int argc, char **argv)
 	for (int i = 0; i < num_jobs; ++i) {
 		job_t *job = &jobs[i];
 		int result;
-		if (jas_thread_join(job->thread, &result)) {
+		if (jas_thread_join(&job->thread, &result)) {
 			fprintf(stderr, "cannot join thread\n");
 			abort();
 		}

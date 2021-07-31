@@ -40,11 +40,29 @@
 #cmakedefine JAS_DEFAULT_MAX_MEM_USAGE 0
 
 #cmakedefine JAS_ENABLE_MULTITHREADING_SUPPORT 1
+#cmakedefine JAS_HAVE_THREADS 1
+#cmakedefine JAS_HAVE_PTHREAD 1
 
 #cmakedefine JAS_ENABLE_NON_THREAD_SAFE_DEBUGGING 1
+#cmakedefine JAS_PREFER_PTHREAD 1
 
-#if defined(__STDC_NO_THREADS__)
-#undef JAS_ENABLE_MULTITHREADING_SUPPORT
+#if defined(JAS_ENABLE_MULTITHREADING_SUPPORT)
+#	if !defined(__STDC_NO_THREADS__)
+#		define JAS_THREADS_C11
+#	endif
+#	if defined(JAS_HAVE_PTHREAD)
+#		define JAS_THREADS_PTHREAD
+#	endif
+#	if defined(JAS_THREADS_C11) && defined(JAS_THREADS_PTHREAD)
+#		if defined(JAS_PREFER_PTHREAD)
+#			undef JAS_THREADS_C11
+#		else
+#			undef JAS_THREADS_PTHREAD
+#		endif
+#	endif
+#	if !defined(JAS_THREADS_C11) && !defined(JAS_THREADS_PTHREAD)
+#		undef JAS_ENABLE_MULTITHREADING_SUPPORT
+#	endif
 #endif
 
 #if defined(JAS_ENABLE_DANGEROUS_INTERNAL_TESTING_MODE)
@@ -71,10 +89,6 @@
 
 #if (JAS_DEFAULT_MAX_MEM_USAGE == 0)
 #define JAS_DEFAULT_MAX_MEM_USAGE (1024ULL * 1024ULL * 1024ULL)
-#endif
-
-#if defined(JAS_ENABLE_MULTITHREADING_SUPPORT)
-#define JAS_THREADS_C11
 #endif
 
 #endif

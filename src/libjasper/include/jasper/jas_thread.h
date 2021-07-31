@@ -69,16 +69,32 @@
 #ifndef JAS_THREAD_H
 #define JAS_THREAD_H
 
+/******************************************************************************\
+* Includes
+\******************************************************************************/
+
 /* The configuration header file should be included first. */
 #include <jasper/jas_config.h>
 
 #include "jasper/jas_compiler.h"
+#include "jasper/jas_types.h"
 
 #if defined(JAS_ENABLE_MULTITHREADING_SUPPORT)
-#ifndef __STDC_NO_THREADS__
+
+#include <stdlib.h>
+#include <assert.h>
+
+#if defined(JAS_THREADS_C11)
 #include <threads.h>
 #endif
+#if defined(JAS_THREADS_PTHREAD)
+#include <pthread.h>
 #endif
+
+#endif
+
+/******************************************************************************\
+\******************************************************************************/
 
 #ifdef __cplusplus
 extern "C" {
@@ -87,103 +103,209 @@ extern "C" {
 #if defined(JAS_ENABLE_MULTITHREADING_SUPPORT)
 
 #if defined(JAS_THREADS_C11)
+#	define JAS_THREADS_IMPL "C11"
+#elif defined(JAS_THREADS_PTHREAD)
+#	define JAS_THREADS_IMPL "PTHREAD"
+#endif
 
-/******************************************************************************\
-* Thread Support Based on the C11 Standard
-\******************************************************************************/
+#if defined(JAS_THREADS_C11)
 
-#define JAS_ONCE_FLAG_INIT ONCE_FLAG_INIT
-
-typedef once_flag jas_once_flag_t;
-
-typedef struct {
-	mtx_t mutex;
-} jas_mutex_t;
-
-typedef struct {
-	tss_t value;
-} jas_tss_t;
+typedef thrd_t jas_thread_t;
 
 typedef thrd_t jas_thread_id_t;
 
+typedef mtx_t jas_mutex_t;
+
+typedef tss_t jas_tss_t;
+
+typedef once_flag jas_once_flag_t;
+#define JAS_ONCE_FLAG_INIT ONCE_FLAG_INIT
+
+#elif defined(JAS_THREADS_PTHREAD)
+
+typedef pthread_t jas_thread_id_t;
 typedef struct {
-	thrd_t thread;
+	pthread_t id;
+	int result;
+	void *arg;
+	int (*func)(void *);
 } jas_thread_t;
 
-static inline
-int jas_tss_create(jas_tss_t *id, void (*destructor)(void *))
+typedef pthread_mutex_t jas_mutex_t;
+
+typedef pthread_key_t jas_tss_t;
+
+typedef pthread_once_t jas_once_flag_t;
+#define JAS_ONCE_FLAG_INIT PTHREAD_ONCE_INIT
+
+#endif
+
+#if defined(JAS_THREADS_PTHREAD)
+static void *thread_func_wrapper(void *thread_ptr)
 {
-	return tss_create(&id->value, destructor) == thrd_success ? 0 : -1;
+	jas_thread_t *thread = JAS_CAST(jas_thread_t *, thread_ptr);
+	int result = (thread->func)(thread->arg);
+	thread->result = result;
+	return thread;
 }
+#endif
 
 static inline
-void *jas_tss_get(jas_tss_t id)
+int jas_thread_compare(jas_thread_id_t x, jas_thread_id_t y)
 {
-	return tss_get(id.value);
-}
-
-static inline
-int jas_tss_set(jas_tss_t id, void *value)
-{
-	return tss_set(id.value, value) == thrd_success ? 0 : -1;
-}
-
-static inline
-void jas_tss_delete(jas_tss_t id)
-{
-	tss_delete(id.value);
+#if defined(JAS_THREADS_C11)
+	return thrd_equal(x, y);
+#elif defined(JAS_THREADS_PTHREAD)
+	return pthread_equal(x, y);
+#endif
 }
 
 static inline
 int jas_thread_create(jas_thread_t *thread, int (*func)(void *), void *arg)
 {
-	return thrd_create(&thread->thread, func, arg) == thrd_success ? 0 : -1;
+#if defined(JAS_THREADS_C11)
+	return thrd_create(thread, func, arg) == thrd_success ? 0 : -1;
+#elif defined(JAS_THREADS_PTHREAD)
+	thread->func = func;
+	thread->arg = arg;
+	thread->result = 0;
+	return pthread_create(&thread->id, 0, thread_func_wrapper, thread);
+#endif
 }
 
 static inline
-int jas_thread_join(jas_thread_t thread, int *result)
+int jas_thread_join(jas_thread_t *thread, int *result)
 {
-	return thrd_join(thread.thread, result) == thrd_success ? 0 : -1;
+#if defined(JAS_THREADS_C11)
+	return thrd_join(*thread, result) == thrd_success ? 0 : -1;
+#elif defined(JAS_THREADS_PTHREAD)
+	void *result_buf;
+	int ret = pthread_join(thread->id, &result_buf);
+	if (!ret) {
+		jas_thread_t *other_thread = JAS_CAST(jas_thread_t *, result_buf);
+		if (result) {
+			/* A null pointer is probably a bug. */
+			assert(other_thread);
+			*result = other_thread ? other_thread->result : 0;
+		}
+	}
+	return ret;
+#endif
 }
 
+#if 0
+/* This functionality is not available for all threading support libraries. */
 static inline
 void jas_thread_exit(int result)
 {
+#if defined(JAS_THREADS_C11)
 	thrd_exit(result);
+#elif defined(JAS_THREADS_PTHREAD)
+	/* This does not have a trivial implementation, as far as I can see. */
+	/* There is no jas_thread_find function. */
+	jas_thread_t *thread = jas_thread_find(pthread_self());
+	thread->result = result;
+	pthread_exit(JAS_CAST(void *, thread));
+#endif
 }
+#endif
 
 static inline
 jas_thread_id_t jas_thread_current(void)
 {
+#if defined(JAS_THREADS_C11)
 	return thrd_current();
+#elif defined(JAS_THREADS_PTHREAD)
+	return pthread_self();
+#endif
 }
 
 static inline int jas_mutex_init(jas_mutex_t *mtx)
 {
-	return mtx_init(&mtx->mutex, mtx_plain) == thrd_success ? 0 : -1;
+#if defined(JAS_THREADS_C11)
+	return mtx_init(mtx, mtx_plain) == thrd_success ? 0 : -1;
+#elif defined(JAS_THREADS_PTHREAD)
+	return pthread_mutex_init(mtx, 0);
+#endif
 }
 
-static inline void jas_mutex_cleanup(jas_mutex_t *mtx)
+static inline int jas_mutex_cleanup(jas_mutex_t *mtx)
 {
-	mtx_destroy(&mtx->mutex);
+#if defined(JAS_THREADS_C11)
+	mtx_destroy(mtx);
+	return 0;
+#elif defined(JAS_THREADS_PTHREAD)
+	return pthread_mutex_destroy(mtx);
+#endif
 }
 
 static inline int jas_mutex_lock(jas_mutex_t *mtx)
 {
-	return mtx_lock(&mtx->mutex);
+#if defined(JAS_THREADS_C11)
+	return mtx_lock(mtx);
+#elif defined(JAS_THREADS_PTHREAD)
+	return pthread_mutex_lock(mtx);
+#endif
 }
 
 static inline int jas_mutex_unlock(jas_mutex_t *mtx)
 {
-	return mtx_unlock(&mtx->mutex);
-}
-
-static inline void jas_call_once(jas_once_flag_t *flag, void (*func)(void))
-{
-	call_once(flag, func);
-}
-
+#if defined(JAS_THREADS_C11)
+	return mtx_unlock(mtx);
+#elif defined(JAS_THREADS_PTHREAD)
+	return pthread_mutex_unlock(mtx);
 #endif
+}
+
+static inline
+int jas_tss_create(jas_tss_t *tss, void (*destructor)(void *))
+{
+#if defined(JAS_THREADS_C11)
+	return tss_create(tss, destructor) == thrd_success ? 0 : -1;
+#elif defined(JAS_THREADS_PTHREAD)
+	return pthread_key_create(tss, destructor);
+#endif
+}
+
+static inline
+void *jas_tss_get(jas_tss_t tss)
+{
+#if defined(JAS_THREADS_C11)
+	return tss_get(tss);
+#elif defined(JAS_THREADS_PTHREAD)
+	return pthread_getspecific(tss);
+#endif
+}
+
+static inline
+int jas_tss_set(jas_tss_t tss, void *value)
+{
+#if defined(JAS_THREADS_C11)
+	return tss_set(tss, value) == thrd_success ? 0 : -1;
+#elif defined(JAS_THREADS_PTHREAD)
+	return pthread_setspecific(tss, value);
+#endif
+}
+
+static inline
+void jas_tss_delete(jas_tss_t tss)
+{
+#if defined(JAS_THREADS_C11)
+	tss_delete(tss);
+#elif defined(JAS_THREADS_PTHREAD)
+	pthread_key_delete(tss);
+#endif
+}
+
+static inline int jas_call_once(jas_once_flag_t *flag, void (*func)(void))
+{
+#if defined(JAS_THREADS_C11)
+	call_once(flag, func);
+	return 0;
+#elif defined(JAS_THREADS_PTHREAD)
+	return pthread_once(flag, func);
+#endif
+}
 
 #else
 

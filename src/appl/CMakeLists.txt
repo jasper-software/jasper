@@ -88,7 +88,7 @@ if (BASH_PROGRAM)
 		add_test(run_test_5
 		  "${BASH_PROGRAM}" "${CMAKE_CURRENT_BINARY_DIR}/../../test/bin/wrapper"
 		  "${CMAKE_CURRENT_SOURCE_DIR}/../../test/bin/run_test_5" -v)
-		set(extra_programs "${extra_programs} multithread")
+		set(extra_programs "${extra_programs}" multithread)
 	endif()
 	add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS
 	  ${programs} ${extra_programs}

@@ -93,7 +93,9 @@ option(JAS_ENABLE_OPENGL "Enable the use of the OpenGL/GLUT Library" true)
 option(JAS_ENABLE_AUTOMATIC_DEPENDENCIES "Enable automatic dependencies" true)
 option(JAS_ENABLE_DOC "Enable building of the documentation" true)
 option(JAS_ENABLE_PROGRAMS "Enable building of the programs" true)
-option(JAS_ENABLE_MULTITHREADING_SUPPORT "Enable multithreading support" false)
+option(JAS_ENABLE_MULTITHREADING_SUPPORT "Enable multithreading support" true)
+option(JAS_PREFER_PTHREAD
+  "Prefer POSIX Threading Library (over C11) for threading support" false)
 
 option(JAS_INCLUDE_PNM_CODEC "Include PNM codec support" true)
 option(JAS_INCLUDE_BMP_CODEC "Include BMP codec support" true)
@@ -250,10 +252,23 @@ endif()
 #
 ################################################################################
 
+set(JAS_HAVE_THREADS false)
 if (JAS_ENABLE_MULTITHREADING_SUPPORT)
-	find_package(Threads REQUIRED)
+	set(THREADS_PREFER_PTHREAD_FLAG true)
+	find_package(Threads)
+	if (Threads_FOUND)
+		set(JAS_HAVE_THREADS true)
+	endif()
+	if (CMAKE_USE_PTHREADS_INIT)
+		set(JAS_HAVE_PTHREAD true)
+	else()
+		set(JAS_HAVE_PTHREAD false)
+	endif()
 	set(THREAD_LIBRARY "Threads::Threads")
 endif()
+message("Threads library found: ${JAS_HAVE_THREADS}")
+message("Prefer POSIX Threads library: ${JAS_PREFER_PTHREAD}")
+message("POSIX Threads library found: ${JAS_HAVE_PTHREAD}")
 
 ################################################################################
 # Check for the JPEG library.
