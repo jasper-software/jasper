@@ -199,7 +199,7 @@ include(CPack)
 if (NOT MSVC)
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pedantic")
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -W -Wformat -Wmissing-prototypes -Wstrict-prototypes")
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -W -Wno-sign-compare -Wformat -Wmissing-prototypes -Wstrict-prototypes")
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wmissing-declarations -Wredundant-decls")
 endif()
 
