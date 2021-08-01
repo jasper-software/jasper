@@ -20,10 +20,10 @@ jobs:
         with:
           fetch-depth: 0
       ############################################################
-#      - name: Prebuild
-#        shell: bash
-#        run: build/github/prebuild
-#      ############################################################
+      - name: Prebuild
+        shell: bash
+        run: build/github/prebuild
+      ############################################################
 #      - name: Build
 #        shell: bash
 #        run: build/make_release -r ${{github.ref}} -w ${{github.workspace}} -t ${{runner.temp}}/tmp -o ${{runner.temp}}/out
