@@ -28,16 +28,15 @@ jobs:
         shell: bash
         run: build/make_release -r ${{github.ref}} -w ${{github.workspace}} -t ${{runner.temp}}/tmp -o ${{runner.temp}}/out
       ############################################################
-#      - name: Deploy Release
-#        shell: bash
-#        uses: softprops/action-gh-release@v1
-#        with:
-#          files: |
-#            ${{runner.temp}}/out/jasper*.tar.gz
-#          body_path: ${{runner.temp}}/out/release_notes.txt
-#        env:
-#          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-#      ############################################################
+      - name: Deploy Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            ${{runner.temp}}/out/jasper*.tar.gz
+          body_path: ${{runner.temp}}/out/release_notes.txt
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      ############################################################
 #      - name: Deploy GitHub Pages Site for Manual
 #        env:
 #          DEPLOY_KEY: ${{secrets.MANUAL_DEPLOY_KEY}}
