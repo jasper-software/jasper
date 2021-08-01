@@ -47,7 +47,7 @@ jobs:
             -m key \
             -t ${{runner.temp}}/deploy_gh_pages \
             -i ${{runner.temp}}/out/doc \
-            -r jasper-software/jasper-manual-test \
+            -r jasper-software/jasper-manual \
             -b gh-pages \
             -z ${{github.ref}}
       ############################################################

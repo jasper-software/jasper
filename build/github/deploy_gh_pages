@@ -292,10 +292,10 @@ ln -s "$version/html" "$target" || \
 
 index_html_data='
 <head>
-  <meta http-equiv="refresh" content="0; URL=https://jasper-software.github.io/jasper-manual-test/latest/" />
+  <meta http-equiv="refresh" content="0; URL=https://jasper-software.github.io/jasper-manual/latest/" />
 </head>
 <body>
-  <p>If you are not redirected in five seconds, <a href="https://jasper-software.github.io/jasper-manual-test/latest/">click here</a>.</p>
+  <p>If you are not redirected in five seconds, <a href="https://jasper-software.github.io/jasper-manual/latest/">click here</a>.</p>
 </body>
 '
 
