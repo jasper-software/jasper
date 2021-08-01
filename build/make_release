@@ -125,7 +125,7 @@ cmake --build "$build_dir" --clean-first || \
 #cmake --build "$build_dir" --target install || \
 #  panic "make install failed"
 
-cp -a "$build_dir/doc/html" "$out_dir/doc/html" || \
+cp -a "$build_dir/doc/html/." "$out_dir/doc/html" || \
   panic "cannot move html"
 
 #mv "$build_dir/doc/latex/refman.pdf" "$source_dir/doc/manual.pdf" || \
