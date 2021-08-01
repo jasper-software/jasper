@@ -59,21 +59,21 @@ script:
 # Specify deployment.
 ################################################################################
 
-jobs:
-  include:
-    - stage: deploy
-      script:
-        - build/travis/build -t /tmp/jasper
-      os: linux
-      dist: xenial
-      compiler: gcc
-      deploy:
-        provider: pages
-        repo: jasper-software/jasper-manual
-        target_branch: gh-pages
-        local_dir: /tmp/jasper/static/install/share/doc/JasPer/html
-        skip_cleanup: true
-        github_token: $GITHUB_TOKEN
-        keep_history: true
-        on:
-          branch: master
+#jobs:
+#  include:
+#    - stage: deploy
+#      script:
+#        - build/travis/build -t /tmp/jasper
+#      os: linux
+#      dist: xenial
+#      compiler: gcc
+#      deploy:
+#        provider: pages
+#        repo: jasper-software/jasper-manual
+#        target_branch: gh-pages
+#        local_dir: /tmp/jasper/static/install/share/doc/JasPer/html
+#        skip_cleanup: true
+#        github_token: $GITHUB_TOKEN
+#        keep_history: true
+#        on:
+#          branch: master
