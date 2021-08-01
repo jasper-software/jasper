@@ -90,7 +90,8 @@ echo "commit: $commit"
 echo "tag: $tag"
 echo "version: $version"
 
-for dir in "$tmp_dir" "$out_dir" "$build_dir" "$source_dir" "$install_dir"; do
+for dir in "$tmp_dir" "$out_dir" "$build_dir" "$source_dir" "$install_dir" \
+  "$out_dir/doc/html"; do
 	if [ ! -d "$dir" ]; then
 		mkdir -p "$dir" || panic "cannot make directory $dir"
 	fi
@@ -113,7 +114,7 @@ git -C "$workspace_dir" log --stat -M -C --name-status --no-color | \
 cmake \
   -G "Unix Makefiles" \
   -DCMAKE_INSTALL_PREFIX="$install_dir" \
-  -DJAS_ENABLE_DOC=false \
+  -DJAS_ENABLE_DOC=true \
   -DJAS_ENABLE_OPENGL=false \
   -H"$source_dir" -B"$build_dir" || \
   panic "cmake failed"
@@ -121,8 +122,11 @@ cmake \
 cmake --build "$build_dir" --clean-first || \
   panic "make clean/all failed"
 
-#mv "$build_dir/doc/html" "$source_dir/doc/html" || \
-#  panic "cannot move html"
+#cmake --build "$build_dir" --target install || \
+#  panic "make install failed"
+
+cp -a "$build_dir/doc/html" "$out_dir/doc/html" || \
+  panic "cannot move html"
 
 #mv "$build_dir/doc/latex/refman.pdf" "$source_dir/doc/manual.pdf" || \
 #  panic "cannot move manual.pdf"
@@ -148,4 +152,3 @@ done
 
 tar -C "$tmp_dir" -czf - "$name" > "$archive_file" || \
   panic "cannot make archive"
-

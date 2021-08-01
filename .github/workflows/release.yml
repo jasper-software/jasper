@@ -4,16 +4,29 @@ on:
   push:
     tags:
       - 'version-*.*.*'
+      - 'v*.*.*'
+      - 'tmp-v*.*.*'
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      ############################################################
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Prepare
+        with:
+          fetch-depth: 0
+      ############################################################
+      - name: Prebuild
+        shell: bash
+        run: build/github/prebuild
+      ############################################################
+      - name: Build
+        shell: bash
         run: build/make_release -r ${{github.ref}} -w ${{github.workspace}} -t ${{runner.temp}}/tmp -o ${{runner.temp}}/out
-      - name: Release
+      ############################################################
+      - name: Deploy Release
+        shell: bash
         uses: softprops/action-gh-release@v1
         with:
           files: |
@@ -21,3 +34,18 @@ jobs:
           body_path: ${{runner.temp}}/out/release_notes.txt
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      ############################################################
+      - name: Deploy GitHub Pages Site for Manual
+        env:
+          DEPLOY_KEY: ${{secrets.MANUAL_DEPLOY_KEY}}
+        shell: bash
+        run: |
+          build/github/deploy_gh_pages \
+            -f \
+            -m key \
+            -t ${{runner.temp}}/deploy_gh_pages \
+            -i ${{runner.temp}}/out \
+            -r jasper-software/jasper-manual-test \
+            -b gh-pages \
+            -z ${{github.ref}}
+      ############################################################
