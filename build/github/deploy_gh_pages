@@ -290,12 +290,23 @@ fi
 ln -s "$version/html" "$target" || \
   panic "ln failed"
 
+index_html_data='
+<head>
+  <meta http-equiv="refresh" content="0; URL=https://jasper-software.github.io/jasper-manual-test/latest/" />
+</head>
+<body>
+  <p>If you are not redirected in five seconds, <a href="https://jasper-software.github.io/jasper-manual-test/latest/">click here</a>.</p>
+</body>
+'
+
 # Add a top-level index.html file to redirect to the latest release.
 target="$git_dir/index.html"
 if [ -e "$target" ]; then
 	rm -f "$target" || panic "cannot remove $target"
 fi
-cp "$top_dir/sources/index.html" "$target" || panic "cannot copy $target"
+cat > "$target" <<< "$index_html_data" || \
+  panic "cannot create index.html"
+#cp "$top_dir/sources/index.html" "$target" || panic "cannot copy $target"
 
 if [ "$verbose" -ge 2 ]; then
 	ls -al "$git_dir"/*
