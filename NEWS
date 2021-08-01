@@ -1,10 +1,16 @@
-?.?.?? (????-??-??)
+3.0.0 (????-??-??)
 ===================
 
 * Add support for multithreading.
 * Add support for customizing some library behavior, such as allowing the
   library user to control the memory allocator to be employed by the library).
 * Fix numerous bugs.
+
+2.0.33 (2021-08-01)
+===================
+
+* Fix a JP2/JPC decoder bug.
+* Fix a build issue impacting some platforms.
 
 2.0.32 (2021-04-18)
 ===================
