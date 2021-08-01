@@ -37,17 +37,17 @@ jobs:
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
       ############################################################
-#      - name: Deploy GitHub Pages Site for Manual
-#        env:
-#          DEPLOY_KEY: ${{secrets.MANUAL_DEPLOY_KEY}}
-#        shell: bash
-#        run: |
-#          build/github/deploy_gh_pages \
-#            -f \
-#            -m key \
-#            -t ${{runner.temp}}/deploy_gh_pages \
-#            -i ${{runner.temp}}/out \
-#            -r jasper-software/jasper-manual-test \
-#            -b gh-pages \
-#            -z ${{github.ref}}
-#      ############################################################
+      - name: Deploy GitHub Pages Site for Manual
+        env:
+          DEPLOY_KEY: ${{secrets.MANUAL_DEPLOY_KEY}}
+        shell: bash
+        run: |
+          build/github/deploy_gh_pages \
+            -f \
+            -m key \
+            -t ${{runner.temp}}/deploy_gh_pages \
+            -i ${{runner.temp}}/out/doc \
+            -r jasper-software/jasper-manual-test \
+            -b gh-pages \
+            -z ${{github.ref}}
+      ############################################################
