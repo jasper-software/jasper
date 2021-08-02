@@ -316,7 +316,11 @@ static jas_mb_t *jas_get_mb(void *ptr)
 	  JAS_CAST(max_align_t *, ptr) - JAS_MB_ADJUST);
 	assert(mb->magic == JAS_BMA_MAGIC);
 	/* This is one check that I do not want disabled with NDEBUG. */
-	if (mb->magic != JAS_BMA_MAGIC) {abort();}
+	if (mb->magic != JAS_BMA_MAGIC) {
+		/* This line of code should never be reached. */
+		assert(0);
+		abort();
+	}
 	return mb;
 }
 
@@ -366,6 +370,8 @@ void jas_basic_allocator_init(jas_basic_allocator_t *allocator,
 	allocator->mem = 0;
 #if defined(JAS_ENABLE_MULTITHREADING_SUPPORT)
 	if (jas_mutex_init(&allocator->mutex)) {
+		/* This line of code should never be reached. */
+		assert(0);
 		abort();
 	}
 #endif
@@ -405,7 +411,7 @@ void *jas_basic_alloc(jas_allocator_t *allocator, size_t size)
 	}
 #endif
 	if (!jas_safe_size_add(size, JAS_MB_SIZE, &ext_size)) {
-		jas_eprintf("requested memory size is too large\n");
+		jas_eprintf("requested memory size is too large (%zu)\n", size);
 		result = 0;
 		goto done;
 	}
@@ -415,17 +421,26 @@ void *jas_basic_alloc(jas_allocator_t *allocator, size_t size)
 	has_lock = true;
 #endif
 
-	if (!jas_safe_size_add(a->mem, size, &mem) || mem > a->max_mem) {
+	/*
+	Calculate the amount of memory that would be allocated after the requested
+	allocation is performed, being careful to ensure that this computation
+	does not cause overflow.  Then, ensure that the computed value does not
+	exceed the memory usage limit.
+	*/
+	if (!jas_safe_size_add(a->mem, ext_size, &mem) || mem > a->max_mem) {
 		jas_eprintf("maximum memory limit (%zu) would be exceeded\n",
 		  a->max_mem);
 		result = 0;
 		goto done;
 	}
 
+	/*
+	Perform the requested allocation using the delegated-to allocator.
+	*/
 	JAS_DBGLOG(100, ("jas_basic_alloc: alloc(%p, %zu)\n", a->delegate,
 	  ext_size));
 	if ((mb = (a->delegate->alloc)(a->delegate, ext_size))) {
-		jas_mb_init(mb, size); /* mb->size = size; */
+		jas_mb_init(mb, ext_size);
 		result = jas_mb_get_data(mb);
 		a->mem = mem;
 	} else {
@@ -450,9 +465,9 @@ JAS_DLLEXPORT
 void *jas_basic_realloc(jas_allocator_t *allocator, void *ptr, size_t size)
 {
 	void *result;
-	jas_mb_t *mb;
 	jas_mb_t *old_mb;
-	size_t old_size;
+	size_t old_ext_size;
+	jas_mb_t *mb;
 	size_t ext_size;
 	size_t mem;
 	jas_basic_allocator_t *a = JAS_CAST(jas_basic_allocator_t *, allocator);
@@ -462,14 +477,22 @@ void *jas_basic_realloc(jas_allocator_t *allocator, void *ptr, size_t size)
 
 	JAS_DBGLOG(100, ("jas_basic_realloc(%p, %p, %zu)\n", allocator, ptr,
 	  size));
+	/*
+	Check for a realloc operation that is equivalent to an alloc operation.
+	*/
 	if (!ptr) {
 		result = jas_basic_alloc(allocator, size);
 		goto done;
 	}
+	/*
+	Check for a realloc operation that is equivalent to a free operation.
+	*/
 	if (ptr && !size) {
 		jas_basic_free(allocator, ptr);
+		result = 0;
 		goto done;
 	}
+
 	if (!jas_safe_size_add(size, JAS_MB_SIZE, &ext_size)) {
 		jas_eprintf("requested memory size is too large\n");
 		result = 0;
@@ -482,32 +505,35 @@ void *jas_basic_realloc(jas_allocator_t *allocator, void *ptr, size_t size)
 #endif
 
 	old_mb = jas_get_mb(ptr);
-	old_size = old_mb->size;
-	JAS_DBGLOG(101, ("jas_basic_realloc: old_mb=%p; old_size=%zu\n", old_mb,
-	  old_size));
-	if (size > old_size) {
-		if (!jas_safe_size_add(a->mem, size - old_size, &mem) ||
-		  mem > a->max_mem) {
-			jas_eprintf("maximum memory limit (%zu) would be exceeded\n",
-			  a->max_mem);
-			result = 0;
-			goto done;
-		}
-	} else {
-		if (!jas_safe_size_sub(a->mem, old_size - size, &a->mem)) {
-			jas_eprintf("heap corruption detected\n");
-			abort();
-		}
+	old_ext_size = old_mb->size;
+	JAS_DBGLOG(101, ("jas_basic_realloc: old_mb=%p; old_ext_size=%zu\n",
+	  old_mb, old_ext_size));
+	/*
+	Skip performing any allocation if the currently-allocated block is
+	sufficiently large to accommodate the allocation request.
+	*/
+	if (size <= old_ext_size) {
+		result = jas_mb_get_data(old_mb);
+		goto done;
 	}
+
+	if (!jas_safe_size_add(a->mem, ext_size - old_ext_size, &mem) ||
+	  mem > a->max_mem) {
+		jas_eprintf("maximum memory limit (%zu) would be exceeded\n",
+		  a->max_mem);
+		result = 0;
+		goto done;
+	}
+
 	JAS_DBGLOG(100, ("jas_basic_realloc: realloc(%p, %p, %zu)\n", a->delegate,
 	  old_mb, ext_size));
 	jas_mb_destroy(old_mb);
-	if (!(mb = (a->delegate->realloc)(a->delegate, old_mb, ext_size))) {
-		result = 0;
-	} else {
-		jas_mb_init(mb, size); /* mb->size = size; */
+	if ((mb = (a->delegate->realloc)(a->delegate, old_mb, ext_size))) {
+		jas_mb_init(mb, ext_size);
 		result = jas_mb_get_data(mb);
 		a->mem = mem;
+	} else {
+		result = 0;
 	}
 
 done:
@@ -528,7 +554,7 @@ JAS_DLLEXPORT
 void jas_basic_free(jas_allocator_t *allocator, void *ptr)
 {
 	jas_mb_t *mb;
-	size_t size;
+	size_t ext_size;
 	jas_basic_allocator_t *a = JAS_CAST(jas_basic_allocator_t *, allocator);
 
 
@@ -538,11 +564,14 @@ void jas_basic_free(jas_allocator_t *allocator, void *ptr)
 		jas_mutex_lock(&a->mutex);
 #endif
 		mb = jas_get_mb(ptr);
-		size = mb->size;
-		JAS_DBGLOG(101, ("jas_basic_free(%p, %p) (mb=%p; size=%zu)\n",
-		  allocator, ptr, mb, size));
-		if (!jas_safe_size_sub(a->mem, size, &a->mem)) {
-			jas_eprintf("heap corruption detected\n");
+		ext_size = mb->size;
+		JAS_DBGLOG(101, ("jas_basic_free(%p, %p) (mb=%p; ext_size=%zu)\n",
+		  allocator, ptr, mb, ext_size));
+		if (!jas_safe_size_sub(a->mem, ext_size, &a->mem)) {
+			jas_eprintf("heap corruption detected (%zu exceeds %zu)\n",
+			  ext_size, a->mem);
+			/* This line of code should never be reached. */
+			assert(0);
 			abort();
 		}
 		JAS_DBGLOG(100, ("jas_basic_free: free(%p, %p)\n", a->delegate, mb));
