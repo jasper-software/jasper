@@ -642,7 +642,9 @@ WARN_LOGFILE           =
 INPUT                  = \
                          @CMAKE_BINARY_DIR@/doc/src/mainpage.dox \
                          @CMAKE_BINARY_DIR@/doc/src/getting_started.dox \
-                         @CMAKE_SOURCE_DIR@/doc/src/faq.dox \
+                         @CMAKE_SOURCE_DIR@/doc/src/initialization.dox \
+                         @CMAKE_SOURCE_DIR@/doc/src/images.dox \
+                         @CMAKE_SOURCE_DIR@/doc/src/streams.dox \
                          @CMAKE_SOURCE_DIR@/doc/src/bugs.dox \
                          @CMAKE_SOURCE_DIR@/doc/src/modules.dox \
                          @CMAKE_SOURCE_DIR@/src
