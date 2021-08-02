@@ -59,6 +59,10 @@ while getopts d:o: option; do
 done
 shift $((OPTIND - 1))
 
+if [ ! -d "$in_dir" ]; then
+	usage "no input directory specified"
+fi
+
 releases_dir="$in_dir/releases"
 
 official_list=()

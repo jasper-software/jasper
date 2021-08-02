@@ -73,6 +73,7 @@ usage()
 program_dir="$(dirname "$0")" || panic
 make_main_gh_page="$program_dir/make_main_gh_page"
 
+latest=0
 branch="gh-pages"
 in_dir=
 repo_name=
@@ -83,8 +84,10 @@ prepare_only=0
 verbose=1
 deploy_mode=
 
-while getopts b:i:r:t:z:fnvqm: opt; do
+while getopts b:i:r:t:z:fnvqm:l opt; do
 	case $opt in
+	l)
+		latest=1;;
 	m)
 		deploy_mode="$OPTARG";;
 	v)
@@ -288,13 +291,15 @@ mkdir -p "$version_dir" || \
 (cd "$in_dir" && tar -cf - .) | (cd "$version_dir" && tar -xf -) || \
   panic "tar failed"
 
-# Update the symlink for the latest release.
-target="$git_dir/latest"
-if [ -h "$target" -o -e "$target" ]; then
-	rm -f "$target" || panic "rm failed"
+if [ "$latest" -ne 0 ]; then
+	# Update the symlink for the latest release.
+	target="$git_dir/latest"
+	if [ -h "$target" -o -e "$target" ]; then
+		rm -f "$target" || panic "rm failed"
+	fi
+	ln -s "releases/$version/html" "$target" || \
+	  panic "ln failed"
 fi
-ln -s "releases/$version/html" "$target" || \
-  panic "ln failed"
 
 # Add a top-level index.html file.
 target="$git_dir/index.html"
