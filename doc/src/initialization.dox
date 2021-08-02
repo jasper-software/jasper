@@ -14,8 +14,8 @@ There are two stages in the setup of the JasPer library at run time:
 The configuration stage initializes the current configuration settings
 for the library.
 The configuration settings are initialized to their default values
-using the `jas_conf_clear()` function.
-(where these default values are fixed at library build time).
+using the `jas_conf_clear()` function
+(where these default values are fixed at the time that the library is built).
 The initialization stage initializes the library using the current
 configuration settings.
 The `jas_initialize()` function performs initialization (not configuration).
@@ -134,7 +134,7 @@ jas_conf_set_max_mem(10000000);
 Initialize the JasPer library.
 */
 if (jas_initialize()) {
-	/* handle initialization error */
+	/* Handle the initialization error. */
 }
 
 /*
@@ -155,7 +155,10 @@ For each thread, the code for this might resemble something like the following:
 
 ~~~~~~~~~~
 /* Create a new context. */
-jas_context_t context = jas_create_context();
+jas_context_t context;
+if (!(context = jas_create_context())) {
+	/* Handle the error. */
+}
 /* Set the context for the calling thread to this new context. */
 jas_set_context(context);
 ~~~~~~~~~~
@@ -213,7 +216,7 @@ C standard library.
 
 Normally, the JasPer library does not directly use the allocator
 provided by the library user.  It instead uses this allocator
-directly through a wrapper.
+indirectly through a wrapper.
 The allocator wrapper is a pseudo-allocator.  That is, it
 does not actually allocate memory directly but rather delegates
 the memory allocation operations to another allocator (namely,
