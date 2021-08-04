@@ -301,7 +301,7 @@ A pointer to the storage in memory that will hold the state associated
 with the allocator.
 
 @details
-The object referenced by @allocator must have a lifetime that extends
+The object referenced by @c allocator must have a lifetime that extends
 until @c jas_allocator_cleanup is called for the allocator.
 */
 JAS_DLLEXPORT
