@@ -61,7 +61,7 @@ The JasPer library has the notion of a context.
 A context is used to store certain state used by the library.
 There can be multiple contexts in use at any given time.
 From the library user's point of view, a context is specified using an opaque
-handle (e.g., a void pointer).
+handle.
 The type of this handle is `jas_context_t`.
 A handle with the special value of 0 does not correspond to a valid context.
 It is analogous to a null pointer.
@@ -236,10 +236,38 @@ So, this memory limiting functionality is available even when the
 library user provides a custom allocator that does not itself
 track memory usage.
 
-Although `jas_malloc()`, `jas_realloc(), `jas_free() and other related
+Although `jas_malloc()`, `jas_realloc()`, `jas_free()` and other related
 functions internally use the allocator provided
 by the library user for all memory allocations, this does not imply that
 pointers returned by `jas_malloc()` (and related functions) can be used
 with the library user's allocator directly.
+
+An allocator provides functions with the following signatures
+and semantics:
+
+  - `void (*cleanup)(jas_allocator_t *allocator);`
+
+    This function performs a clean-up operation, which cleans up the
+    allocator when it is no longer needed.
+    This operation should free any resources associated with the allocator.
+    The allocator cannot be used after the clean-up operation is performed.
+    This function pointer may be null, in which case the clean-up operation
+    is treated as a no-op.
+
+  - `void *(*alloc)(jas_allocator_t *allocator, size_t size);`
+
+    This function performs a memory-allocation operation, and has
+    behavior similar to `malloc()`.
+
+  - `void (*free)(jas_allocator_t *allocator, void *pointer)`;
+
+    This function performs a memory-deallocation operation, and has
+    behavior similar to `free()`.
+
+  - `void *(*realloc)(jas_allocator_t *allocator, void *pointer,
+    size_t new_size);`
+
+    This function performs a memory-reallocation operation, and has
+    behavior similar to `realloc()`.
 
 */

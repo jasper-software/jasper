@@ -112,19 +112,20 @@ typedef struct jas_allocator_s {
 	Function to allocate memory.
 	This function should have behavior similar to malloc.
 	*/
-	void *(*alloc)(struct jas_allocator_s *allocator, size_t);
+	void *(*alloc)(struct jas_allocator_s *allocator, size_t size);
 
 	/*!
 	Function to deallocate memory.
 	This function should have behavior similar to free.
 	*/
-	void (*free)(struct jas_allocator_s *allocator, void*);
+	void (*free)(struct jas_allocator_s *allocator, void *pointer);
 
 	/*!
 	Function to reallocate memory.
 	This function should have behavior similar to realloc.
 	*/
-	void *(*realloc)(struct jas_allocator_s *allocator, void*, size_t);
+	void *(*realloc)(struct jas_allocator_s *allocator, void *pointer,
+	  size_t new_size);
 
 	/*! For future use. */
 	void (*(reserved[4]))(void);
