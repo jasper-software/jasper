@@ -71,6 +71,8 @@
 * Includes.
 \******************************************************************************/
 
+#define JAS_INTERNAL_USE_ONLY
+
 #include "jasper/jas_stream.h"
 #include "jasper/jas_debug.h"
 #include "jasper/jas_types.h"
@@ -289,7 +291,7 @@ jas_stream_t *jas_stream_memopen(char *buf, int bufsize)
 	}
 	if (buf && bufsize <= 0) {
 		// This was never a valid thing to do with the old API.
-		jas_eprintf("Invalid use of jas_stream_memopen detected.\n");
+		jas_printferror("Invalid use of jas_stream_memopen detected.\n");
 		jas_deprecated("A user-provided buffer for "
 		  "jas_stream_memopen cannot be growable.\n");
 	}
@@ -1273,7 +1275,7 @@ static int mem_resize(jas_stream_memobj_t *m, size_t bufsize)
 
 	JAS_DBGLOG(100, ("mem_resize(%p, %zu)\n", m, bufsize));
 	if (!bufsize) {
-		jas_eprintf(
+		jas_printferror(
 		  "mem_resize was not really designed to handle a buffer of size 0\n"
 		  "This may not work.\n"
 		);

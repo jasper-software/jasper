@@ -63,6 +63,8 @@
 * Includes.
 \******************************************************************************/
 
+#define JAS_INTERNAL_USE_ONLY
+
 #include "jasper/jas_icc.h"
 #include "jasper/jas_types.h"
 #include "jasper/jas_malloc.h"
@@ -336,11 +338,11 @@ jas_iccprof_t *jas_iccprof_load(jas_stream_t *in)
 	}
 
 	if (jas_iccprof_readhdr(in, &prof->hdr)) {
-		jas_eprintf("cannot get header\n");
+		jas_printferror("cannot get header\n");
 		goto error;
 	}
 	if (jas_iccprof_gettagtab(in, &prof->tagtab)) {
-		jas_eprintf("cannot get tab table\n");
+		jas_printferror("cannot get tab table\n");
 		goto error;
 	}
 	jas_iccprof_sorttagtab(&prof->tagtab);
@@ -361,7 +363,7 @@ jas_iccprof_t *jas_iccprof_load(jas_stream_t *in)
 				attrval = 0;
 			} else {
 #if 0
-				jas_eprintf("warning: skipping unknown tag type\n");
+				jas_printfwarn("warning: skipping unknown tag type\n");
 #endif
 			}
 			continue;
@@ -384,7 +386,7 @@ jas_iccprof_t *jas_iccprof_load(jas_stream_t *in)
 		curoff += 8;
 		if (!jas_iccattrvalinfo_lookup(type)) {
 #if 0
-			jas_eprintf("warning: skipping unknown tag type\n");
+			jas_printfwarn("warning: skipping unknown tag type\n");
 #endif
 			prevattrval = 0;
 			continue;

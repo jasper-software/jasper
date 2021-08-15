@@ -411,7 +411,7 @@ void *jas_basic_alloc(jas_allocator_t *allocator, size_t size)
 	}
 #endif
 	if (!jas_safe_size_add(size, JAS_MB_SIZE, &ext_size)) {
-		jas_eprintf("requested memory size is too large (%zu)\n", size);
+		jas_printferror("requested memory size is too large (%zu)\n", size);
 		result = 0;
 		goto done;
 	}
@@ -428,7 +428,7 @@ void *jas_basic_alloc(jas_allocator_t *allocator, size_t size)
 	exceed the memory usage limit.
 	*/
 	if (!jas_safe_size_add(a->mem, ext_size, &mem) || mem > a->max_mem) {
-		jas_eprintf("maximum memory limit (%zu) would be exceeded\n",
+		jas_printferror("maximum memory limit (%zu) would be exceeded\n",
 		  a->max_mem);
 		result = 0;
 		goto done;
@@ -494,7 +494,7 @@ void *jas_basic_realloc(jas_allocator_t *allocator, void *ptr, size_t size)
 	}
 
 	if (!jas_safe_size_add(size, JAS_MB_SIZE, &ext_size)) {
-		jas_eprintf("requested memory size is too large\n");
+		jas_printferror("requested memory size is too large\n");
 		result = 0;
 		goto done;
 	}
@@ -519,7 +519,7 @@ void *jas_basic_realloc(jas_allocator_t *allocator, void *ptr, size_t size)
 
 	if (!jas_safe_size_add(a->mem, ext_size - old_ext_size, &mem) ||
 	  mem > a->max_mem) {
-		jas_eprintf("maximum memory limit (%zu) would be exceeded\n",
+		jas_printferror("maximum memory limit (%zu) would be exceeded\n",
 		  a->max_mem);
 		result = 0;
 		goto done;
@@ -568,7 +568,7 @@ void jas_basic_free(jas_allocator_t *allocator, void *ptr)
 		JAS_DBGLOG(101, ("jas_basic_free(%p, %p) (mb=%p; ext_size=%zu)\n",
 		  allocator, ptr, mb, ext_size));
 		if (!jas_safe_size_sub(a->mem, ext_size, &a->mem)) {
-			jas_eprintf("heap corruption detected (%zu exceeds %zu)\n",
+			jas_printferror("heap corruption detected (%zu exceeds %zu)\n",
 			  ext_size, a->mem);
 			/* This line of code should never be reached. */
 			assert(0);

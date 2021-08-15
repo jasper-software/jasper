@@ -78,8 +78,6 @@
 #include <unistd.h>
 
 #include <jasper/jasper.h>
-#include <jasper/jas_debug.h>
-#include <jasper/jas_thread.h>
 
 /******************************************************************************\
 *
@@ -127,7 +125,7 @@ int process_job(void *job_handle)
 		exit(EXIT_FAILURE);
 	}
 	jas_context_set_debug_level(context, job->debug_level);
-	jas_context_set_veprintf(context, jas_veprintf_stderr);
+	jas_context_set_vlogprintf(context, jas_vlogprintf_stderr);
 	jas_set_context(context);
 
 	for (int iter_no = 0; iter_no < JAS_CAST(int, job->num_iters); ++iter_no) {

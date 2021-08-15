@@ -99,7 +99,6 @@ configure_opts+=(-H"$source_dir")
 #	configure_opts+=("-DCMAKE_C_COMPILER=$sde_gcc")
 #fi
 configure_opts+=("-DCMAKE_INSTALL_PREFIX=$install_dir")
-configure_opts+=("-DJAS_ENABLE_STRICT=true")
 if [ "$enable_debug" -ne 0 ]; then
 	configure_opts+=("-DCMAKE_BUILD_TYPE=Debug")
 	configure_opts+=("-DJAS_ENABLE_SHARED=false")

@@ -287,7 +287,7 @@ jp2_box_t *jp2_box_get(jas_stream_t *in)
 			goto error;
 		}
 		if (extlen > 0xffffffffUL) {
-			jas_eprintf("warning: cannot handle large 64-bit box length\n");
+			jas_printferror("cannot handle large 64-bit box length\n");
 			goto error;
 		}
 		box->len = extlen;
@@ -316,7 +316,7 @@ jp2_box_t *jp2_box_get(jas_stream_t *in)
 			goto error;
 		}
 		if (jas_stream_copy(tmpstream, in, box->datalen)) {
-			jas_eprintf("cannot copy box data\n");
+			jas_printferror("cannot copy box data\n");
 			goto error;
 		}
 		jas_stream_rewind(tmpstream);
@@ -327,7 +327,7 @@ jp2_box_t *jp2_box_get(jas_stream_t *in)
 
 		if (box->ops->getdata) {
 			if ((*box->ops->getdata)(box, tmpstream)) {
-				jas_eprintf("cannot parse box data\n");
+				jas_printferror("cannot parse box data\n");
 				goto error;
 			}
 		}
@@ -566,7 +566,7 @@ int jp2_box_put(jp2_box_t *box, jas_stream_t *out)
 	if (dataflag) {
 		if (jas_stream_copy(out, tmpstream, box->len -
 		  JP2_BOX_HDRLEN(false))) {
-			jas_eprintf("cannot copy box data\n");
+			jas_printferror("cannot copy box data\n");
 			goto error;
 		}
 		jas_stream_close(tmpstream);
@@ -931,7 +931,7 @@ static int jp2_getint(jas_stream_t *in, int s, int n, int_fast32_t *val)
 
 	// Ensure that the integer to be read has a valid size.
 	if (n < 0 || n > 32) {
-		jas_eprintf("jp2_getint: invalid integer size (%d bits)\n", n);
+		jas_printferror("jp2_getint: invalid integer size (%d bits)\n", n);
 		return -1;
 	}
 

@@ -59,6 +59,8 @@
  * __END_OF_JASPER_LICENSE__
  */
 
+#define JAS_INTERNAL_USE_ONLY
+
 #include "jasper/jas_version.h"
 
 const char *jas_getversion()

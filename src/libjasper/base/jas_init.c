@@ -238,8 +238,8 @@ void jas_conf_clear()
 	jas_conf.dec_default_max_samples = JAS_DEC_DEFAULT_MAX_SAMPLES;
 	jas_conf.debug_level = 0;
 	jas_conf.enable_atexit_cleanup = 0;
-	jas_conf.veprintf = jas_veprintf_stderr;
-	//jas_conf.veprintf = jas_veprintf_discard_impl;
+	jas_conf.vlogprintf = jas_vlogprintf_stderr;
+	//jas_conf.vlogprintf = jas_vlogprintf_discard;
 	jas_conf.num_image_formats = sizeof(jas_image_fmts) /
 	  sizeof(jas_image_fmt_t);
 	jas_conf.image_formats = jas_image_fmts;
@@ -276,9 +276,10 @@ void jas_conf_set_dec_default_max_samples(size_t n)
 }
 
 JAS_DLLEXPORT
-void jas_conf_set_veprintf(int (*func)(const char *, va_list))
+void jas_conf_set_vlogprintf(int (*func)(jas_logtype_t type, const char *,
+  va_list))
 {
-	jas_conf.veprintf = func;
+	jas_conf.vlogprintf = func;
 }
 
 JAS_DLLEXPORT
@@ -430,7 +431,7 @@ void jas_context_init(jas_ctx_t *ctx)
 	memset(ctx, 0, sizeof(jas_ctx_t));
 	ctx->dec_default_max_samples = jas_conf.dec_default_max_samples;
 	ctx->debug_level = jas_conf.debug_level;
-	ctx->veprintf = jas_conf.veprintf;
+	ctx->vlogprintf = jas_conf.vlogprintf;
 	ctx->image_numfmts = 0;
 }
 
@@ -504,9 +505,9 @@ void jas_context_set_dec_default_max_samples(jas_context_t context,
 }
 
 JAS_DLLEXPORT
-void jas_context_set_veprintf(jas_context_t context,
-  int (*func)(const char *, va_list))
+void jas_context_set_vlogprintf(jas_context_t context,
+  int (*func)(jas_logtype_t, const char *, va_list))
 {
 	jas_ctx_t *ctx = JAS_CAST(jas_ctx_t *, context);
-	ctx->veprintf = func;
+	ctx->vlogprintf = func;
 }

@@ -150,7 +150,7 @@ static int pnm_dec_parseopts(const char *optstr, pnm_dec_importopts_t *opts)
 			opts->max_samples = strtoull(jas_tvparser_getval(tvp), 0, 10);
 			break;
 		default:
-			jas_eprintf("warning: ignoring invalid option %s\n",
+			jas_printfwarn("warning: ignoring invalid option %s\n",
 			  jas_tvparser_gettag(tvp));
 			break;
 		}
@@ -200,11 +200,11 @@ jas_image_t *pnm_decode(jas_stream_t *in, const char *optstr)
 
 	if (!jas_safe_size_mul3(hdr.width, hdr.height, hdr.numcmpts,
 	  &num_samples)) {
-		jas_eprintf("image too large\n");
+		jas_printferror("image too large\n");
 		goto error;
 	}
 	if (opts.max_samples > 0 && num_samples > opts.max_samples) {
-		jas_eprintf(
+		jas_printferror(
 		  "maximum number of samples would be exceeded (%zu > %zu)\n",
 		  num_samples, opts.max_samples);
 		goto error;
@@ -403,7 +403,7 @@ static int pnm_getdata(jas_stream_t *in, pnm_hdr_t *hdr, jas_image_t *image,
 								if (!allow_trunc) {
 									goto done;
 								}
-								jas_eprintf("bad sample data\n");
+								jas_printfwarn("bad sample data\n");
 								sv = 0;
 							}
 							v = sv;
@@ -414,7 +414,7 @@ static int pnm_getdata(jas_stream_t *in, pnm_hdr_t *hdr, jas_image_t *image,
 								if (!allow_trunc) {
 									goto done;
 								}
-								jas_eprintf("bad sample data\n");
+								jas_printfwarn("bad sample data\n");
 								uv = 0;
 							}
 							v = uv;
@@ -428,7 +428,7 @@ static int pnm_getdata(jas_stream_t *in, pnm_hdr_t *hdr, jas_image_t *image,
 								if (!allow_trunc) {
 									goto done;
 								}
-								jas_eprintf("bad sample data\n");
+								jas_printfwarn("bad sample data\n");
 								sv = 0;
 							}
 							v = sv;
@@ -439,7 +439,7 @@ static int pnm_getdata(jas_stream_t *in, pnm_hdr_t *hdr, jas_image_t *image,
 								if (!allow_trunc) {
 									goto done;
 								}
-								jas_eprintf("bad sample data\n");
+								jas_printfwarn("bad sample data\n");
 								uv = 0;
 							}
 							v = uv;
@@ -482,7 +482,7 @@ static int pnm_getsint(jas_stream_t *in, int wordsize, int_fast32_t *val)
 		return -1;
 	}
 	if ((tmpval & (1 << (wordsize - 1))) != 0) {
-		jas_eprintf("PNM decoder does not fully support signed data\n");
+		jas_printferror("PNM decoder does not fully support signed data\n");
 		return -1;
 	}
 	if (val) {

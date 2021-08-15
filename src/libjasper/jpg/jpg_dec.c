@@ -180,7 +180,7 @@ static int jpg_dec_parseopts(const char *optstr, jpg_dec_importopts_t *opts)
 			opts->print_version = true;
 			break;
 		default:
-			jas_eprintf("warning: ignoring invalid option %s\n",
+			jas_printfwarn("warning: ignoring invalid option %s\n",
 			  jas_tvparser_gettag(tvp));
 			break;
 		}
@@ -236,11 +236,11 @@ jas_image_t *jpg_decode(jas_stream_t *in, const char *optstr)
 	  jas_libjpeg_turbo_version));
 
 	if (!(input_file = tmpfile())) {
-		jas_eprintf("cannot make temporary file\n");
+		jas_printferror("cannot make temporary file\n");
 		goto error;
 	}
 	if (jpg_copystreamtofile(input_file, in)) {
-		jas_eprintf("cannot copy stream\n");
+		jas_printferror("cannot copy stream\n");
 		goto error;
 	}
 	rewind(input_file);
@@ -260,7 +260,7 @@ jas_image_t *jpg_decode(jas_stream_t *in, const char *optstr)
 	ret = jpeg_read_header(&cinfo, TRUE);
 	JAS_DBGLOG(10, ("jpeg_read_header return value %d\n", ret));
 	if (ret != JPEG_HEADER_OK) {
-		jas_eprintf("jpeg_read_header did not return JPEG_HEADER_OK\n");
+		jas_printfwarn("jpeg_read_header did not return JPEG_HEADER_OK\n");
 	}
 	JAS_DBGLOG(10, (
 	  "header: image_width %d; image_height %d; num_components %d\n",
@@ -268,7 +268,7 @@ jas_image_t *jpg_decode(jas_stream_t *in, const char *optstr)
 	  );
 
 	if (!cinfo.image_width || !cinfo.image_height || !cinfo.num_components) {
-		jas_eprintf("image has no samples");
+		jas_printferror("image has no samples");
 		goto error;
 	}
 	if (opts.max_samples > 0) {
@@ -277,7 +277,7 @@ jas_image_t *jpg_decode(jas_stream_t *in, const char *optstr)
 			goto error;
 		}
 		if (num_samples > opts.max_samples) {
-			jas_eprintf("image is too large (%zu > %zu)\n", num_samples,
+			jas_printferror("image is too large (%zu > %zu)\n", num_samples,
 			  opts.max_samples);
 			goto error;
 		}
@@ -294,14 +294,14 @@ jas_image_t *jpg_decode(jas_stream_t *in, const char *optstr)
 
 	/* Create an image object to hold the decoded data. */
 	if (!(image = jpg_mkimage(&cinfo))) {
-		jas_eprintf("jpg_mkimage failed\n");
+		jas_printferror("jpg_mkimage failed\n");
 		goto error;
 	}
 
 	/* Initialize the data sink object. */
 	dest_mgr->image = image;
 	if (!(dest_mgr->data = jas_matrix_create(1, cinfo.output_width))) {
-		jas_eprintf("jas_matrix_create failed\n");
+		jas_printferror("jas_matrix_create failed\n");
 		goto error;
 	}
 	dest_mgr->start_output = jpg_start_output;
@@ -341,7 +341,7 @@ jas_image_t *jpg_decode(jas_stream_t *in, const char *optstr)
 	input_file = 0;
 
 	if (dest_mgr->error) {
-		jas_eprintf("error during decoding\n");
+		jas_printferror("error during decoding\n");
 		goto error;
 	}
 

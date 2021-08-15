@@ -68,6 +68,7 @@
 #include "jasper/jas_init.h"
 #include "jasper/jas_debug.h"
 #include "jasper/jas_types.h"
+#include "jasper/jas_log.h"
 
 #include <stdarg.h>
 #include <stdio.h>
@@ -102,27 +103,112 @@ int jas_eprintf(const char *fmt, ...)
 {
 	int ret;
 	va_list ap;
-
-	jas_ctx_t *ctx = jas_get_ctx();
-
 	va_start(ap, fmt);
-	ret = (ctx->veprintf)(fmt, ap);
+	ret = vfprintf(stderr, fmt, ap);
 	va_end(ap);
+	return ret;
+}
+
+/* Generate formatted error log message. */
+int jas_printferror(const char *fmt, ...)
+{
+	int ret;
+	va_list ap;
+	va_start(ap, fmt);
+	ret = jas_vlogprintf(jas_logtype_init(JAS_LOGTYPE_CLASS_ERROR, 0), fmt,
+	  ap);
+	va_end(ap);
+	return ret;
+}
+
+/* Generate formatted warning log message. */
+int jas_printfwarn(const char *fmt, ...)
+{
+	int ret;
+	va_list ap;
+	va_start(ap, fmt);
+	ret = jas_vlogprintf(jas_logtype_init(JAS_LOGTYPE_CLASS_WARN, 0), fmt,
+	  ap);
+	va_end(ap);
+	return ret;
+}
+
+/* Generate formatted informational log message. */
+int jas_printfinfo(const char *fmt, ...)
+{
+	int ret;
+	va_list ap;
+	va_start(ap, fmt);
+	ret = jas_vlogprintf(jas_logtype_init(JAS_LOGTYPE_CLASS_INFO, 0), fmt,
+	  ap);
+	va_end(ap);
+	return ret;
+}
+
+/* Generate formatted debugging log message. */
+int jas_printfdebug(const char *fmt, ...)
+{
+	int ret;
+	va_list ap;
+	va_start(ap, fmt);
+	ret = jas_vlogprintf(jas_logtype_init(JAS_LOGTYPE_CLASS_DEBUG, 0), fmt,
+	  ap);
+	va_end(ap);
+	return ret;
+}
+
+/*!
+@brief
+@details
+*/
+JAS_DLLEXPORT
+int jas_vlogprintf(jas_logtype_t type, const char *fmt, va_list ap)
+{
+	int ret;
+	jas_ctx_t *ctx = jas_get_ctx();
+	ret = (ctx->vlogprintf)(type, fmt, ap);
 	return ret;
 }
 
 /* Perform formatted output to standard error. */
 JAS_DLLEXPORT
-int jas_veprintf_stderr(const char *fmt, va_list ap)
+int jas_vlogprintf_stderr(jas_logtype_t type, const char *fmt, va_list ap)
 {
+#if 0
+	JAS_UNUSED(type);
 	int result = vfprintf(stderr, fmt, ap);
 	return result;
+#else
+	const char *s = "INVALID";
+	switch (jas_logtype_get_class(type)) {
+	case JAS_LOGTYPE_CLASS_ERROR:
+		s = "ERROR";
+		break;
+	case JAS_LOGTYPE_CLASS_WARN:
+		s = "WARNING";
+		break;
+	case JAS_LOGTYPE_CLASS_INFO:
+		s = "INFO";
+		break;
+	case JAS_LOGTYPE_CLASS_DEBUG:
+		s = "DEBUG";
+		break;
+	}
+	int r1 = fprintf(stderr, "%s: ", s);
+	int r2 = vfprintf(stderr, fmt, ap);
+	int result = -1;
+	if (r1 > 0 && r2 > 0) {
+		result = r1 + r2;
+	}
+	return result;
+#endif
 }
 
 /* Perform formatted output to standard error. */
 JAS_DLLEXPORT
-int jas_veprintf_discard(const char *fmt, va_list ap)
+int jas_vlogprintf_discard(jas_logtype_t type, const char *fmt, va_list ap)
 {
+	JAS_UNUSED(type);
 	JAS_CAST(void, fmt);
 	JAS_CAST(void, ap);
 	return 0;

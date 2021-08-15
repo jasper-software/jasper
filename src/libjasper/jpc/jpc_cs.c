@@ -291,7 +291,7 @@ jpc_ms_t *jpc_getms(jas_stream_t *in, jpc_cstate_t *cstate)
 		}
 
 		if (JAS_CAST(jas_ulong, jas_stream_tell(tmpstream)) != ms->len) {
-			jas_eprintf(
+			jas_printfwarn(
 			  "warning: trailing garbage in marker segment (%ld bytes)\n",
 			  ms->len - jas_stream_tell(tmpstream));
 		}
@@ -508,31 +508,31 @@ static int jpc_siz_getparms(jpc_ms_t *ms, jpc_cstate_t *cstate,
 		goto error;
 	}
 	if (!siz->width || !siz->height) {
-		jas_eprintf("reference grid cannot have zero area\n");
+		jas_printferror("reference grid cannot have zero area\n");
 		goto error;
 	}
 	if (!siz->tilewidth || !siz->tileheight) {
-		jas_eprintf("tile cannot have zero area\n");
+		jas_printferror("tile cannot have zero area\n");
 		goto error;
 	}
 	if (!siz->numcomps || siz->numcomps > 16384) {
-		jas_eprintf("number of components not in permissible range\n");
+		jas_printferror("number of components not in permissible range\n");
 		goto error;
 	}
 	if (siz->xoff >= siz->width) {
-		jas_eprintf("XOsiz not in permissible range\n");
+		jas_printferror("XOsiz not in permissible range\n");
 		goto error;
 	}
 	if (siz->yoff >= siz->height) {
-		jas_eprintf("YOsiz not in permissible range\n");
+		jas_printferror("YOsiz not in permissible range\n");
 		goto error;
 	}
 	if (siz->tilexoff > siz->xoff || siz->tilexoff + siz->tilewidth <= siz->xoff) {
-		jas_eprintf("XTOsiz not in permissible range\n");
+		jas_printferror("XTOsiz not in permissible range\n");
 		goto error;
 	}
 	if (siz->tileyoff > siz->yoff || siz->tileyoff + siz->tileheight <= siz->yoff) {
-		jas_eprintf("YTOsiz not in permissible range\n");
+		jas_printferror("YTOsiz not in permissible range\n");
 		goto error;
 	}
 
@@ -546,11 +546,11 @@ static int jpc_siz_getparms(jpc_ms_t *ms, jpc_cstate_t *cstate,
 			goto error;
 		}
 		if (siz->comps[i].hsamp == 0) {
-			jas_eprintf("invalid XRsiz value %d\n", siz->comps[i].hsamp);
+			jas_printferror("invalid XRsiz value %d\n", siz->comps[i].hsamp);
 			goto error;
 		}
 		if (siz->comps[i].vsamp == 0) {
-			jas_eprintf("invalid YRsiz value %d\n", siz->comps[i].vsamp);
+			jas_printferror("invalid YRsiz value %d\n", siz->comps[i].vsamp);
 			goto error;
 		}
 		siz->comps[i].sgnd = (tmp >> 7) & 1;
@@ -559,7 +559,7 @@ static int jpc_siz_getparms(jpc_ms_t *ms, jpc_cstate_t *cstate,
 		   samples and 2 bits for signed samples */
 		if (siz->comps[i].prec < 1U + siz->comps[i].sgnd ||
 		    siz->comps[i].prec > 38) {
-			jas_eprintf("invalid component bit depth %d\n", siz->comps[i].prec);
+			jas_printferror("invalid component bit depth %d\n", siz->comps[i].prec);
 			goto error;
 		}
 	}
@@ -695,7 +695,7 @@ static int jpc_cod_dumpparms(jpc_ms_t *ms, FILE *out)
 	  cod->compparms.cblksty);
 	if (cod->csty & JPC_COX_PRT) {
 		for (i = 0; i < cod->compparms.numrlvls; ++i) {
-			jas_eprintf("prcwidth[%d] = %d, prcheight[%d] = %d\n",
+			jas_printfinfo("prcwidth[%d] = %d, prcheight[%d] = %d\n",
 			  i, cod->compparms.rlvls[i].parwidthval,
 			  i, cod->compparms.rlvls[i].parheightval);
 		}

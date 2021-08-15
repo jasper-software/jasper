@@ -133,7 +133,7 @@ int pnm_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 
 	/* Parse the encoder option string. */
 	if (pnm_parseencopts(optstr ? optstr : "", &encopts)) {
-		jas_eprintf("invalid PNM encoder options specified\n");
+		jas_printferror("invalid PNM encoder options specified\n");
 		return -1;
 	}
 
@@ -141,7 +141,7 @@ int pnm_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 	switch (clrspc_fam) {
 	case JAS_CLRSPC_FAM_RGB:
 		if (jas_image_clrspc(image) != JAS_CLRSPC_SRGB)
-			jas_eprintf("warning: inaccurate color\n");
+			jas_printfwarn("warning: inaccurate color\n");
 		enc->numcmpts = 3;
 		if ((enc->cmpts[0] = jas_image_getcmptbytype(image,
 		  JAS_IMAGE_CT_COLOR(JAS_CLRSPC_CHANIND_RGB_R))) < 0 ||
@@ -149,22 +149,22 @@ int pnm_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 		  JAS_IMAGE_CT_COLOR(JAS_CLRSPC_CHANIND_RGB_G))) < 0 ||
 		  (enc->cmpts[2] = jas_image_getcmptbytype(image,
 		  JAS_IMAGE_CT_COLOR(JAS_CLRSPC_CHANIND_RGB_B))) < 0) {
-			jas_eprintf("error: missing color component\n");
+			jas_printferror("error: missing color component\n");
 			return -1;
 		}
 		break;
 	case JAS_CLRSPC_FAM_GRAY:
 		if (jas_image_clrspc(image) != JAS_CLRSPC_SGRAY)
-			jas_eprintf("warning: inaccurate color\n");
+			jas_printfwarn("warning: inaccurate color\n");
 		enc->numcmpts = 1;
 		if ((enc->cmpts[0] = jas_image_getcmptbytype(image,
 		  JAS_IMAGE_CT_COLOR(JAS_CLRSPC_CHANIND_GRAY_Y))) < 0) {
-			jas_eprintf("error: missing color component\n");
+			jas_printferror("error: missing color component\n");
 			return -1;
 		}
 		break;
 	default:
-		jas_eprintf("error: unsupported color space %d\n", clrspc_fam);
+		jas_printferror("error: unsupported color space %d\n", clrspc_fam);
 		return -1;
 	}
 
@@ -192,14 +192,14 @@ int pnm_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 		  jas_image_cmptvstep(image, enc->cmpts[cmptno]) != jas_image_cmptvstep(image, 0) ||
 		  jas_image_cmpttlx(image, enc->cmpts[cmptno]) != jas_image_cmpttlx(image, 0) ||
 		  jas_image_cmpttly(image, enc->cmpts[cmptno]) != jas_image_cmpttly(image, 0)) {
-			jas_eprintf("The PNM format cannot be used to represent an image with this geometry.\n");
+			jas_printferror("The PNM format cannot be used to represent an image with this geometry.\n");
 			return -1;
 		}
 	}
 
 	if (sgnd) {
-		jas_eprintf("warning: support for signed sample data requires use of nonstandard extension to PNM format\n");
-		jas_eprintf("You may not be able to read or correctly display the resulting PNM data with other software.\n");
+		jas_printfwarn("warning: support for signed sample data requires use of nonstandard extension to PNM format\n");
+		jas_printfwarn("You may not be able to read or correctly display the resulting PNM data with other software.\n");
 	}
 
 	/* Initialize the header. */
@@ -261,7 +261,7 @@ static int pnm_parseencopts(const char *optstr, pnm_encopts_t *encopts)
 			encopts->bin = false;
 			break;
 		default:
-			jas_eprintf("warning: ignoring invalid option %s\n",
+			jas_printfwarn("warning: ignoring invalid option %s\n",
 			  jas_tvparser_gettag(tvp));
 			break;
 		}	

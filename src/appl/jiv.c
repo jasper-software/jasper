@@ -63,10 +63,12 @@
 * Includes
 \******************************************************************************/
 
-#include <jasper/jasper.h>
 #include <stdlib.h>
 #include <math.h>
 #include <inttypes.h>
+
+#include <jasper/jasper.h>
+
 #if defined(JAS_HAVE_GL_GLUT_H)
 #include <GL/glut.h>
 #else

@@ -14,6 +14,7 @@ set(libjasper_headers
 	include/jasper/jas_icc.h
 	include/jasper/jas_image.h
 	include/jasper/jas_init.h
+	include/jasper/jas_log.h
 	include/jasper/jas_malloc.h
 	include/jasper/jas_math.h
 	include/jasper/jasper.h

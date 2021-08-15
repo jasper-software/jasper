@@ -100,6 +100,11 @@
 extern "C" {
 #endif
 
+/*!
+ * @addtogroup threads
+ * @{
+ */
+
 #if defined(JAS_ENABLE_MULTITHREADING_SUPPORT)
 
 #if defined(JAS_THREADS_C11)
@@ -108,36 +113,51 @@ extern "C" {
 #	define JAS_THREADS_IMPL "PTHREAD"
 #endif
 
+/*!  Thread type. */
 #if defined(JAS_THREADS_C11)
-
 typedef thrd_t jas_thread_t;
-
-typedef thrd_t jas_thread_id_t;
-
-typedef mtx_t jas_mutex_t;
-
-typedef tss_t jas_tss_t;
-
-typedef once_flag jas_once_flag_t;
-#define JAS_ONCE_FLAG_INIT ONCE_FLAG_INIT
-
 #elif defined(JAS_THREADS_PTHREAD)
-
-typedef pthread_t jas_thread_id_t;
 typedef struct {
 	pthread_t id;
 	int result;
 	void *arg;
 	int (*func)(void *);
 } jas_thread_t;
+#endif
 
+/*!  Thread ID type. */
+#if defined(JAS_THREADS_C11)
+typedef thrd_t jas_thread_id_t;
+#elif defined(JAS_THREADS_PTHREAD)
+typedef pthread_t jas_thread_id_t;
+#endif
+
+/*!  Mutex type. */
+#if defined(JAS_THREADS_C11)
+typedef mtx_t jas_mutex_t;
+#elif defined(JAS_THREADS_PTHREAD)
 typedef pthread_mutex_t jas_mutex_t;
+#endif
 
+/*!  Thread-specific storage type. */
+#if defined(JAS_THREADS_C11)
+typedef tss_t jas_tss_t;
+#elif defined(JAS_THREADS_PTHREAD)
 typedef pthread_key_t jas_tss_t;
+#endif
 
+/*!  Once-flag type. */
+#if defined(JAS_THREADS_C11)
+typedef once_flag jas_once_flag_t;
+#elif defined(JAS_THREADS_PTHREAD)
 typedef pthread_once_t jas_once_flag_t;
-#define JAS_ONCE_FLAG_INIT PTHREAD_ONCE_INIT
+#endif
 
+/*!  Once-flag initializer. */
+#if defined(JAS_THREADS_C11)
+#define JAS_ONCE_FLAG_INIT ONCE_FLAG_INIT
+#elif defined(JAS_THREADS_PTHREAD)
+#define JAS_ONCE_FLAG_INIT PTHREAD_ONCE_INIT
 #endif
 
 #if defined(JAS_THREADS_PTHREAD)
@@ -150,6 +170,9 @@ static void *thread_func_wrapper(void *thread_ptr)
 }
 #endif
 
+/*!
+@brief Compare two thread IDs.
+*/
 static inline
 int jas_thread_compare(jas_thread_id_t x, jas_thread_id_t y)
 {
@@ -160,6 +183,9 @@ int jas_thread_compare(jas_thread_id_t x, jas_thread_id_t y)
 #endif
 }
 
+/*!
+@brief Create a thread.
+*/
 static inline
 int jas_thread_create(jas_thread_t *thread, int (*func)(void *), void *arg)
 {
@@ -173,6 +199,9 @@ int jas_thread_create(jas_thread_t *thread, int (*func)(void *), void *arg)
 #endif
 }
 
+/*!
+@brief Join a thread.
+*/
 static inline
 int jas_thread_join(jas_thread_t *thread, int *result)
 {
@@ -210,6 +239,9 @@ void jas_thread_exit(int result)
 }
 #endif
 
+/*!
+@brief Get the ID of the calling thread.
+*/
 static inline
 jas_thread_id_t jas_thread_current(void)
 {
@@ -220,6 +252,9 @@ jas_thread_id_t jas_thread_current(void)
 #endif
 }
 
+/*!
+@brief Initialize a mutex.
+*/
 static inline int jas_mutex_init(jas_mutex_t *mtx)
 {
 #if defined(JAS_THREADS_C11)
@@ -229,6 +264,9 @@ static inline int jas_mutex_init(jas_mutex_t *mtx)
 #endif
 }
 
+/*!
+@brief Cleanup a mutex.
+*/
 static inline int jas_mutex_cleanup(jas_mutex_t *mtx)
 {
 #if defined(JAS_THREADS_C11)
@@ -239,6 +277,9 @@ static inline int jas_mutex_cleanup(jas_mutex_t *mtx)
 #endif
 }
 
+/*!
+@brief Acquire a mutex.
+*/
 static inline int jas_mutex_lock(jas_mutex_t *mtx)
 {
 #if defined(JAS_THREADS_C11)
@@ -248,6 +289,9 @@ static inline int jas_mutex_lock(jas_mutex_t *mtx)
 #endif
 }
 
+/*!
+@brief Release a mutex.
+*/
 static inline int jas_mutex_unlock(jas_mutex_t *mtx)
 {
 #if defined(JAS_THREADS_C11)
@@ -257,6 +301,9 @@ static inline int jas_mutex_unlock(jas_mutex_t *mtx)
 #endif
 }
 
+/*!
+@brief Create thread-specific storage.
+*/
 static inline
 int jas_tss_create(jas_tss_t *tss, void (*destructor)(void *))
 {
@@ -267,6 +314,9 @@ int jas_tss_create(jas_tss_t *tss, void (*destructor)(void *))
 #endif
 }
 
+/*!
+@brief Get the thread-specific storage instance for the calling thread.
+*/
 static inline
 void *jas_tss_get(jas_tss_t tss)
 {
@@ -277,6 +327,9 @@ void *jas_tss_get(jas_tss_t tss)
 #endif
 }
 
+/*!
+@brief Set the thread-specific storage instance for the calling thread.
+*/
 static inline
 int jas_tss_set(jas_tss_t tss, void *value)
 {
@@ -287,6 +340,9 @@ int jas_tss_set(jas_tss_t tss, void *value)
 #endif
 }
 
+/*!
+@brief Delete thread-specific storage.
+*/
 static inline
 void jas_tss_delete(jas_tss_t tss)
 {
@@ -297,6 +353,9 @@ void jas_tss_delete(jas_tss_t tss)
 #endif
 }
 
+/*!
+@brief Register to call a function once.
+*/
 static inline int jas_call_once(jas_once_flag_t *flag, void (*func)(void))
 {
 #if defined(JAS_THREADS_C11)
@@ -314,6 +373,10 @@ static inline int jas_call_once(jas_once_flag_t *flag, void (*func)(void))
 \******************************************************************************/
 
 #endif
+
+/*!
+ * @}
+ */
 
 #ifdef __cplusplus
 }

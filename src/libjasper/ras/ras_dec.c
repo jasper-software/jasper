@@ -144,7 +144,7 @@ static int ras_dec_parseopts(const char *optstr, ras_dec_importopts_t *opts)
 			opts->max_samples = strtoull(jas_tvparser_getval(tvp), 0, 10);
 			break;
 		default:
-			jas_eprintf("warning: ignoring invalid option %s\n",
+			jas_printfwarn("warning: ignoring invalid option %s\n",
 			  jas_tvparser_gettag(tvp));
 		}
 	}
@@ -192,11 +192,11 @@ jas_image_t *ras_decode(jas_stream_t *in, const char *optstr)
 
 	if (!jas_safe_size_mul3(hdr.width, hdr.height, (hdr.depth + 7) / 8,
 	  &num_samples)) {
-		jas_eprintf("image too large\n");
+		jas_printferror("image too large\n");
 		goto error;
 	}
 	if (opts.max_samples > 0 && num_samples > opts.max_samples) {
-		jas_eprintf(
+		jas_printferror(
 		  "maximum number of samples would be exceeded (%zu > %zu)\n",
 		  num_samples, opts.max_samples);
 		goto error;
@@ -299,11 +299,11 @@ static int ras_getdata(jas_stream_t *in, ras_hdr_t *hdr, ras_cmap_t *cmap,
 		ret = ras_getdatastd(in, hdr, cmap, image);
 		break;
 	case RAS_TYPE_RLE:
-		jas_eprintf("error: RLE encoding method not supported\n");
+		jas_printferror("error: RLE encoding method not supported\n");
 		ret = -1;
 		break;
 	default:
-		jas_eprintf("error: encoding method not supported\n");
+		jas_printferror("error: encoding method not supported\n");
 		ret = -1;
 	}
 	return ret;
@@ -406,7 +406,7 @@ static int ras_getcmap(jas_stream_t *in, ras_hdr_t *hdr, ras_cmap_t *cmap)
 		break;
 	case RAS_MT_EQUALRGB:
 		{
-		jas_eprintf("warning: palettized images not fully supported\n");
+		jas_printfwarn("warning: palettized images not fully supported\n");
 		numcolors = 1 << hdr->depth;
 		if (numcolors > RAS_CMAP_MAXSIZ) {
 			return -1;

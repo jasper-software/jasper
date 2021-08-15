@@ -1,7 +1,7 @@
 /*!
 
-@defgroup init Initialization and Clean Up
-@brief Initialization and Clean Up
+@defgroup init Configuration, Initialization, and Shutdown
+@brief Configuration, Initialization, and Shutdown
 
 @defgroup malloc Memory Allocation
 @brief Memory Allocation
@@ -12,5 +12,26 @@
 @details
 For more detail on I/O streams, please refer to
 <a href="iostreams__page.html">here</a>.
+
+@defgroup image Image Representation
+@brief Image Representation
+
+@defgroup color_management Color Management
+@brief Color Management
+
+@defgroup fixed Fixed-Point Arithmetic
+@brief Fixed-Point Arithmetic
+
+@defgroup logging Logging
+@brief Logging
+
+@defgroup seq One- and Two-Dimensional Sequences
+@brief One- and Two-Dimensional Sequences
+
+@defgroup threads Threads
+@brief Threads
+
+@defgroup timers Timers
+@brief Timers
 
  */

@@ -89,6 +89,9 @@
 #include <jasper/jas_string.h>
 #include <jasper/jas_tmr.h>
 #include <jasper/jas_tvp.h>
+#include <jasper/jas_thread.h>
+#include <jasper/jas_init.h>
+#include <jasper/jas_log.h>
 
 #ifdef __cplusplus
 extern "C" {

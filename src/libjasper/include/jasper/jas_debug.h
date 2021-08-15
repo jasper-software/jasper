@@ -74,7 +74,7 @@
 /* The configuration header file should be included first. */
 #include <jasper/jas_config.h>
 
-#include "jasper/jas_thread.h"
+//#include "jasper/jas_thread.h"
 #include "jasper/jas_init.h"
 
 #include <stdio.h>
@@ -121,21 +121,17 @@ Output a log message (for an error, a warning, or other information).
 JAS_DLLEXPORT
 int jas_eprintf(const char *fmt, ...);
 
-/*!
-@brief
-Output a log message to standard error.
-@details
-*/
 JAS_DLLEXPORT
-int jas_veprintf_stderr(const char *fmt, va_list ap);
+int jas_printferror(const char *fmt, ...);
 
-/*!
-@brief
-Output a log message to nowhere (i.e., discard the message).
-@details
-*/
 JAS_DLLEXPORT
-int jas_veprintf_discard(const char *fmt, va_list ap);
+int jas_printfwarn(const char *fmt, ...);
+
+JAS_DLLEXPORT
+int jas_printfinfo(const char *fmt, ...);
+
+JAS_DLLEXPORT
+int jas_printfdebug(const char *fmt, ...);
 
 /*!
 @brief

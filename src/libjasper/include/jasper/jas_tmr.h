@@ -80,6 +80,14 @@
 extern "C" {
 #endif
 
+/*!
+ * @addtogroup timers
+ * @{
+ */
+
+/*!
+@brief Timer type.
+*/
 #if defined(JAS_HAVE_GETTIMEOFDAY)
 
 typedef struct {
@@ -100,9 +108,24 @@ typedef int jas_tmr_t;
 
 #endif
 
+/*!
+@brief Start a timer.
+*/
 JAS_DLLEXPORT void jas_tmr_start(jas_tmr_t *tmr);
+
+/*!
+@brief Stop a timer.
+*/
 JAS_DLLEXPORT void jas_tmr_stop(jas_tmr_t *tmr);
+
+/*!
+@brief Get the elapsed time for a timer.
+*/
 JAS_DLLEXPORT double jas_tmr_get(jas_tmr_t *tmr);
+
+/*!
+ * @}
+ */
 
 #ifdef __cplusplus
 }

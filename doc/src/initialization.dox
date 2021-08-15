@@ -1,6 +1,6 @@
 /*!
 
-\page init__page Initialization and Shutdown
+\page init__page Configuration, Initialization, and Shutdown
 
 \tableofcontents
 
@@ -102,7 +102,7 @@ The global state for the library includes:
 The per-context state includes:
 
   - the debug level
-  - the veprintf function to be used for logging error/warning/informational
+  - the vlogprintf function to be used for logging error/warning/informational
     messages
   - the image format table
   - the maximum number of samples in an image that a decoder is allowed to

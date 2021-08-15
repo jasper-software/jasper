@@ -78,6 +78,7 @@
 
 #include "jasper/jas_malloc.h"
 #include "jasper/jas_math.h"
+#include "jasper/jas_debug.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -228,10 +229,11 @@ assert(pass->term == 1);
 }
 	}
 
-	cblk->flags = jas_matrix_create(jas_matrix_numrows(cblk->data) + 2,
-	  jas_matrix_numcols(cblk->data) + 2);
-	assert(cblk->flags);
-
+	if (!(cblk->flags = jas_matrix_create(jas_matrix_numrows(cblk->data) + 2,
+	  jas_matrix_numcols(cblk->data) + 2))) {
+		jas_printferror("cannot create matrix\n");
+		return -1;
+	}
 
 	bitpos = cblk->numbps - 1;
 	pass = cblk->passes;
@@ -244,8 +246,9 @@ assert(pass->term == 1);
 			assert(pass->type == JPC_SEG_RAW);
 			if (!bout) {
 				bout = jpc_bitstream_sopen(cblk->stream, "w");
-				if (!bout)
+				if (!bout) {
 					return -1;
+				}
 			}
 		}
 

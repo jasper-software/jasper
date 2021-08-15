@@ -111,7 +111,7 @@ static bool JPC_T1D_GETBIT(jpc_mqdec_t *mqdec, const char *passtypename, const c
 	bool v = jpc_mqdec_getbit(mqdec);
 #if defined(JAS_ENABLE_NON_THREAD_SAFE_DEBUGGING)
 	if (jas_getdbglevel() >= 100) {
-		jas_eprintf("index = %zu; passtype = %s; symtype = %s; sym = %d\n",
+		jas_printfdebug("index = %zu; passtype = %s; symtype = %s; sym = %d\n",
 		  t1dec_cnt, passtypename, symtypename, v);
 		++t1dec_cnt;
 	}
@@ -134,7 +134,7 @@ static int JPC_T1D_RAWGETBIT(jpc_bitstream_t *bitstream, const char *passtypenam
 	int v = jpc_bitstream_getbit(bitstream);
 #if defined(JAS_ENABLE_NON_THREAD_SAFE_DEBUGGING)
 	if (jas_getdbglevel() >= 100) {
-		jas_eprintf("index = %ld; passtype = %s; symtype = %s; sym = %d\n", t1dec_cnt, passtypename, symtypename, v);
+		jas_printfdebug("index = %ld; passtype = %s; symtype = %s; sym = %d\n", t1dec_cnt, passtypename, symtypename, v);
 		++t1dec_cnt;
 	}
 #else
@@ -248,10 +248,10 @@ static int jpc_dec_decodecblk(jpc_dec_tile_t *tile, jpc_dec_tcomp_t *tcomp, jpc_
 		for (unsigned i = 0; i < seg->numpasses; ++i) {
 			if (cblk->numimsbs > band->numbps) {
 				if (ccp->roishift <= 0) {
-					jas_eprintf("warning: corrupt code stream\n");
+					jas_printfwarn("warning: corrupt code stream\n");
 				} else {
 					if (cblk->numimsbs < ccp->roishift - band->numbps) {
-						jas_eprintf("warning: corrupt code stream\n");
+						jas_printfwarn("warning: corrupt code stream\n");
 					}
 				}
 			}
@@ -296,7 +296,7 @@ if (bpno < 0) {
 			}
 
 			if (ret) {
-				jas_eprintf("coding pass failed passtype=%d segtype=%d\n", passtype, seg->type);
+				jas_printferror("coding pass failed passtype=%d segtype=%d\n", passtype, seg->type);
 				goto error;
 			}
 
@@ -317,7 +317,7 @@ if (bpno < 0) {
 			  filldata)) < 0) {
 				goto error;
 			} else if (ret > 0) {
-				jas_eprintf("warning: bad termination pattern detected\n");
+				jas_printfwarn("warning: bad termination pattern detected\n");
 			}
 			jpc_bitstream_close(nulldec);
 			nulldec = 0;
@@ -795,7 +795,7 @@ static int dec_clnpass(jpc_mqdec_t *mqdec, unsigned bitpos, enum jpc_tsfb_orient
 		segsymval = (segsymval << 1) | JPC_T1D_GETBITNOSKEW(mqdec, "CLN", "SEGSYM");
 		segsymval = (segsymval << 1) | JPC_T1D_GETBITNOSKEW(mqdec, "CLN", "SEGSYM");
 		if (segsymval != 0xa) {
-			jas_eprintf("warning: bad segmentation symbol\n");
+			jas_printfwarn("warning: bad segmentation symbol\n");
 		}
 	}
 

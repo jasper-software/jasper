@@ -137,7 +137,7 @@ static int pgx_dec_parseopts(const char *optstr, pgx_dec_importopts_t *opts)
 			opts->max_samples = strtoull(jas_tvparser_getval(tvp), 0, 10);
 			break;
 		default:
-			jas_eprintf("warning: ignoring invalid option %s\n",
+			jas_printfwarn("warning: ignoring invalid option %s\n",
 			  jas_tvparser_gettag(tvp));
 			break;
 		}
@@ -171,7 +171,7 @@ jas_image_t *pgx_decode(jas_stream_t *in, const char *optstr)
 	}
 
 	if (pgx_gethdr(in, &hdr)) {
-		jas_eprintf("cannot get header\n");
+		jas_printferror("cannot get header\n");
 		goto error;
 	}
 
@@ -180,15 +180,15 @@ jas_image_t *pgx_decode(jas_stream_t *in, const char *optstr)
 	}
 
 	if (!jas_safe_size_mul(hdr.width, hdr.height, &num_samples)) {
-		jas_eprintf("image too large\n");
+		jas_printferror("image too large\n");
 		goto error;
 	}
 	if (!num_samples) {
-		jas_eprintf("image has no samples\n");
+		jas_printferror("image has no samples\n");
 		goto error;
 	}
 	if (opts.max_samples > 0 && num_samples > opts.max_samples) {
-		jas_eprintf(
+		jas_printferror(
 		  "maximum number of samples would be exceeded (%zu > %zu)\n",
 		  num_samples, opts.max_samples);
 		goto error;
@@ -209,7 +209,7 @@ jas_image_t *pgx_decode(jas_stream_t *in, const char *optstr)
 		goto error;
 	}
 	if (pgx_getdata(in, &hdr, image)) {
-		jas_eprintf("cannot get data\n");
+		jas_printferror("cannot get data\n");
 		goto error;
 	}
 
@@ -272,34 +272,34 @@ static int pgx_gethdr(jas_stream_t *in, pgx_hdr_t *hdr)
 	buf[1] = c;
 	hdr->magic = buf[0] << 8 | buf[1];
 	if (hdr->magic != PGX_MAGIC) {
-		jas_eprintf("invalid PGX signature\n");
+		jas_printferror("invalid PGX signature\n");
 		goto error;
 	}
 	if ((c = pgx_getc(in)) == EOF || !isspace(c)) {
 		goto error;
 	}
 	if (pgx_getbyteorder(in, &hdr->bigendian)) {
-		jas_eprintf("cannot get byte order\n");
+		jas_printferror("cannot get byte order\n");
 		goto error;
 	}
 	if (pgx_getsgnd(in, &hdr->sgnd)) {
-		jas_eprintf("cannot get signedness\n");
+		jas_printferror("cannot get signedness\n");
 		goto error;
 	}
 	if (pgx_getuint32(in, &hdr->prec)) {
-		jas_eprintf("cannot get precision\n");
+		jas_printferror("cannot get precision\n");
 		goto error;
 	}
 	if (hdr->prec > 32) {
-		jas_eprintf("unsupported precision\n");
+		jas_printferror("unsupported precision\n");
 		goto error;
 	}
 	if (pgx_getuint32(in, &hdr->width)) {
-		jas_eprintf("cannot get width\n");
+		jas_printferror("cannot get width\n");
 		goto error;
 	}
 	if (pgx_getuint32(in, &hdr->height)) {
-		jas_eprintf("cannot get height\n");
+		jas_printferror("cannot get height\n");
 		goto error;
 	}
 	return 0;

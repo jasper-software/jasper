@@ -72,6 +72,7 @@
 
 #include "jasper/jas_malloc.h"
 #include "jasper/jas_image.h"
+#include "jasper/jas_log.h"
 
 #include <stdarg.h>
 
@@ -144,7 +145,7 @@ typedef struct {
 	The function used to output error/warning/informational messages
 	for newly created contexts.
 	*/
-	int (*veprintf)(const char *format, va_list ap);
+	int (*vlogprintf)(jas_logtype_t type, const char *format, va_list ap);
 
 } jas_conf_t;
 #endif
@@ -169,7 +170,7 @@ typedef struct {
 	/*
 	The function used to output error/warning/informational messages.
 	*/
-	int (*veprintf)(const char *format, va_list ap);
+	int (*vlogprintf)(jas_logtype_t type, const char *format, va_list ap);
 
 	/*
 	The image format information to be used to populate the image format
@@ -306,7 +307,8 @@ informational messages.
 @details
 */
 JAS_DLLEXPORT
-void jas_conf_set_veprintf(int (*func)(const char *, va_list));
+void jas_conf_set_vlogprintf(int (*func)(jas_logtype_t, const char *,
+  va_list));
 
 /*!
 @brief Set the image-format table to be used to initialize the library.
@@ -383,8 +385,8 @@ Set the function to be used for log messages.
 @details
 */
 JAS_DLLEXPORT
-void jas_context_set_veprintf(jas_context_t context,
-  int (*func)(const char *, va_list));
+void jas_context_set_vlogprintf(jas_context_t context,
+  int (*func)(jas_logtype_t, const char *, va_list));
 
 /*!
  * @}

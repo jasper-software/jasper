@@ -1,8 +1,6 @@
 /*
- * Copyright (c) 1999-2000, Image Power, Inc. and the University of
- *   British Columbia.
  * Copyright (c) 2001-2002 Michael David Adams.
- * All rights reserved. 
+ * All rights reserved.
  */
 
 /* __START_OF_JASPER_LICENSE__
@@ -61,110 +59,101 @@
  * __END_OF_JASPER_LICENSE__
  */
 
-/*
- * Command Line Option Parsing Library
- *
- * $Id$
+/*!
+ * @file jas_debug.h
+ * @brief JasPer Debugging-Related Functionality
  */
+
+#ifndef JAS_LOG_H
+#define JAS_LOG_H
 
 /******************************************************************************\
 * Includes.
 \******************************************************************************/
 
-#define JAS_INTERNAL_USE_ONLY
+/* The configuration header file should be included first. */
+#include <jasper/jas_config.h>
 
-#include "jasper/jas_getopt.h"
-#include "jasper/jas_math.h"
-#include "jasper/jas_debug.h"
+#include <stdio.h>
+#include <stdarg.h>
 
-#include <string.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/*!
+ * @addtogroup logging
+ * @{
+ */
 
 /******************************************************************************\
-* Global data.
+* Macros and functions.
 \******************************************************************************/
 
-int jas_optind = 0;
-int jas_opterr = 1;
-const char *jas_optarg = 0;
+/*! Log type class for errors. */
+#define JAS_LOGTYPE_CLASS_ERROR 0
+/*! Log type class for warnings. */
+#define JAS_LOGTYPE_CLASS_WARN 1
+/*! Log type class for informational messages. */
+#define JAS_LOGTYPE_CLASS_INFO 2
+/*! Log type class for debugging messages. */
+#define JAS_LOGTYPE_CLASS_DEBUG 3
 
-/******************************************************************************\
-* Code.
-\******************************************************************************/
+/*!
+@brief Type used for the log type.
+*/
+typedef unsigned int jas_logtype_t;
 
-static const jas_opt_t *jas_optlookup(const jas_opt_t *opts, const char *name)
+/*!
+@brief Create an instance of a logtype.
+*/
+static inline jas_logtype_t jas_logtype_init(int class, int priority)
 {
-	const jas_opt_t *opt;
-
-	for (opt = opts; opt->id >= 0 && opt->name; ++opt) {
-		if (!strcmp(opt->name, name)) {
-			return opt;
-		}
-	}
-	return 0;
+	assert(class >= 0 && class < 4);
+	assert(priority >= 0 && priority < 1024);
+	return (class & 0xff) | (priority << 8);
 }
 
-int jas_getopt(int argc, char **argv, const jas_opt_t *opts)
+/*!
+@brief Get the class of a logtype.
+*/
+static inline int jas_logtype_get_class(jas_logtype_t type)
 {
-	const char *cp;
-	int id;
-	int hasarg;
-	const jas_opt_t *opt;
-	const char *s;
-
-	if (!jas_optind) {
-		jas_optind = JAS_MIN(1, argc);
-	}
-	while (jas_optind < argc) {
-		s = cp = argv[jas_optind];
-		if (*cp == '-') {
-			/* We are processing an option. */
-			++jas_optind;
-			if (*++cp == '-') {
-				/* We are processing a long option. */
-				++cp;
-				if (*cp == '\0') {
-					/* This is the end of the options. */
-					return JAS_GETOPT_EOF;
-				}
-				if (!(opt = jas_optlookup(opts, cp))) {
-					if (jas_opterr) {
-						jas_eprintf("unknown long option %s\n", s);
-					}
-					return JAS_GETOPT_ERR;
-				}
-				hasarg = (opt->flags & JAS_OPT_HASARG) != 0;
-				id = opt->id;
-			} else {
-				/* We are processing a short option. */
-				if (strlen(cp) != 1 ||
-				  !(opt = jas_optlookup(opts, cp))) {
-					if (jas_opterr) {
-						jas_eprintf("unknown short option %s\n", s);
-					}
-					return JAS_GETOPT_ERR;
-				}
-				hasarg = (opt->flags & JAS_OPT_HASARG) != 0;
-				id = opt->id;
-			}
-			if (hasarg) {
-				/* The option has an argument. */
-				if (jas_optind >= argc) {
-					if (jas_opterr) {
-						jas_eprintf("missing argument for option %s\n", s);
-					}
-					return JAS_GETOPT_ERR;
-				}
-				jas_optarg = argv[jas_optind];
-				++jas_optind;
-			} else {
-				/* The option does not have an argument. */
-				jas_optarg = 0;
-			}
-			return id;
-		} else {
-			/* We are not processing an option. */
-			return JAS_GETOPT_EOF;
-		}
-	}
-	return JAS_GETOPT_EOF;
+	return type & 0xff;
 }
+
+/*!
+@brief Get the priority of a logtype.
+*/
+static inline int jas_logtype_get_priority(jas_logtype_t type)
+{
+	return type >> 8;
+}
+
+/*!
+@brief Print formatted log message.
+*/
+JAS_DLLEXPORT
+int jas_vlogprintf(jas_logtype_t type, const char *fmt, va_list ap);
+
+/*!
+@brief Output a log message to standard error.
+*/
+JAS_DLLEXPORT
+int jas_vlogprintf_stderr(jas_logtype_t type, const char *fmt, va_list ap);
+
+/*!
+@brief Output a log message to nowhere (i.e., discard the message).
+*/
+JAS_DLLEXPORT
+int jas_vlogprintf_discard(jas_logtype_t type, const char *fmt, va_list ap);
+
+/*!
+ * @}
+ */
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif
