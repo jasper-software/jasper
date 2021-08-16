@@ -1,8 +1,8 @@
 2.0.33 (2021-08-01)
 ===================
 
-* Fix a JP2/JPC decoder bug.
-* Fix a build issue impacting some platforms.
+* Fix a JP2/JPC decoder bug. (#291)
+* Fix a build issue impacting some platforms. (#296)
 
 2.0.32 (2021-04-18)
 ===================
