@@ -42,6 +42,7 @@
 #cmakedefine JAS_ENABLE_MULTITHREADING_SUPPORT 1
 #cmakedefine JAS_HAVE_THREADS 1
 #cmakedefine JAS_HAVE_PTHREAD 1
+#cmakedefine JAS_HAVE_WIN32_THREADS 1
 
 #cmakedefine JAS_ENABLE_NON_THREAD_SAFE_DEBUGGING 1
 #cmakedefine JAS_PREFER_PTHREAD 1
@@ -53,8 +54,11 @@
 #	if defined(JAS_HAVE_PTHREAD)
 #		define JAS_THREADS_PTHREAD
 #	endif
-#	if defined(_MSC_VER) && !defined(JAS_THREADS_C11)
+#	if defined(JAS_HAVE_WIN32_THREADS)
 #		define JAS_THREADS_MSVC
+#	endif
+#	if defined(JAS_THREADS_C11) || defined(JAS_THREADS_PTHREAD)
+#		undef JAS_THREADS_MSVC
 #	endif
 #	if defined(JAS_THREADS_C11) && defined(JAS_THREADS_PTHREAD)
 #		if defined(JAS_PREFER_PTHREAD)
@@ -63,7 +67,7 @@
 #			undef JAS_THREADS_PTHREAD
 #		endif
 #	endif
-#	if !defined(JAS_THREADS_C11) && !defined(JAS_THREADS_PTHREAD)
+#	if !defined(JAS_THREADS_C11) && !defined(JAS_THREADS_PTHREAD) && !defined(JAS_THREADS_MSVC)
 #		undef JAS_ENABLE_MULTITHREADING_SUPPORT
 #	endif
 #	if defined(JAS_THREADS_C11) + defined(JAS_THREADS_PTHREAD) + defined(JAS_THREADS_MSVC) > 1

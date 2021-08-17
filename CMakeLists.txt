@@ -264,11 +264,17 @@ if (JAS_ENABLE_MULTITHREADING_SUPPORT)
 	else()
 		set(JAS_HAVE_PTHREAD false)
 	endif()
+	if (CMAKE_USE_WIN32_THREADS_INIT)
+		set(JAS_HAVE_WIN32_THREADS true)
+	else()
+		set(JAS_HAVE_WIN32_THREADS false)
+	endif()
 	set(THREAD_LIBRARY "Threads::Threads")
 endif()
 message("Threads library found: ${JAS_HAVE_THREADS}")
 message("Prefer POSIX Threads library: ${JAS_PREFER_PTHREAD}")
 message("POSIX Threads library found: ${JAS_HAVE_PTHREAD}")
+message("Win32 Threads library found: ${JAS_HAVE_WIN32_THREADS}")
 
 ################################################################################
 # Check for the JPEG library.

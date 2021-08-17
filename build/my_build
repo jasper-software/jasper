@@ -22,12 +22,20 @@ sde_top_dir=
 configure_only=0
 enable_doc=0
 
-while getopts ZE:AULTditvCDn opt; do
+while getopts ZYE:AULTditvCDn opt; do
 	case $opt in
 	n)
 		enable=0;;
-	Z)
+	Y)
 		enable_tsan=1
+		enable_asan=0
+		enable_lsan=0
+		enable_ubsan=1
+		enable_doc=0
+		enable_debug=1
+		;;
+	Z)
+		enable_tsan=0
 		enable_asan=1
 		enable_lsan=1
 		enable_ubsan=1
