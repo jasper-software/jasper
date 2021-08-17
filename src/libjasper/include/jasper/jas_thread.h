@@ -385,7 +385,7 @@ static inline int jas_mutex_unlock(jas_mutex_t *mtx)
 static inline
 int jas_tss_create(jas_tss_t *tss, void (*destructor)(void *))
 {
-	assert(mtx);
+	assert(tss);
 #if defined(JAS_THREADS_C11)
 	return tss_create(tss, destructor) == thrd_success ? 0 : -1;
 #elif defined(JAS_THREADS_PTHREAD)
