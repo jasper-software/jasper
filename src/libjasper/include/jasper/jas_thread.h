@@ -138,7 +138,7 @@ typedef thrd_t jas_thread_id_t;
 #elif defined(JAS_THREADS_PTHREAD)
 typedef pthread_t jas_thread_id_t;
 #elif defined(JAS_THREADS_MSVC)
-typedef thrd_t jas_thread_id_t;
+typedef HANDLE jas_thread_id_t;
 #endif
 
 /*!  Mutex type. */
