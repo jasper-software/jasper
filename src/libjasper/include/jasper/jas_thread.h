@@ -210,6 +210,8 @@ int jas_thread_compare(jas_thread_id_t x, jas_thread_id_t y)
 static inline
 int jas_thread_create(jas_thread_t *thread, int (*func)(void *), void *arg)
 {
+	assert(thread);
+	assert(func);
 #if defined(JAS_THREADS_C11)
 	return thrd_create(thread, func, arg) == thrd_success ? 0 : -1;
 #elif defined(JAS_THREADS_PTHREAD)
@@ -218,8 +220,12 @@ int jas_thread_create(jas_thread_t *thread, int (*func)(void *), void *arg)
 	thread->result = 0;
 	return pthread_create(&thread->id, 0, thread_func_wrapper, thread);
 #elif defined(JAS_THREADS_MSVC)
-	/* FIXME - NOT YET IMPLEMENTED. */
-	return -1;
+	uintptr_t handle;
+	if (!(handle = _beginthreadex(0, 0, func, arg, 0, 0))) {
+		return -1;
+	}
+	*thread = JAS_CAST(jas_thread_t, handle);
+	return 0;
 #endif
 }
 
@@ -229,6 +235,7 @@ int jas_thread_create(jas_thread_t *thread, int (*func)(void *), void *arg)
 static inline
 int jas_thread_join(jas_thread_t *thread, int *result)
 {
+	assert(thread);
 #if defined(JAS_THREADS_C11)
 	return thrd_join(*thread, result) == thrd_success ? 0 : -1;
 #elif defined(JAS_THREADS_PTHREAD)
@@ -244,8 +251,20 @@ int jas_thread_join(jas_thread_t *thread, int *result)
 	}
 	return ret;
 #elif defined(JAS_THREADS_MSVC)
-	/* FIXME - NOT YET IMPLEMENTED. */
-	return -1;
+	DWORD w;
+	DWORD code;
+	if ((w = WaitForSingleObject(*thread, INFINITE)) != WAIT_OBJECT_0) {
+		return -1;
+	}
+	if (result) {
+		if (!GetExitCodeThread(*thread, &code)) {
+			CloseHandle(*thread);
+			return -1;
+		}
+		*result = JAS_CAST(int, code);
+	}
+	CloseHandle(*thread);
+	return 0;
 #endif
 }
 
@@ -300,6 +319,7 @@ jas_thread_id_t jas_thread_current(void)
 */
 static inline int jas_mutex_init(jas_mutex_t *mtx)
 {
+	assert(mtx);
 #if defined(JAS_THREADS_C11)
 	return mtx_init(mtx, mtx_plain) == thrd_success ? 0 : -1;
 #elif defined(JAS_THREADS_PTHREAD)
@@ -315,6 +335,7 @@ static inline int jas_mutex_init(jas_mutex_t *mtx)
 */
 static inline int jas_mutex_cleanup(jas_mutex_t *mtx)
 {
+	assert(mtx);
 #if defined(JAS_THREADS_C11)
 	mtx_destroy(mtx);
 	return 0;
@@ -331,6 +352,7 @@ static inline int jas_mutex_cleanup(jas_mutex_t *mtx)
 */
 static inline int jas_mutex_lock(jas_mutex_t *mtx)
 {
+	assert(mtx);
 #if defined(JAS_THREADS_C11)
 	return mtx_lock(mtx);
 #elif defined(JAS_THREADS_PTHREAD)
@@ -346,6 +368,7 @@ static inline int jas_mutex_lock(jas_mutex_t *mtx)
 */
 static inline int jas_mutex_unlock(jas_mutex_t *mtx)
 {
+	assert(mtx);
 #if defined(JAS_THREADS_C11)
 	return mtx_unlock(mtx);
 #elif defined(JAS_THREADS_PTHREAD)
@@ -362,6 +385,7 @@ static inline int jas_mutex_unlock(jas_mutex_t *mtx)
 static inline
 int jas_tss_create(jas_tss_t *tss, void (*destructor)(void *))
 {
+	assert(mtx);
 #if defined(JAS_THREADS_C11)
 	return tss_create(tss, destructor) == thrd_success ? 0 : -1;
 #elif defined(JAS_THREADS_PTHREAD)
@@ -425,6 +449,8 @@ int jas_tss_set(jas_tss_t tss, void *value)
 */
 static inline int jas_call_once(jas_once_flag_t *flag, void (*func)(void))
 {
+	assert(flag);
+	assert(func);
 #if defined(JAS_THREADS_C11)
 	call_once(flag, func);
 	return 0;
