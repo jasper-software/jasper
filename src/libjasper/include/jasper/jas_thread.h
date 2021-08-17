@@ -118,20 +118,6 @@ extern "C" {
 #	define JAS_THREADS_IMPL "MSVC"
 #endif
 
-/*!  Thread type. */
-#if defined(JAS_THREADS_C11)
-typedef thrd_t jas_thread_t;
-#elif defined(JAS_THREADS_PTHREAD)
-typedef struct {
-	pthread_t id;
-	int result;
-	void *arg;
-	int (*func)(void *);
-} jas_thread_t;
-#elif defined(JAS_THREADS_MSVC)
-typedef HANDLE jas_thread_t;
-#endif
-
 /*!  Thread ID type. */
 #if defined(JAS_THREADS_C11)
 typedef thrd_t jas_thread_id_t;
@@ -139,6 +125,24 @@ typedef thrd_t jas_thread_id_t;
 typedef pthread_t jas_thread_id_t;
 #elif defined(JAS_THREADS_MSVC)
 typedef HANDLE jas_thread_id_t;
+#endif
+
+/*!  Thread type. */
+#if defined(JAS_THREADS_C11)
+typedef thrd_t jas_thread_t;
+#elif defined(JAS_THREADS_PTHREAD)
+typedef struct {
+	pthread_t id;
+	int (*func)(void *);
+	void *arg;
+	int result;
+} jas_thread_t;
+#elif defined(JAS_THREADS_MSVC)
+typedef struct {
+	jas_thread_id_t id;
+	int (*func)(void *);
+	void *arg;
+} jas_thread_t;
 #endif
 
 /*!  Mutex type. */
@@ -187,6 +191,13 @@ static void *thread_func_wrapper(void *thread_ptr)
 	thread->result = result;
 	return thread;
 }
+#elif defined(JAS_THREADS_MSVC)
+static unsigned __stdcall thread_func_wrapper(void *thread_ptr)
+{
+	jas_thread_t *thread = JAS_CAST(jas_thread_t *, thread_ptr);
+	int result = (thread->func)(thread->arg);
+	return JAS_CAST(unsigned, result);
+}
 #endif
 
 /*!
@@ -221,10 +232,12 @@ int jas_thread_create(jas_thread_t *thread, int (*func)(void *), void *arg)
 	return pthread_create(&thread->id, 0, thread_func_wrapper, thread);
 #elif defined(JAS_THREADS_MSVC)
 	uintptr_t handle;
-	if (!(handle = _beginthreadex(0, 0, func, arg, 0, 0))) {
+	thread->func = func;
+	thread->arg = arg;
+	if (!(handle = _beginthreadex(0, 0, thread_func_wrapper, thread, 0, 0))) {
 		return -1;
 	}
-	*thread = JAS_CAST(jas_thread_t, handle);
+	thread->id = JAS_CAST(jas_thread_t, handle);
 	return 0;
 #endif
 }
@@ -253,17 +266,17 @@ int jas_thread_join(jas_thread_t *thread, int *result)
 #elif defined(JAS_THREADS_MSVC)
 	DWORD w;
 	DWORD code;
-	if ((w = WaitForSingleObject(*thread, INFINITE)) != WAIT_OBJECT_0) {
+	if ((w = WaitForSingleObject(thread->id, INFINITE)) != WAIT_OBJECT_0) {
 		return -1;
 	}
 	if (result) {
-		if (!GetExitCodeThread(*thread, &code)) {
-			CloseHandle(*thread);
+		if (!GetExitCodeThread(thread->id, &code)) {
+			CloseHandle(thread->id);
 			return -1;
 		}
 		*result = JAS_CAST(int, code);
 	}
-	CloseHandle(*thread);
+	CloseHandle(thread->id);
 	return 0;
 #endif
 }
