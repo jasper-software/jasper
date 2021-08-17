@@ -237,7 +237,7 @@ int jas_thread_create(jas_thread_t *thread, int (*func)(void *), void *arg)
 	if (!(handle = _beginthreadex(0, 0, thread_func_wrapper, thread, 0, 0))) {
 		return -1;
 	}
-	thread->id = JAS_CAST(jas_thread_t, handle);
+	thread->id = JAS_CAST(jas_thread_id_t, handle);
 	return 0;
 #endif
 }
