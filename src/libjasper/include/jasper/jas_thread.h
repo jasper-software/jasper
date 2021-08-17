@@ -401,7 +401,7 @@ void *jas_tss_get(jas_tss_t tss)
 #elif defined(JAS_THREADS_PTHREAD)
 	return pthread_getspecific(tss);
 #elif defined(JAS_THREADS_MSVC)
-	return TlsGetValue(key);
+	return TlsGetValue(tss);
 #endif
 }
 
