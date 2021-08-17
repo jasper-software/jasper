@@ -53,6 +53,9 @@
 #	if defined(JAS_HAVE_PTHREAD)
 #		define JAS_THREADS_PTHREAD
 #	endif
+#	if defined(_MSC_VER) && !defined(JAS_THREADS_C11)
+#		define JAS_THREADS_MSVC
+#	endif
 #	if defined(JAS_THREADS_C11) && defined(JAS_THREADS_PTHREAD)
 #		if defined(JAS_PREFER_PTHREAD)
 #			undef JAS_THREADS_C11
@@ -62,6 +65,9 @@
 #	endif
 #	if !defined(JAS_THREADS_C11) && !defined(JAS_THREADS_PTHREAD)
 #		undef JAS_ENABLE_MULTITHREADING_SUPPORT
+#	endif
+#	if defined(JAS_THREADS_C11) + defined(JAS_THREADS_PTHREAD) + defined(JAS_THREADS_MSVC) > 1
+#		error Only one threading library can be selected.
 #	endif
 #endif
 
