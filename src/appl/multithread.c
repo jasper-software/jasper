@@ -75,7 +75,6 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <stdint.h>
-#include <unistd.h>
 
 #include <jasper/jasper.h>
 
@@ -186,6 +185,31 @@ done:
 	return result;
 }
 
+typedef enum {
+	CLI_OPT_HELP,
+	CLI_OPT_VERSION,
+	CLI_OPT_VERBOSE,
+	CLI_OPT_USE_WRAPPER,
+	CLI_OPT_OUT_FORMAT,
+	CLI_OPT_SPECIAL,
+	CLI_OPT_REPEAT,
+	CLI_OPT_NUM_ITERS,
+	CLI_OPT_DEBUG_LEVEL,
+} cli_opt_id;
+
+static const jas_opt_t cli_opts[] = {
+    {CLI_OPT_HELP, "help", 0},
+    {CLI_OPT_VERSION, "version", 0},
+    {CLI_OPT_VERBOSE, "v", 0},
+    {CLI_OPT_USE_WRAPPER, "w", 0},
+    {CLI_OPT_OUT_FORMAT, "f", JAS_OPT_HASARG},
+    {CLI_OPT_SPECIAL, "X", 0},
+    {CLI_OPT_REPEAT, "r", JAS_OPT_HASARG},
+    {CLI_OPT_NUM_ITERS, "n", JAS_OPT_HASARG},
+    {CLI_OPT_DEBUG_LEVEL, "l", JAS_OPT_HASARG},
+	{-1, 0, 0},
+};
+
 int main(int argc, char **argv)
 {
 	int verbose = 0;
@@ -197,29 +221,29 @@ int main(int argc, char **argv)
 	bool use_wrapper = true;
 
 	int c;
-	while ((c = getopt(argc, argv, "wvl:n:r:Xf:")) != EOF) {
+	while ((c = jas_getopt(argc, argv, cli_opts)) != EOF) {
 		switch (c) {
-		case 'w':
+		case CLI_OPT_USE_WRAPPER:
 			use_wrapper = false;
 			break;
-		case 'f':
-			out_format = optarg;
+		case CLI_OPT_OUT_FORMAT:
+			out_format = jas_optarg;
 			break;
-		case 'X':
+		case CLI_OPT_SPECIAL:
 			num_iters = 10000;
 			repeat = 4;
 			break;
-		case 'v':
+		case CLI_OPT_VERBOSE:
 			++verbose;
 			break;
-		case 'r':
-			repeat = atoi(optarg);
+		case CLI_OPT_REPEAT:
+			repeat = atoi(jas_optarg);
 			break;
-		case 'n':
-			num_iters = atoi(optarg);
+		case CLI_OPT_NUM_ITERS:
+			num_iters = atoi(jas_optarg);
 			break;
-		case 'l':
-			debug_level = atoi(optarg);
+		case CLI_OPT_DEBUG_LEVEL:
+			debug_level = atoi(jas_optarg);
 			break;
 		default:
 			usage();
@@ -231,7 +255,7 @@ int main(int argc, char **argv)
 
 	job_t *job = jobs;
 	num_jobs = 0;
-	int i = optind;
+	int i = jas_optind;
 	while (i < argc && num_jobs < max_jobs) {
 		for (int j = 0; j < repeat; ++j) {
 			if (i >= argc) {
