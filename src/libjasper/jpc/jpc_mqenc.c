@@ -281,8 +281,8 @@ void jpc_mqenc_getstate(const jpc_mqenc_t *mqenc, jpc_mqencstate_t *state)
 int jpc_mqenc_putbit(jpc_mqenc_t *mqenc, bool bit)
 {
 	const jpc_mqstate_t *state;
-	JAS_DBGLOG(100, ("jpc_mqenc_putbit(%p, %d)\n", mqenc, bit));
-	JPC_MQENC_CALL(100, jpc_mqenc_dump(mqenc, stderr));
+	JAS_LOGDEBUGF(100, "jpc_mqenc_putbit(%p, %d)\n", mqenc, bit);
+	JPC_MQENC_CALL(100, jpc_mqenc_dump(mqenc));
 
 	state = *(mqenc->curctx);
 
@@ -377,11 +377,11 @@ static void jpc_mqenc_setbits(jpc_mqenc_t *mqenc)
 
 /* Dump a MQ encoder to a stream for debugging. */
 
-int jpc_mqenc_dump(const jpc_mqenc_t *mqenc, FILE *out)
+int jpc_mqenc_dump(const jpc_mqenc_t *mqenc)
 {
-	fprintf(out, "AREG = %08"PRIxLEAST32", CREG = %08"PRIxLEAST32", CTREG = %"PRIuLEAST32"\n",
+	jas_logprintf("AREG = %08"PRIxLEAST32", CREG = %08"PRIxLEAST32", CTREG = %"PRIuLEAST32"\n",
 	  mqenc->areg, mqenc->creg, mqenc->ctreg);
-	fprintf(out, "IND = %02"PRIdPTR", MPS = %d, QEVAL = %04"PRIxLEAST16"\n",
+	jas_logprintf("IND = %02"PRIdPTR", MPS = %d, QEVAL = %04"PRIxLEAST16"\n",
 	  *mqenc->curctx - jpc_mqstates, (*mqenc->curctx)->mps,
 	  (*mqenc->curctx)->qeval);
 	return 0;

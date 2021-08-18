@@ -341,11 +341,11 @@ extern "C" {
 
 /* Handle overflow. */
 #define	JAS_FIX_OFLOW() \
-	jas_printferror("overflow error: file %s, line %d\n", __FILE__, __LINE__)
+	jas_logerrorf("overflow error: file %s, line %d\n", __FILE__, __LINE__)
 
 /* Handle underflow. */
 #define	JAS_FIX_UFLOW() \
-	jas_printferror("underflow error: file %s, line %d\n", __FILE__, __LINE__)
+	jas_logerrorf("underflow error: file %s, line %d\n", __FILE__, __LINE__)
 
 /*!
  * @}

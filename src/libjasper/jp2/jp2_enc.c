@@ -121,7 +121,7 @@ int jp2_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 	iccprof = 0;
 
 	if (jas_image_numcmpts(image) < 1) {
-		jas_printferror("image must have at least one component\n");
+		jas_logerrorf("image must have at least one component\n");
 		goto error;
 	}
 
@@ -139,12 +139,12 @@ int jp2_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 	/* Output the signature box. */
 
 	if (!(box = jp2_box_create(JP2_BOX_JP))) {
-		jas_printferror("cannot create JP box\n");
+		jas_logerrorf("cannot create JP box\n");
 		goto error;
 	}
 	box->data.jp.magic = JP2_JP_MAGIC;
 	if (jp2_box_put(box, out)) {
-		jas_printferror("cannot write JP box\n");
+		jas_logerrorf("cannot write JP box\n");
 		goto error;
 	}
 	jp2_box_destroy(box);
@@ -153,7 +153,7 @@ int jp2_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 	/* Output the file type box. */
 
 	if (!(box = jp2_box_create(JP2_BOX_FTYP))) {
-		jas_printferror("cannot create FTYP box\n");
+		jas_logerrorf("cannot create FTYP box\n");
 		goto error;
 	}
 	ftyp = &box->data.ftyp;
@@ -162,7 +162,7 @@ int jp2_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 	ftyp->numcompatcodes = 1;
 	ftyp->compatcodes[0] = JP2_FTYP_COMPATCODE;
 	if (jp2_box_put(box, out)) {
-		jas_printferror("cannot write FTYP box\n");
+		jas_logerrorf("cannot write FTYP box\n");
 		goto error;
 	}
 	jp2_box_destroy(box);
@@ -176,14 +176,14 @@ int jp2_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 	 */
 
 	if (!(tmpstream = jas_stream_memopen(0, 0))) {
-		jas_printferror("cannot create temporary stream\n");
+		jas_logerrorf("cannot create temporary stream\n");
 		goto error;
 	}
 
 	/* Generate image header box. */
 
 	if (!(box = jp2_box_create(JP2_BOX_IHDR))) {
-		jas_printferror("cannot create IHDR box\n");
+		jas_logerrorf("cannot create IHDR box\n");
 		goto error;
 	}
 	ihdr = &box->data.ihdr;
@@ -196,7 +196,7 @@ int jp2_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 	ihdr->csunk = 0;
 	ihdr->ipr = 0;
 	if (jp2_box_put(box, tmpstream)) {
-		jas_printferror("cannot write IHDR box\n");
+		jas_logerrorf("cannot write IHDR box\n");
 		goto error;
 	}
 	jp2_box_destroy(box);
@@ -206,14 +206,14 @@ int jp2_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 
 	if (!allcmptssame) {
 		if (!(box = jp2_box_create(JP2_BOX_BPCC))) {
-			jas_printferror("cannot create BPCC box\n");
+			jas_logerrorf("cannot create BPCC box\n");
 			goto error;
 		}
 		bpcc = &box->data.bpcc;
 		bpcc->numcmpts = jas_image_numcmpts(image);
 		if (!(bpcc->bpcs = jas_alloc2(bpcc->numcmpts,
 		  sizeof(uint_fast8_t)))) {
-			jas_printferror("memory allocation failed\n");
+			jas_logerrorf("memory allocation failed\n");
 			goto error;
 		}
 		for (cmptno = 0; cmptno < bpcc->numcmpts; ++cmptno) {
@@ -221,7 +221,7 @@ int jp2_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 			  cmptno), jas_image_cmptprec(image, cmptno));
 		}
 		if (jp2_box_put(box, tmpstream)) {
-			jas_printferror("cannot write BPCC box\n");
+			jas_logerrorf("cannot write BPCC box\n");
 			goto error;
 		}
 		jp2_box_destroy(box);
@@ -231,7 +231,7 @@ int jp2_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 	/* Generate color specification box. */
 
 	if (!(box = jp2_box_create(JP2_BOX_COLR))) {
-		jas_printferror("cannot create COLR box\n");
+		jas_logerrorf("cannot create COLR box\n");
 		goto error;
 	}
 	colr = &box->data.colr;
@@ -250,35 +250,35 @@ int jp2_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 		colr->approx = 0;
 		/* Ensure that cmprof_ is not null. */
 		if (!jas_image_cmprof(image)) {
-			jas_printferror("CM profile is null\n");
+			jas_logerrorf("CM profile is null\n");
 			goto error;
 		}
 		if (!(iccprof = jas_iccprof_createfromcmprof(
 		  jas_image_cmprof(image)))) {
-			jas_printferror("cannot create ICC profile\n");
+			jas_logerrorf("cannot create ICC profile\n");
 			goto error;
 		}
 		if (!(iccstream = jas_stream_memopen(0, 0))) {
-			jas_printferror("cannot create temporary stream\n");
+			jas_logerrorf("cannot create temporary stream\n");
 			goto error;
 		}
 		if (jas_iccprof_save(iccprof, iccstream)) {
-			jas_printferror("cannot write ICC profile\n");
+			jas_logerrorf("cannot write ICC profile\n");
 			goto error;
 		}
 		if ((pos = jas_stream_tell(iccstream)) < 0) {
-			jas_printferror("cannot get stream position\n");
+			jas_logerrorf("cannot get stream position\n");
 			goto error;
 		}
 		colr->iccplen = pos;
 		if (!(colr->iccp = jas_malloc(pos))) {
-			jas_printferror("memory allocation failed\n");
+			jas_logerrorf("memory allocation failed\n");
 			goto error;
 		}
 		jas_stream_rewind(iccstream);
 		if (jas_stream_read(iccstream, colr->iccp, colr->iccplen) !=
 		  colr->iccplen) {
-			jas_printferror("cannot read temporary stream\n");
+			jas_logerrorf("cannot read temporary stream\n");
 			goto error;
 		}
 		jas_stream_close(iccstream);
@@ -288,7 +288,7 @@ int jp2_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 		break;
 	}
 	if (jp2_box_put(box, tmpstream)) {
-		jas_printferror("cannot write box\n");
+		jas_logerrorf("cannot write box\n");
 		goto error;
 	}
 	jp2_box_destroy(box);
@@ -329,7 +329,7 @@ int jp2_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 
 	if (needcdef) {
 		if (!(box = jp2_box_create(JP2_BOX_CDEF))) {
-			jas_printferror("cannot create CDEF box\n");
+			jas_logerrorf("cannot create CDEF box\n");
 			goto error;
 		}
 		cdef = &box->data.cdef;
@@ -346,7 +346,7 @@ int jp2_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 			cdefchanent->assoc = typeasoc & 0x7fff;
 		}
 		if (jp2_box_put(box, tmpstream)) {
-			jas_printferror("cannot write CDEF box\n");
+			jas_logerrorf("cannot write CDEF box\n");
 			goto error;
 		}
 		jp2_box_destroy(box);
@@ -363,19 +363,19 @@ int jp2_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 	 */
 
 	if (!(box = jp2_box_create(JP2_BOX_JP2H))) {
-		jas_printferror("cannot create JP2H box\n");
+		jas_logerrorf("cannot create JP2H box\n");
 		goto error;
 	}
 	box->len = len + JP2_BOX_HDRLEN(false);
 	if (jp2_box_put(box, out)) {
-		jas_printferror("cannot write JP2H box\n");
+		jas_logerrorf("cannot write JP2H box\n");
 		goto error;
 	}
 	jp2_box_destroy(box);
 	box = 0;
 
 	if (jas_stream_copy(out, tmpstream, len)) {
-		jas_printferror("cannot copy stream\n");
+		jas_logerrorf("cannot copy stream\n");
 		goto error;
 	}
 
@@ -387,12 +387,12 @@ int jp2_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 	 */
 
 	if (!(box = jp2_box_create(JP2_BOX_JP2C))) {
-		jas_printferror("cannot create JP2C box\n");
+		jas_logerrorf("cannot create JP2C box\n");
 		goto error;
 	}
 	box->len = 0;
 	if (jp2_box_put(box, out)) {
-		jas_printferror("cannot write JP2C box\n");
+		jas_logerrorf("cannot write JP2C box\n");
 		goto error;
 	}
 	jp2_box_destroy(box);
@@ -405,7 +405,7 @@ int jp2_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 	  (unsigned long) overhead);
 
 	if (jpc_encode(image, out, buf)) {
-		jas_printferror("jpc_encode failed\n");
+		jas_logerrorf("jpc_encode failed\n");
 		goto error;
 	}
 

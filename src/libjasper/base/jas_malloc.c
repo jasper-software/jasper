@@ -122,13 +122,13 @@ void *jas_malloc(size_t size)
 {
 	assert(jas_allocator);
 	void *result;
-	JAS_DBGLOG(101, ("jas_malloc(%zu)\n", size));
+	JAS_LOGDEBUGF(101, "jas_malloc(%zu)\n", size);
 #if defined(JAS_MALLOC_RETURN_NULL_PTR_FOR_ZERO_SIZE)
 	result = size ? (jas_allocator->alloc)(jas_allocator, size) : 0;
 #else
 	result = (jas_allocator->alloc)(jas_allocator, size ? size : 1);
 #endif
-	JAS_DBGLOG(100, ("jas_malloc(%zu) -> %p\n", size, result));
+	JAS_LOGDEBUGF(100, "jas_malloc(%zu) -> %p\n", size, result);
 	return result;
 }
 
@@ -137,20 +137,20 @@ void *jas_realloc(void *ptr, size_t size)
 {
 	assert(jas_allocator);
 	void *result;
-	JAS_DBGLOG(101, ("jas_realloc(%p, %zu)\n", ptr, size));
+	JAS_LOGDEBUGF(101, "jas_realloc(%p, %zu)\n", ptr, size);
 	if (!ptr && !size) {
 #if defined(JAS_MALLOC_RETURN_NULL_PTR_FOR_ZERO_SIZE)
 		result = 0;
-		JAS_DBGLOG(101, ("jas_realloc: no-op -> %p\n", result));
+		JAS_LOGDEBUGF(101, "jas_realloc: no-op -> %p\n", result);
 #else
 		result = (jas_allocator->alloc)(jas_allocator, 1);
-		JAS_DBGLOG(101, ("jas_realloc: alloc(%p, %p, %zu) -> %p\n",
-		  jas_allocator, ptr, size, result));
+		JAS_LOGDEBUGF(101, "jas_realloc: alloc(%p, %p, %zu) -> %p\n",
+		  jas_allocator, ptr, size, result);
 #endif
 	} else {
 		result = (jas_allocator->realloc)(jas_allocator, ptr, size);
-		JAS_DBGLOG(100, ("jas_realloc: realloc(%p, %p, %zu) -> %p\n",
-		  jas_allocator, ptr, size, result));
+		JAS_LOGDEBUGF(100, "jas_realloc: realloc(%p, %p, %zu) -> %p\n",
+		  jas_allocator, ptr, size, result);
 	}
 	return result;
 }
@@ -159,7 +159,7 @@ JAS_DLLEXPORT
 void jas_free(void *ptr)
 {
 	assert(jas_allocator);
-	JAS_DBGLOG(100, ("jas_free(%p)\n", ptr));
+	JAS_LOGDEBUGF(100, "jas_free(%p)\n", ptr);
 	(jas_allocator->free)(jas_allocator, ptr);
 }
 
@@ -245,9 +245,9 @@ JAS_DLLEXPORT
 void *jas_std_alloc(jas_allocator_t *allocator, size_t size)
 {
 	JAS_CAST(void, allocator);
-	JAS_DBGLOG(111, ("jas_std_alloc(%zu)\n", size));
+	JAS_LOGDEBUGF(111, "jas_std_alloc(%zu)\n", size);
 	void* result = malloc(size);
-	JAS_DBGLOG(110, ("jas_std_alloc(%zu) -> %p\n", size, result));
+	JAS_LOGDEBUGF(110, "jas_std_alloc(%zu) -> %p\n", size, result);
 	return result;
 }
 
@@ -255,9 +255,9 @@ JAS_DLLEXPORT
 void *jas_std_realloc(jas_allocator_t *allocator, void *ptr, size_t size)
 {
 	JAS_CAST(void, allocator);
-	JAS_DBGLOG(111, ("jas_std_realloc(%p, %zu)\n", allocator, size));
+	JAS_LOGDEBUGF(111, "jas_std_realloc(%p, %zu)\n", allocator, size);
 	void *result = realloc(ptr, size);
-	JAS_DBGLOG(110, ("jas_std_realloc(%zu) -> %p\n", size, result));
+	JAS_LOGDEBUGF(110, "jas_std_realloc(%zu) -> %p\n", size, result);
 	return result;
 }
 
@@ -265,7 +265,7 @@ JAS_DLLEXPORT
 void jas_std_free(jas_allocator_t *allocator, void *ptr)
 {
 	JAS_CAST(void, allocator);
-	JAS_DBGLOG(111, ("jas_std_free(%p, %p)\n", allocator, ptr));
+	JAS_LOGDEBUGF(111, "jas_std_free(%p, %p)\n", allocator, ptr);
 	free(ptr);
 }
 
@@ -402,8 +402,8 @@ void *jas_basic_alloc(jas_allocator_t *allocator, size_t size)
 
 	JAS_CAST(void, has_lock); /* suppress warning about unused variable */
 
-	JAS_DBGLOG(100, ("jas_basic_alloc(%p, %zu)\n", allocator, size));
-	JAS_DBGLOG(102, ("max_mem=%zu; mem=%zu\n", a->max_mem, a->mem));
+	JAS_LOGDEBUGF(100, "jas_basic_alloc(%p, %zu)\n", allocator, size);
+	JAS_LOGDEBUGF(102, "max_mem=%zu; mem=%zu\n", a->max_mem, a->mem);
 #if defined(JAS_MALLOC_RETURN_NULL_PTR_FOR_ZERO_SIZE)
 	if (!size) {
 		result = 0;
@@ -411,7 +411,7 @@ void *jas_basic_alloc(jas_allocator_t *allocator, size_t size)
 	}
 #endif
 	if (!jas_safe_size_add(size, JAS_MB_SIZE, &ext_size)) {
-		jas_printferror("requested memory size is too large (%zu)\n", size);
+		jas_logerrorf("requested memory size is too large (%zu)\n", size);
 		result = 0;
 		goto done;
 	}
@@ -428,7 +428,7 @@ void *jas_basic_alloc(jas_allocator_t *allocator, size_t size)
 	exceed the memory usage limit.
 	*/
 	if (!jas_safe_size_add(a->mem, ext_size, &mem) || mem > a->max_mem) {
-		jas_printferror("maximum memory limit (%zu) would be exceeded\n",
+		jas_logerrorf("maximum memory limit (%zu) would be exceeded\n",
 		  a->max_mem);
 		result = 0;
 		goto done;
@@ -437,8 +437,8 @@ void *jas_basic_alloc(jas_allocator_t *allocator, size_t size)
 	/*
 	Perform the requested allocation using the delegated-to allocator.
 	*/
-	JAS_DBGLOG(100, ("jas_basic_alloc: alloc(%p, %zu)\n", a->delegate,
-	  ext_size));
+	JAS_LOGDEBUGF(100, "jas_basic_alloc: alloc(%p, %zu)\n", a->delegate,
+	  ext_size);
 	if ((mb = (a->delegate->alloc)(a->delegate, ext_size))) {
 		jas_mb_init(mb, ext_size);
 		result = jas_mb_get_data(mb);
@@ -454,9 +454,9 @@ done:
 	}
 #endif
 
-	JAS_DBGLOG(99, ("jas_basic_alloc(%p, %zu) -> %p (mb=%p)\n", allocator,
-	  size, result, mb));
-	JAS_DBGLOG(102, ("max_mem=%zu; mem=%zu\n", a->max_mem, a->mem));
+	JAS_LOGDEBUGF(99, "jas_basic_alloc(%p, %zu) -> %p (mb=%p)\n", allocator,
+	  size, result, mb);
+	JAS_LOGDEBUGF(102, "max_mem=%zu; mem=%zu\n", a->max_mem, a->mem);
 
 	return result;
 }
@@ -475,8 +475,8 @@ void *jas_basic_realloc(jas_allocator_t *allocator, void *ptr, size_t size)
 
 	JAS_CAST(void, has_lock); /* suppress warning about unused variable */
 
-	JAS_DBGLOG(100, ("jas_basic_realloc(%p, %p, %zu)\n", allocator, ptr,
-	  size));
+	JAS_LOGDEBUGF(100, "jas_basic_realloc(%p, %p, %zu)\n", allocator, ptr,
+	  size);
 	/*
 	Check for a realloc operation that is equivalent to an alloc operation.
 	*/
@@ -494,7 +494,7 @@ void *jas_basic_realloc(jas_allocator_t *allocator, void *ptr, size_t size)
 	}
 
 	if (!jas_safe_size_add(size, JAS_MB_SIZE, &ext_size)) {
-		jas_printferror("requested memory size is too large\n");
+		jas_logerrorf("requested memory size is too large\n");
 		result = 0;
 		goto done;
 	}
@@ -506,8 +506,8 @@ void *jas_basic_realloc(jas_allocator_t *allocator, void *ptr, size_t size)
 
 	old_mb = jas_get_mb(ptr);
 	old_ext_size = old_mb->size;
-	JAS_DBGLOG(101, ("jas_basic_realloc: old_mb=%p; old_ext_size=%zu\n",
-	  old_mb, old_ext_size));
+	JAS_LOGDEBUGF(101, "jas_basic_realloc: old_mb=%p; old_ext_size=%zu\n",
+	  old_mb, old_ext_size);
 	/*
 	Skip performing any allocation if the currently-allocated block is
 	sufficiently large to accommodate the allocation request.
@@ -519,14 +519,14 @@ void *jas_basic_realloc(jas_allocator_t *allocator, void *ptr, size_t size)
 
 	if (!jas_safe_size_add(a->mem, ext_size - old_ext_size, &mem) ||
 	  mem > a->max_mem) {
-		jas_printferror("maximum memory limit (%zu) would be exceeded\n",
+		jas_logerrorf("maximum memory limit (%zu) would be exceeded\n",
 		  a->max_mem);
 		result = 0;
 		goto done;
 	}
 
-	JAS_DBGLOG(100, ("jas_basic_realloc: realloc(%p, %p, %zu)\n", a->delegate,
-	  old_mb, ext_size));
+	JAS_LOGDEBUGF(100, "jas_basic_realloc: realloc(%p, %p, %zu)\n", a->delegate,
+	  old_mb, ext_size);
 	jas_mb_destroy(old_mb);
 	if ((mb = (a->delegate->realloc)(a->delegate, old_mb, ext_size))) {
 		jas_mb_init(mb, ext_size);
@@ -543,9 +543,9 @@ done:
 	}
 #endif
 
-	JAS_DBGLOG(100, ("jas_basic_realloc(%p, %p, %zu) -> %p (%p)\n", allocator,
-	  ptr, size, result, mb));
-	JAS_DBGLOG(102, ("max_mem=%zu; mem=%zu\n", a->max_mem, a->mem));
+	JAS_LOGDEBUGF(100, "jas_basic_realloc(%p, %p, %zu) -> %p (%p)\n", allocator,
+	  ptr, size, result, mb);
+	JAS_LOGDEBUGF(102, "max_mem=%zu; mem=%zu\n", a->max_mem, a->mem);
 
 	return result;
 }
@@ -558,29 +558,29 @@ void jas_basic_free(jas_allocator_t *allocator, void *ptr)
 	jas_basic_allocator_t *a = JAS_CAST(jas_basic_allocator_t *, allocator);
 
 
-	JAS_DBGLOG(100, ("jas_basic_free(%p)\n", ptr));
+	JAS_LOGDEBUGF(100, "jas_basic_free(%p)\n", ptr);
 	if (ptr) {
 #if defined(JAS_ENABLE_MULTITHREADING_SUPPORT)
 		jas_mutex_lock(&a->mutex);
 #endif
 		mb = jas_get_mb(ptr);
 		ext_size = mb->size;
-		JAS_DBGLOG(101, ("jas_basic_free(%p, %p) (mb=%p; ext_size=%zu)\n",
-		  allocator, ptr, mb, ext_size));
+		JAS_LOGDEBUGF(101, "jas_basic_free(%p, %p) (mb=%p; ext_size=%zu)\n",
+		  allocator, ptr, mb, ext_size);
 		if (!jas_safe_size_sub(a->mem, ext_size, &a->mem)) {
-			jas_printferror("heap corruption detected (%zu exceeds %zu)\n",
+			jas_logerrorf("heap corruption detected (%zu exceeds %zu)\n",
 			  ext_size, a->mem);
 			/* This line of code should never be reached. */
 			assert(0);
 			abort();
 		}
-		JAS_DBGLOG(100, ("jas_basic_free: free(%p, %p)\n", a->delegate, mb));
+		JAS_LOGDEBUGF(100, "jas_basic_free: free(%p, %p)\n", a->delegate, mb);
 		jas_mb_destroy(mb);
 		(a->delegate->free)(a->delegate, mb);
 #if defined(JAS_ENABLE_MULTITHREADING_SUPPORT)
 		jas_mutex_unlock(&a->mutex);
 #endif
 	}
-	JAS_DBGLOG(102, ("max_mem=%zu; mem=%zu\n", a->max_mem, a->mem));
+	JAS_LOGDEBUGF(102, "max_mem=%zu; mem=%zu\n", a->max_mem, a->mem);
 
 }

@@ -203,16 +203,20 @@ static int jpc_enc_enccblk(const jpc_enc_tcmpt_t *tcmpt, const jpc_enc_band_t *b
 
 	bout = 0;
 
-	cblk->stream = jas_stream_memopen(0, 0);
-	assert(cblk->stream);
-	cblk->mqenc = jpc_mqenc_create(JPC_NUMCTXS, cblk->stream);
-	assert(cblk->mqenc);
+	if (!(cblk->stream = jas_stream_memopen(0, 0))) {
+		goto error;
+	}
+	if (!(cblk->mqenc = jpc_mqenc_create(JPC_NUMCTXS, cblk->stream))) {
+		goto error;
+	}
 	jpc_mqenc_setctxs(cblk->mqenc, JPC_NUMCTXS, jpc_mqctxs);
 
 	cblk->numpasses = (cblk->numbps > 0) ? (3 * cblk->numbps - 2) : 0;
 	if (cblk->numpasses > 0) {
-		cblk->passes = jas_alloc2(cblk->numpasses, sizeof(jpc_enc_pass_t));
-		assert(cblk->passes);
+		if (!(cblk->passes = jas_alloc2(cblk->numpasses,
+		  sizeof(jpc_enc_pass_t)))) {
+			goto error;
+		};
 	} else {
 		cblk->passes = 0;
 	}
@@ -220,19 +224,22 @@ static int jpc_enc_enccblk(const jpc_enc_tcmpt_t *tcmpt, const jpc_enc_band_t *b
 	for (pass = cblk->passes; pass != endpasses; ++pass) {
 		pass->start = 0;
 		pass->end = 0;
-		pass->term = JPC_ISTERMINATED(pass - cblk->passes, 0, cblk->numpasses, (tcmpt->cblksty & JPC_COX_TERMALL) != 0, (tcmpt->cblksty & JPC_COX_LAZY) != 0);
-		pass->type = JPC_SEGTYPE(pass - cblk->passes, 0, (tcmpt->cblksty & JPC_COX_LAZY) != 0);
+		pass->term = JPC_ISTERMINATED(pass - cblk->passes, 0, cblk->numpasses,
+		  (tcmpt->cblksty & JPC_COX_TERMALL) != 0,
+		  (tcmpt->cblksty & JPC_COX_LAZY) != 0);
+		pass->type = JPC_SEGTYPE(pass - cblk->passes, 0,
+		  (tcmpt->cblksty & JPC_COX_LAZY) != 0);
 		pass->lyrno = -1;
-if (pass == endpasses - 1) {
-assert(pass->term == 1);
-	pass->term = 1;
-}
+		if (pass == endpasses - 1) {
+			assert(pass->term == 1);
+			pass->term = 1;
+		}
 	}
 
 	if (!(cblk->flags = jas_matrix_create(jas_matrix_numrows(cblk->data) + 2,
 	  jas_matrix_numcols(cblk->data) + 2))) {
-		jas_printferror("cannot create matrix\n");
-		return -1;
+		jas_logerrorf("cannot create matrix\n");
+		goto error;
 	}
 
 	bitpos = cblk->numbps - 1;
@@ -247,7 +254,7 @@ assert(pass->term == 1);
 			if (!bout) {
 				bout = jpc_bitstream_sopen(cblk->stream, "w");
 				if (!bout) {
-					return -1;
+					goto error;
 				}
 			}
 		}
@@ -297,7 +304,7 @@ assert(jas_stream_tell(cblk->stream) == jas_stream_getrwcount(cblk->stream));
 			if (bout) {
 				jpc_bitstream_close(bout);
 			}
-			return -1;
+			goto error;
 		}
 
 		if (pass->type == JPC_SEG_MQ) {
@@ -402,6 +409,9 @@ dump_passes(cblk->passes, cblk->numpasses, cblk);
 	}
 
 	return 0;
+
+error:
+	return -1;
 }
 
 /******************************************************************************\

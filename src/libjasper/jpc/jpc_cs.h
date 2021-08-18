@@ -730,7 +730,7 @@ typedef struct jpc_msops_s {
 	int (*putparms)(jpc_ms_t *ms, jpc_cstate_t *cstate, jas_stream_t *out);
 
 	/* Dump the marker segment parameters (for debugging). */
-	int (*dumpparms)(jpc_ms_t *ms, FILE *out);
+	int (*dumpparms)(jpc_ms_t *ms);
 
 } jpc_msops_t;
 
@@ -778,7 +778,7 @@ int jpc_getdata(jas_stream_t *in, jas_stream_t *out, long n);
 int jpc_putdata(jas_stream_t *out, jas_stream_t *in, long n);
 
 /* Dump a marker segment (for debugging). */
-void jpc_ms_dump(jpc_ms_t *ms, FILE *out);
+void jpc_ms_dump(jpc_ms_t *ms);
 
 /* Read a 8-bit unsigned integer from a stream. */
 int jpc_getuint8(jas_stream_t *in, uint_fast8_t *val);

@@ -270,7 +270,7 @@ typedef struct jp2_boxops_s {
 	void (*destroy)(jp2_box_t *box);
 	int (*getdata)(jp2_box_t *box, jas_stream_t *in);
 	int (*putdata)(const jp2_box_t *box, jas_stream_t *out);
-	void (*dumpdata)(const jp2_box_t *box, FILE *out);
+	void (*dumpdata)(const jp2_box_t *box);
 } jp2_boxops_t;
 
 /******************************************************************************\

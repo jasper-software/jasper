@@ -209,12 +209,12 @@ void jpc_mqdec_setctxs(const jpc_mqdec_t *mqdec, unsigned numctxs, const jpc_mqc
 bool jpc_mqdec_getbit_func(register jpc_mqdec_t *mqdec)
 {
 	bool bit;
-	JAS_DBGLOG(100, ("jpc_mqdec_getbit_func(%p)\n", mqdec));
-	MQDEC_CALL(100, jpc_mqdec_dump(mqdec, stderr));
+	JAS_LOGDEBUGF(100, "jpc_mqdec_getbit_func(%p)\n", mqdec);
+	MQDEC_CALL(100, jpc_mqdec_dump(mqdec));
 	bit = jpc_mqdec_getbit_macro(mqdec);
-	MQDEC_CALL(100, jpc_mqdec_dump(mqdec, stderr));
-	JAS_DBGLOG(100, ("ctx = %d, decoded %d\n", mqdec->curctx -
-	  mqdec->ctxs, bit));
+	MQDEC_CALL(100, jpc_mqdec_dump(mqdec));
+	JAS_LOGDEBUGF(100, "ctx = %d, decoded %d\n", mqdec->curctx -
+	  mqdec->ctxs, bit);
 	return bit;
 }
 
@@ -289,12 +289,12 @@ static void jpc_mqdec_bytein(jpc_mqdec_t *mqdec)
 
 /* Dump a MQ decoder to a stream for debugging. */
 
-void jpc_mqdec_dump(const jpc_mqdec_t *mqdec, FILE *out)
+void jpc_mqdec_dump(const jpc_mqdec_t *mqdec)
 {
-	fprintf(out, "MQDEC A = %08lx, C = %08lx, CT=%08lx, ",
+	jas_logprintf("MQDEC A = %08lx, C = %08lx, CT=%08lx, ",
 	  (unsigned long) mqdec->areg, (unsigned long) mqdec->creg,
 	  (unsigned long) mqdec->ctreg);
-	fprintf(out, "CTX = %" PRIdPTR ", ", mqdec->curctx - mqdec->ctxs);
-	fprintf(out, "IND %" PRIdPTR ", MPS %d, QEVAL %"PRIxLEAST16"\n", *mqdec->curctx -
+	jas_logprintf("CTX = %" PRIdPTR ", ", mqdec->curctx - mqdec->ctxs);
+	jas_logprintf("IND %" PRIdPTR ", MPS %d, QEVAL %"PRIxLEAST16"\n", *mqdec->curctx -
 	  jpc_mqstates, (*mqdec->curctx)->mps, (*mqdec->curctx)->qeval);
 }

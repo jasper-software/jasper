@@ -26,7 +26,7 @@ void jpc_init(void)
 
 static void jpc_init_helper(void)
 {
-	JAS_DBGLOG(10, ("jpc_init_helper called\n"));
+	JAS_LOGDEBUGF(10, "jpc_init_helper called\n");
 	jpc_initmqctxs();
 	jpc_initluts();
 }

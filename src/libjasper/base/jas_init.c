@@ -238,8 +238,8 @@ void jas_conf_clear()
 	jas_conf.dec_default_max_samples = JAS_DEC_DEFAULT_MAX_SAMPLES;
 	jas_conf.debug_level = 0;
 	jas_conf.enable_atexit_cleanup = 0;
-	jas_conf.vlogprintf = jas_vlogprintf_stderr;
-	//jas_conf.vlogprintf = jas_vlogprintf_discard;
+	jas_conf.vlogprintf = jas_vlogmsgf_stderr;
+	//jas_conf.vlogprintf = jas_vlogmsgf_discard;
 	jas_conf.num_image_formats = sizeof(jas_image_fmts) /
 	  sizeof(jas_image_fmt_t);
 	jas_conf.image_formats = jas_image_fmts;
@@ -386,7 +386,7 @@ static int jas_init_codecs(jas_ctx_t *ctx)
 			if (!(ext = jas_strtok(first ? buf : NULL, delim, &saveptr))) {
 				break;
 			}
-			JAS_DBGLOG(10, ("adding image format %s %s\n", fmt->name, ext));
+			JAS_LOGDEBUGF(10, "adding image format %s %s\n", fmt->name, ext);
 			jas_image_addfmt_internal(ctx->image_fmtinfos, &ctx->image_numfmts,
 			  fmtid, fmt->name, ext, fmt->desc, &fmt->ops);
 			++fmtid;
@@ -400,7 +400,7 @@ static int jas_init_codecs(jas_ctx_t *ctx)
 JAS_DLLEXPORT
 void jas_cleanup()
 {
-	JAS_DBGLOG(10, ("jas_cleanup invoked\n"));
+	JAS_LOGDEBUGF(10, "jas_cleanup invoked\n");
 
 	jas_global_ctx = &jas_global_ctx_buf;
 	jas_context_cleanup(&jas_global_ctx_buf);
@@ -410,7 +410,7 @@ void jas_cleanup()
 	jas_allocator_cleanup(jas_allocator);
 	jas_allocator = 0;
 
-	JAS_DBGLOG(10, ("jas_cleanup returning\n"));
+	JAS_LOGDEBUGF(10, "jas_cleanup returning\n");
 
 #if defined(JAS_ENABLE_MULTITHREADING_SUPPORT)
 	jas_tss_delete(jas_tss);

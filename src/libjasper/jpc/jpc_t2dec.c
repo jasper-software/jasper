@@ -195,13 +195,13 @@ static int jpc_dec_decodepkt(jpc_dec_t *dec, jas_stream_t *pkthdrstream, jas_str
 			}
 			if (jpc_ms_gettype(ms) != JPC_MS_SOP) {
 				jpc_ms_destroy(ms);
-				jas_printferror("cannot get (SOP) marker segment\n");
+				jas_logerrorf("cannot get (SOP) marker segment\n");
 				return -1;
 			}
 			unsigned int maxNsop = 65536;
 			/* checking the packet sequence number */
 			if (tile->pi->pktno % maxNsop != ms->parms.sop.seqno) {
-				jas_printferror("incorrect packet sequence number %d was found, but expected %d\n",
+				jas_logerrorf("incorrect packet sequence number %d was found, but expected %d\n",
 					ms->parms.sop.seqno, tile->pi->pktno % maxNsop);
 				jpc_ms_destroy(ms);
 				return -1;
@@ -220,8 +220,8 @@ static int jpc_dec_decodepkt(jpc_dec_t *dec, jas_stream_t *pkthdrstream, jas_str
 		jpc_bitstream_close(inb);
 		return 1;
 	}
-	JAS_DBGLOG(10, ("\n", present));
-	JAS_DBGLOG(10, ("present=%d ", present));
+	JAS_LOGDEBUGF(10, "\n", present);
+	JAS_LOGDEBUGF(10, "present=%d ", present);
 
 	/* Is the packet non-empty? */
 	if (present) {
@@ -256,8 +256,8 @@ static int jpc_dec_decodepkt(jpc_dec_t *dec, jas_stream_t *pkthdrstream, jas_str
 						return -1;
 					}
 				}
-				JAS_DBGLOG(10, ("\n"));
-				JAS_DBGLOG(10, ("included=%d ", included));
+				JAS_LOGDEBUGF(10, "\n");
+				JAS_LOGDEBUGF(10, "included=%d ", included);
 				if (!included) {
 					continue;
 				}
@@ -281,7 +281,7 @@ static int jpc_dec_decodepkt(jpc_dec_t *dec, jas_stream_t *pkthdrstream, jas_str
 					jpc_bitstream_close(inb);
 					return -1;
 				}
-				JAS_DBGLOG(10, ("numnewpasses=%d ", numnewpasses));
+				JAS_LOGDEBUGF(10, "numnewpasses=%d ", numnewpasses);
 				seg = cblk->curseg;
 				const unsigned savenumnewpasses = numnewpasses;
 				unsigned mycounter = 0;
@@ -305,7 +305,7 @@ static int jpc_dec_decodepkt(jpc_dec_t *dec, jas_stream_t *pkthdrstream, jas_str
 						return -1;
 					}
 					cblk->numlenbits += m;
-					JAS_DBGLOG(10, ("increment=%d ", m));
+					JAS_LOGDEBUGF(10, "increment=%d ", m);
 					while (numnewpasses > 0) {
 						const unsigned passno = cblk->firstpassno + cblk->numpasses + mycounter;
 						if (passno >= 10000) {
@@ -341,7 +341,7 @@ static int jpc_dec_decodepkt(jpc_dec_t *dec, jas_stream_t *pkthdrstream, jas_str
 							jpc_bitstream_close(inb);
 							return -1;
 						}
-						JAS_DBGLOG(10, ("len=%d ", len));
+						JAS_LOGDEBUGF(10, "len=%d ", len);
 						if (!discard) {
 							seg->lyrno = lyrno;
 							seg->numpasses += n;
@@ -359,7 +359,7 @@ static int jpc_dec_decodepkt(jpc_dec_t *dec, jas_stream_t *pkthdrstream, jas_str
 
 	} else {
 		if (jpc_bitstream_inalign(inb, 0x7f, 0)) {
-			jas_printferror("alignment failed\n");
+			jas_logerrorf("alignment failed\n");
 			jpc_bitstream_close(inb);
 			return -1;
 		}
@@ -369,18 +369,18 @@ static int jpc_dec_decodepkt(jpc_dec_t *dec, jas_stream_t *pkthdrstream, jas_str
 	if (jas_getdbglevel() >= 5) {
 		const uint_least64_t hdroffend = jas_stream_getrwcount(pkthdrstream);
 		const unsigned long hdrlen = hdroffend - hdroffstart;
-		jas_printfdebug("hdrlen=%lu bodylen=%lu \n", (unsigned long) hdrlen,
+		jas_logdebugf(5, "hdrlen=%lu bodylen=%lu \n", (unsigned long) hdrlen,
 		  (unsigned long) bodylen);
 	}
 
 	if (cp->csty & JPC_COD_EPH) {
 		if (!(ms = jpc_getms(pkthdrstream, dec->cstate))) {
-			jas_printferror("cannot get (EPH) marker segment\n");
+			jas_logerrorf("cannot get (EPH) marker segment\n");
 			return -1;
 		}
 		if (jpc_ms_gettype(ms) != JPC_MS_EPH) {
 			jpc_ms_destroy(ms);
-			jas_printferror("missing EPH marker segment\n");
+			jas_logerrorf("missing EPH marker segment\n");
 			return -1;
 		}
 		jpc_ms_destroy(ms);
@@ -389,7 +389,7 @@ static int jpc_dec_decodepkt(jpc_dec_t *dec, jas_stream_t *pkthdrstream, jas_str
 	/* decode the packet body. */
 
 	if (jas_getdbglevel() >= 1) {
-		jas_printfdebug("packet body offset=%06ld\n", (long) jas_stream_getrwcount(in));
+		jas_logdebugf(1, "packet body offset=%06ld\n", (long) jas_stream_getrwcount(in));
 	}
 
 	if (!discard) {
@@ -471,11 +471,11 @@ int jpc_dec_decodepkts(jpc_dec_t *dec, jas_stream_t *pkthdrstream, jas_stream_t 
 			return ret;
 		}
 		if (dec->maxpkts >= 0 && dec->numpkts >= (unsigned)dec->maxpkts) {
-			jas_printfwarn("warning: stopping decode prematurely as requested\n");
+			jas_logwarnf("warning: stopping decode prematurely as requested\n");
 			return 0;
 		}
 		if (jas_getdbglevel() >= 1) {
-			jas_printfdebug("packet offset=%08ld prg=%d cmptno=%02d "
+			jas_logdebugf(1, "packet offset=%08ld prg=%d cmptno=%02d "
 			  "rlvlno=%02d prcno=%03d lyrno=%02d\n", (long)
 			  jas_stream_getrwcount(in), jpc_pi_prg(pi), jpc_pi_cmptno(pi),
 			  jpc_pi_rlvlno(pi), jpc_pi_prcno(pi), jpc_pi_lyrno(pi));

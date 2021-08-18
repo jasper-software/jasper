@@ -90,14 +90,19 @@ extern "C" {
 * Macros and functions.
 \******************************************************************************/
 
+/*! Log type class for unclassified messages. */
+#define JAS_LOGTYPE_CLASS_NULL 0
 /*! Log type class for errors. */
-#define JAS_LOGTYPE_CLASS_ERROR 0
+#define JAS_LOGTYPE_CLASS_ERROR 1
 /*! Log type class for warnings. */
-#define JAS_LOGTYPE_CLASS_WARN 1
+#define JAS_LOGTYPE_CLASS_WARN 2
 /*! Log type class for informational messages. */
-#define JAS_LOGTYPE_CLASS_INFO 2
+#define JAS_LOGTYPE_CLASS_INFO 3
 /*! Log type class for debugging messages. */
-#define JAS_LOGTYPE_CLASS_DEBUG 3
+#define JAS_LOGTYPE_CLASS_DEBUG 4
+#define JAS_LOGTYPE_NUM_CLASSES 5
+
+#define JAS_LOGTYPE_MAX_PRIORITY 16384
 
 /*!
 @brief Type used for the log type.
@@ -109,9 +114,9 @@ typedef unsigned int jas_logtype_t;
 */
 static inline jas_logtype_t jas_logtype_init(int class, int priority)
 {
-	assert(class >= 0 && class < 4);
-	assert(priority >= 0 && priority < 1024);
-	return (class & 0xff) | (priority << 8);
+	assert(class >= 0 && class < JAS_LOGTYPE_NUM_CLASSES);
+	assert(priority >= 0 && priority <= JAS_LOGTYPE_MAX_PRIORITY);
+	return (class & 0xf) | (priority << 4);
 }
 
 /*!
@@ -119,7 +124,7 @@ static inline jas_logtype_t jas_logtype_init(int class, int priority)
 */
 static inline int jas_logtype_get_class(jas_logtype_t type)
 {
-	return type & 0xff;
+	return type & 0xf;
 }
 
 /*!
@@ -127,26 +132,26 @@ static inline int jas_logtype_get_class(jas_logtype_t type)
 */
 static inline int jas_logtype_get_priority(jas_logtype_t type)
 {
-	return type >> 8;
+	return type >> 4;
 }
 
 /*!
 @brief Print formatted log message.
 */
 JAS_DLLEXPORT
-int jas_vlogprintf(jas_logtype_t type, const char *fmt, va_list ap);
+int jas_vlogmsgf(jas_logtype_t type, const char *fmt, va_list ap);
 
 /*!
 @brief Output a log message to standard error.
 */
 JAS_DLLEXPORT
-int jas_vlogprintf_stderr(jas_logtype_t type, const char *fmt, va_list ap);
+int jas_vlogmsgf_stderr(jas_logtype_t type, const char *fmt, va_list ap);
 
 /*!
 @brief Output a log message to nowhere (i.e., discard the message).
 */
 JAS_DLLEXPORT
-int jas_vlogprintf_discard(jas_logtype_t type, const char *fmt, va_list ap);
+int jas_vlogmsgf_discard(jas_logtype_t type, const char *fmt, va_list ap);
 
 /*!
  * @}

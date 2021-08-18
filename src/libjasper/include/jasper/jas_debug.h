@@ -97,6 +97,13 @@ extern "C" {
 #define	JAS_DBGLOG(n, x)
 #endif
 
+#if !defined(NDEBUG)
+#define	JAS_LOGDEBUGF(n, ...) \
+	((jas_getdbglevel() >= (n)) ? jas_logdebugf((n), __VA_ARGS__) : 0)
+#else
+#define	JAS_LOGDEBUGF(n, ...)
+#endif
+
 /*
 @brief
 Get the library debug level.
@@ -104,7 +111,7 @@ Get the library debug level.
 static inline
 int jas_getdbglevel(void)
 {
-	return jas_get_ctx()->debug_level;
+	return jas_context_get_debug_level(jas_get_context());
 }
 
 /*
@@ -118,20 +125,15 @@ int jas_setdbglevel(int dbglevel);
 @brief
 Output a log message (for an error, a warning, or other information).
 */
-JAS_DLLEXPORT
 int jas_eprintf(const char *fmt, ...);
 
-JAS_DLLEXPORT
-int jas_printferror(const char *fmt, ...);
+int jas_logprintf(const char *fmt, ...);
+int jas_logerrorf(const char *fmt, ...);
+int jas_logwarnf(const char *fmt, ...);
+int jas_loginfof(const char *fmt, ...);
+int jas_logdebugf(int priority, const char *fmt, ...);
 
-JAS_DLLEXPORT
-int jas_printfwarn(const char *fmt, ...);
-
-JAS_DLLEXPORT
-int jas_printfinfo(const char *fmt, ...);
-
-JAS_DLLEXPORT
-int jas_printfdebug(const char *fmt, ...);
+int jas_logmemdump(const void *data, size_t len);
 
 /*!
 @brief

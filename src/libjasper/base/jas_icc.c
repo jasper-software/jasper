@@ -338,11 +338,11 @@ jas_iccprof_t *jas_iccprof_load(jas_stream_t *in)
 	}
 
 	if (jas_iccprof_readhdr(in, &prof->hdr)) {
-		jas_printferror("cannot get header\n");
+		jas_logerrorf("cannot get header\n");
 		goto error;
 	}
 	if (jas_iccprof_gettagtab(in, &prof->tagtab)) {
-		jas_printferror("cannot get tab table\n");
+		jas_logerrorf("cannot get tab table\n");
 		goto error;
 	}
 	jas_iccprof_sorttagtab(&prof->tagtab);
@@ -363,7 +363,7 @@ jas_iccprof_t *jas_iccprof_load(jas_stream_t *in)
 				attrval = 0;
 			} else {
 #if 0
-				jas_printfwarn("warning: skipping unknown tag type\n");
+				jas_logwarnf("warning: skipping unknown tag type\n");
 #endif
 			}
 			continue;
@@ -386,7 +386,7 @@ jas_iccprof_t *jas_iccprof_load(jas_stream_t *in)
 		curoff += 8;
 		if (!jas_iccattrvalinfo_lookup(type)) {
 #if 0
-			jas_printfwarn("warning: skipping unknown tag type\n");
+			jas_logwarnf("warning: skipping unknown tag type\n");
 #endif
 			prevattrval = 0;
 			continue;

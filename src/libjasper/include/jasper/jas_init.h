@@ -351,13 +351,13 @@ Set the current context for the calling thread.
 JAS_DLLEXPORT
 void jas_set_context(jas_context_t context);
 
-//#if defined(JAS_INTERNAL_USE_ONLY)
+#if defined(JAS_INTERNAL_USE_ONLY)
 /* This function is only for internal use by the library. */
 static inline jas_ctx_t *jas_get_ctx(void)
 {
 	return JAS_CAST(jas_ctx_t *, jas_get_context());
 }
-//#endif
+#endif
 
 /*!
 @brief
@@ -387,6 +387,20 @@ Set the function to be used for log messages.
 JAS_DLLEXPORT
 void jas_context_set_vlogprintf(jas_context_t context,
   int (*func)(jas_logtype_t, const char *, va_list));
+
+
+static inline int jas_context_get_debug_level(jas_context_t context)
+{
+	jas_ctx_t *ctx = JAS_CAST(jas_ctx_t *, context);
+	return ctx->debug_level;
+}
+
+static inline size_t jas_context_get_dec_default_max_samples(
+  jas_context_t context)
+{
+	jas_ctx_t *ctx = JAS_CAST(jas_ctx_t *, context);
+	return ctx->dec_default_max_samples;
+}
 
 /*!
  * @}

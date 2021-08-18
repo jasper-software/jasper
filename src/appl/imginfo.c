@@ -90,7 +90,8 @@ typedef enum {
 	OPT_DEBUG,
 	OPT_MAXSAMPLES,
 	OPT_MAXMEM,
-	OPT_DECOPT
+	OPT_DECOPT,
+	OPT_SPECIAL,
 } optid_t;
 
 /******************************************************************************\
@@ -114,6 +115,7 @@ static const jas_opt_t opts[] = {
 	{OPT_MAXMEM, "memory-limit", JAS_OPT_HASARG},
 	{OPT_DECOPT, "decoder-option", JAS_OPT_HASARG},
 	{OPT_DECOPT, "o", JAS_OPT_HASARG},
+	{OPT_SPECIAL, "X", 0},
 	{-1, 0, 0}
 };
 
@@ -141,6 +143,7 @@ int main(int argc, char **argv)
 	char optstr[32];
 	char dec_opt_spec[256];
 	int verbose;
+	int special = 0;
 
 	cmdname = argv[0];
 
@@ -183,6 +186,9 @@ int main(int argc, char **argv)
 			strncat(dec_opt_spec, jas_optarg,
 			  sizeof(dec_opt_spec) - 1 - strlen(dec_opt_spec));
 			break;
+		case OPT_SPECIAL:
+			special = 1;
+			break;
 		case OPT_HELP:
 		default:
 			usage();
@@ -210,6 +216,9 @@ int main(int argc, char **argv)
 	jas_conf_set_allocator(&allocator.base);
 	jas_conf_set_max_mem(max_mem);
 	jas_conf_set_debug_level(debug);
+	if (special) {
+		jas_conf_set_vlogprintf(jas_vlogmsgf_discard);
+	}
 	if (jas_initialize()) {
 		fprintf(stderr, "cannot initialize JasPer library\n");
 		exit(EXIT_FAILURE);

@@ -110,49 +110,61 @@ int jas_eprintf(const char *fmt, ...)
 }
 
 /* Generate formatted error log message. */
-int jas_printferror(const char *fmt, ...)
+int jas_logprintf(const char *fmt, ...)
 {
 	int ret;
 	va_list ap;
 	va_start(ap, fmt);
-	ret = jas_vlogprintf(jas_logtype_init(JAS_LOGTYPE_CLASS_ERROR, 0), fmt,
+	ret = jas_vlogmsgf(jas_logtype_init(JAS_LOGTYPE_CLASS_NULL, 0), fmt,
+	  ap);
+	va_end(ap);
+	return ret;
+}
+
+/* Generate formatted error log message. */
+int jas_logerrorf(const char *fmt, ...)
+{
+	int ret;
+	va_list ap;
+	va_start(ap, fmt);
+	ret = jas_vlogmsgf(jas_logtype_init(JAS_LOGTYPE_CLASS_ERROR, 0), fmt,
 	  ap);
 	va_end(ap);
 	return ret;
 }
 
 /* Generate formatted warning log message. */
-int jas_printfwarn(const char *fmt, ...)
+int jas_logwarnf(const char *fmt, ...)
 {
 	int ret;
 	va_list ap;
 	va_start(ap, fmt);
-	ret = jas_vlogprintf(jas_logtype_init(JAS_LOGTYPE_CLASS_WARN, 0), fmt,
+	ret = jas_vlogmsgf(jas_logtype_init(JAS_LOGTYPE_CLASS_WARN, 0), fmt,
 	  ap);
 	va_end(ap);
 	return ret;
 }
 
 /* Generate formatted informational log message. */
-int jas_printfinfo(const char *fmt, ...)
+int jas_loginfof(const char *fmt, ...)
 {
 	int ret;
 	va_list ap;
 	va_start(ap, fmt);
-	ret = jas_vlogprintf(jas_logtype_init(JAS_LOGTYPE_CLASS_INFO, 0), fmt,
+	ret = jas_vlogmsgf(jas_logtype_init(JAS_LOGTYPE_CLASS_INFO, 0), fmt,
 	  ap);
 	va_end(ap);
 	return ret;
 }
 
 /* Generate formatted debugging log message. */
-int jas_printfdebug(const char *fmt, ...)
+int jas_logdebugf(int priority, const char *fmt, ...)
 {
 	int ret;
 	va_list ap;
 	va_start(ap, fmt);
-	ret = jas_vlogprintf(jas_logtype_init(JAS_LOGTYPE_CLASS_DEBUG, 0), fmt,
-	  ap);
+	ret = jas_vlogmsgf(jas_logtype_init(JAS_LOGTYPE_CLASS_DEBUG, priority),
+	  fmt, ap);
 	va_end(ap);
 	return ret;
 }
@@ -162,7 +174,7 @@ int jas_printfdebug(const char *fmt, ...)
 @details
 */
 JAS_DLLEXPORT
-int jas_vlogprintf(jas_logtype_t type, const char *fmt, va_list ap)
+int jas_vlogmsgf(jas_logtype_t type, const char *fmt, va_list ap)
 {
 	int ret;
 	jas_ctx_t *ctx = jas_get_ctx();
@@ -172,15 +184,18 @@ int jas_vlogprintf(jas_logtype_t type, const char *fmt, va_list ap)
 
 /* Perform formatted output to standard error. */
 JAS_DLLEXPORT
-int jas_vlogprintf_stderr(jas_logtype_t type, const char *fmt, va_list ap)
+int jas_vlogmsgf_stderr(jas_logtype_t type, const char *fmt, va_list ap)
 {
-#if 0
+#if 1
 	JAS_UNUSED(type);
 	int result = vfprintf(stderr, fmt, ap);
 	return result;
 #else
 	const char *s = "INVALID";
 	switch (jas_logtype_get_class(type)) {
+	case JAS_LOGTYPE_CLASS_NULL:
+		s = "OTHER";
+		break;
 	case JAS_LOGTYPE_CLASS_ERROR:
 		s = "ERROR";
 		break;
@@ -206,7 +221,7 @@ int jas_vlogprintf_stderr(jas_logtype_t type, const char *fmt, va_list ap)
 
 /* Perform formatted output to standard error. */
 JAS_DLLEXPORT
-int jas_vlogprintf_discard(jas_logtype_t type, const char *fmt, va_list ap)
+int jas_vlogmsgf_discard(jas_logtype_t type, const char *fmt, va_list ap)
 {
 	JAS_UNUSED(type);
 	JAS_CAST(void, fmt);
@@ -228,6 +243,24 @@ int jas_memdump(FILE *out, const void *data, size_t len)
 			}
 		}
 		fprintf(out, "\n");
+	}
+	return 0;
+}
+
+/* Dump memory to a stream. */
+int jas_logmemdump(const void *data, size_t len)
+{
+	size_t i;
+	size_t j;
+	const jas_uchar *dp = data;
+	for (i = 0; i < len; i += 16) {
+		jas_logprintf("%04zx:", i);
+		for (j = 0; j < 16; ++j) {
+			if (i + j < len) {
+				jas_logprintf(" %02x", dp[i + j]);
+			}
+		}
+		jas_logprintf("\n");
 	}
 	return 0;
 }

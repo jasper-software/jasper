@@ -130,8 +130,8 @@ jas_image_t *jas_image_create(unsigned numcmpts, const jas_image_cmptparm_t *cmp
 
 	image = 0;
 
-	JAS_DBGLOG(100, ("jas_image_create(%d, %p, %d)\n", numcmpts, cmptparms,
-	  clrspc));
+	JAS_LOGDEBUGF(100, "jas_image_create(%d, %p, %d)\n", numcmpts, cmptparms,
+	  clrspc);
 
 	if (!(image = jas_image_create0())) {
 		goto error;
@@ -318,7 +318,7 @@ static jas_image_cmpt_t *jas_image_cmpt_create(int_fast32_t tlx,
 	jas_image_cmpt_t *cmpt;
 	size_t size;
 
-	JAS_DBGLOG(100, (
+	JAS_LOGDEBUGF(100,
 	  "jas_image_cmpt_create(%ld, %ld, %ld, %ld, %ld, %ld, %d, %d, %d)\n",
 	  JAS_CAST(long, tlx),
 	  JAS_CAST(long, tly),
@@ -329,7 +329,7 @@ static jas_image_cmpt_t *jas_image_cmpt_create(int_fast32_t tlx,
 	  JAS_CAST(int, depth),
 	  sgnd,
 	  inmem
-	  ));
+	  );
 
 	if (depth < 1U + sgnd) {
 		/* we need at least 1 bit for unsigned samples and 2
@@ -419,7 +419,7 @@ jas_image_t *jas_image_decode(jas_stream_t *in, int fmt, const char *optstr)
 	/* If possible, try to determine the format of the input data. */
 	if (fmt < 0) {
 		if ((fmt = jas_image_getfmt(in)) < 0) {
-			jas_printferror("jas_image_decode: cannot determine image format\n");
+			jas_logerrorf("jas_image_decode: cannot determine image format\n");
 			goto error;
 		}
 	}
@@ -429,13 +429,13 @@ jas_image_t *jas_image_decode(jas_stream_t *in, int fmt, const char *optstr)
 		goto error;
 	}
 	if (!fmtinfo->ops.decode) {
-		jas_printferror("jas_image_decode: no decode operation available\n");
+		jas_logerrorf("jas_image_decode: no decode operation available\n");
 		goto error;
 	}
 
 	/* Decode the image. */
 	if (!(image = (*fmtinfo->ops.decode)(in, optstr))) {
-		jas_printferror("jas_image_decode: decode operation failed\n");
+		jas_logerrorf("jas_image_decode: decode operation failed\n");
 		goto error;
 	}
 
@@ -444,7 +444,7 @@ jas_image_t *jas_image_decode(jas_stream_t *in, int fmt, const char *optstr)
 	  !jas_clrspc_isgeneric(image->clrspc_) && !image->cmprof_) {
 		if (!(image->cmprof_ =
 		  jas_cmprof_createfromclrspc(jas_image_clrspc(image)))) {
-			jas_printferror("jas_image_decode: cannot create CM profile\n");
+			jas_logerrorf("jas_image_decode: cannot create CM profile\n");
 			goto error;
 		}
 	}
@@ -462,7 +462,7 @@ int jas_image_encode(jas_image_t *image, jas_stream_t *out, int fmt,
 {
 	const jas_image_fmtinfo_t *fmtinfo;
 	if (!(fmtinfo = jas_image_lookupfmtbyid(fmt))) {
-		jas_printferror("format lookup failed\n");
+		jas_logerrorf("format lookup failed\n");
 		return -1;
 	}
 	return (fmtinfo->ops.encode) ? (*fmtinfo->ops.encode)(image, out,
@@ -485,9 +485,9 @@ int jas_image_readcmpt(jas_image_t *image, unsigned cmptno, jas_image_coord_t x,
 	jas_seqent_t *dr;
 	jas_seqent_t *d;
 
-	JAS_DBGLOG(100, ("jas_image_readcmpt(%p, %d, %ld, %ld, %ld, %ld, %p)\n",
+	JAS_LOGDEBUGF(100, "jas_image_readcmpt(%p, %d, %ld, %ld, %ld, %ld, %p)\n",
 	  image, cmptno, JAS_CAST(long, x), JAS_CAST(long, y),
-	  JAS_CAST(long, width), JAS_CAST(long, height), data));
+	  JAS_CAST(long, width), JAS_CAST(long, height), data);
 
 	if(data == NULL) {
 		return -1;
@@ -583,9 +583,9 @@ int jas_image_writecmpt(jas_image_t *image, unsigned cmptno, jas_image_coord_t x
 	jas_seqent_t v;
 	int c;
 
-	JAS_DBGLOG(100, ("jas_image_writecmpt(%p, %d, %ld, %ld, %ld, %ld, %p)\n",
+	JAS_LOGDEBUGF(100, "jas_image_writecmpt(%p, %d, %ld, %ld, %ld, %ld, %p)\n",
 	  image, cmptno, JAS_CAST(long, x), JAS_CAST(long, y),
-	  JAS_CAST(long, width), JAS_CAST(long, height), data));
+	  JAS_CAST(long, width), JAS_CAST(long, height), data);
 
 	if (cmptno >= image->numcmpts_) {
 		return -1;
@@ -783,12 +783,12 @@ int jas_image_getfmt(jas_stream_t *in)
 	  ++fmtinfo) {
 		if (fmtinfo->ops.validate) {
 			/* Is the input data valid for this format? */
-			JAS_DBGLOG(20, ("testing for format %s ... ", fmtinfo->name));
+			JAS_LOGDEBUGF(20, "testing for format %s ... ", fmtinfo->name);
 			if (!(*fmtinfo->ops.validate)(in)) {
-				JAS_DBGLOG(20, ("test succeeded\n"));
+				JAS_LOGDEBUGF(20, "test succeeded\n");
 				return fmtinfo->id;
 			}
-			JAS_DBGLOG(20, ("test failed\n"));
+			JAS_LOGDEBUGF(20, "test failed\n");
 		}
 	}
 	return -1;
@@ -1381,7 +1381,7 @@ static inline long decode_twos_comp(jas_ulong c, unsigned prec)
 {
 	long result;
 	assert(prec >= 2);
-	jas_printfwarn("warning: support for signed data is untested\n");
+	jas_logwarnf("warning: support for signed data is untested\n");
 	// NOTE: Is this correct?
 	result = (c & ((1 << (prec - 1)) - 1)) - (c & (1 << (prec - 1)));
 	return result;
@@ -1392,7 +1392,7 @@ static inline jas_ulong encode_twos_comp(long n, unsigned prec)
 {
 	jas_ulong result;
 	assert(prec >= 2);
-	jas_printfwarn("warning: support for signed data is untested\n");
+	jas_logwarnf("warning: support for signed data is untested\n");
 	// NOTE: Is this correct?
 	if (n < 0) {
 		result = -n;
