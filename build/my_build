@@ -9,6 +9,12 @@ panic()
 cmd_dir=$(dirname "$0") || exit 1
 abs_cmd_dir=$(readlink -f "$cmd_dir") || panic
 
+usage()
+{
+	echo "bad usage: $@"
+	exit 2
+}
+
 enable=1
 enable_install=0
 enable_debug=0
@@ -21,26 +27,48 @@ enable_tsan=0
 sde_top_dir=
 configure_only=0
 enable_doc=0
+use_pthread=0
 
-while getopts ZYE:AULTditvCDn opt; do
+while getopts m:PE:AULTditvCDn opt; do
 	case $opt in
+	P)
+		use_pthread=1;;
 	n)
 		enable=0;;
-	Y)
-		enable_tsan=1
-		enable_asan=0
-		enable_lsan=0
-		enable_ubsan=1
-		enable_doc=0
-		enable_debug=1
-		;;
-	Z)
-		enable_tsan=0
-		enable_asan=1
-		enable_lsan=1
-		enable_ubsan=1
-		enable_doc=0
-		enable_debug=1
+	m)
+		case "$OPTARG" in
+		tsan)
+			enable_tsan=1
+			enable_asan=0
+			enable_lsan=0
+			enable_ubsan=1
+			enable_doc=0
+			enable_debug=1
+			enable_install=1
+			use_pthread=1
+			;;
+		debug)
+			enable_tsan=0
+			enable_asan=1
+			enable_lsan=1
+			enable_ubsan=1
+			enable_doc=0
+			enable_debug=1
+			enable_install=1
+			;;
+		release)
+			enable_tsan=0
+			enable_asan=1
+			enable_lsan=1
+			enable_ubsan=1
+			enable_doc=0
+			enable_debug=0
+			enable_install=1
+			;;
+		*)
+			usage
+			;;
+		esac
 		;;
 	A)
 		enable_asan=1;;
@@ -130,6 +158,10 @@ if [ "$enable_doc" -ne 0 ]; then
 	configure_opts+=("-DJAS_ENABLE_DOC=true")
 else
 	configure_opts+=("-DJAS_ENABLE_DOC=false")
+fi
+configure_opts+=("-DCMAKE_VERBOSE_MAKEFILE=true")
+if [ "$use_pthread" -ne 0 ]; then
+	configure_opts+=("-DJAS_PREFER_PTHREAD=true")
 fi
 configure_opts+=("$@")
 command=(cmake "${configure_opts[@]}")

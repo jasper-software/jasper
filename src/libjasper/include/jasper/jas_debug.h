@@ -125,12 +125,18 @@ int jas_setdbglevel(int dbglevel);
 @brief
 Output a log message (for an error, a warning, or other information).
 */
+JAS_DLLEXPORT
 int jas_eprintf(const char *fmt, ...);
 
+JAS_DLLEXPORT
 int jas_logprintf(const char *fmt, ...);
+JAS_DLLEXPORT
 int jas_logerrorf(const char *fmt, ...);
+JAS_DLLEXPORT
 int jas_logwarnf(const char *fmt, ...);
+JAS_DLLEXPORT
 int jas_loginfof(const char *fmt, ...);
+JAS_DLLEXPORT
 int jas_logdebugf(int priority, const char *fmt, ...);
 
 int jas_logmemdump(const void *data, size_t len);

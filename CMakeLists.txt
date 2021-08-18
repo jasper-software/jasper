@@ -86,7 +86,7 @@ cmake_policy(SET CMP0012 NEW)
 ################################################################################
 
 option(JAS_ENABLE_SHARED "Enable building of shared library" true)
-option(JAS_ENABLE_HIDDEN "Hide internal symbols" false)
+option(JAS_ENABLE_HIDDEN "Hide internal symbols" true)
 option(JAS_ENABLE_32BIT "Use 32 bit integers on 64 bit CPUs" false)
 option(JAS_ENABLE_LIBJPEG "Enable the use of the JPEG Library" true)
 option(JAS_ENABLE_OPENGL "Enable the use of the OpenGL/GLUT Library" true)

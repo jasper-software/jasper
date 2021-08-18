@@ -1421,7 +1421,7 @@ static long file_seek(jas_stream_obj_t *obj, long offset, int origin)
 
 static int file_close(jas_stream_obj_t *obj)
 {
-	int ret;
+	int ret = 0;
 	jas_stream_fileobj_t *fileobj;
 	JAS_LOGDEBUGF(100, "file_close(%p)\n", obj);
 	fileobj = JAS_CAST(jas_stream_fileobj_t *, obj);
