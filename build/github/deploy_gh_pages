@@ -70,6 +70,10 @@ usage()
 # Parse command line.
 ################################################################################
 
+program_dir="$(dirname "$0")" || panic
+make_main_gh_page="$program_dir/make_main_gh_page"
+
+latest=0
 branch="gh-pages"
 in_dir=
 repo_name=
@@ -80,8 +84,10 @@ prepare_only=0
 verbose=1
 deploy_mode=
 
-while getopts b:i:r:t:z:fnvqm: opt; do
+while getopts b:i:r:t:z:fnvqm:l opt; do
 	case $opt in
+	l)
+		latest=1;;
 	m)
 		deploy_mode="$OPTARG";;
 	v)
@@ -166,7 +172,7 @@ fi
 tmp_dir="$tmp_dir/deploy"
 
 git_dir="$tmp_dir/git"
-version_dir="$git_dir/$version"
+version_dir="$git_dir/releases/$version"
 github_host="github.com"
 github_user="git"
 
@@ -273,7 +279,10 @@ git -C "$git_dir" config --local user.name "Michael Adams" || \
 git -C "$git_dir" config --local user.email "mdadams@ece.uvic.ca" || \
   panic "cannot set Git user email"
 
+################################################################################
 # Add the content for the new release.
+################################################################################
+
 if [ -e "$version_dir" ]; then
 	panic "directory already exist for $version"
 fi
@@ -282,37 +291,32 @@ mkdir -p "$version_dir" || \
 (cd "$in_dir" && tar -cf - .) | (cd "$version_dir" && tar -xf -) || \
   panic "tar failed"
 
-# Update the symlink for the latest release.
-target="$git_dir/latest"
-if [ -h "$target" -o -e "$target" ]; then
-	rm -f "$target" || panic "rm failed"
+if [ "$latest" -ne 0 ]; then
+	# Update the symlink for the latest release.
+	target="$git_dir/latest"
+	if [ -h "$target" -o -e "$target" ]; then
+		rm -f "$target" || panic "rm failed"
+	fi
+	ln -s "releases/$version/html" "$target" || \
+	  panic "ln failed"
 fi
-ln -s "$version/html" "$target" || \
-  panic "ln failed"
 
-index_html_data='
-<head>
-  <meta http-equiv="refresh" content="0; URL=https://jasper-software.github.io/jasper-manual/latest/" />
-</head>
-<body>
-  <p>If you are not redirected in five seconds, <a href="https://jasper-software.github.io/jasper-manual/latest/">click here</a>.</p>
-</body>
-'
-
-# Add a top-level index.html file to redirect to the latest release.
+# Add a top-level index.html file.
 target="$git_dir/index.html"
 if [ -e "$target" ]; then
 	rm -f "$target" || panic "cannot remove $target"
 fi
-cat > "$target" <<< "$index_html_data" || \
+"$make_main_gh_page" -d "$git_dir" > "$target" || \
   panic "cannot create index.html"
-#cp "$top_dir/sources/index.html" "$target" || panic "cannot copy $target"
 
 if [ "$verbose" -ge 2 ]; then
 	ls -al "$git_dir"/*
 fi
 
+################################################################################
 # Commit and push all of the changes.
+################################################################################
+
 git -C "$git_dir" add . || \
   panic "git add failed"
 git -C "$git_dir" commit -m "Deploying release $version" || \

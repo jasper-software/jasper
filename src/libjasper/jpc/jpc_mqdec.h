@@ -178,7 +178,7 @@ void jpc_mqdec_setctxs(const jpc_mqdec_t *dec, unsigned numctxs, const jpc_mqctx
 \******************************************************************************/
 
 /* Dump the MQ decoder state for debugging. */
-void jpc_mqdec_dump(const jpc_mqdec_t *dec, FILE *out);
+void jpc_mqdec_dump(const jpc_mqdec_t *dec);
 
 /******************************************************************************\
 * EVERYTHING BELOW THIS POINT IS IMPLEMENTATION SPECIFIC AND NOT PART OF THE

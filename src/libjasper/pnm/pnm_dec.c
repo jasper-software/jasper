@@ -73,6 +73,7 @@
 
 #include "pnm_cod.h"
 
+#include "jasper/jas_init.h"
 #include "jasper/jas_types.h"
 #include "jasper/jas_stream.h"
 #include "jasper/jas_image.h"
@@ -130,7 +131,8 @@ static int pnm_dec_parseopts(const char *optstr, pnm_dec_importopts_t *opts)
 {
 	jas_tvparser_t *tvp;
 
-	opts->max_samples = JAS_DEC_DEFAULT_MAX_SAMPLES;
+	jas_context_t context = jas_get_context();
+	opts->max_samples = jas_context_get_dec_default_max_samples(context);
 	opts->allow_trunc = 0;
 
 	if (!(tvp = jas_tvparser_create(optstr ? optstr : ""))) {
@@ -147,7 +149,7 @@ static int pnm_dec_parseopts(const char *optstr, pnm_dec_importopts_t *opts)
 			opts->max_samples = strtoull(jas_tvparser_getval(tvp), 0, 10);
 			break;
 		default:
-			jas_eprintf("warning: ignoring invalid option %s\n",
+			jas_logwarnf("warning: ignoring invalid option %s\n",
 			  jas_tvparser_gettag(tvp));
 			break;
 		}
@@ -174,7 +176,7 @@ jas_image_t *pnm_decode(jas_stream_t *in, const char *optstr)
 
 	image = 0;
 
-	JAS_DBGLOG(10, ("pnm_decode(%p, \"%s\")\n", in, optstr ? optstr : ""));
+	JAS_LOGDEBUGF(10, "pnm_decode(%p, \"%s\")\n", in, optstr ? optstr : "");
 
 	if (pnm_dec_parseopts(optstr, &opts)) {
 		goto error;
@@ -184,11 +186,11 @@ jas_image_t *pnm_decode(jas_stream_t *in, const char *optstr)
 	if (pnm_gethdr(in, &hdr)) {
 		goto error;
 	}
-	JAS_DBGLOG(10, (
+	JAS_LOGDEBUGF(10,
 	  "magic %lx; width %lu; height %ld; numcmpts %d; maxval %ld; sgnd %d\n",
 	  JAS_CAST(unsigned long, hdr.magic), JAS_CAST(long, hdr.width),
 	  JAS_CAST(long, hdr.height), hdr.numcmpts, JAS_CAST(long, hdr.maxval),
-	  hdr.sgnd)
+	  hdr.sgnd
 	  );
 
 	if (hdr.width <= 0 || hdr.height <= 0) {
@@ -197,11 +199,11 @@ jas_image_t *pnm_decode(jas_stream_t *in, const char *optstr)
 
 	if (!jas_safe_size_mul3(hdr.width, hdr.height, hdr.numcmpts,
 	  &num_samples)) {
-		jas_eprintf("image too large\n");
+		jas_logerrorf("image too large\n");
 		goto error;
 	}
 	if (opts.max_samples > 0 && num_samples > opts.max_samples) {
-		jas_eprintf(
+		jas_logerrorf(
 		  "maximum number of samples would be exceeded (%zu > %zu)\n",
 		  num_samples, opts.max_samples);
 		goto error;
@@ -400,7 +402,7 @@ static int pnm_getdata(jas_stream_t *in, pnm_hdr_t *hdr, jas_image_t *image,
 								if (!allow_trunc) {
 									goto done;
 								}
-								jas_eprintf("bad sample data\n");
+								jas_logwarnf("bad sample data\n");
 								sv = 0;
 							}
 							v = sv;
@@ -411,7 +413,7 @@ static int pnm_getdata(jas_stream_t *in, pnm_hdr_t *hdr, jas_image_t *image,
 								if (!allow_trunc) {
 									goto done;
 								}
-								jas_eprintf("bad sample data\n");
+								jas_logwarnf("bad sample data\n");
 								uv = 0;
 							}
 							v = uv;
@@ -425,7 +427,7 @@ static int pnm_getdata(jas_stream_t *in, pnm_hdr_t *hdr, jas_image_t *image,
 								if (!allow_trunc) {
 									goto done;
 								}
-								jas_eprintf("bad sample data\n");
+								jas_logwarnf("bad sample data\n");
 								sv = 0;
 							}
 							v = sv;
@@ -436,7 +438,7 @@ static int pnm_getdata(jas_stream_t *in, pnm_hdr_t *hdr, jas_image_t *image,
 								if (!allow_trunc) {
 									goto done;
 								}
-								jas_eprintf("bad sample data\n");
+								jas_logwarnf("bad sample data\n");
 								uv = 0;
 							}
 							v = uv;
@@ -479,7 +481,7 @@ static int pnm_getsint(jas_stream_t *in, int wordsize, int_fast32_t *val)
 		return -1;
 	}
 	if ((tmpval & (1 << (wordsize - 1))) != 0) {
-		jas_eprintf("PNM decoder does not fully support signed data\n");
+		jas_logerrorf("PNM decoder does not fully support signed data\n");
 		return -1;
 	}
 	if (val) {

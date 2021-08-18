@@ -79,6 +79,11 @@
 extern "C" {
 #endif
 
+/*!
+ * @addtogroup color_management
+ * @{
+ */
+
 /* Profile file signature. */
 #define	JAS_ICC_MAGIC		0x61637370
 
@@ -411,6 +416,10 @@ JAS_DLLEXPORT extern const jas_uchar jas_iccprofdata_sgray[];
 JAS_DLLEXPORT extern const unsigned jas_iccprofdata_sgraylen;
 JAS_DLLEXPORT jas_iccprof_t *jas_iccprof_createfrombuf(const jas_uchar *buf, unsigned len);
 JAS_DLLEXPORT jas_iccprof_t *jas_iccprof_createfromclrspc(unsigned clrspc);
+
+/*!
+ * @}
+ */
 
 #ifdef __cplusplus
 }

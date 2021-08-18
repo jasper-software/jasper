@@ -77,8 +77,13 @@
 #include "jpc_fix.h"
 
 #include "jasper/jas_seq.h"
+#include "jasper/jas_malloc.h"
 
 #include <stdlib.h>
+
+/******************************************************************************\
+* Function prototypes.
+\******************************************************************************/
 
 static int jpc_tsfb_analyze2(jpc_tsfb_t *tsfb, jpc_fix_t *a, int xstart, int ystart,
   unsigned width, unsigned height, unsigned stride, unsigned numlvls);
@@ -98,7 +103,7 @@ jpc_tsfb_t *jpc_cod_gettsfb(unsigned qmfbid, unsigned numlvls)
 {
 	jpc_tsfb_t *tsfb;
 
-	if (!(tsfb = malloc(sizeof(jpc_tsfb_t))))
+	if (!(tsfb = jas_malloc(sizeof(jpc_tsfb_t))))
 		return 0;
 
 	if (numlvls > 0) {
@@ -120,7 +125,7 @@ jpc_tsfb_t *jpc_cod_gettsfb(unsigned qmfbid, unsigned numlvls)
 
 void jpc_tsfb_destroy(jpc_tsfb_t *tsfb)
 {
-	free(tsfb);
+	jas_free(tsfb);
 }
 
 int jpc_tsfb_analyze(jpc_tsfb_t *tsfb, jas_seq2d_t *a)

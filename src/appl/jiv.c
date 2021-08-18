@@ -63,10 +63,12 @@
 * Includes
 \******************************************************************************/
 
-#include <jasper/jasper.h>
 #include <stdlib.h>
 #include <math.h>
 #include <inttypes.h>
+
+#include <jasper/jasper.h>
+
 #if defined(JAS_HAVE_GL_GLUT_H)
 #include <GL/glut.h>
 #else
@@ -226,11 +228,6 @@ int main(int argc, char **argv)
 		cmdname = argv[0];
 	}
 
-	/* Initialize the JasPer library. */
-	if (jas_init()) {
-		abort();
-	}
-
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE);
 	glutCreateWindow(cmdname);
@@ -292,8 +289,31 @@ int main(int argc, char **argv)
 		cmdopts.numfiles = 1;
 	}
 
-#if defined(JAS_DEFAULT_MAX_MEM_USAGE)
+	/* Initialize the JasPer library. */
+#if defined(JAS_USE_JAS_INIT)
+	if (jas_init()) {
+		fprintf(stderr, "cannot initialize JasPer library\n");
+		exit(EXIT_FAILURE);
+	}
 	jas_set_max_mem_usage(cmdopts.max_mem);
+#else
+	jas_conf_clear();
+	static jas_std_allocator_t allocator;
+	jas_std_allocator_init(&allocator);
+	jas_conf_set_allocator(&allocator.base);
+	//jas_conf_set_debug_level(debug);
+	//jas_conf_set_max_mem(max_mem);
+	if (jas_initialize()) {
+		fprintf(stderr, "cannot initialize JasPer library\n");
+		exit(EXIT_FAILURE);
+	}
+	jas_context_t context;
+	if (!(context = jas_context_create())) {
+		fprintf(stderr, "cannot create context\n");
+		exit(EXIT_FAILURE);
+	}
+	jas_set_context(context);
+	atexit(jas_cleanup);
 #endif
 
 	streamin = jas_stream_fdopen(0, "rb");

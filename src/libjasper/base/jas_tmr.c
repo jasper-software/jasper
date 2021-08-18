@@ -69,6 +69,8 @@
 * Includes.
 \******************************************************************************/
 
+#define JAS_INTERNAL_USE_ONLY
+
 #include "jasper/jas_tmr.h"
 
 #include <stdlib.h>

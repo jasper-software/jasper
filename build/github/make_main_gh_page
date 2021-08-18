@@ -1,0 +1,140 @@
+#! /usr/bin/env bash
+
+# Copyright (c) 2021 Michael David Adams.
+# All rights reserved.
+
+################################################################################
+# Some helper functions.
+################################################################################
+
+# Terminate with error.
+panic()
+{
+	echo "ERROR: $@" 1>&2
+	exit 1
+}
+
+eecho()
+{
+	echo "$@" 1>&2
+}
+
+# Print usage information and exit.
+usage()
+{
+	echo "bad usage: $@"
+	exit 2
+}
+
+dir_to_version()
+{
+	local dir="$1"
+	case "$dir" in
+	version-*)
+		sed -e 's/^version-//' <<< "$dir"
+		;;
+	manual-version-*)
+		sed -e 's/^manual-version-//' <<< "$dir"
+		;;
+	*)
+		echo "$dir"
+		;;
+	esac
+}
+
+################################################################################
+# Parse command line.
+################################################################################
+
+in_dir=
+
+while getopts d:o: option; do
+	case $option in
+	d)
+		in_dir="$OPTARG";;
+	\?)
+		usage
+		break;;
+	esac
+done
+shift $((OPTIND - 1))
+
+if [ ! -d "$in_dir" ]; then
+	usage "no input directory specified"
+fi
+
+releases_dir="$in_dir/releases"
+
+official_list=()
+other_list=()
+for path in $releases_dir/*; do
+
+	if [ -d "$path" ]; then
+		base=$(basename "$path") || panic
+		case "$base" in
+		version-*)
+			official_list+=("$base")
+			;;
+		*)
+			other_list+=("$base")
+			;;
+		esac
+	fi
+
+done
+dir_list=("${official_list[@]}" "${other_list[@]}")
+
+title="JasPer Reference Manual"
+
+#index_html_data='
+#<head>
+#  <meta http-equiv="refresh" content="0; URL=https://jasper-software.github.io/jasper-manual/latest/" />
+#</head>
+#<body>
+#  <p>If you are not redirected in five seconds, <a href="https://jasper-software.github.io/jasper-manual/latest/">click here</a>.</p>
+#</body>
+#'
+
+dquote='"'
+echo "
+<!DOCTYPE html PUBLIC"ISO/IEC 15445:2000//DTD HTML//EN">
+<html>
+<head>
+<title>$title</title>
+</head>
+<body>
+<h1>$title</h1>
+"
+
+
+echo "
+<h2>Official Versions</h2>
+"
+
+printf "The following official versions of the manual are available:\n\n"
+printf "<ul>\n"
+for dir in "${official_list[@]}"; do
+	version=$(dir_to_version "$dir") || panic
+	url="releases/$dir/html/index.html"
+	printf "    <li><a href=$dquote$url$dquote>$version</a>\n"
+done
+printf "</ul>\n"
+
+echo "
+<h2>Other Versions</h2>
+"
+
+printf "The following other versions of the manual are available:\n\n"
+printf "<ul>\n"
+for dir in "${other_list[@]}"; do
+	version=$(dir_to_version "$dir") || panic
+	url="releases/$dir/html/index.html"
+	printf "    <li><a href=$dquote$url$dquote>$version</a>\n"
+done
+printf "</ul>\n"
+
+echo "
+</body>
+</html>
+"
+

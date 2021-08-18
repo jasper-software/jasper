@@ -219,9 +219,11 @@ inline static bool jas_safe_size_mul(size_t x, size_t y, size_t *result)
 {
 #if jas_has_builtin(__builtin_mul_overflow) || (defined(__GNUC__) && __GNUC__ > 5)
 	size_t result_buffer;
-	if (!result)
-		result = &result_buffer;
-	return !__builtin_mul_overflow(x, y, result);
+	bool valid = !__builtin_mul_overflow(x, y, &result_buffer);
+	if (valid && result) {
+		*result = result_buffer;
+	}
+	return valid;
 #else
 	/* Check if overflow would occur */
 	if (x && y > SIZE_MAX / x) {
@@ -255,9 +257,11 @@ inline static bool jas_safe_size_add(size_t x, size_t y, size_t *result)
 {
 #if jas_has_builtin(__builtin_add_overflow) || (defined(__GNUC__) && __GNUC__ > 5)
 	size_t result_buffer;
-	if (!result)
-		result = &result_buffer;
-	return !__builtin_add_overflow(x, y, result);
+	bool valid = !__builtin_add_overflow(x, y, &result_buffer);
+	if (valid && result) {
+		*result = result_buffer;
+	}
+	return valid;
 #else
 	if (y > SIZE_MAX - x) {
 		return false;
@@ -274,9 +278,11 @@ inline static bool jas_safe_size_sub(size_t x, size_t y, size_t *result)
 {
 #if jas_has_builtin(__builtin_sub_overflow) || (defined(__GNUC__) && __GNUC__ > 5)
 	size_t result_buffer;
-	if (!result)
-		result = &result_buffer;
-	return !__builtin_sub_overflow(x, y, result);
+	bool valid = !__builtin_sub_overflow(x, y, &result_buffer);
+	if (valid && result) {
+		*result = result_buffer;
+	}
+	return valid;
 #else
 	if (y > x) {
 		return false;
@@ -294,9 +300,11 @@ inline static bool jas_safe_intfast32_mul(int_fast32_t x, int_fast32_t y,
 {
 #if jas_has_builtin(__builtin_mul_overflow) || (defined(__GNUC__) && __GNUC__ > 5)
 	int_fast32_t result_buffer;
-	if (!result)
-		result = &result_buffer;
-	return !__builtin_mul_overflow(x, y, result);
+	bool valid = !__builtin_mul_overflow(x, y, &result_buffer);
+	if (valid && result) {
+		*result = result_buffer;
+	}
+	return valid;
 #else
 	if (x > 0) {
 		/* x is positive */
@@ -353,9 +361,11 @@ inline static bool jas_safe_intfast32_add(int_fast32_t x, int_fast32_t y,
 {
 #if jas_has_builtin(__builtin_add_overflow) || (defined(__GNUC__) && __GNUC__ > 5)
 	int_fast32_t result_buffer;
-	if (!result)
-		result = &result_buffer;
-	return !__builtin_add_overflow(x, y, result);
+	bool valid = !__builtin_add_overflow(x, y, &result_buffer);
+	if (valid && result) {
+		*result = result_buffer;
+	}
+	return valid;
 #else
 	if ((y > 0 && x > INT_FAST32_MAX - y) ||
 	  (y < 0 && x < INT_FAST32_MIN - y)) {

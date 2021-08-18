@@ -74,7 +74,11 @@
 /* The configuration header file should be included first. */
 #include <jasper/jas_config.h>
 
+//#include "jasper/jas_thread.h"
+#include "jasper/jas_init.h"
+
 #include <stdio.h>
+#include <stdarg.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -93,26 +97,74 @@ extern "C" {
 #define	JAS_DBGLOG(n, x)
 #endif
 
-/* Get the library debug level. */
-JAS_ATTRIBUTE_CONST
-JAS_DLLEXPORT int jas_getdbglevel(void);
+#if !defined(NDEBUG)
+#define	JAS_LOGDEBUGF(n, ...) \
+	((jas_getdbglevel() >= (n)) ? jas_logdebugf((n), __VA_ARGS__) : 0)
+#else
+#define	JAS_LOGDEBUGF(n, ...)
+#endif
 
-/* Set the library debug level. */
-JAS_DLLEXPORT int jas_setdbglevel(int dbglevel);
+/*
+@brief
+Get the library debug level.
+*/
+static inline
+int jas_getdbglevel(void)
+{
+	return jas_context_get_debug_level(jas_get_context());
+}
 
-/* Perform formatted output to standard error. */
-JAS_DLLEXPORT int jas_eprintf(const char *fmt, ...);
+/*
+@brief
+Set the library debug level.
+*/
+JAS_DLLEXPORT
+int jas_setdbglevel(int dbglevel);
 
-/* Dump memory to a stream. */
-JAS_DLLEXPORT int jas_memdump(FILE *out, const void *data, size_t len);
+/*
+@brief
+Output a log message (for an error, a warning, or other information).
+*/
+JAS_DLLEXPORT
+int jas_eprintf(const char *fmt, ...);
 
-/* Warn about use of deprecated functionality. */
-JAS_DLLEXPORT void jas_deprecated(const char *s);
+JAS_DLLEXPORT
+int jas_logprintf(const char *fmt, ...);
+JAS_DLLEXPORT
+int jas_logerrorf(const char *fmt, ...);
+JAS_DLLEXPORT
+int jas_logwarnf(const char *fmt, ...);
+JAS_DLLEXPORT
+int jas_loginfof(const char *fmt, ...);
+JAS_DLLEXPORT
+int jas_logdebugf(int priority, const char *fmt, ...);
 
-/* Convert to a string literal */
+int jas_logmemdump(const void *data, size_t len);
+
+/*!
+@brief
+Dump memory to a stream.
+*/
+JAS_DLLEXPORT
+int jas_memdump(FILE *out, const void *data, size_t len);
+
+/*!
+@brief
+Warn about the use of deprecated functionality.
+*/
+JAS_DLLEXPORT
+void jas_deprecated(const char *s);
+
+/*!
+@brief
+Convert to a string literal.
+*/
 #define JAS_STRINGIFY(x) #x
 
-/* Convert to a string literal after macro expansion */
+/*!
+@brief
+Convert to a string literal after macro expansion.
+*/
 #define JAS_STRINGIFYX(x) JAS_STRINGIFY(x)
 
 #ifdef __cplusplus

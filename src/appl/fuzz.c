@@ -63,7 +63,6 @@
 \******************************************************************************/
 
 #include <jasper/jasper.h>
-#include <jasper/jas_debug.h>
 
 #include <stdio.h>
 #include <stdlib.h>

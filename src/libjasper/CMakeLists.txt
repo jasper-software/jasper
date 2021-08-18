@@ -14,12 +14,14 @@ set(libjasper_headers
 	include/jasper/jas_icc.h
 	include/jasper/jas_image.h
 	include/jasper/jas_init.h
+	include/jasper/jas_log.h
 	include/jasper/jas_malloc.h
 	include/jasper/jas_math.h
 	include/jasper/jasper.h
 	include/jasper/jas_seq.h
 	include/jasper/jas_stream.h
 	include/jasper/jas_string.h
+	include/jasper/jas_thread.h
 	include/jasper/jas_tmr.h
 	include/jasper/jas_tvp.h
 	include/jasper/jas_types.h
@@ -67,6 +69,7 @@ if (JAS_INCLUDE_JPC_CODEC)
 	set(libjasper_jpc_sources
 		jpc/jpc_bs.c
 		jpc/jpc_cs.c
+		jpc/jpc_cod.c
 		jpc/jpc_dec.c
 		jpc/jpc_enc.c
 		jpc/jpc_math.c

@@ -65,16 +65,27 @@
  * $Id$
  */
 
+/******************************************************************************\
+* Includes.
+\******************************************************************************/
+
+#define JAS_INTERNAL_USE_ONLY
+
 #include "jasper/jas_cm.h"
 #include "jasper/jas_icc.h"
 #include "jasper/jas_malloc.h"
 #include "jasper/jas_math.h"
+#include "jasper/jas_debug.h"
 
 #include <assert.h>
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+
+/******************************************************************************\
+* Function prototypes.
+\******************************************************************************/
 
 static jas_cmprof_t *jas_cmprof_create(void);
 static void jas_cmshapmatlut_cleanup(jas_cmshapmatlut_t *);
@@ -106,6 +117,10 @@ static int jas_cmshapmat_invmat(jas_cmreal_t out[3][4], jas_cmreal_t in[3][4]);
 static int jas_cmpxformseq_insertpxform(jas_cmpxformseq_t *pxformseq,
   int i, jas_cmpxform_t *pxform);
 
+/******************************************************************************\
+* Function prototypes.
+\******************************************************************************/
+
 #define	SEQFWD(intent)	(intent)
 #define	SEQREV(intent)	(4 + (intent))
 #define	SEQSIM(intent)	(8 + (intent))
@@ -133,9 +148,13 @@ static jas_cmpxform_t *jas_cmpxform_create0(void);
 static jas_cmpxform_t *jas_cmpxform_createshapmat(void);
 static void jas_cmshapmatlut_init(jas_cmshapmatlut_t *lut);
 static int jas_cmshapmatlut_set(jas_cmshapmatlut_t *lut, const jas_icccurv_t *curv);
+static jas_cmprof_t *jas_cmprof_createsycc(void);
+
+/******************************************************************************\
+*
+\******************************************************************************/
 
 static const jas_cmpxformops_t shapmat_ops = {jas_cmshapmat_destroy, jas_cmshapmat_apply, 0};
-static jas_cmprof_t *jas_cmprof_createsycc(void);
 
 /******************************************************************************\
 * Color profile class.
@@ -972,10 +991,12 @@ assert(0);
 		invlut->data[i] = sx;
 	}
 #if 0
-for (i=0;i<lut->size;++i)
-	jas_eprintf("lut[%d]=%f ", i, lut->data[i]);
-for (i=0;i<invlut->size;++i)
-	jas_eprintf("invlut[%d]=%f ", i, invlut->data[i]);
+	for (i=0;i<lut->size;++i) {
+		jas_eprintf("lut[%d]=%f ", i, lut->data[i]);
+	}
+	for (i=0;i<invlut->size;++i) {
+		jas_eprintf("invlut[%d]=%f ", i, invlut->data[i]);
+	}
 #endif
 	return 0;
 }
@@ -987,7 +1008,7 @@ static int jas_cmshapmat_invmat(jas_cmreal_t out[3][4], jas_cmreal_t in[3][4])
 	  - in[0][1] * (in[1][0] * in[2][2] - in[1][2] * in[2][0])
 	  + in[0][2] * (in[1][0] * in[2][1] - in[1][1] * in[2][0]);
 #if 0
-jas_eprintf("delta=%f\n", d);
+	jas_eprintf("delta=%f\n", d);
 #endif
 	if (JAS_ABS(d) < 1e-6)
 		return -1;
@@ -1004,14 +1025,14 @@ jas_eprintf("delta=%f\n", d);
 	out[1][3] = -in[1][3];
 	out[2][3] = -in[2][3];
 #if 0
-jas_eprintf("[ %f %f %f %f ]\n[ %f %f %f %f ]\n[ %f %f %f %f ]\n",
-in[0][0], in[0][1], in[0][2], in[0][3],
-in[1][0], in[1][1], in[1][2], in[1][3],
-in[2][0], in[2][1], in[2][2], in[2][3]);
-jas_eprintf("[ %f %f %f %f ]\n[ %f %f %f %f ]\n[ %f %f %f %f ]\n",
-out[0][0], out[0][1], out[0][2], out[0][3],
-out[1][0], out[1][1], out[1][2], out[1][3],
-out[2][0], out[2][1], out[2][2], out[2][3]);
+	jas_eprintf("[ %f %f %f %f ]\n[ %f %f %f %f ]\n[ %f %f %f %f ]\n",
+	  in[0][0], in[0][1], in[0][2], in[0][3],
+	  in[1][0], in[1][1], in[1][2], in[1][3],
+	  in[2][0], in[2][1], in[2][2], in[2][3]);
+	jas_eprintf("[ %f %f %f %f ]\n[ %f %f %f %f ]\n[ %f %f %f %f ]\n",
+	  out[0][0], out[0][1], out[0][2], out[0][3],
+	  out[1][0], out[1][1], out[1][2], out[1][3],
+	  out[2][0], out[2][1], out[2][2], out[2][3]);
 #endif
 	return 0;
 }

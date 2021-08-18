@@ -133,6 +133,10 @@ static void jpc_qmfb_join_colgrp(jpc_fix_t *a, unsigned numrows, unsigned stride
 static void jpc_qmfb_join_colres(jpc_fix_t *a, unsigned numrows, unsigned numcols, unsigned stride,
   bool parity);
 
+/******************************************************************************\
+* Data.
+\******************************************************************************/
+
 static const double jpc_ft_lpenergywts[32] = {
 	1.2247448713915889,
 	1.6583123951776999,

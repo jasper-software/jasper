@@ -188,10 +188,6 @@ int main(int argc, char **argv)
 	size_t max_mem = JAS_DEFAULT_MAX_MEM_USAGE;
 #endif
 
-	if (jas_init()) {
-		abort();
-	}
-
 	cmdname = argv[0];
 
 	/* Parse the command line options. */
@@ -238,6 +234,34 @@ int main(int argc, char **argv)
 		cmdinfo();
 	}
 
+#if defined(JAS_USE_JAS_INIT)
+	if (jas_init()) {
+		fprintf(stderr, "cannot initialize JasPer library\n");
+		exit(EXIT_FAILURE);
+	}
+	jas_set_max_mem_usage(max_mem);
+#else
+	jas_conf_clear();
+	static jas_std_allocator_t allocator;
+	jas_std_allocator_init(&allocator);
+	jas_conf_set_allocator(&allocator.base);
+	jas_conf_set_max_mem(max_mem);
+	//jas_conf_set_debug_level(debug);
+	if (jas_initialize()) {
+		fprintf(stderr, "cannot initialize JasPer library\n");
+		exit(EXIT_FAILURE);
+	}
+
+	jas_context_t context;
+	if (!(context = jas_context_create())) {
+		fprintf(stderr, "cannot create context\n");
+		exit(EXIT_FAILURE);
+	}
+	jas_set_context(context);
+
+	atexit(jas_cleanup);
+#endif
+
 	/* Ensure that files are given for both the original and reconstructed
 	  images. */
 	if (!origpath || !reconpath) {
@@ -251,10 +275,6 @@ int main(int argc, char **argv)
 			usage();
 		}
 	}
-
-#if defined(JAS_DEFAULT_MAX_MEM_USAGE)
-	jas_set_max_mem_usage(max_mem);
-#endif
 
 	/* Open the original image file. */
 	if (!(origstream = jas_stream_fopen(origpath, "rb"))) {
@@ -386,7 +406,20 @@ int main(int argc, char **argv)
 
 	jas_image_destroy(origimage);
 	jas_image_destroy(reconimage);
+	/*
+	The following function call is not needed.
+	It is only here for testing backward compatibility.
+	*/
 	jas_image_clearfmts();
+
+#if !defined(JAS_USE_JAS_INIT)
+	/*
+	Stop using the context that is about to be destroyed.
+	Then, destroy the context.
+	*/
+	jas_set_context(0);
+	jas_context_destroy(context);
+#endif
 
 	return EXIT_SUCCESS;
 }

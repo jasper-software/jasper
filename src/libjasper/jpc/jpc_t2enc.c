@@ -180,8 +180,8 @@ int jpc_enc_encpkt(jpc_enc_t *enc, jas_stream_t *out, unsigned compno, unsigned 
 	jpc_enc_cp_t *cp;
 	jpc_ms_t *ms;
 
-	JAS_DBGLOG(10, ("encoding packet begin %d %d %d %d\n", compno, lvlno,
-	  prcno, lyrno));
+	JAS_LOGDEBUGF(10, "encoding packet begin %d %d %d %d\n", compno, lvlno,
+	  prcno, lyrno);
 
 	tile = enc->curtile;
 	cp = enc->cp;
@@ -204,8 +204,7 @@ int jpc_enc_encpkt(jpc_enc_t *enc, jas_stream_t *out, unsigned compno, unsigned 
 	if (jpc_bitstream_putbit(outb, 1) == EOF) {
 		goto error_close;
 	}
-	//JAS_DBGLOG(10, ("\n"));
-	JAS_DBGLOG(10, ("present.\n"));
+	JAS_LOGDEBUGF(10, "present.\n");
 
 	comp = &tile->tcmpts[compno];
 	lvl = &comp->rlvls[lvlno];
@@ -251,7 +250,7 @@ int jpc_enc_encpkt(jpc_enc_t *enc, jas_stream_t *out, unsigned compno, unsigned 
 					goto error_close;
 				}
 			}
-			JAS_DBGLOG(10, ("included=%d ", included));
+			JAS_LOGDEBUGF(10, "included=%d ", included);
 			if (!included) {
 				continue;
 			}
@@ -281,7 +280,7 @@ int jpc_enc_encpkt(jpc_enc_t *enc, jas_stream_t *out, unsigned compno, unsigned 
 			if (jpc_putnumnewpasses(outb, numnewpasses)) {
 				goto error_close;
 			}
-			JAS_DBGLOG(10, ("numnewpasses=%d ", numnewpasses));
+			JAS_LOGDEBUGF(10, "numnewpasses=%d ", numnewpasses);
 
 			lastpass = endpass - 1;
 			unsigned n = startpass->start;
@@ -383,7 +382,7 @@ int jpc_enc_encpkt(jpc_enc_t *enc, jas_stream_t *out, unsigned compno, unsigned 
 		}
 	}
 
-	JAS_DBGLOG(10, ("encoding packet end\n"));
+	JAS_LOGDEBUGF(10, "encoding packet end\n");
 
 	return 0;
 

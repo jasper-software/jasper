@@ -202,7 +202,7 @@ int jpc_mqenc_flush(jpc_mqenc_t *enc, int termmode);
 * Functions/macros for debugging.
 \******************************************************************************/
 
-int jpc_mqenc_dump(const jpc_mqenc_t *mqenc, FILE *out);
+int jpc_mqenc_dump(const jpc_mqenc_t *mqenc);
 
 /******************************************************************************\
 * Implementation-specific details.

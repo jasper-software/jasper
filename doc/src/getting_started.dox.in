@@ -3,11 +3,9 @@
 \page getting_started Getting Started
 
 The following sections are useful for getting started with the JasPer software:
-<ul>
-	<li>\subpage install. Describes how to install the JasPer software.
-	<li>\subpage organization. Briefly explains the organization of the
+  - \subpage install. Describes how to install the JasPer software.
+  - \subpage organization. Briefly explains the organization of the
 	manual (e.g., where to find things).
-</ul>
 
 */
 
@@ -16,7 +14,7 @@ The following sections are useful for getting started with the JasPer software:
 \page organization Organization of the Manual
 
 The library is partitioned into groups of related code called modules.
-The documentation is also parititioned in this way.
+The documentation is also partitioned in this way.
 The documentation for each of the various modules can be found in the
 <a href="modules.html">modules page</a>.
 

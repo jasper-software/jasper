@@ -1,6 +1,4 @@
 /*
- * Copyright (c) 1999-2000 Image Power, Inc. and the University of
- *   British Columbia.
  * Copyright (c) 2001-2002 Michael David Adams.
  * All rights reserved.
  */
@@ -61,22 +59,106 @@
  * __END_OF_JASPER_LICENSE__
  */
 
-/*
- * $Id$
+/*!
+ * @file jas_debug.h
+ * @brief JasPer Debugging-Related Functionality
  */
 
-#ifndef JPC_COD_H
-#define JPC_COD_H
-
-#include "jpc_t1cod.h"
+#ifndef JAS_LOG_H
+#define JAS_LOG_H
 
 /******************************************************************************\
-* Constants.
+* Includes.
 \******************************************************************************/
 
-/* The nominal word size used by this implementation. */
-#define	JPC_PREC	32
+/* The configuration header file should be included first. */
+#include <jasper/jas_config.h>
 
-void jpc_init(void);
+#include <stdio.h>
+#include <stdarg.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/*!
+ * @addtogroup logging
+ * @{
+ */
+
+/******************************************************************************\
+* Macros and functions.
+\******************************************************************************/
+
+/*! Log type class for unclassified messages. */
+#define JAS_LOGTYPE_CLASS_NULL 0
+/*! Log type class for errors. */
+#define JAS_LOGTYPE_CLASS_ERROR 1
+/*! Log type class for warnings. */
+#define JAS_LOGTYPE_CLASS_WARN 2
+/*! Log type class for informational messages. */
+#define JAS_LOGTYPE_CLASS_INFO 3
+/*! Log type class for debugging messages. */
+#define JAS_LOGTYPE_CLASS_DEBUG 4
+#define JAS_LOGTYPE_NUM_CLASSES 5
+
+#define JAS_LOGTYPE_MAX_PRIORITY 16384
+
+/*!
+@brief Type used for the log type.
+*/
+typedef unsigned int jas_logtype_t;
+
+/*!
+@brief Create an instance of a logtype.
+*/
+static inline jas_logtype_t jas_logtype_init(int class, int priority)
+{
+	assert(class >= 0 && class < JAS_LOGTYPE_NUM_CLASSES);
+	assert(priority >= 0 && priority <= JAS_LOGTYPE_MAX_PRIORITY);
+	return (class & 0xf) | (priority << 4);
+}
+
+/*!
+@brief Get the class of a logtype.
+*/
+static inline int jas_logtype_get_class(jas_logtype_t type)
+{
+	return type & 0xf;
+}
+
+/*!
+@brief Get the priority of a logtype.
+*/
+static inline int jas_logtype_get_priority(jas_logtype_t type)
+{
+	return type >> 4;
+}
+
+/*!
+@brief Print formatted log message.
+*/
+JAS_DLLEXPORT
+int jas_vlogmsgf(jas_logtype_t type, const char *fmt, va_list ap);
+
+/*!
+@brief Output a log message to standard error.
+*/
+JAS_DLLEXPORT
+int jas_vlogmsgf_stderr(jas_logtype_t type, const char *fmt, va_list ap);
+
+/*!
+@brief Output a log message to nowhere (i.e., discard the message).
+*/
+JAS_DLLEXPORT
+int jas_vlogmsgf_discard(jas_logtype_t type, const char *fmt, va_list ap);
+
+/*!
+ * @}
+ */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

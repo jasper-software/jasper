@@ -90,7 +90,8 @@ typedef enum {
 	OPT_DEBUG,
 	OPT_MAXSAMPLES,
 	OPT_MAXMEM,
-	OPT_DECOPT
+	OPT_DECOPT,
+	OPT_SPECIAL,
 } optid_t;
 
 /******************************************************************************\
@@ -111,11 +112,10 @@ static const jas_opt_t opts[] = {
 	{OPT_INFILE, "f", JAS_OPT_HASARG},
 	{OPT_DEBUG, "debug-level", JAS_OPT_HASARG},
 	{OPT_MAXSAMPLES, "max-samples", JAS_OPT_HASARG},
-#if defined(JAS_DEFAULT_MAX_MEM_USAGE)
 	{OPT_MAXMEM, "memory-limit", JAS_OPT_HASARG},
-#endif
 	{OPT_DECOPT, "decoder-option", JAS_OPT_HASARG},
 	{OPT_DECOPT, "o", JAS_OPT_HASARG},
+	{OPT_SPECIAL, "X", 0},
 	{-1, 0, 0}
 };
 
@@ -142,27 +142,24 @@ int main(int argc, char **argv)
 	bool max_samples_valid;
 	char optstr[32];
 	char dec_opt_spec[256];
-
-	if (jas_init()) {
-		abort();
-	}
+	int verbose;
+	int special = 0;
 
 	cmdname = argv[0];
 
+	verbose = 0;
 	max_samples = 0;
 	max_samples_valid = false;
 	infile = 0;
 	debug = 0;
-#if defined(JAS_DEFAULT_MAX_MEM_USAGE)
 	size_t max_mem = JAS_DEFAULT_MAX_MEM_USAGE;
-#endif
 	dec_opt_spec[0] = '\0';
 
 	/* Parse the command line options. */
 	while ((id = jas_getopt(argc, argv, opts)) >= 0) {
 		switch (id) {
 		case OPT_VERBOSE:
-			/* not used - can we remove this option? */
+			++verbose;
 			break;
 		case OPT_VERSION:
 			printf("%s\n", JAS_VERSION);
@@ -179,9 +176,7 @@ int main(int argc, char **argv)
 			max_samples_valid = true;
 			break;
 		case OPT_MAXMEM:
-#if defined(JAS_DEFAULT_MAX_MEM_USAGE)
 			max_mem = strtoull(jas_optarg, 0, 10);
-#endif
 			break;
 		case OPT_DECOPT:
 			if (dec_opt_spec[0] != '\0') {
@@ -191,6 +186,9 @@ int main(int argc, char **argv)
 			strncat(dec_opt_spec, jas_optarg,
 			  sizeof(dec_opt_spec) - 1 - strlen(dec_opt_spec));
 			break;
+		case OPT_SPECIAL:
+			special = 1;
+			break;
 		case OPT_HELP:
 		default:
 			usage();
@@ -198,10 +196,44 @@ int main(int argc, char **argv)
 		}
 	}
 
-	jas_setdbglevel(debug);
-#if defined(JAS_DEFAULT_MAX_MEM_USAGE)
+#if defined(JAS_USE_JAS_INIT)
+	if (verbose >= 1) {
+		fprintf(stderr, "using jas_init\n");
+	}
+	if (jas_init()) {
+		fprintf(stderr, "cannot initialize JasPer library\n");
+		exit(EXIT_FAILURE);
+	}
 	jas_set_max_mem_usage(max_mem);
+	jas_setdbglevel(debug);
+#else
+	if (verbose >= 1) {
+		fprintf(stderr, "using jas_init_custom\n");
+	}
+	jas_conf_clear();
+	static jas_std_allocator_t allocator;
+	jas_std_allocator_init(&allocator);
+	jas_conf_set_allocator(&allocator.base);
+	jas_conf_set_max_mem(max_mem);
+	jas_conf_set_debug_level(debug);
+	if (special) {
+		jas_conf_set_vlogprintf(jas_vlogmsgf_discard);
+	}
+	if (jas_initialize()) {
+		fprintf(stderr, "cannot initialize JasPer library\n");
+		exit(EXIT_FAILURE);
+	}
+	jas_context_t context;
+	if (!(context = jas_context_create())) {
+		fprintf(stderr, "cannot create context\n");
+		exit(EXIT_FAILURE);
+	}
+	jas_set_context(context);
+	atexit(jas_cleanup);
 #endif
+
+//#if defined(JAS_DEFAULT_MAX_MEM_USAGE)
+//#endif
 
 	/* Open the image file. */
 	if (infile) {
@@ -264,7 +296,16 @@ int main(int argc, char **argv)
 	  JAS_CAST(long, jas_image_rawsize(image)));
 
 	jas_image_destroy(image);
-	jas_image_clearfmts();
+	//jas_image_clearfmts();
+
+#if !defined(JAS_USE_JAS_INIT)
+	/*
+	Stop using the context that is about to be destroyed.
+	Then, destroy the context.
+	*/
+	jas_set_context(0);
+	jas_context_destroy(context);
+#endif
 
 	return EXIT_SUCCESS;
 }
@@ -285,9 +326,28 @@ static void cmdinfo()
 
 static void usage()
 {
+	static const char help[] = {
+		"Options:\n"
+		"    --help\n"
+		"    --memory-limit $n\n"
+		"        Set the memory limit to $n bytes.\n"
+		"    --debug-level $level\n"
+		"        Set the debug level to $level\n"
+		"    --max-samples $n\n"
+		"        Set the maximum number of samples for decoding to $n\n"
+		"    --decoder-option $string\n"
+		"        Add the option $string to the list of decoder options.\n"
+		"    --verbose\n"
+		"        Increase the verbosity level.\n"
+		"    --version\n"
+		"        Display the version information and exit.\n"
+		"    -f $file\n"
+		"        Read the input image from the file $file.\n"
+	};
 	cmdinfo();
 	fprintf(stderr, "usage:\n");
 	fprintf(stderr,"%s ", cmdname);
 	fprintf(stderr, "[-f image_file]\n");
+	fputs(help, stderr);
 	exit(EXIT_FAILURE);
 }

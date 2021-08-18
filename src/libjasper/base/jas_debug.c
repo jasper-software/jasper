@@ -63,18 +63,15 @@
 * Includes.
 \******************************************************************************/
 
+#define JAS_INTERNAL_USE_ONLY
+
+#include "jasper/jas_init.h"
 #include "jasper/jas_debug.h"
 #include "jasper/jas_types.h"
+#include "jasper/jas_log.h"
 
 #include <stdarg.h>
 #include <stdio.h>
-
-/******************************************************************************\
-* Local data.
-\******************************************************************************/
-
-static int jas_dbglevel = 0;
-/* The debug level. */
 
 /******************************************************************************\
 * Code for getting/setting the debug level.
@@ -85,20 +82,16 @@ int jas_setdbglevel(int dbglevel)
 {
 	int olddbglevel;
 
+	jas_ctx_t *ctx = jas_get_ctx();
+
 	/* Save the old debug level. */
-	olddbglevel = jas_dbglevel;
+	olddbglevel = ctx->debug_level;
 
 	/* Change the debug level. */
-	jas_dbglevel = dbglevel;
+	ctx->debug_level = dbglevel;
 
 	/* Return the old debug level. */
 	return olddbglevel;
-}
-
-/* Get the library debug level. */
-int jas_getdbglevel()
-{
-	return jas_dbglevel;
 }
 
 /******************************************************************************\
@@ -110,11 +103,130 @@ int jas_eprintf(const char *fmt, ...)
 {
 	int ret;
 	va_list ap;
-
 	va_start(ap, fmt);
 	ret = vfprintf(stderr, fmt, ap);
 	va_end(ap);
 	return ret;
+}
+
+/* Generate formatted error log message. */
+int jas_logprintf(const char *fmt, ...)
+{
+	int ret;
+	va_list ap;
+	va_start(ap, fmt);
+	ret = jas_vlogmsgf(jas_logtype_init(JAS_LOGTYPE_CLASS_NULL, 0), fmt,
+	  ap);
+	va_end(ap);
+	return ret;
+}
+
+/* Generate formatted error log message. */
+int jas_logerrorf(const char *fmt, ...)
+{
+	int ret;
+	va_list ap;
+	va_start(ap, fmt);
+	ret = jas_vlogmsgf(jas_logtype_init(JAS_LOGTYPE_CLASS_ERROR, 0), fmt,
+	  ap);
+	va_end(ap);
+	return ret;
+}
+
+/* Generate formatted warning log message. */
+int jas_logwarnf(const char *fmt, ...)
+{
+	int ret;
+	va_list ap;
+	va_start(ap, fmt);
+	ret = jas_vlogmsgf(jas_logtype_init(JAS_LOGTYPE_CLASS_WARN, 0), fmt,
+	  ap);
+	va_end(ap);
+	return ret;
+}
+
+/* Generate formatted informational log message. */
+int jas_loginfof(const char *fmt, ...)
+{
+	int ret;
+	va_list ap;
+	va_start(ap, fmt);
+	ret = jas_vlogmsgf(jas_logtype_init(JAS_LOGTYPE_CLASS_INFO, 0), fmt,
+	  ap);
+	va_end(ap);
+	return ret;
+}
+
+/* Generate formatted debugging log message. */
+int jas_logdebugf(int priority, const char *fmt, ...)
+{
+	int ret;
+	va_list ap;
+	va_start(ap, fmt);
+	ret = jas_vlogmsgf(jas_logtype_init(JAS_LOGTYPE_CLASS_DEBUG, priority),
+	  fmt, ap);
+	va_end(ap);
+	return ret;
+}
+
+/*!
+@brief
+@details
+*/
+JAS_DLLEXPORT
+int jas_vlogmsgf(jas_logtype_t type, const char *fmt, va_list ap)
+{
+	int ret;
+	jas_ctx_t *ctx = jas_get_ctx();
+	ret = (ctx->vlogprintf)(type, fmt, ap);
+	return ret;
+}
+
+/* Perform formatted output to standard error. */
+JAS_DLLEXPORT
+int jas_vlogmsgf_stderr(jas_logtype_t type, const char *fmt, va_list ap)
+{
+#if 1
+	JAS_UNUSED(type);
+	int result = vfprintf(stderr, fmt, ap);
+	return result;
+#else
+	const char *s = "INVALID";
+	switch (jas_logtype_get_class(type)) {
+	case JAS_LOGTYPE_CLASS_NULL:
+		s = "OTHER";
+		break;
+	case JAS_LOGTYPE_CLASS_ERROR:
+		s = "ERROR";
+		break;
+	case JAS_LOGTYPE_CLASS_WARN:
+		s = "WARNING";
+		break;
+	case JAS_LOGTYPE_CLASS_INFO:
+		s = "INFO";
+		break;
+	case JAS_LOGTYPE_CLASS_DEBUG:
+		s = "DEBUG";
+		break;
+	}
+	int r1 = fprintf(stderr, "%s: ", s);
+	int r2 = vfprintf(stderr, fmt, ap);
+	int result = -1;
+	if (r1 > 0 && r2 > 0) {
+		result = r1 + r2;
+	}
+	return result;
+#endif
+}
+
+/* Perform formatted output to standard error. */
+JAS_DLLEXPORT
+int jas_vlogmsgf_discard(jas_logtype_t type, const char *fmt, va_list ap)
+{
+	JAS_UNUSED(type);
+	JAS_CAST(void, fmt);
+	JAS_CAST(void, ap);
+	return 0;
 }
 
 /* Dump memory to a stream. */
@@ -135,6 +247,24 @@ int jas_memdump(FILE *out, const void *data, size_t len)
 	return 0;
 }
 
+/* Dump memory to a stream. */
+int jas_logmemdump(const void *data, size_t len)
+{
+	size_t i;
+	size_t j;
+	const jas_uchar *dp = data;
+	for (i = 0; i < len; i += 16) {
+		jas_logprintf("%04zx:", i);
+		for (j = 0; j < 16; ++j) {
+			if (i + j < len) {
+				jas_logprintf(" %02x", dp[i + j]);
+			}
+		}
+		jas_logprintf("\n");
+	}
+	return 0;
+}
+
 /******************************************************************************\
 * Code.
 \******************************************************************************/
@@ -151,5 +281,4 @@ void jas_deprecated(const char *s)
 	;
 	jas_eprintf("%s", message);
 	jas_eprintf("The specific problem is as follows:\n%s\n", s);
-	//abort();
 }

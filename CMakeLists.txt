@@ -15,9 +15,9 @@ include(CheckCCompilerFlag)
 ################################################################################
 
 # The major, minor, and micro version numbers of the project.
-set(JAS_VERSION_MAJOR 2)
+set(JAS_VERSION_MAJOR 3)
 set(JAS_VERSION_MINOR 0)
-set(JAS_VERSION_PATCH 33)
+set(JAS_VERSION_PATCH 0)
 
 # The project version.
 set(JAS_VERSION
@@ -86,13 +86,16 @@ cmake_policy(SET CMP0012 NEW)
 ################################################################################
 
 option(JAS_ENABLE_SHARED "Enable building of shared library" true)
-option(JAS_ENABLE_HIDDEN "Hide internal symbols" false)
+option(JAS_ENABLE_HIDDEN "Hide internal symbols" true)
 option(JAS_ENABLE_32BIT "Use 32 bit integers on 64 bit CPUs" false)
 option(JAS_ENABLE_LIBJPEG "Enable the use of the JPEG Library" true)
 option(JAS_ENABLE_OPENGL "Enable the use of the OpenGL/GLUT Library" true)
 option(JAS_ENABLE_AUTOMATIC_DEPENDENCIES "Enable automatic dependencies" true)
 option(JAS_ENABLE_DOC "Enable building of the documentation" true)
 option(JAS_ENABLE_PROGRAMS "Enable building of the programs" true)
+option(JAS_ENABLE_MULTITHREADING_SUPPORT "Enable multithreading support" true)
+option(JAS_PREFER_PTHREAD
+  "Prefer POSIX Threading Library (over C11) for threading support" false)
 
 option(JAS_INCLUDE_PNM_CODEC "Include PNM codec support" true)
 option(JAS_INCLUDE_BMP_CODEC "Include BMP codec support" true)
@@ -102,6 +105,24 @@ option(JAS_INCLUDE_JPC_CODEC "Include JPC codec support" true)
 option(JAS_INCLUDE_JPG_CODEC "Include JPG codec support" true)
 option(JAS_INCLUDE_PGX_CODEC "Include PGX codec support" true)
 option(JAS_INCLUDE_MIF_CODEC "Include MIF codec support" true)
+
+set(JAS_ENABLE_DEFAULT_MAX_MEM_USAGE
+  "1073741824"
+  CACHE STRING
+  "Set memory usage limit in bytes"
+)
+
+# The following options are for testing/debugging and should normally only
+# be changed by the developers of JasPer.
+option(JAS_USE_JAS_INIT
+  "Use jas_init instead of jas_init_custom for initialization (should be false, except for testing)"
+  false)
+option(JAS_ENABLE_NON_THREAD_SAFE_DEBUGGING
+  "Enable non-thread safe debug code" false)
+
+if (JAS_USE_JAS_INIT)
+	add_definitions(-DJAS_USE_JAS_INIT)
+endif()
 
 # WARNING: THE FOLLOWING OPTION SHOULD ONLY BE ENABLED BY THE JASPER SOFTWARE
 # DEVELOPMENT TEAM.  IT IS NECESSARY FOR INTERNAL TESTING PURPOSES AND POSES
@@ -113,6 +134,8 @@ option(JAS_ENABLE_DANGEROUS_INTERNAL_TESTING_MODE
 ################################################################################
 #
 ################################################################################
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS true)
 
 set(CMAKE_C_STANDARD 11)
 
@@ -176,7 +199,7 @@ include(CPack)
 if (NOT MSVC)
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pedantic")
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -W -Wformat -Wmissing-prototypes -Wstrict-prototypes")
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -W -Wno-sign-compare -Wformat -Wmissing-prototypes -Wstrict-prototypes")
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wmissing-declarations -Wredundant-decls")
 endif()
 
@@ -224,6 +247,34 @@ check_function_exists(mkostemp JAS_HAVE_MKOSTEMP)
 if (JAS_INCLUDE_JP2_CODEC AND NOT JAS_INCLUDE_JPC_CODEC)
 	message(FATAL_ERROR "The JPC codec must be included in order to include the JP2 codec.")
 endif()
+
+################################################################################
+#
+################################################################################
+
+set(JAS_HAVE_THREADS false)
+if (JAS_ENABLE_MULTITHREADING_SUPPORT)
+	set(THREADS_PREFER_PTHREAD_FLAG true)
+	find_package(Threads)
+	if (Threads_FOUND)
+		set(JAS_HAVE_THREADS true)
+	endif()
+	if (CMAKE_USE_PTHREADS_INIT)
+		set(JAS_HAVE_PTHREAD true)
+	else()
+		set(JAS_HAVE_PTHREAD false)
+	endif()
+	if (CMAKE_USE_WIN32_THREADS_INIT)
+		set(JAS_HAVE_WIN32_THREADS true)
+	else()
+		set(JAS_HAVE_WIN32_THREADS false)
+	endif()
+	set(THREAD_LIBRARY "Threads::Threads")
+endif()
+message("Threads library found: ${JAS_HAVE_THREADS}")
+message("Prefer POSIX Threads library: ${JAS_PREFER_PTHREAD}")
+message("POSIX Threads library found: ${JAS_HAVE_PTHREAD}")
+message("Win32 Threads library found: ${JAS_HAVE_WIN32_THREADS}")
 
 ################################################################################
 # Check for the JPEG library.
@@ -335,25 +386,3 @@ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/build/jasper.pc"
   DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
 
 install(FILES "README" DESTINATION "${CMAKE_INSTALL_DOCDIR}")
-
-################################################################################
-# Test suite
-################################################################################
-
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/test/bin/wrapper.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/test/bin/wrapper" @ONLY)
-
-if (BASH_PROGRAM)
-	add_test(run_test_1
-	  "${BASH_PROGRAM}" "${CMAKE_CURRENT_BINARY_DIR}/test/bin/wrapper"
-	  "${CMAKE_CURRENT_SOURCE_DIR}/test/bin/run_test_1")
-	add_test(run_test_2
-	  "${BASH_PROGRAM}" "${CMAKE_CURRENT_BINARY_DIR}/test/bin/wrapper"
-	  "${CMAKE_CURRENT_SOURCE_DIR}/test/bin/run_test_2")
-	add_test(run_test_3
-	  "${BASH_PROGRAM}" "${CMAKE_CURRENT_BINARY_DIR}/test/bin/wrapper"
-	  "${CMAKE_CURRENT_SOURCE_DIR}/test/bin/run_test_3")
-	add_test(run_test_4
-	  "${BASH_PROGRAM}" "${CMAKE_CURRENT_BINARY_DIR}/test/bin/wrapper"
-	  "${CMAKE_CURRENT_SOURCE_DIR}/test/bin/run_test_4")
-endif()

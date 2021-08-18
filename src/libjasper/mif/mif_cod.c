@@ -181,7 +181,7 @@ jas_image_t *mif_decode(jas_stream_t *in, const char *optstr)
 		cmpt = hdr->cmpts[cmptno];
 		tmpstream = cmpt->data ? jas_stream_fopen(cmpt->data, "rb") : in;
 		if (!tmpstream) {
-			jas_eprintf("cannot open component file %s\n", cmpt->data);
+			jas_logerrorf("cannot open component file %s\n", cmpt->data);
 			goto error;
 		}
 		if (!(tmpimage = jas_image_decode(tmpstream, -1, "allow_trunc=1"))) {
@@ -286,11 +286,11 @@ int mif_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 	data = 0;
 
 	if (optstr && *optstr != '\0') {
-		jas_eprintf("warning: ignoring unsupported options\n");
+		jas_logwarnf("warning: ignoring unsupported options\n");
 	}
 
 	if ((fmt = jas_image_strtofmt("pnm")) < 0) {
-		jas_eprintf("error: PNM support required\n");
+		jas_logerrorf("error: PNM support required\n");
 		goto error;
 	}
 
@@ -467,7 +467,7 @@ static mif_hdr_t *mif_hdr_get(jas_stream_t *in)
 	if (magicbuf[0] != (MIF_MAGIC >> 24) || magicbuf[1] != ((MIF_MAGIC >> 16) &
 	  0xff) || magicbuf[2] != ((MIF_MAGIC >> 8) & 0xff) || magicbuf[3] !=
 	  (MIF_MAGIC & 0xff)) {
-		jas_eprintf("error: bad signature\n");
+		jas_logerrorf("error: bad signature\n");
 		goto error;
 	}
 
@@ -478,19 +478,19 @@ static mif_hdr_t *mif_hdr_get(jas_stream_t *in)
 	done = false;
 	do {
 		if (!mif_getline(in, buf, sizeof(buf))) {
-			jas_eprintf("mif_getline failed\n");
+			jas_logerrorf("mif_getline failed\n");
 			goto error;
 		}
 		if (buf[0] == '\0') {
 			continue;
 		}
-		JAS_DBGLOG(10, ("header line: len=%d; %s\n", strlen(buf), buf));
+		JAS_LOGDEBUGF(10, "header line: len=%d; %s\n", strlen(buf), buf);
 		if (!(tvp = jas_tvparser_create(buf))) {
-			jas_eprintf("jas_tvparser_create failed\n");
+			jas_logerrorf("jas_tvparser_create failed\n");
 			goto error;
 		}
 		if (jas_tvparser_next(tvp)) {
-			jas_eprintf("cannot get record type\n");
+			jas_logerrorf("cannot get record type\n");
 			goto error;
 		}
 		id = jas_taginfo_nonull(jas_taginfos_lookup(mif_tags2,
@@ -500,7 +500,7 @@ static mif_hdr_t *mif_hdr_get(jas_stream_t *in)
 		switch (id) {
 		case MIF_CMPT:
 			if (mif_process_cmpt(hdr, buf)) {
-				jas_eprintf("cannot get component information\n");
+				jas_logerrorf("cannot get component information\n");
 				goto error;
 			}
 			break;
@@ -508,7 +508,7 @@ static mif_hdr_t *mif_hdr_get(jas_stream_t *in)
 			done = 1;
 			break;
 		default:
-			jas_eprintf("invalid header information: %s\n", buf);
+			jas_logerrorf("invalid header information: %s\n", buf);
 			goto error;
 			break;
 		}
@@ -536,7 +536,7 @@ static int mif_process_cmpt(mif_hdr_t *hdr, char *buf)
 	tvp = 0;
 
 	if (!(cmpt = mif_cmpt_create())) {
-		jas_eprintf("cannot create component\n");
+		jas_logerrorf("cannot create component\n");
 		goto error;
 	}
 	cmpt->tlx = 0;
@@ -550,7 +550,7 @@ static int mif_process_cmpt(mif_hdr_t *hdr, char *buf)
 	cmpt->data = 0;
 
 	if (!(tvp = jas_tvparser_create(buf))) {
-		jas_eprintf("cannot create parser\n");
+		jas_logerrorf("cannot create parser\n");
 		goto error;
 	}
 
@@ -594,7 +594,7 @@ static int mif_process_cmpt(mif_hdr_t *hdr, char *buf)
 			}
 			break;
 		default:
-			jas_eprintf("invalid component information: %s\n", buf);
+			jas_logerrorf("invalid component information: %s\n", buf);
 			goto error;
 			break;
 		}
@@ -606,7 +606,7 @@ static int mif_process_cmpt(mif_hdr_t *hdr, char *buf)
 		goto error;
 	}
 	if (mif_hdr_addcmpt(hdr, hdr->numcmpts, cmpt)) {
-		jas_eprintf("cannot add component\n");
+		jas_logerrorf("cannot add component\n");
 		goto error;
 	}
 	jas_tvparser_destroy(tvp);

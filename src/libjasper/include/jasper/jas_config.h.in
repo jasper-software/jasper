@@ -37,6 +37,45 @@
 #cmakedefine JAS_INCLUDE_MIF_CODEC 1
 #cmakedefine JAS_ENABLE_DANGEROUS_INTERNAL_TESTING_MODE 1
 
+#cmakedefine JAS_DEFAULT_MAX_MEM_USAGE 0
+
+#cmakedefine JAS_ENABLE_MULTITHREADING_SUPPORT 1
+#cmakedefine JAS_HAVE_THREADS 1
+#cmakedefine JAS_HAVE_PTHREAD 1
+#cmakedefine JAS_HAVE_WIN32_THREADS 1
+
+#cmakedefine JAS_ENABLE_NON_THREAD_SAFE_DEBUGGING 1
+#cmakedefine JAS_PREFER_PTHREAD 1
+
+#if defined(JAS_ENABLE_MULTITHREADING_SUPPORT)
+#	if !defined(__STDC_NO_THREADS__)
+#		define JAS_THREADS_C11
+#	endif
+#	if defined(JAS_HAVE_PTHREAD)
+#		define JAS_THREADS_PTHREAD
+#	endif
+#	if defined(JAS_HAVE_WIN32_THREADS)
+#		define JAS_THREADS_MSVC
+#	endif
+#	if defined(JAS_THREADS_MSVC)
+#		undef JAS_THREADS_C11
+#		undef JAS_THREADS_PTHREAD
+#	endif
+#	if defined(JAS_THREADS_C11) && defined(JAS_THREADS_PTHREAD)
+#		if defined(JAS_PREFER_PTHREAD)
+#			undef JAS_THREADS_C11
+#		else
+#			undef JAS_THREADS_PTHREAD
+#		endif
+#	endif
+#	if !defined(JAS_THREADS_C11) && !defined(JAS_THREADS_PTHREAD) && !defined(JAS_THREADS_MSVC)
+#		undef JAS_ENABLE_MULTITHREADING_SUPPORT
+#	endif
+#	if defined(JAS_THREADS_C11) + defined(JAS_THREADS_PTHREAD) + defined(JAS_THREADS_MSVC) > 1
+#		error Only one threading library can be selected.
+#	endif
+#endif
+
 #if defined(JAS_ENABLE_DANGEROUS_INTERNAL_TESTING_MODE)
 #define JAS_ENABLE_MIF_CODEC 1
 #else
@@ -57,6 +96,10 @@
 
 #if !defined(JAS_DEC_DEFAULT_MAX_SAMPLES)
 #define JAS_DEC_DEFAULT_MAX_SAMPLES (64 * ((size_t) 1048576))
+#endif
+
+#if (JAS_DEFAULT_MAX_MEM_USAGE == 0)
+#define JAS_DEFAULT_MAX_MEM_USAGE (1024ULL * 1024ULL * 1024ULL)
 #endif
 
 #endif

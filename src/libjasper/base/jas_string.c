@@ -71,6 +71,8 @@
 * Includes
 \******************************************************************************/
 
+#define JAS_INTERNAL_USE_ONLY
+
 #include "jasper/jas_string.h"
 #include "jasper/jas_malloc.h"
 
@@ -93,4 +95,37 @@ char *jas_strdup(const char *s)
 	}
 	strcpy(p, s);
 	return p;
+}
+
+char *jas_strtok(char *s, const char *delim, char **save_ptr)
+{
+#if 1
+	char *result;
+	char *end;
+	if (!s) {
+		s = *save_ptr;
+	}
+	if (*s != '\0') {
+		s += strspn(s, delim);
+		if (*s != '\0') {
+			end = s + strcspn(s, delim);
+			if (*end == '\0') {
+				*save_ptr = end;
+			} else {
+				*end = '\0';
+				*save_ptr = end + 1;
+			}
+			result = s;
+		} else {
+			*save_ptr = s;
+			result = 0;
+		}
+	} else {
+		*save_ptr = s;
+		result = 0;
+	}
+	return result;
+#else
+	return strtok_r(str, delim, save_ptr);
+#endif
 }

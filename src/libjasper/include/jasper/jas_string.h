@@ -84,8 +84,24 @@ extern "C" {
 * Functions.
 \******************************************************************************/
 
-/* Copy a string (a la strdup). */
+/*!
+@brief
+Create a copy of a null-terminated string.
+
+@details
+This function has a behavior similar to the well-known strdup function.
+*/
 JAS_DLLEXPORT char *jas_strdup(const char *);
+
+/*!
+@brief
+Extract tokens from a string.
+
+@details
+This function has a similar behavior as @c strtok_r in the POSIX standard.
+*/
+JAS_DLLEXPORT
+char *jas_strtok(char *str, const char *delim, char **saveptr);
 
 #ifdef __cplusplus
 }

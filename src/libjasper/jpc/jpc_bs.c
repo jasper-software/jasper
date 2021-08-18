@@ -169,9 +169,9 @@ static jpc_bitstream_t *jpc_bitstream_alloc()
 int jpc_bitstream_getbit_func(jpc_bitstream_t *bitstream)
 {
 	int ret;
-	JAS_DBGLOG(1000, ("jpc_bitstream_getbit_func(%p)\n", bitstream));
+	JAS_LOGDEBUGF(1000, "jpc_bitstream_getbit_func(%p)\n", bitstream);
 	ret = jpc_bitstream_getbit_macro(bitstream);
-	JAS_DBGLOG(1000, ("jpc_bitstream_getbit_func -> %d\n", ret));
+	JAS_LOGDEBUGF(1000, "jpc_bitstream_getbit_func -> %d\n", ret);
 	return ret;
 }
 
@@ -179,9 +179,9 @@ int jpc_bitstream_getbit_func(jpc_bitstream_t *bitstream)
 int jpc_bitstream_putbit_func(jpc_bitstream_t *bitstream, int b)
 {
 	int ret;
-	JAS_DBGLOG(1000, ("jpc_bitstream_putbit_func(%p, %d)\n", bitstream, b));
+	JAS_LOGDEBUGF(1000, "jpc_bitstream_putbit_func(%p, %d)\n", bitstream, b);
 	ret = jpc_bitstream_putbit_macro(bitstream, b);
-	JAS_DBGLOG(1000, ("jpc_bitstream_putbit_func() -> %d\n", ret));
+	JAS_LOGDEBUGF(1000, "jpc_bitstream_putbit_func() -> %d\n", ret);
 	return ret;
 }
 

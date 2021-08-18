@@ -109,21 +109,21 @@ int bmp_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 	jas_clrspc_t clrspc;
 
 	if (optstr) {
-		jas_eprintf("warning: ignoring BMP encoder options\n");
+		jas_logwarnf("warning: ignoring BMP encoder options\n");
 	}
 
 	clrspc = jas_image_clrspc(image);
 	switch (jas_clrspc_fam(clrspc)) {
 	case JAS_CLRSPC_FAM_RGB:
 		if (clrspc != JAS_CLRSPC_SRGB)
-			jas_eprintf("warning: inaccurate color\n");
+			jas_logwarnf("warning: inaccurate color\n");
 		break;
 	case JAS_CLRSPC_FAM_GRAY:
 		if (clrspc != JAS_CLRSPC_SGRAY)
-			jas_eprintf("warning: inaccurate color\n");
+			jas_logwarnf("warning: inaccurate color\n");
 		break;
 	default:
-		jas_eprintf("error: BMP format does not support color space\n");
+		jas_logerrorf("error: BMP format does not support color space\n");
 		return -1;
 	}
 
@@ -136,7 +136,7 @@ int bmp_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 		  JAS_IMAGE_CT_COLOR(JAS_CLRSPC_CHANIND_RGB_G))) < 0 ||
 		  (enc->cmpts[2] = jas_image_getcmptbytype(image,
 		  JAS_IMAGE_CT_COLOR(JAS_CLRSPC_CHANIND_RGB_B))) < 0) {
-			jas_eprintf("error: missing color component\n");
+			jas_logerrorf("error: missing color component\n");
 			return -1;
 		}
 		break;
@@ -144,7 +144,7 @@ int bmp_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 		enc->numcmpts = 1;
 		if ((enc->cmpts[0] = jas_image_getcmptbytype(image,
 		  JAS_IMAGE_CT_COLOR(JAS_CLRSPC_CHANIND_GRAY_Y))) < 0) {
-			jas_eprintf("error: missing color component\n");
+			jas_logerrorf("error: missing color component\n");
 			return -1;
 		}
 		break;
@@ -165,7 +165,7 @@ int bmp_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 		  jas_image_cmptsgnd(image, enc->cmpts[cmptno]) != false ||
 		  jas_image_cmpttlx(image, enc->cmpts[cmptno]) != 0 ||
 		  jas_image_cmpttly(image, enc->cmpts[cmptno]) != 0) {
-			jas_eprintf("The BMP format cannot be used to represent an image with this geometry.\n");
+			jas_logerrorf("The BMP format cannot be used to represent an image with this geometry.\n");
 			return -1;
 		}
 	}
@@ -292,7 +292,7 @@ static int bmp_putdata(jas_stream_t *out, bmp_info_t *info, jas_image_t *image,
 
 	/* We do not support palettized images. */
 	if (BMP_HASPAL(info) && numcmpts == 3) {
-		jas_eprintf("no palettized image support for BMP format\n");
+		jas_logerrorf("no palettized image support for BMP format\n");
 		return -1;
 	}
 

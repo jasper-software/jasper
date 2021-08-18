@@ -270,7 +270,7 @@ typedef struct jp2_boxops_s {
 	void (*destroy)(jp2_box_t *box);
 	int (*getdata)(jp2_box_t *box, jas_stream_t *in);
 	int (*putdata)(const jp2_box_t *box, jas_stream_t *out);
-	void (*dumpdata)(const jp2_box_t *box, FILE *out);
+	void (*dumpdata)(const jp2_box_t *box);
 } jp2_boxops_t;
 
 /******************************************************************************\
@@ -310,6 +310,5 @@ static inline uint_least8_t JP2_BPCTODTYPE(uint_least8_t bpc)
 #define ICC_CS_GRAY	0x47524159
 
 const jp2_cdefchan_t *jp2_cdef_lookup(jp2_cdef_t *cdef, int channo);
-
 
 #endif

@@ -77,6 +77,7 @@
 #include "jpc_t1cod.h"
 #include "jpc_dec.h"
 
+#include "jasper/jas_thread.h"
 #include "jasper/jas_stream.h"
 #include "jasper/jas_math.h"
 #include "jasper/jas_debug.h"
@@ -100,22 +101,23 @@ static int dec_rawrefpass(jpc_bitstream_t *in, unsigned bitpos,
 static int dec_clnpass(jpc_mqdec_t *mqdec, unsigned bitpos, enum jpc_tsfb_orient orient,
   bool vcausalflag, bool segsymflag, jas_matrix_t *flags, jas_matrix_t *data);
 
-#ifndef NDEBUG
-static long t1dec_cnt = 0;
+#if defined(JAS_ENABLE_NON_THREAD_SAFE_DEBUGGING)
+static size_t t1dec_cnt = 0;
 #endif
 
 JAS_FORCE_INLINE
 static bool JPC_T1D_GETBIT(jpc_mqdec_t *mqdec, const char *passtypename, const char *symtypename)
 {
 	bool v = jpc_mqdec_getbit(mqdec);
-#ifndef NDEBUG
+#if defined(JAS_ENABLE_NON_THREAD_SAFE_DEBUGGING)
 	if (jas_getdbglevel() >= 100) {
-		jas_eprintf("index = %ld; passtype = %s; symtype = %s; sym = %d\n", t1dec_cnt, passtypename, symtypename, v);
+		jas_logdebugf(100, "index = %zu; passtype = %s; symtype = %s; sym = %d\n",
+		  t1dec_cnt, passtypename, symtypename, v);
 		++t1dec_cnt;
 	}
 #else
-	(void)passtypename;
-	(void)symtypename;
+	JAS_UNUSED(passtypename);
+	JAS_UNUSED(symtypename);
 #endif
 	return v;
 }
@@ -130,14 +132,14 @@ JAS_FORCE_INLINE
 static int JPC_T1D_RAWGETBIT(jpc_bitstream_t *bitstream, const char *passtypename, const char *symtypename)
 {
 	int v = jpc_bitstream_getbit(bitstream);
-#ifndef NDEBUG
+#if defined(JAS_ENABLE_NON_THREAD_SAFE_DEBUGGING)
 	if (jas_getdbglevel() >= 100) {
-		jas_eprintf("index = %ld; passtype = %s; symtype = %s; sym = %d\n", t1dec_cnt, passtypename, symtypename, v);
+		jas_logdebugf(100, "index = %ld; passtype = %s; symtype = %s; sym = %d\n", t1dec_cnt, passtypename, symtypename, v);
 		++t1dec_cnt;
 	}
 #else
-	(void)passtypename;
-	(void)symtypename;
+	JAS_UNUSED(passtypename);
+	JAS_UNUSED(symtypename);
 #endif
 	return v;
 }
@@ -246,10 +248,10 @@ static int jpc_dec_decodecblk(jpc_dec_tile_t *tile, jpc_dec_tcomp_t *tcomp, jpc_
 		for (unsigned i = 0; i < seg->numpasses; ++i) {
 			if (cblk->numimsbs > band->numbps) {
 				if (ccp->roishift <= 0) {
-					jas_eprintf("warning: corrupt code stream\n");
+					jas_logwarnf("warning: corrupt code stream\n");
 				} else {
 					if (cblk->numimsbs < ccp->roishift - band->numbps) {
-						jas_eprintf("warning: corrupt code stream\n");
+						jas_logwarnf("warning: corrupt code stream\n");
 					}
 				}
 			}
@@ -294,7 +296,7 @@ if (bpno < 0) {
 			}
 
 			if (ret) {
-				jas_eprintf("coding pass failed passtype=%d segtype=%d\n", passtype, seg->type);
+				jas_logerrorf("coding pass failed passtype=%d segtype=%d\n", passtype, seg->type);
 				goto error;
 			}
 
@@ -315,7 +317,7 @@ if (bpno < 0) {
 			  filldata)) < 0) {
 				goto error;
 			} else if (ret > 0) {
-				jas_eprintf("warning: bad termination pattern detected\n");
+				jas_logwarnf("warning: bad termination pattern detected\n");
 			}
 			jpc_bitstream_close(nulldec);
 			nulldec = 0;
@@ -793,7 +795,7 @@ static int dec_clnpass(jpc_mqdec_t *mqdec, unsigned bitpos, enum jpc_tsfb_orient
 		segsymval = (segsymval << 1) | JPC_T1D_GETBITNOSKEW(mqdec, "CLN", "SEGSYM");
 		segsymval = (segsymval << 1) | JPC_T1D_GETBITNOSKEW(mqdec, "CLN", "SEGSYM");
 		if (segsymval != 0xa) {
-			jas_eprintf("warning: bad segmentation symbol\n");
+			jas_logwarnf("warning: bad segmentation symbol\n");
 		}
 	}
 

@@ -65,6 +65,7 @@
 
 #include "jpg_jpeglib.h"
 
+#include "jasper/jas_init.h"
 #include "jasper/jas_tvp.h"
 #include "jasper/jas_stream.h"
 #include "jasper/jas_image.h"
@@ -160,7 +161,9 @@ static int jpg_dec_parseopts(const char *optstr, jpg_dec_importopts_t *opts)
 {
 	jas_tvparser_t *tvp;
 
-	opts->max_samples = JAS_DEC_DEFAULT_MAX_SAMPLES;
+	jas_context_t context = jas_get_context();
+
+	opts->max_samples = jas_context_get_dec_default_max_samples(context);
 	opts->print_version = false;
 
 	if (!(tvp = jas_tvparser_create(optstr ? optstr : ""))) {
@@ -177,7 +180,7 @@ static int jpg_dec_parseopts(const char *optstr, jpg_dec_importopts_t *opts)
 			opts->print_version = true;
 			break;
 		default:
-			jas_eprintf("warning: ignoring invalid option %s\n",
+			jas_logwarnf("warning: ignoring invalid option %s\n",
 			  jas_tvparser_gettag(tvp));
 			break;
 		}
@@ -217,7 +220,7 @@ jas_image_t *jpg_decode(jas_stream_t *in, const char *optstr)
 	input_file = 0;
 	dest_mgr->data = 0;
 
-	JAS_DBGLOG(10, ("jpg_decode(%p, \"%s\")\n", in, optstr));
+	JAS_LOGDEBUGF(10, "jpg_decode(%p, \"%s\")\n", in, optstr);
 
 	if (jpg_dec_parseopts(optstr, &opts)) {
 		goto error;
@@ -228,44 +231,44 @@ jas_image_t *jpg_decode(jas_stream_t *in, const char *optstr)
 		goto error;
 	}
 
-	JAS_DBGLOG(10, ("JPEG library version: %d\n", JPEG_LIB_VERSION));
-	JAS_DBGLOG(10, ("JPEG Turbo library version: %s\n",
-	  jas_libjpeg_turbo_version));
+	JAS_LOGDEBUGF(10, "JPEG library version: %d\n", JPEG_LIB_VERSION);
+	JAS_LOGDEBUGF(10, "JPEG Turbo library version: %s\n",
+	  jas_libjpeg_turbo_version);
 
 	if (!(input_file = tmpfile())) {
-		jas_eprintf("cannot make temporary file\n");
+		jas_logerrorf("cannot make temporary file\n");
 		goto error;
 	}
 	if (jpg_copystreamtofile(input_file, in)) {
-		jas_eprintf("cannot copy stream\n");
+		jas_logerrorf("cannot copy stream\n");
 		goto error;
 	}
 	rewind(input_file);
 
 	/* Allocate and initialize a JPEG decompression object. */
-	JAS_DBGLOG(10, ("jpeg_std_error(%p)\n", &jerr));
+	JAS_LOGDEBUGF(10, "jpeg_std_error(%p)\n", &jerr);
 	cinfo.err = jpeg_std_error(&jerr);
-	JAS_DBGLOG(10, ("jpeg_create_decompress(%p)\n", &cinfo));
+	JAS_LOGDEBUGF(10, "jpeg_create_decompress(%p)\n", &cinfo);
 	jpeg_create_decompress(&cinfo);
 
 	/* Specify the data source for decompression. */
-	JAS_DBGLOG(10, ("jpeg_stdio_src(%p, %p)\n", &cinfo, input_file));
+	JAS_LOGDEBUGF(10, "jpeg_stdio_src(%p, %p)\n", &cinfo, input_file);
 	jpeg_stdio_src(&cinfo, input_file);
 
 	/* Read the file header to obtain the image information. */
-	JAS_DBGLOG(10, ("jpeg_read_header(%p, TRUE)\n", &cinfo));
+	JAS_LOGDEBUGF(10, "jpeg_read_header(%p, TRUE)\n", &cinfo);
 	ret = jpeg_read_header(&cinfo, TRUE);
-	JAS_DBGLOG(10, ("jpeg_read_header return value %d\n", ret));
+	JAS_LOGDEBUGF(10, "jpeg_read_header return value %d\n", ret);
 	if (ret != JPEG_HEADER_OK) {
-		jas_eprintf("jpeg_read_header did not return JPEG_HEADER_OK\n");
+		jas_logwarnf("jpeg_read_header did not return JPEG_HEADER_OK\n");
 	}
-	JAS_DBGLOG(10, (
+	JAS_LOGDEBUGF(10,
 	  "header: image_width %d; image_height %d; num_components %d\n",
-	  cinfo.image_width, cinfo.image_height, cinfo.num_components)
+	  cinfo.image_width, cinfo.image_height, cinfo.num_components
 	  );
 
 	if (!cinfo.image_width || !cinfo.image_height || !cinfo.num_components) {
-		jas_eprintf("image has no samples");
+		jas_logerrorf("image has no samples");
 		goto error;
 	}
 	if (opts.max_samples > 0) {
@@ -274,31 +277,31 @@ jas_image_t *jpg_decode(jas_stream_t *in, const char *optstr)
 			goto error;
 		}
 		if (num_samples > opts.max_samples) {
-			jas_eprintf("image is too large (%zu > %zu)\n", num_samples,
+			jas_logerrorf("image is too large (%zu > %zu)\n", num_samples,
 			  opts.max_samples);
 			goto error;
 		}
 	}
 
 	/* Start the decompressor. */
-	JAS_DBGLOG(10, ("jpeg_start_decompress(%p)\n", &cinfo));
+	JAS_LOGDEBUGF(10, "jpeg_start_decompress(%p)\n", &cinfo);
 	ret = jpeg_start_decompress(&cinfo);
-	JAS_DBGLOG(10, ("jpeg_start_decompress return value %d\n", ret));
-	JAS_DBGLOG(10, (
+	JAS_LOGDEBUGF(10, "jpeg_start_decompress return value %d\n", ret);
+	JAS_LOGDEBUGF(10,
 	  "header: output_width %d; output_height %d; output_components %d\n",
-	  cinfo.output_width, cinfo.output_height, cinfo.output_components)
+	  cinfo.output_width, cinfo.output_height, cinfo.output_components
 	  );
 
 	/* Create an image object to hold the decoded data. */
 	if (!(image = jpg_mkimage(&cinfo))) {
-		jas_eprintf("jpg_mkimage failed\n");
+		jas_logerrorf("jpg_mkimage failed\n");
 		goto error;
 	}
 
 	/* Initialize the data sink object. */
 	dest_mgr->image = image;
 	if (!(dest_mgr->data = jas_matrix_create(1, cinfo.output_width))) {
-		jas_eprintf("jas_matrix_create failed\n");
+		jas_logerrorf("jas_matrix_create failed\n");
 		goto error;
 	}
 	dest_mgr->start_output = jpg_start_output;
@@ -313,32 +316,32 @@ jas_image_t *jpg_decode(jas_stream_t *in, const char *optstr)
 	/* Process the compressed data. */
 	(*dest_mgr->start_output)(&cinfo, dest_mgr);
 	while (cinfo.output_scanline < cinfo.output_height) {
-		JAS_DBGLOG(100, ("jpeg_read_scanlines(%p, %p, %lu)\n", &cinfo,
-		  dest_mgr->buffer, JAS_CAST(unsigned long, dest_mgr->buffer_height)));
+		JAS_LOGDEBUGF(100, "jpeg_read_scanlines(%p, %p, %lu)\n", &cinfo,
+		  dest_mgr->buffer, JAS_CAST(unsigned long, dest_mgr->buffer_height));
 		num_scanlines = jpeg_read_scanlines(&cinfo, dest_mgr->buffer,
 		  dest_mgr->buffer_height);
-		JAS_DBGLOG(100, ("jpeg_read_scanlines return value %lu\n",
-		  JAS_CAST(unsigned long, num_scanlines)));
+		JAS_LOGDEBUGF(100, "jpeg_read_scanlines return value %lu\n",
+		  JAS_CAST(unsigned long, num_scanlines));
 		(*dest_mgr->put_pixel_rows)(&cinfo, dest_mgr, num_scanlines);
 	}
 	(*dest_mgr->finish_output)(&cinfo, dest_mgr);
 
 	/* Complete the decompression process. */
-	JAS_DBGLOG(10, ("jpeg_finish_decompress(%p)\n", &cinfo));
+	JAS_LOGDEBUGF(10, "jpeg_finish_decompress(%p)\n", &cinfo);
 	jpeg_finish_decompress(&cinfo);
 
 	/* Destroy the JPEG decompression object. */
-	JAS_DBGLOG(10, ("jpeg_destroy_decompress(%p)\n", &cinfo));
+	JAS_LOGDEBUGF(10, "jpeg_destroy_decompress(%p)\n", &cinfo);
 	jpeg_destroy_decompress(&cinfo);
 
 	jas_matrix_destroy(dest_mgr->data);
 
-	JAS_DBGLOG(10, ("fclose(%p)\n", input_file));
+	JAS_LOGDEBUGF(10, "fclose(%p)\n", input_file);
 	fclose(input_file);
 	input_file = 0;
 
 	if (dest_mgr->error) {
-		jas_eprintf("error during decoding\n");
+		jas_logerrorf("error during decoding\n");
 		goto error;
 	}
 
@@ -382,7 +385,7 @@ static jas_image_t *jpg_mkimage(j_decompress_ptr cinfo)
 	jas_image_cmptparm_t cmptparm;
 	int numcmpts;
 
-	JAS_DBGLOG(10, ("jpg_mkimage(%p)\n", cinfo));
+	JAS_LOGDEBUGF(10, "jpg_mkimage(%p)\n", cinfo);
 
 	image = 0;
 	numcmpts = cinfo->output_components;
@@ -462,7 +465,7 @@ static void jpg_start_output(j_decompress_ptr cinfo, jpg_dest_t *dinfo)
 	/* Avoid compiler warnings about unused parameters. */
 	(void)cinfo;
 
-	JAS_DBGLOG(10, ("jpg_start_output(%p, %p)\n", cinfo, dinfo));
+	JAS_LOGDEBUGF(10, "jpg_start_output(%p, %p)\n", cinfo, dinfo);
 
 	dinfo->row = 0;
 }
@@ -475,7 +478,7 @@ static void jpg_put_pixel_rows(j_decompress_ptr cinfo, jpg_dest_t *dinfo,
 	JDIMENSION x;
 	uint_fast32_t width;
 
-	JAS_DBGLOG(100, ("jpg_put_pixel_rows(%p, %p)\n", cinfo, dinfo));
+	JAS_LOGDEBUGF(100, "jpg_put_pixel_rows(%p, %p)\n", cinfo, dinfo);
 
 	if (dinfo->error) {
 		return;
@@ -490,9 +493,9 @@ static void jpg_put_pixel_rows(j_decompress_ptr cinfo, jpg_dest_t *dinfo,
 			jas_matrix_set(dinfo->data, 0, x, GETJSAMPLE(*bufptr));
 			bufptr += cinfo->output_components;
 		}
-		JAS_DBGLOG(100, (
+		JAS_LOGDEBUGF(100,
 		  "jas_image_writecmpt called for component %d row %lu\n", cmptno,
-		  JAS_CAST(unsigned long, dinfo->row)));
+		  JAS_CAST(unsigned long, dinfo->row));
 		if (jas_image_writecmpt(dinfo->image, cmptno, 0, dinfo->row, width, 1,
 		  dinfo->data)) {
 			dinfo->error = 1;
@@ -503,7 +506,7 @@ static void jpg_put_pixel_rows(j_decompress_ptr cinfo, jpg_dest_t *dinfo,
 
 static void jpg_finish_output(j_decompress_ptr cinfo, jpg_dest_t *dinfo)
 {
-	JAS_DBGLOG(10, ("jpg_finish_output(%p, %p)\n", cinfo, dinfo));
+	JAS_LOGDEBUGF(10, "jpg_finish_output(%p, %p)\n", cinfo, dinfo);
 
 	/* Avoid compiler warnings about unused parameters. */
 	(void)cinfo;

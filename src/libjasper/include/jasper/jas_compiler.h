@@ -110,4 +110,10 @@
 #define jas_has_builtin(x) 0
 #endif
 
+/*!
+@brief
+Indicate that a variable may be unused (in order to avoid a compiler warning).
+*/
+#define JAS_UNUSED(x) ((void) x)
+
 #endif

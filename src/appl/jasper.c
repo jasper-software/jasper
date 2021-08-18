@@ -77,7 +77,6 @@
 #include <stdint.h>
 
 #include <jasper/jasper.h>
-#include <jasper/jas_debug.h>
 
 /******************************************************************************\
 *
@@ -96,6 +95,7 @@ typedef struct {
 	const char *infile;
 	/* The input image file. */
 
+	const char *infmt_str;
 	int infmt;
 	/* The input image file format. */
 
@@ -105,6 +105,7 @@ typedef struct {
 	const char *outfile;
 	/* The output image file. */
 
+	const char *outfmt_str;
 	int outfmt;
 
 	char *outopts;
@@ -166,10 +167,6 @@ int main(int argc, char **argv)
 		cmdname = argv[0];
 	}
 
-	if (jas_init()) {
-		abort();
-	}
-
 	/* Parse the command line options. */
 	if (!(cmdopts = cmdopts_parse(argc, argv))) {
 		fprintf(stderr, "error: cannot parse command line\n");
@@ -182,10 +179,47 @@ int main(int argc, char **argv)
 		exit(EXIT_SUCCESS);
 	}
 
-	jas_setdbglevel(cmdopts->debug);
-#if defined(JAS_DEFAULT_MAX_MEM_USAGE)
+#if defined(JAS_USE_JAS_INIT)
+	if (jas_init()) {
+		fprintf(stderr, "cannot initialize JasPer library\n");
+		exit(EXIT_FAILURE);
+	}
 	jas_set_max_mem_usage(cmdopts->max_mem);
+	jas_setdbglevel(cmdopts->debug);
+#else
+	jas_conf_clear();
+	static jas_std_allocator_t allocator;
+	jas_std_allocator_init(&allocator);
+	jas_conf_set_allocator(&allocator.base);
+	jas_conf_set_debug_level(cmdopts->debug);
+	jas_conf_set_max_mem(cmdopts->max_mem);
+	if (jas_initialize()) {
+		fprintf(stderr, "cannot initialize JasPer library\n");
+		exit(EXIT_FAILURE);
+	}
+	jas_context_t context;
+	if (!(context = jas_context_create())) {
+		fprintf(stderr, "cannot create context\n");
+		exit(EXIT_FAILURE);
+	}
+	jas_set_context(context);
+	atexit(jas_cleanup);
 #endif
+
+	if (cmdopts->infmt_str) {
+		if ((cmdopts->infmt = jas_image_strtofmt(cmdopts->infmt_str)) < 0) {
+			fprintf(stderr, "warning: ignoring invalid input format %s\n",
+			  cmdopts->infmt_str);
+			cmdopts->infmt = -1;
+		}
+	} else {
+		cmdopts->infmt = -1;
+	}
+	if ((cmdopts->outfmt = jas_image_strtofmt(cmdopts->outfmt_str)) < 0) {
+		fprintf(stderr, "error: invalid output format %s\n",
+		cmdopts->outfmt_str);
+		badusage();
+	}
 
 	if (cmdopts->verbose) {
 		cmdinfo();
@@ -297,7 +331,16 @@ int main(int argc, char **argv)
 
 	cmdopts_destroy(cmdopts);
 	jas_image_destroy(image);
-	jas_image_clearfmts();
+	//jas_image_clearfmts();
+
+#if !defined(JAS_USE_JAS_INIT)
+	/*
+	Stop using the context that is about to be destroyed.
+	Then, destroy the context.
+	*/
+	jas_set_context(0);
+	jas_context_destroy(context);
+#endif
 
 	/* Success at last! :-) */
 	return EXIT_SUCCESS;
@@ -357,10 +400,12 @@ cmdopts_t *cmdopts_parse(int argc, char **argv)
 
 	cmdopts->infile = 0;
 	cmdopts->infmt = -1;
+	cmdopts->infmt_str = 0;
 	cmdopts->inopts = 0;
 	cmdopts->inoptsbuf[0] = '\0';
 	cmdopts->outfile = 0;
 	cmdopts->outfmt = -1;
+	cmdopts->outfmt_str = 0;
 	cmdopts->outopts = 0;
 	cmdopts->outoptsbuf[0] = '\0';
 	cmdopts->verbose = 0;
@@ -390,11 +435,15 @@ cmdopts_t *cmdopts_parse(int argc, char **argv)
 			cmdopts->infile = jas_optarg;
 			break;
 		case CMDOPT_INFMT:
+#if 0
 			if ((cmdopts->infmt = jas_image_strtofmt(jas_optarg)) < 0) {
 				fprintf(stderr, "warning: ignoring invalid input format %s\n",
 				  jas_optarg);
 				cmdopts->infmt = -1;
 			}
+#else
+			cmdopts->infmt_str= jas_optarg;
+#endif
 			break;
 		case CMDOPT_INOPT:
 			addopt(cmdopts->inoptsbuf, OPTSMAX, jas_optarg);
@@ -404,10 +453,14 @@ cmdopts_t *cmdopts_parse(int argc, char **argv)
 			cmdopts->outfile = jas_optarg;
 			break;
 		case CMDOPT_OUTFMT:
+#if 0
 			if ((cmdopts->outfmt = jas_image_strtofmt(jas_optarg)) < 0) {
 				fprintf(stderr, "error: invalid output format %s\n", jas_optarg);
 				badusage();
 			}
+#else
+			cmdopts->outfmt_str = jas_optarg;
+#endif
 			break;
 		case CMDOPT_OUTOPT:
 			addopt(cmdopts->outoptsbuf, OPTSMAX, jas_optarg);
@@ -446,10 +499,17 @@ cmdopts_t *cmdopts_parse(int argc, char **argv)
 		}
 	}
 
+#if 0
 	if (cmdopts->outfmt < 0) {
 		fprintf(stderr, "error: no output format specified\n");
 		badusage();
 	}
+#else
+	if (!cmdopts->outfmt_str) {
+		fprintf(stderr, "error: no output format specified\n");
+		badusage();
+	}
+#endif
 
 done:
 	return cmdopts;
@@ -510,8 +570,6 @@ static const char *const helpinfo[] = {
 
 void cmdusage()
 {
-	int fmtid;
-	const jas_image_fmtinfo_t *fmtinfo;
 	const char *s;
 	int i;
 	cmdinfo();
@@ -520,6 +578,9 @@ void cmdusage()
 		fprintf(stderr, "%s", s);
 	}
 	fprintf(stderr, "The following formats are supported:\n");
+#if 0
+	int fmtid;
+	const jas_image_fmtinfo_t *fmtinfo;
 	for (fmtid = 0;; ++fmtid) {
 		if (!(fmtinfo = jas_image_lookupfmtbyid(fmtid))) {
 			break;
@@ -527,6 +588,15 @@ void cmdusage()
 		fprintf(stderr, "    %-5s    %s\n", fmtinfo->name,
 		  fmtinfo->desc);
 	}
+#else
+	const jas_image_fmt_t *formats;
+	size_t num_formats;
+	jas_get_image_format_table(&formats, &num_formats);
+	const jas_image_fmt_t *fmt;
+	for (fmt = formats, i = 0; i < JAS_CAST(int, num_formats); ++fmt, ++i) {
+		fprintf(stderr, "    %-5s    %s\n", fmt->name, fmt->desc);
+	}
+#endif
 	exit(EXIT_FAILURE);
 }
 

@@ -71,6 +71,8 @@
 * Includes.
 \******************************************************************************/
 
+#define JAS_INTERNAL_USE_ONLY
+
 #include "jasper/jas_getopt.h"
 #include "jasper/jas_math.h"
 #include "jasper/jas_debug.h"

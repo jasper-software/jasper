@@ -1,21 +1,22 @@
 set(programs "")
 set(man_pages "")
+set(extra_programs "")
 
 # The jasper program
 add_executable(jasper jasper.c)
-target_link_libraries(jasper libjasper ${JPEG_LIBRARIES} ${MATH_LIBRARY})
+target_link_libraries(jasper libjasper ${JPEG_LIBRARIES} ${MATH_LIBRARY} ${THREAD_LIBRARY})
 set(programs "${programs}" jasper)
 set(man_pages "${man_pages}" jasper.1)
 
 # The imginfo program
 add_executable(imginfo imginfo.c)
-target_link_libraries(imginfo libjasper ${JPEG_LIBRARIES} ${MATH_LIBRARY})
+target_link_libraries(imginfo libjasper ${JPEG_LIBRARIES} ${MATH_LIBRARY} ${THREAD_LIBRARY})
 set(programs "${programs}" imginfo)
 set(man_pages "${man_pages}" imginfo.1)
 
 # The imgcmp program
 add_executable(imgcmp imgcmp.c)
-target_link_libraries(imgcmp libjasper ${JPEG_LIBRARIES} ${MATH_LIBRARY})
+target_link_libraries(imgcmp libjasper ${JPEG_LIBRARIES} ${MATH_LIBRARY} ${THREAD_LIBRARY})
 set(programs "${programs}" imgcmp)
 set(man_pages "${man_pages}" imgcmp.1)
 
@@ -25,16 +26,25 @@ if(JAS_HAVE_OPENGL)
 	target_include_directories(jiv PUBLIC
 	  ${GLUT_INCLUDE_DIR} ${OPENGL_INCLUDE_DIR})
 	target_link_libraries(jiv libjasper ${JPEG_LIBRARIES} ${GLUT_LIBRARIES}
-	  ${OPENGL_LIBRARIES} ${MATH_LIBRARY})
+	  ${OPENGL_LIBRARIES} ${MATH_LIBRARY} ${THREAD_LIBRARY})
 	set(programs "${programs}" jiv)
 	set(man_pages "${man_pages}" jiv.1)
 else()
 	message("GLUT library not found; skipping build of jiv program")
 endif()
 
+if (JAS_ENABLE_MULTITHREADING_SUPPORT)
+	# The multithread program
+	add_executable(multithread multithread.c)
+	target_link_libraries(multithread libjasper ${JPEG_LIBRARIES}
+	  ${MATH_LIBRARY} ${THREAD_LIBRARY})
+	set(programs "${programs}" multithread)
+endif()
+
 if (JAS_ENABLE_FUZZER)
 	add_executable(fuzz fuzz.c)
-	target_link_libraries(fuzz libjasper ${JPEG_LIBRARIES} ${MATH_LIBRARY})
+	target_link_libraries(fuzz libjasper ${JPEG_LIBRARIES} ${MATH_LIBRARY}
+	  ${THREAD_LIBRARY})
 	set(programs "${programs}" fuzz)
 	set_target_properties(fuzz PROPERTIES COMPILE_FLAGS "-fsanitize=fuzzer")
 	set_target_properties(fuzz PROPERTIES LINK_FLAGS "-fsanitize=fuzzer")
@@ -53,3 +63,34 @@ install(TARGETS ${programs} DESTINATION "${CMAKE_INSTALL_BINDIR}")
 
 # Install the manual pages for the programs that were built.
 install(FILES ${man_pages} DESTINATION "${CMAKE_INSTALL_MANDIR}/man1")
+
+################################################################################
+# Test suite
+################################################################################
+
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/../../test/bin/wrapper.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/../../test/bin/wrapper" @ONLY)
+
+if (BASH_PROGRAM)
+	add_test(run_test_1
+	  "${BASH_PROGRAM}" "${CMAKE_CURRENT_BINARY_DIR}/../../test/bin/wrapper"
+	  "${CMAKE_CURRENT_SOURCE_DIR}/../../test/bin/run_test_1" -v)
+	add_test(run_test_2
+	  "${BASH_PROGRAM}" "${CMAKE_CURRENT_BINARY_DIR}/../../test/bin/wrapper"
+	  "${CMAKE_CURRENT_SOURCE_DIR}/../../test/bin/run_test_2" -v)
+	add_test(run_test_3
+	  "${BASH_PROGRAM}" "${CMAKE_CURRENT_BINARY_DIR}/../../test/bin/wrapper"
+	  "${CMAKE_CURRENT_SOURCE_DIR}/../../test/bin/run_test_3" -v)
+	add_test(run_test_4
+	  "${BASH_PROGRAM}" "${CMAKE_CURRENT_BINARY_DIR}/../../test/bin/wrapper"
+	  "${CMAKE_CURRENT_SOURCE_DIR}/../../test/bin/run_test_4" -v)
+	if (JAS_ENABLE_MULTITHREADING_SUPPORT)
+		add_test(run_test_5
+		  "${BASH_PROGRAM}" "${CMAKE_CURRENT_BINARY_DIR}/../../test/bin/wrapper"
+		  "${CMAKE_CURRENT_SOURCE_DIR}/../../test/bin/run_test_5" -v)
+		set(extra_programs "${extra_programs}" multithread)
+	endif()
+	add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS
+	  ${programs} ${extra_programs}
+	  "${CMAKE_CURRENT_BINARY_DIR}/../../test/bin/wrapper") 
+endif()
