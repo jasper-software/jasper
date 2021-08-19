@@ -145,7 +145,7 @@ typedef struct {
 	The function used to output error/warning/informational messages
 	for newly created contexts.
 	*/
-	int (*vlogprintf)(jas_logtype_t type, const char *format, va_list ap);
+	int (*vlogmsgf)(jas_logtype_t type, const char *format, va_list ap);
 
 } jas_conf_t;
 #endif
@@ -170,7 +170,7 @@ typedef struct {
 	/*
 	The function used to output error/warning/informational messages.
 	*/
-	int (*vlogprintf)(jas_logtype_t type, const char *format, va_list ap);
+	int (*vlogmsgf)(jas_logtype_t type, const char *format, va_list ap);
 
 	/*
 	The image format information to be used to populate the image format
@@ -307,7 +307,7 @@ informational messages.
 @details
 */
 JAS_DLLEXPORT
-void jas_conf_set_vlogprintf(int (*func)(jas_logtype_t, const char *,
+void jas_conf_set_vlogmsgf(int (*func)(jas_logtype_t, const char *,
   va_list));
 
 /*!
@@ -385,7 +385,7 @@ Set the function to be used for log messages.
 @details
 */
 JAS_DLLEXPORT
-void jas_context_set_vlogprintf(jas_context_t context,
+void jas_context_set_vlogmsgf(jas_context_t context,
   int (*func)(jas_logtype_t, const char *, va_list));
 
 

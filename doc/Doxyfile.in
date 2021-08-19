@@ -195,12 +195,12 @@ TAB_SIZE               = 8
 
 ALIASES                =
 
-# This tag can be used to specify a number of word-keyword mappings (TCL only).
-# A mapping has the form "name=value". For example adding
-# "class=itcl::class" will allow you to use the command class in the
-# itcl::class meaning.
-
-TCL_SUBST              =
+## This tag can be used to specify a number of word-keyword mappings (TCL only).
+## A mapping has the form "name=value". For example adding
+## "class=itcl::class" will allow you to use the command class in the
+## itcl::class meaning.
+##
+##TCL_SUBST              =
 
 # Set the OPTIMIZE_OUTPUT_FOR_C tag to YES if your project consists of C
 # sources only. Doxygen will then generate output that is more tailored for C.
@@ -643,7 +643,6 @@ INPUT                  = \
                          @CMAKE_BINARY_DIR@/doc/src/mainpage.dox \
                          @CMAKE_BINARY_DIR@/doc/src/getting_started.dox \
                          @CMAKE_SOURCE_DIR@/doc/src/overview.dox \
-                         @CMAKE_SOURCE_DIR@/doc/src/initialization.dox \
                          @CMAKE_SOURCE_DIR@/doc/src/bugs.dox \
                          @CMAKE_SOURCE_DIR@/doc/src/modules.dox \
                          @CMAKE_SOURCE_DIR@/src
@@ -1546,10 +1545,10 @@ ALLEXTERNALS           = NO
 
 EXTERNAL_GROUPS        = YES
 
-# The PERL_PATH should be the absolute path and name of the perl script
-# interpreter (i.e. the result of `which perl').
-
-PERL_PATH              = /usr/bin/perl
+## The PERL_PATH should be the absolute path and name of the perl script
+## interpreter (i.e. the result of `which perl').
+##
+##PERL_PATH              = /usr/bin/perl
 
 #---------------------------------------------------------------------------
 # Configuration options related to the dot tool
@@ -1563,14 +1562,14 @@ PERL_PATH              = /usr/bin/perl
 
 CLASS_DIAGRAMS         = YES
 
-# You can define message sequence charts within doxygen comments using the \msc
-# command. Doxygen will then run the mscgen tool (see
-# http://www.mcternan.me.uk/mscgen/) to produce the chart and insert it in the
-# documentation. The MSCGEN_PATH tag allows you to specify the directory where
-# the mscgen tool resides. If left empty the tool is assumed to be found in the
-# default search path.
-
-MSCGEN_PATH            =
+## You can define message sequence charts within doxygen comments using the \msc
+## command. Doxygen will then run the mscgen tool (see
+## http://www.mcternan.me.uk/mscgen/) to produce the chart and insert it in the
+## documentation. The MSCGEN_PATH tag allows you to specify the directory where
+## the mscgen tool resides. If left empty the tool is assumed to be found in the
+## default search path.
+##
+##MSCGEN_PATH            =
 
 # If set to YES, the inheritance and collaboration graphs will hide
 # inheritance and usage relations if the target is undocumented
@@ -1600,7 +1599,7 @@ DOT_NUM_THREADS        = 0
 # the DOTFONTPATH environment variable or by setting DOT_FONTPATH to the
 # directory containing the font.
 
-DOT_FONTNAME           = FreeSans
+DOT_FONTNAME           =
 
 # The DOT_FONTSIZE tag can be used to set the size of the font of dot graphs.
 # The default size is 10pt.

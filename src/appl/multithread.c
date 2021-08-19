@@ -124,7 +124,7 @@ int process_job(void *job_handle)
 		exit(EXIT_FAILURE);
 	}
 	jas_context_set_debug_level(context, job->debug_level);
-	jas_context_set_vlogprintf(context, jas_vlogmsgf_stderr);
+	jas_context_set_vlogmsgf(context, jas_vlogmsgf_stderr);
 	jas_set_context(context);
 
 	for (int iter_no = 0; iter_no < JAS_CAST(int, job->num_iters); ++iter_no) {

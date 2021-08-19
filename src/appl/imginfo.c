@@ -217,7 +217,7 @@ int main(int argc, char **argv)
 	jas_conf_set_max_mem(max_mem);
 	jas_conf_set_debug_level(debug);
 	if (special) {
-		jas_conf_set_vlogprintf(jas_vlogmsgf_discard);
+		jas_conf_set_vlogmsgf(jas_vlogmsgf_discard);
 	}
 	if (jas_initialize()) {
 		fprintf(stderr, "cannot initialize JasPer library\n");

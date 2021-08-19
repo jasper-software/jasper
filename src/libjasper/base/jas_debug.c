@@ -178,7 +178,7 @@ int jas_vlogmsgf(jas_logtype_t type, const char *fmt, va_list ap)
 {
 	int ret;
 	jas_ctx_t *ctx = jas_get_ctx();
-	ret = (ctx->vlogprintf)(type, fmt, ap);
+	ret = (ctx->vlogmsgf)(type, fmt, ap);
 	return ret;
 }
 
