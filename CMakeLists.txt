@@ -70,6 +70,9 @@ message("Shared library build version: ${JAS_SO_NAME}")
 # Include modules and set policies.
 ################################################################################
 
+# Prefer C11 (if available) but do not require it.
+set(CMAKE_C_STANDARD 11)
+
 # Adhere to GNU filesystem layout conventions.
 include(GNUInstallDirs)
 
