@@ -40,10 +40,27 @@ if [ -z "$build_dir" ]; then
 	build_dir="$abs_program_dir/../tmp_cmake"
 fi
 
+os=unknown
+if [ -n "$RUNNER_OS" ]; then
+	case "$RUNNER_OS" in
+	MacOS|macOS)
+		os=macos;;
+	Linux|linux)
+		os=linux;;
+	Windows|windows)
+		os=windows;;
+	esac
+fi
+
 global_options=()
 if [ "$crostini" -ne 0 ]; then
 	global_options+=(--crostini)
 fi
+lsan_option=(--lsan)
+case "$os" in
+macos)
+	lsan_option=();;
+esac
 
 cat <<- EOF
 ================================================================================
@@ -58,7 +75,7 @@ command+=(--static)
 command+=(--debug)
 command+=(--ubsan)
 command+=(--asan)
-command+=(--lsan)
+command+=("${lsan_option[@]}")
 command+=(--test)
 command+=(--no-documentation)
 command+=(--multithread)
