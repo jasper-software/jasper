@@ -301,6 +301,10 @@ message("Threads library: ${THREAD_LIBRARY}")
 # Check for the JPEG library.
 ################################################################################
 
+if (APPLE)
+	set(CMAKE_FIND_FRAMEWORK LAST)
+endif()
+
 if (JAS_ENABLE_LIBJPEG)
 	find_package(JPEG ${JAS_LIBJPEG_REQUIRED})
 	message("JPEG library found: ${JPEG_FOUND}")
