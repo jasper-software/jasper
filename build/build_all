@@ -46,7 +46,7 @@ fi
 
 cat <<- EOF
 ================================================================================
-Static Library Debug Build (ASan, LSan, UBSan)
+BUILD: Static Library Debug Build (ASan, LSan, UBSan)
 ================================================================================
 EOF
 command=("$build_program")
@@ -68,7 +68,7 @@ fi
 
 cat <<- EOF
 ================================================================================
-Static Library Debug Build (TSan, UBSan)
+BUILD: Static Library Debug Build (TSan, UBSan)
 ================================================================================
 EOF
 command=("$build_program")
@@ -90,7 +90,7 @@ fi
 
 cat <<- EOF
 ================================================================================
-Shared Library Release Build
+BUILD: Shared Library Release Build
 ================================================================================
 EOF
 command=("$build_program")
@@ -110,7 +110,7 @@ fi
 
 cat <<- EOF
 ================================================================================
-Static Library Release Build
+BUILD: Static Library Release Build
 ================================================================================
 EOF
 command=("$build_program")

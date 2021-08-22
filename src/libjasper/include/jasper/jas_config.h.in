@@ -48,7 +48,7 @@
 #cmakedefine JAS_PREFER_PTHREAD 1
 
 #if defined(JAS_ENABLE_MULTITHREADING_SUPPORT)
-#	if (__STDC_VERSION__ >= 201112L) && !defined(__STDC_NO_THREADS__)
+#	if defined(JAS_HAVE_THREADS_H) && (__STDC_VERSION__ >= 201112L) && !defined(__STDC_NO_THREADS__)
 #		define JAS_THREADS_C11
 #	endif
 #	if defined(JAS_HAVE_PTHREAD)

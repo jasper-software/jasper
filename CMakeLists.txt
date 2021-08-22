@@ -241,6 +241,7 @@ include(JasOpenGL)
 
 find_program(BASH_PROGRAM bash)
 
+check_include_files(threads.h JAS_HAVE_THREADS_H)
 check_include_files(fcntl.h JAS_HAVE_FCNTL_H)
 check_include_files(io.h JAS_HAVE_IO_H)
 check_include_files(unistd.h JAS_HAVE_UNISTD_H)
