@@ -7,7 +7,8 @@ panic()
 }
 
 program_dir=$(dirname "$0") || exit 1
-abs_program_dir=$(readlink -f "$program_dir") || panic
+jas_realpath="$program_dir/jas_realpath"
+abs_program_dir=$("$jas_realpath" "$program_dir") || panic
 
 usage()
 {
