@@ -17,4 +17,4 @@ jobs:
       env:
         CC: ${{ matrix.compiler }}
       shell: bash
-      run: build/my_build -A -U -d -t
+      run: build/build_all

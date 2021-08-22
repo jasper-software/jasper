@@ -1,0 +1,315 @@
+#! /usr/bin/env bash
+
+panic()
+{
+	echo "ERROR: $@"
+	exit 1
+}
+
+program_dir=$(dirname "$0") || exit 1
+abs_program_dir=$(readlink -f "$program_dir") || panic
+
+usage()
+{
+	echo "bad usage: $@"
+	exit 2
+}
+
+enable=1
+enable_install=0
+enable_debug=0
+enable_test=0
+verbose=0
+enable_asan=0
+enable_lsan=0
+enable_ubsan=0
+enable_tsan=0
+enable_shared=1
+sde_top_dir=
+configure_only=0
+enable_doc=0
+use_pthread=0
+enable_multithread=1
+build_dir=
+install_dir=
+crostini=0
+clean_tmp_dir=0
+
+while [ $# -gt 0 ]; do
+	option="$1"
+	case "$option" in
+	--clean-tmp-dir)
+		shift 1
+		clean_tmp_dir=1
+		;;
+	--crostini)
+		shift 1
+		crostini=1
+		;;
+	-v|--verbose)
+		shift 1
+		verbose=$((verbose + 1))
+		;;
+	--configure-only)
+		shift 1
+		configure_only=1
+		;;
+	--install)
+		shift 1
+		enable_install=1
+		;;
+	--test)
+		shift 1
+		enable_test=1
+		;;
+	--documentation)
+		shift 1
+		enable_doc=1
+		;;
+	--no-documentation)
+		shift 1
+		enable_doc=0
+		;;
+	--shared)
+		shift 1
+		enable_shared=1
+		;;
+	--asan)
+		shift 1
+		enable_asan=1
+		;;
+	--lsan)
+		shift 1
+		enable_lsan=1
+		;;
+	--ubsan)
+		shift 1
+		enable_ubsan=1
+		;;
+	--tsan)
+		shift 1
+		enable_tsan=1
+		;;
+	--release)
+		shift 1
+		enable_debug=0
+		;;
+	--debug)
+		shift 1
+		enable_debug=1
+		;;
+	--prefer-pthread)
+		shift 1
+		use_pthread=1
+		;;
+	--print-only)
+		shift 1
+		enable=0
+		;;
+	--shared)
+		shift 1
+		enable_shared=1
+		;;
+	--static)
+		shift 1
+		enable_shared=0
+		;;
+	--no-multithread)
+		shift 1
+		enable_multithread=0
+		;;
+	--multithread)
+		shift 1
+		enable_multithread=1
+		;;
+	--build-dir)
+		shift 1
+		[ $# -gt 0 ] || usage
+		build_dir="$1"
+		shift 1
+		;;
+	--install-dir)
+		shift 1
+		[ $# -gt 0 ] || usage
+		install_dir="$1"
+		shift 1
+		;;
+	--mode)
+		shift 1
+		[ $# -gt 0 ] || usage
+		case "$1" in
+		*)
+			shift 1;;
+		esac
+		;;
+	--*|-*)
+		usage "invalid option $option"
+		;;
+	*)
+		break
+		;;
+	esac
+done
+
+if [ "$crostini" -ne 0 ]; then
+	enable_tsan=0
+fi
+
+source_dir="$abs_program_dir/.."
+tmp_dir="$source_dir/tmp_cmake"
+if [ -z "$build_dir" ]; then
+	build_dir="$tmp_dir/build"
+fi
+if [ -z "$install_dir" ]; then
+	install_dir="$tmp_dir/install"
+fi
+
+echo "source directory $source_dir"
+echo "build directory $build_dir"
+echo "install directory $install_dir"
+if [ -n "$CC" ]; then
+	echo "C compiler $CC"
+fi
+
+if [ -n "$sde_top_dir" ]; then
+	#sde_gcc="$sde_top_dir/bin/gcc"
+	sde_setup="$sde_top_dir/bin/sde_make_setup"
+	eval $("$sde_setup") || panic "setup failed"
+fi
+
+if [ "$clean_tmp_dir" -ne 0 -a -e "$tmp_dir" ]; then
+	echo "Removing $tmp_dir"
+	rm -rf "$tmp_dir" || panic "cannot remove directory $tmp_dir"
+fi
+
+################################################################################
+# Configure
+################################################################################
+
+configure_opts=()
+configure_opts+=(-B"$build_dir")
+configure_opts+=(-H"$source_dir")
+
+configure_opts+=("-DCMAKE_INSTALL_PREFIX=$install_dir")
+
+configure_opts+=("-DCMAKE_VERBOSE_MAKEFILE=true")
+
+if [ "$enable_debug" -ne 0 ]; then
+	configure_opts+=("-DCMAKE_BUILD_TYPE=Debug")
+else
+	configure_opts+=("-DCMAKE_BUILD_TYPE=Release")
+fi
+
+if [ "$enable_shared" -ne 0 ]; then
+	configure_opts+=("-DJAS_ENABLE_SHARED=true")
+else
+	configure_opts+=("-DJAS_ENABLE_SHARED=false")
+fi
+
+if [ "$enable_asan" -ne 0 ]; then
+	configure_opts+=("-DJAS_ENABLE_ASAN=true")
+fi
+if [ "$enable_tsan" -ne 0 ]; then
+	configure_opts+=("-DJAS_ENABLE_TSAN=true")
+fi
+if [ "$enable_lsan" -ne 0 ]; then
+	configure_opts+=("-DJAS_ENABLE_LSAN=true")
+fi
+if [ "$enable_ubsan" -ne 0 ]; then
+	configure_opts+=("-DJAS_ENABLE_USAN=true")
+fi
+
+configure_opts+=("-DJAS_ENABLE_DANGEROUS_INTERNAL_TESTING_MODE=true")
+
+if [ "$enable_doc" -ne 0 ]; then
+	configure_opts+=("-DJAS_ENABLE_DOC=true")
+else
+	configure_opts+=("-DJAS_ENABLE_DOC=false")
+fi
+
+if [ "$enable_multithread" -ne 0 ]; then
+	configure_opts+=("-DJAS_ENABLE_MULTITHREADING_SUPPORT=true")
+else
+	configure_opts+=("-DJAS_ENABLE_MULTITHREADING_SUPPORT=false")
+fi
+if [ "$use_pthread" -ne 0 ]; then
+	configure_opts+=("-DJAS_PREFER_PTHREAD=true")
+fi
+
+configure_opts+=("$@")
+command=(cmake "${configure_opts[@]}")
+echo "============================================================"
+echo "RUNNING: ${command[@]}"
+echo "============================================================"
+if [ "$enable" -ne 0 ]; then
+	"${command[@]}" || panic "cmake failed"
+fi
+
+if [ "$configure_only" -ne 0 ]; then
+	exit
+fi
+
+################################################################################
+#
+################################################################################
+
+build_opts=()
+
+if [ "$verbose" -ne 0 ]; then
+	build_opts+=(--verbose)
+fi
+
+command=(cmake)
+command+=(--build "$build_dir")
+command+=(--clean-first)
+command+=("${build_opts[@]}")
+echo "============================================================"
+echo "RUNNING: ${command[@]}"
+echo "============================================================"
+if [ "$enable" -ne 0 ]; then
+	"${command[@]}" || \
+	  panic "cmake build failed"
+fi
+
+################################################################################
+#
+################################################################################
+
+install_opts=()
+
+if [ "$verbose" -ne 0 ]; then
+	install_opts+=(--verbose)
+fi
+
+if [ "$enable_install" -ne 0 ]; then
+	command=(cmake)
+	command+=(--build "$build_dir")
+	command+=(--target install)
+	command+=("${install_opts[@]}")
+	echo "============================================================"
+	echo "RUNNING: ${command[@]}"
+	echo "============================================================"
+	if [ "$enable" -ne 0 ]; then
+		"${command[@]}" || \
+		  panic "cmake install failed"
+	fi
+fi
+
+################################################################################
+#
+################################################################################
+
+test_opts=()
+
+test_opts+=(--output-on-failure)
+
+command=(ctest "${test_opts[@]}")
+if [ "$enable_test" -ne 0 ]; then
+	echo "============================================================"
+	echo "Testing"
+	echo "RUNNING: ${command[@]}"
+	echo "============================================================"
+	if [ "$enable" -ne 0 ]; then
+		(cd "$build_dir" && "${command[@]}") || panic "ctest failed"
+	fi
+fi
