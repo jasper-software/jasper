@@ -17,34 +17,25 @@ Let $BUILD_DIR denote this directory.
 2) Generate the makefiles used for building the software.  To do this,
 invoke the command:
 
-    cmake -G "Unix Makefiles" -H$SOURCE_DIR -B$BUILD_DIR \
-      -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR $OPTIONS
+    cmake -H$SOURCE_DIR -B$BUILD_DIR -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR \
+      $OPTIONS
 
 where $OPTIONS corresponds to zero or more -D options as described below
 under the heading "Cmake Options".
 
-3) Change the working directory to the build directory.  To do this,
-use the command:
+3) Build the code using the make utility.  To do this, invoke the command:
+
+    cmake --build $BUILD_DIR
+
+4) Run the test suite to ensure that the software seems to be working
+correctly.  To do this, invoke the commands:
 
     cd $BUILD_DIR
+    ctest --output-on-failure
 
-4) Build the code using the make utility.  To do this, invoke the command:
+5) Install the software.  To do this, invoke the command:
 
-    make clean all
-
-5) Run the test suite to ensure that the software seems to be working
-correctly.  To do this, invoke the command:
-
-    make test
-
-If more verbose output from the testing process is desired (e.g., to
-assist in diagnosing a problem), instead use the command:
-
-    make test ARGS="-V"
-
-6) Install the software.  To do this, invoke the command:
-
-    make install
+    cmake --build $BUILD_DIR --target install
 
 Additional Remarks:
 
