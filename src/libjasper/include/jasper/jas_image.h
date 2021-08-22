@@ -345,7 +345,7 @@ typedef struct {
 /*!
 @brief Get the image format table (generated when the library was built).
 */
-JAS_DLLEXPORT
+JAS_EXPORT
 void jas_get_image_format_table(const jas_image_fmt_t**, size_t *);
 
 /******************************************************************************\
@@ -355,23 +355,23 @@ void jas_get_image_format_table(const jas_image_fmt_t**, size_t *);
 /*!
 @brief Create an image.
 */
-JAS_DLLEXPORT jas_image_t *jas_image_create(unsigned numcmpts,
+JAS_EXPORT jas_image_t *jas_image_create(unsigned numcmpts,
   const jas_image_cmptparm_t *cmptparms, jas_clrspc_t clrspc);
 
 /*!
 @brief Create an "empty" image.
 */
-JAS_DLLEXPORT jas_image_t *jas_image_create0(void);
+JAS_EXPORT jas_image_t *jas_image_create0(void);
 
 /*!
 @brief Clone an image.
 */
-JAS_DLLEXPORT jas_image_t *jas_image_copy(jas_image_t *image);
+JAS_EXPORT jas_image_t *jas_image_copy(jas_image_t *image);
 
 /*!
 @brief Deallocate any resources associated with an image.
 */
-JAS_DLLEXPORT void jas_image_destroy(jas_image_t *image);
+JAS_EXPORT void jas_image_destroy(jas_image_t *image);
 
 /*!
 @brief Get the width of the image in units of the image reference grid.
@@ -504,26 +504,26 @@ box on the reference grid (plus one).
 @brief Test if all components are specified at the same positions in space.
 */
 JAS_ATTRIBUTE_PURE
-JAS_DLLEXPORT bool jas_image_cmpt_domains_same(const jas_image_t *image);
+JAS_EXPORT bool jas_image_cmpt_domains_same(const jas_image_t *image);
 
 /*!
 @brief Get the raw size of an image
 (i.e., the nominal size of the image without any compression.
 */
 JAS_ATTRIBUTE_PURE
-JAS_DLLEXPORT
+JAS_EXPORT
 uint_fast32_t jas_image_rawsize(const jas_image_t *image);
 
 /*!
 @brief Create an image from a stream in some specified format.
 */
-JAS_DLLEXPORT
+JAS_EXPORT
 jas_image_t *jas_image_decode(jas_stream_t *in, int fmt, const char *optstr);
 
 /*!
 @brief Write an image to a stream in a specified format.
 */
-JAS_DLLEXPORT
+JAS_EXPORT
 int jas_image_encode(jas_image_t *image, jas_stream_t *out, int fmt,
   const char *optstr);
 
@@ -534,7 +534,7 @@ int jas_image_encode(jas_image_t *image, jas_stream_t *out, int fmt,
 The position and size of the rectangular region to be read is specified
 relative to the component's coordinate system.
 */
-JAS_DLLEXPORT
+JAS_EXPORT
 int jas_image_readcmpt(jas_image_t *image, unsigned cmptno,
   jas_image_coord_t x, jas_image_coord_t y, jas_image_coord_t width,
   jas_image_coord_t height, jas_matrix_t *data);
@@ -542,7 +542,7 @@ int jas_image_readcmpt(jas_image_t *image, unsigned cmptno,
 /*!
 @brief Write a rectangular region of an image component.
 */
-JAS_DLLEXPORT
+JAS_EXPORT
 int jas_image_writecmpt(jas_image_t *image, unsigned cmptno,
   jas_image_coord_t x, jas_image_coord_t y, jas_image_coord_t width,
   jas_image_coord_t height, const jas_matrix_t *data);
@@ -550,18 +550,18 @@ int jas_image_writecmpt(jas_image_t *image, unsigned cmptno,
 /*!
 @brief Delete a component from an image.
 */
-JAS_DLLEXPORT void jas_image_delcmpt(jas_image_t *image, unsigned cmptno);
+JAS_EXPORT void jas_image_delcmpt(jas_image_t *image, unsigned cmptno);
 
 /*!
 @brief Add a component to an image.
 */
-JAS_DLLEXPORT int jas_image_addcmpt(jas_image_t *image, int cmptno,
+JAS_EXPORT int jas_image_addcmpt(jas_image_t *image, int cmptno,
   const jas_image_cmptparm_t *cmptparm);
 
 /*!
 @brief Copy a component from one image to another.
 */
-JAS_DLLEXPORT int jas_image_copycmpt(jas_image_t *dstimage, unsigned dstcmptno,
+JAS_EXPORT int jas_image_copycmpt(jas_image_t *dstimage, unsigned dstcmptno,
   jas_image_t *srcimage, unsigned srccmptno);
 
 JAS_ATTRIBUTE_CONST
@@ -598,7 +598,7 @@ static inline uint_least8_t jas_image_cmptdtype(const jas_image_t *image, unsign
 /*!
 @brief Depalettize an image
 */
-JAS_DLLEXPORT
+JAS_EXPORT
 int jas_image_depalettize(jas_image_t *image, unsigned cmptno,
   unsigned numlutents, const int_fast32_t *lutents, unsigned dtype,
   unsigned newcmptno);
@@ -606,14 +606,14 @@ int jas_image_depalettize(jas_image_t *image, unsigned cmptno,
 /*!
 @brief Read a component sample for an image.
 */
-JAS_DLLEXPORT
+JAS_EXPORT
 int jas_image_readcmptsample(jas_image_t *image, unsigned cmptno, unsigned x,
   unsigned y);
 
 /*!
 @brief Write a component sample for an image.
 */
-JAS_DLLEXPORT
+JAS_EXPORT
 void jas_image_writecmptsample(jas_image_t *image, unsigned cmptno,
   unsigned x, unsigned y, int_fast32_t v);
 
@@ -621,7 +621,7 @@ void jas_image_writecmptsample(jas_image_t *image, unsigned cmptno,
 @brief Get an image component by its type.
 */
 JAS_ATTRIBUTE_PURE
-JAS_DLLEXPORT
+JAS_EXPORT
 int jas_image_getcmptbytype(const jas_image_t *image, jas_image_cmpttype_t ctype);
 
 /******************************************************************************\
@@ -631,7 +631,7 @@ int jas_image_getcmptbytype(const jas_image_t *image, jas_image_cmpttype_t ctype
 /*!
 @brief Clear the table of image formats.
 */
-JAS_DLLEXPORT
+JAS_EXPORT
 void jas_image_clearfmts(void);
 
 #if defined(JAS_INTERNAL_USE_ONLY)
@@ -642,7 +642,7 @@ void jas_image_clearfmts_internal(jas_image_fmtinfo_t *image_fmtinfos,
 /*!
 @brief Add entry to table of image formats.
 */
-JAS_DLLEXPORT
+JAS_EXPORT
 int jas_image_addfmt(int id, const char *name, const char *ext,
   const char *desc, const jas_image_fmtops_t *ops);
 
@@ -656,42 +656,42 @@ int jas_image_addfmt_internal(jas_image_fmtinfo_t *image_fmtinfos,
 @brief Get the ID for the image format with the specified name.
 */
 JAS_ATTRIBUTE_PURE
-JAS_DLLEXPORT
+JAS_EXPORT
 int jas_image_strtofmt(const char *s);
 
 /*!
 @brief Get the name of the image format with the specified ID.
 */
 JAS_ATTRIBUTE_CONST
-JAS_DLLEXPORT
+JAS_EXPORT
 const char *jas_image_fmttostr(int fmt);
 
 /*!
 @brief Lookup image format information by the format ID.
 */
 JAS_ATTRIBUTE_CONST
-JAS_DLLEXPORT
+JAS_EXPORT
 const jas_image_fmtinfo_t *jas_image_lookupfmtbyid(int id);
 
 /*!
 @brief Lookup image format information by the format name.
 */
 JAS_ATTRIBUTE_PURE
-JAS_DLLEXPORT
+JAS_EXPORT
 const jas_image_fmtinfo_t *jas_image_lookupfmtbyname(const char *name);
 
 /*!
 @brief Guess the format of an image file based on its name.
 */
 JAS_ATTRIBUTE_PURE
-JAS_DLLEXPORT
+JAS_EXPORT
 int jas_image_fmtfromname(const char *filename);
 
 /*!
 @brief Get the format of image data in a stream.
 */
 JAS_ATTRIBUTE_PURE
-JAS_DLLEXPORT
+JAS_EXPORT
 int jas_image_getfmt(jas_stream_t *in);
 
 
@@ -705,13 +705,13 @@ int jas_image_getfmt(jas_stream_t *in);
 Test if the sampling of the image is homogeneous.
 */
 JAS_ATTRIBUTE_PURE
-JAS_DLLEXPORT
+JAS_EXPORT
 int jas_image_ishomosamp(const jas_image_t *image);
 
 /*!
 @brief ???
 */
-JAS_DLLEXPORT
+JAS_EXPORT
 int jas_image_sampcmpt(jas_image_t *image, unsigned cmptno, unsigned newcmptno,
   jas_image_coord_t ho, jas_image_coord_t vo, jas_image_coord_t hs,
   jas_image_coord_t vs, int sgnd, unsigned prec);
@@ -719,14 +719,14 @@ int jas_image_sampcmpt(jas_image_t *image, unsigned cmptno, unsigned newcmptno,
 /*!
 @brief Write sample data in a component of an image.
 */
-JAS_DLLEXPORT int jas_image_writecmpt2(jas_image_t *image, unsigned cmptno, jas_image_coord_t x,
+JAS_EXPORT int jas_image_writecmpt2(jas_image_t *image, unsigned cmptno, jas_image_coord_t x,
   jas_image_coord_t y, jas_image_coord_t width, jas_image_coord_t height,
   const long *buf);
 
 /*!
 @brief Read sample data in a component of an image.
 */
-JAS_DLLEXPORT
+JAS_EXPORT
 int jas_image_readcmpt2(jas_image_t *image, unsigned cmptno,
   jas_image_coord_t x, jas_image_coord_t y, jas_image_coord_t width,
   jas_image_coord_t height, long *buf);
@@ -739,13 +739,13 @@ int jas_image_readcmpt2(jas_image_t *image, unsigned cmptno,
 /*!
 @brief Change the color space for an image.
 */
-JAS_DLLEXPORT jas_image_t *jas_image_chclrspc(jas_image_t *image, const jas_cmprof_t *outprof,
+JAS_EXPORT jas_image_t *jas_image_chclrspc(jas_image_t *image, const jas_cmprof_t *outprof,
   jas_cmxform_intent_t intent);
 
 /*!
 @brief Dump the information for an image (for debugging).
 */
-JAS_DLLEXPORT void jas_image_dump(jas_image_t *image, FILE *out);
+JAS_EXPORT void jas_image_dump(jas_image_t *image, FILE *out);
 
 /******************************************************************************\
 * Image format-dependent operations.
@@ -753,58 +753,58 @@ JAS_DLLEXPORT void jas_image_dump(jas_image_t *image, FILE *out);
 
 #if defined(JAS_INCLUDE_JPG_CODEC)
 /* Format-dependent operations for JPG support. */
-JAS_DLLEXPORT jas_image_t *jpg_decode(jas_stream_t *in, const char *optstr);
-JAS_DLLEXPORT int jpg_encode(jas_image_t *image, jas_stream_t *out, const char *optstr);
-JAS_DLLEXPORT int jpg_validate(jas_stream_t *in);
+JAS_EXPORT jas_image_t *jpg_decode(jas_stream_t *in, const char *optstr);
+JAS_EXPORT int jpg_encode(jas_image_t *image, jas_stream_t *out, const char *optstr);
+JAS_EXPORT int jpg_validate(jas_stream_t *in);
 #endif
 
 #if defined(JAS_INCLUDE_MIF_CODEC)
 /* Format-dependent operations for MIF support. */
-JAS_DLLEXPORT jas_image_t *mif_decode(jas_stream_t *in, const char *optstr);
-JAS_DLLEXPORT int mif_encode(jas_image_t *image, jas_stream_t *out, const char *optstr);
-JAS_DLLEXPORT int mif_validate(jas_stream_t *in);
+JAS_EXPORT jas_image_t *mif_decode(jas_stream_t *in, const char *optstr);
+JAS_EXPORT int mif_encode(jas_image_t *image, jas_stream_t *out, const char *optstr);
+JAS_EXPORT int mif_validate(jas_stream_t *in);
 #endif
 
 #if defined(JAS_INCLUDE_PNM_CODEC)
 /* Format-dependent operations for PNM support. */
-JAS_DLLEXPORT jas_image_t *pnm_decode(jas_stream_t *in, const char *optstr);
-JAS_DLLEXPORT int pnm_encode(jas_image_t *image, jas_stream_t *out, const char *optstr);
-JAS_DLLEXPORT int pnm_validate(jas_stream_t *in);
+JAS_EXPORT jas_image_t *pnm_decode(jas_stream_t *in, const char *optstr);
+JAS_EXPORT int pnm_encode(jas_image_t *image, jas_stream_t *out, const char *optstr);
+JAS_EXPORT int pnm_validate(jas_stream_t *in);
 #endif
 
 #if defined(JAS_INCLUDE_RAS_CODEC)
 /* Format-dependent operations for Sun Rasterfile support. */
-JAS_DLLEXPORT jas_image_t *ras_decode(jas_stream_t *in, const char *optstr);
-JAS_DLLEXPORT int ras_encode(jas_image_t *image, jas_stream_t *out, const char *optstr);
-JAS_DLLEXPORT int ras_validate(jas_stream_t *in);
+JAS_EXPORT jas_image_t *ras_decode(jas_stream_t *in, const char *optstr);
+JAS_EXPORT int ras_encode(jas_image_t *image, jas_stream_t *out, const char *optstr);
+JAS_EXPORT int ras_validate(jas_stream_t *in);
 #endif
 
 #if defined(JAS_INCLUDE_BMP_CODEC)
 /* Format-dependent operations for BMP support. */
-JAS_DLLEXPORT jas_image_t *bmp_decode(jas_stream_t *in, const char *optstr);
-JAS_DLLEXPORT int bmp_encode(jas_image_t *image, jas_stream_t *out, const char *optstr);
-JAS_DLLEXPORT int bmp_validate(jas_stream_t *in);
+JAS_EXPORT jas_image_t *bmp_decode(jas_stream_t *in, const char *optstr);
+JAS_EXPORT int bmp_encode(jas_image_t *image, jas_stream_t *out, const char *optstr);
+JAS_EXPORT int bmp_validate(jas_stream_t *in);
 #endif
 
 #if defined(JAS_INCLUDE_JP2_CODEC)
 /* Format-dependent operations for JP2 support. */
-JAS_DLLEXPORT jas_image_t *jp2_decode(jas_stream_t *in, const char *optstr);
-JAS_DLLEXPORT int jp2_encode(jas_image_t *image, jas_stream_t *out, const char *optstr);
-JAS_DLLEXPORT int jp2_validate(jas_stream_t *in);
+JAS_EXPORT jas_image_t *jp2_decode(jas_stream_t *in, const char *optstr);
+JAS_EXPORT int jp2_encode(jas_image_t *image, jas_stream_t *out, const char *optstr);
+JAS_EXPORT int jp2_validate(jas_stream_t *in);
 #endif
 
 #if defined(JAS_INCLUDE_JPC_CODEC)
 /* Format-dependent operations for JPEG-2000 code stream support. */
-JAS_DLLEXPORT jas_image_t *jpc_decode(jas_stream_t *in, const char *optstr);
-JAS_DLLEXPORT int jpc_encode(jas_image_t *image, jas_stream_t *out, const char *optstr);
-JAS_DLLEXPORT int jpc_validate(jas_stream_t *in);
+JAS_EXPORT jas_image_t *jpc_decode(jas_stream_t *in, const char *optstr);
+JAS_EXPORT int jpc_encode(jas_image_t *image, jas_stream_t *out, const char *optstr);
+JAS_EXPORT int jpc_validate(jas_stream_t *in);
 #endif
 
 #if defined(JAS_INCLUDE_PGX_CODEC)
 /* Format-dependent operations for PGX support. */
-JAS_DLLEXPORT jas_image_t *pgx_decode(jas_stream_t *in, const char *optstr);
-JAS_DLLEXPORT int pgx_encode(jas_image_t *image, jas_stream_t *out, const char *optstr);
-JAS_DLLEXPORT int pgx_validate(jas_stream_t *in);
+JAS_EXPORT jas_image_t *pgx_decode(jas_stream_t *in, const char *optstr);
+JAS_EXPORT int pgx_encode(jas_image_t *image, jas_stream_t *out, const char *optstr);
+JAS_EXPORT int pgx_validate(jas_stream_t *in);
 #endif
 
 /*!

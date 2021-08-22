@@ -199,11 +199,20 @@ endif()
 # Also, try adding MATH_LIBRARY to fix a Gentoo problem.
 target_link_libraries(libjasper ${JPEG_LIBRARIES} ${MATH_LIBRARY})
 
+generate_export_header(libjasper
+  EXPORT_FILE_NAME include/jasper/jas_export_cmake.h
+  INCLUDE_GUARD_NAME JAS_EXPORT_CMAKE_H
+  EXPORT_MACRO_NAME JAS_EXPORT
+  NO_EXPORT_MACRO_NAME JAS_LOCAL
+)
+
 install(TARGETS libjasper
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
-install(FILES ${libjasper_headers}
+install(FILES
+  ${libjasper_headers}
+  "${CMAKE_CURRENT_BINARY_DIR}/include/jasper/jas_export_cmake.h"
   DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/jasper"
 )

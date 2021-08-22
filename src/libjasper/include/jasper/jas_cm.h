@@ -289,39 +289,39 @@ void *jas_cm_prof_getattr(jas_cm_prof_t *prof, jas_cm_attrname_t name);
 
 /*!
 */
-JAS_DLLEXPORT jas_cmxform_t *jas_cmxform_create(const jas_cmprof_t *inprof, const jas_cmprof_t *outprof,
+JAS_EXPORT jas_cmxform_t *jas_cmxform_create(const jas_cmprof_t *inprof, const jas_cmprof_t *outprof,
   const jas_cmprof_t *proofprof, jas_cmxform_op_t op, jas_cmxform_intent_t intent, jas_cmxform_optm_t optimize);
 
 /*!
 */
-JAS_DLLEXPORT void jas_cmxform_destroy(jas_cmxform_t *xform);
+JAS_EXPORT void jas_cmxform_destroy(jas_cmxform_t *xform);
 
 /*!
 Apply a transform to data.
 */
-JAS_DLLEXPORT int jas_cmxform_apply(const jas_cmxform_t *xform, const jas_cmpixmap_t *in,
+JAS_EXPORT int jas_cmxform_apply(const jas_cmxform_t *xform, const jas_cmpixmap_t *in,
   jas_cmpixmap_t *out);
 
 /*!
 Create a color-management profile from an ICC profile.
 */
-JAS_DLLEXPORT jas_cmprof_t *jas_cmprof_createfromiccprof(const jas_iccprof_t *iccprof);
+JAS_EXPORT jas_cmprof_t *jas_cmprof_createfromiccprof(const jas_iccprof_t *iccprof);
 
 /*!
 Create a color-management profile from a color space.
 */
-JAS_DLLEXPORT jas_cmprof_t *jas_cmprof_createfromclrspc(jas_clrspc_t clrspc);
+JAS_EXPORT jas_cmprof_t *jas_cmprof_createfromclrspc(jas_clrspc_t clrspc);
 
 /*!
 @brief Destroy a color-management profile.
 */
-JAS_DLLEXPORT void jas_cmprof_destroy(jas_cmprof_t *prof);
+JAS_EXPORT void jas_cmprof_destroy(jas_cmprof_t *prof);
 
 /*!
 @brief Get the number of channels associated with a particular color space.
 */
 unsigned jas_clrspc_numchans(jas_clrspc_t clrspc);
-JAS_DLLEXPORT jas_iccprof_t *jas_iccprof_createfromcmprof(const jas_cmprof_t *prof);
+JAS_EXPORT jas_iccprof_t *jas_iccprof_createfromcmprof(const jas_cmprof_t *prof);
 
 /*!
 @brief Get the color space associated with a color-management profile.
@@ -331,7 +331,7 @@ JAS_DLLEXPORT jas_iccprof_t *jas_iccprof_createfromcmprof(const jas_cmprof_t *pr
 /*!
 @brief Copy a color-management profile.
 */
-JAS_DLLEXPORT jas_cmprof_t *jas_cmprof_copy(const jas_cmprof_t *prof);
+JAS_EXPORT jas_cmprof_t *jas_cmprof_copy(const jas_cmprof_t *prof);
 
 /*!
  * @}

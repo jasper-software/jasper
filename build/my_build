@@ -24,13 +24,16 @@ enable_asan=0
 enable_lsan=0
 enable_ubsan=0
 enable_tsan=0
+enable_shared=1
 sde_top_dir=
 configure_only=0
 enable_doc=0
 use_pthread=0
 
-while getopts m:PE:AULTditvCDn opt; do
+while getopts m:PE:AULTditvCDnS: opt; do
 	case $opt in
+	S)
+		enable_shared="$OPTARG";;
 	P)
 		use_pthread=1;;
 	n)
@@ -137,9 +140,13 @@ configure_opts+=(-H"$source_dir")
 configure_opts+=("-DCMAKE_INSTALL_PREFIX=$install_dir")
 if [ "$enable_debug" -ne 0 ]; then
 	configure_opts+=("-DCMAKE_BUILD_TYPE=Debug")
-	configure_opts+=("-DJAS_ENABLE_SHARED=false")
 else
 	configure_opts+=("-DCMAKE_BUILD_TYPE=Release")
+fi
+if [ "$enable_shared" -ne 0 ]; then
+	configure_opts+=("-DJAS_ENABLE_SHARED=true")
+else
+	configure_opts+=("-DJAS_ENABLE_SHARED=false")
 fi
 if [ "$enable_asan" -ne 0 ]; then
 	configure_opts+=("-DJAS_ENABLE_ASAN=true")

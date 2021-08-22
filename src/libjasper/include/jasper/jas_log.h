@@ -138,19 +138,19 @@ static inline int jas_logtype_get_priority(jas_logtype_t type)
 /*!
 @brief Print formatted log message.
 */
-JAS_DLLEXPORT
+JAS_EXPORT
 int jas_vlogmsgf(jas_logtype_t type, const char *fmt, va_list ap);
 
 /*!
 @brief Output a log message to standard error.
 */
-JAS_DLLEXPORT
+JAS_EXPORT
 int jas_vlogmsgf_stderr(jas_logtype_t type, const char *fmt, va_list ap);
 
 /*!
 @brief Output a log message to nowhere (i.e., discard the message).
 */
-JAS_DLLEXPORT
+JAS_EXPORT
 int jas_vlogmsgf_discard(jas_logtype_t type, const char *fmt, va_list ap);
 
 /*!

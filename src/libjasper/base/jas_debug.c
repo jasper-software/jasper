@@ -173,7 +173,7 @@ int jas_logdebugf(int priority, const char *fmt, ...)
 @brief
 @details
 */
-JAS_DLLEXPORT
+JAS_EXPORT
 int jas_vlogmsgf(jas_logtype_t type, const char *fmt, va_list ap)
 {
 	int ret;
@@ -183,7 +183,7 @@ int jas_vlogmsgf(jas_logtype_t type, const char *fmt, va_list ap)
 }
 
 /* Perform formatted output to standard error. */
-JAS_DLLEXPORT
+JAS_EXPORT
 int jas_vlogmsgf_stderr(jas_logtype_t type, const char *fmt, va_list ap)
 {
 #if 1
@@ -220,7 +220,7 @@ int jas_vlogmsgf_stderr(jas_logtype_t type, const char *fmt, va_list ap)
 }
 
 /* Perform formatted output to standard error. */
-JAS_DLLEXPORT
+JAS_EXPORT
 int jas_vlogmsgf_discard(jas_logtype_t type, const char *fmt, va_list ap)
 {
 	JAS_UNUSED(type);

@@ -276,27 +276,27 @@ static inline jas_seqent_t *jas_matrix_getvref(const jas_matrix_t *matrix, jas_m
 /*!
 Create a matrix with the specified dimensions.
 */
-JAS_DLLEXPORT jas_matrix_t *jas_matrix_create(jas_matind_t numrows, jas_matind_t numcols);
+JAS_EXPORT jas_matrix_t *jas_matrix_create(jas_matind_t numrows, jas_matind_t numcols);
 
 /*!
 Destroy a matrix.
 */
-JAS_DLLEXPORT void jas_matrix_destroy(jas_matrix_t *matrix);
+JAS_EXPORT void jas_matrix_destroy(jas_matrix_t *matrix);
 
 /*!
 Resize a matrix.  The previous contents of the matrix are lost.
 */
-JAS_DLLEXPORT int jas_matrix_resize(jas_matrix_t *matrix, jas_matind_t numrows, jas_matind_t numcols);
+JAS_EXPORT int jas_matrix_resize(jas_matrix_t *matrix, jas_matind_t numrows, jas_matind_t numcols);
 
 /*!
 @brief
 */
-JAS_DLLEXPORT int jas_matrix_output(jas_matrix_t *matrix, FILE *out);
+JAS_EXPORT int jas_matrix_output(jas_matrix_t *matrix, FILE *out);
 
 /*!
 Create a matrix that references part of another matrix.
 */
-JAS_DLLEXPORT int jas_matrix_bindsub(jas_matrix_t *mat0, jas_matrix_t *mat1, jas_matind_t r0,
+JAS_EXPORT int jas_matrix_bindsub(jas_matrix_t *mat0, jas_matrix_t *mat1, jas_matind_t r0,
   jas_matind_t c0, jas_matind_t r1, jas_matind_t c1);
 
 /*!
@@ -318,28 +318,28 @@ static inline int jas_matrix_bindcol(jas_matrix_t *mat0, jas_matrix_t *mat1, jas
 /*!
 Clip the values of matrix elements to the specified range.
 */
-JAS_DLLEXPORT void jas_matrix_clip(jas_matrix_t *matrix, jas_seqent_t minval,
+JAS_EXPORT void jas_matrix_clip(jas_matrix_t *matrix, jas_seqent_t minval,
   jas_seqent_t maxval);
 
 /*!
 Arithmetic shift left of all elements in a matrix.
 */
-JAS_DLLEXPORT void jas_matrix_asl(jas_matrix_t *matrix, unsigned n);
+JAS_EXPORT void jas_matrix_asl(jas_matrix_t *matrix, unsigned n);
 
 /*!
 Arithmetic shift right of all elements in a matrix.
 */
-JAS_DLLEXPORT void jas_matrix_asr(jas_matrix_t *matrix, unsigned n);
+JAS_EXPORT void jas_matrix_asr(jas_matrix_t *matrix, unsigned n);
 
 /*!
 Almost-but-not-quite arithmetic shift right of all elements in a matrix.
 */
-JAS_DLLEXPORT void jas_matrix_divpow2(jas_matrix_t *matrix, unsigned n);
+JAS_EXPORT void jas_matrix_divpow2(jas_matrix_t *matrix, unsigned n);
 
 /*!
 Set all elements of a matrix to the specified value.
 */
-JAS_DLLEXPORT void jas_matrix_setall(jas_matrix_t *matrix, jas_seqent_t val);
+JAS_EXPORT void jas_matrix_setall(jas_matrix_t *matrix, jas_seqent_t val);
 
 /*!
 The spacing between rows of a matrix.
@@ -366,17 +366,17 @@ static inline size_t jas_matrix_step(const jas_matrix_t *matrix)
 /*!
 Compare two matrices for equality.
 */
-JAS_DLLEXPORT int jas_matrix_cmp(jas_matrix_t *mat0, jas_matrix_t *mat1);
+JAS_EXPORT int jas_matrix_cmp(jas_matrix_t *mat0, jas_matrix_t *mat1);
 
 /*!
 @brief
 */
-JAS_DLLEXPORT jas_matrix_t *jas_matrix_copy(jas_matrix_t *x);
+JAS_EXPORT jas_matrix_t *jas_matrix_copy(jas_matrix_t *x);
 
 /*!
 @brief
 */
-JAS_DLLEXPORT jas_matrix_t *jas_matrix_input(FILE *);
+JAS_EXPORT jas_matrix_t *jas_matrix_input(FILE *);
 
 /*!
 @brief
@@ -411,12 +411,12 @@ static inline jas_seqent_t jas_seqent_asr(jas_seqent_t x, unsigned n)
 /*!
 @brief
 */
-JAS_DLLEXPORT jas_seq2d_t *jas_seq2d_copy(jas_seq2d_t *x);
+JAS_EXPORT jas_seq2d_t *jas_seq2d_copy(jas_seq2d_t *x);
 
 /*!
 @brief
 */
-JAS_DLLEXPORT jas_matrix_t *jas_seq2d_create(jas_matind_t xstart, jas_matind_t ystart,
+JAS_EXPORT jas_matrix_t *jas_seq2d_create(jas_matind_t xstart, jas_matind_t ystart,
   jas_matind_t xend, jas_matind_t yend);
 
 static inline void jas_seq2d_destroy(jas_seq2d_t *s)
@@ -537,7 +537,7 @@ static inline bool jas_seq2d_empty(const jas_seq2d_t *s)
 /*!
 @brief
 */
-JAS_DLLEXPORT int jas_seq2d_bindsub(jas_matrix_t *s, jas_matrix_t *s1, jas_matind_t xstart,
+JAS_EXPORT int jas_seq2d_bindsub(jas_matrix_t *s, jas_matrix_t *s1, jas_matind_t xstart,
   jas_matind_t ystart, jas_matind_t xend, jas_matind_t yend);
 
 /******************************************************************************\

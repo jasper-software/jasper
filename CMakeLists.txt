@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 2.8.11)
+cmake_minimum_required(VERSION 3.12)
 
 project(JasPer C)
 
@@ -81,6 +81,7 @@ include(CheckFunctionExists)
 include(CheckCSourceCompiles)
 include(CTest)
 include(Sanitizers)
+include(GenerateExportHeader)
 
 cmake_policy(SET CMP0012 NEW)
 
@@ -206,24 +207,31 @@ if (NOT MSVC)
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wmissing-declarations -Wredundant-decls")
 endif()
 
+#cmake_policy(SET CMP0063 NEW)
 if (JAS_ENABLE_HIDDEN AND NOT WIN32)
-	# don't export internal symbols
-	check_c_compiler_flag("-fvisibility=hidden" JAS_HAVE_VISIBILITY)
-	if (JAS_HAVE_VISIBILITY)
-		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fvisibility=hidden -DJAS_HAVE_VISIBILITY")
-	endif()
-
-	if (NOT (CMAKE_BUILD_TYPE MATCHES "Debug"))
-		# remove unused internal symbols
-		check_c_compiler_flag("-ffunction-sections" HAVE_FUNCTION_SECTIONS)
-		check_c_compiler_flag("-fdata-sections" HAVE_DATA_SECTIONS)
-		check_c_compiler_flag("-Wl,--gc-sections" HAVE_GC_SECTIONS)
-
-		if (HAVE_FUNCTION_SECTIONS AND HAVE_DATA_SECTIONS AND HAVE_GC_SECTIONS)
-			set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -ffunction-sections -fdata-sections -Wl,--gc-sections")
-		endif()
-	endif()
+	set(CMAKE_C_VISIBILITY_PRESET hidden)
+	set(CMAKE_VISIBILITY_INLINES_HIDDEN 0)
 endif()
+
+# FIXME - Delete this obsolete stuff someday.
+#if (JAS_ENABLE_HIDDEN AND NOT WIN32)
+#	# don't export internal symbols
+#	check_c_compiler_flag("-fvisibility=hidden" JAS_HAVE_VISIBILITY)
+#	if (JAS_HAVE_VISIBILITY)
+#		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fvisibility=hidden -DJAS_HAVE_VISIBILITY")
+#	endif()
+#
+#	if (NOT (CMAKE_BUILD_TYPE MATCHES "Debug"))
+#		# remove unused internal symbols
+#		check_c_compiler_flag("-ffunction-sections" HAVE_FUNCTION_SECTIONS)
+#		check_c_compiler_flag("-fdata-sections" HAVE_DATA_SECTIONS)
+#		check_c_compiler_flag("-Wl,--gc-sections" HAVE_GC_SECTIONS)
+#
+#		if (HAVE_FUNCTION_SECTIONS AND HAVE_DATA_SECTIONS AND HAVE_GC_SECTIONS)
+#			set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -ffunction-sections -fdata-sections -Wl,--gc-sections")
+#		endif()
+#	endif()
+#endif()
 
 ################################################################################
 # Perform plaform checks.

@@ -1165,7 +1165,7 @@ long jas_stream_setrwcount(jas_stream_t *stream, long rwcnt)
 	return old;
 }
 
-JAS_DLLEXPORT
+JAS_EXPORT
 long jas_stream_setrwlimit(jas_stream_t *stream, long rwlimit)
 {
 	long old;

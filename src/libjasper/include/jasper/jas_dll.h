@@ -65,6 +65,7 @@
 /* The configuration header file should be included first. */
 #include <jasper/jas_config.h>
 
+#if 0
 #if defined(JAS_DLL)
 	#if defined(_WIN32)
 		#if defined(JAS_BUILDING_DLL)
@@ -89,5 +90,13 @@
 	#define JAS_DLLEXPORT
 	#define JAS_DLLLOCAL
 #endif
+#endif
+
+#include <jasper/jas_export_cmake.h>
+
+/* For backward compatibility only. */
+#define JAS_DLLEXPORT JAS_EXPORT
+/* For backward compatibility only. */
+#define JAS_DLLLOCAL JAS_LOCAL
 
 #endif

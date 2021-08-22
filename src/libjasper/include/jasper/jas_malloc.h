@@ -200,7 +200,7 @@ This function has an identical behavior as malloc (from the C standard
 library), except that a zero-sized allocation returns a non-null pointer
 (assuming no out-of-memory error occurs).
 */
-JAS_DLLEXPORT
+JAS_EXPORT
 void *jas_malloc(size_t size);
 
 /*!
@@ -210,7 +210,7 @@ Free memory.
 @details
 This function has an identical behavior as free (from the C standard library).
 */
-JAS_DLLEXPORT
+JAS_EXPORT
 void jas_free(void *ptr);
 
 /*!
@@ -221,7 +221,7 @@ Resize a block of allocated memory.
 This function has an identical behavior as realloc (from the C standard
 library).
 */
-JAS_DLLEXPORT
+JAS_EXPORT
 void *jas_realloc(void *ptr, size_t size);
 
 /*!
@@ -232,26 +232,26 @@ Allocate a block of memory and initialize the contents to zero.
 This function has an identical behavior as calloc (from the C standard
 library).
 */
-JAS_DLLEXPORT
+JAS_EXPORT
 void *jas_calloc(size_t num_elements, size_t element_size);
 
 /*!
 @brief
 Allocate array (with overflow checking).
 */
-JAS_DLLEXPORT void *jas_alloc2(size_t num_elements, size_t element_size);
+JAS_EXPORT void *jas_alloc2(size_t num_elements, size_t element_size);
 
 /*!
 @brief
 Allocate array of arrays (with overflow checking).
 */
-JAS_DLLEXPORT void *jas_alloc3(size_t num_arrays, size_t array_size, size_t element_size);
+JAS_EXPORT void *jas_alloc3(size_t num_arrays, size_t array_size, size_t element_size);
 
 /*!
 @brief
 Resize a block of allocated memory (with overflow checking).
 */
-JAS_DLLEXPORT void *jas_realloc2(void *ptr, size_t num_elements, size_t element_size);
+JAS_EXPORT void *jas_realloc2(void *ptr, size_t num_elements, size_t element_size);
 
 /*!
 @brief
@@ -274,7 +274,7 @@ The limit on the amount of memory that the allocator can use should
 never be set to a value less than the amount of memory currently being
 used by the allocator (as doing so results in undefined behavior).
 */
-JAS_DLLEXPORT
+JAS_EXPORT
 void jas_set_max_mem_usage(size_t max_mem);
 
 /*!
@@ -289,7 +289,7 @@ is enabled.
 Calling this function if the allocator wrapper is not enabled results
 in undefined behavior.
 */
-JAS_DLLEXPORT
+JAS_EXPORT
 size_t jas_get_mem_usage(void);
 
 /*!
@@ -305,7 +305,7 @@ with the allocator.
 The object referenced by @c allocator must have a lifetime that extends
 until @c jas_allocator_cleanup is called for the allocator.
 */
-JAS_DLLEXPORT
+JAS_EXPORT
 void jas_std_allocator_init(jas_std_allocator_t *allocator);
 
 /*!
@@ -317,7 +317,7 @@ This function cleans up an allocator, releasing any resources associated
 with the allocator.
 After clean up is performed, the allocator can no longer be used.
 */
-JAS_DLLEXPORT
+JAS_EXPORT
 void jas_allocator_cleanup(jas_allocator_t *allocator);
 
 #if defined(JAS_INTERNAL_USE_ONLY)

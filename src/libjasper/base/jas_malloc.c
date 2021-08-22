@@ -117,7 +117,7 @@ jas_basic_allocator_t jas_basic_allocator = {
 * Basic memory allocation and deallocation primitives.
 \******************************************************************************/
 
-JAS_DLLEXPORT
+JAS_EXPORT
 void *jas_malloc(size_t size)
 {
 	assert(jas_allocator);
@@ -132,7 +132,7 @@ void *jas_malloc(size_t size)
 	return result;
 }
 
-JAS_DLLEXPORT
+JAS_EXPORT
 void *jas_realloc(void *ptr, size_t size)
 {
 	assert(jas_allocator);
@@ -155,7 +155,7 @@ void *jas_realloc(void *ptr, size_t size)
 	return result;
 }
 
-JAS_DLLEXPORT
+JAS_EXPORT
 void jas_free(void *ptr)
 {
 	assert(jas_allocator);
@@ -213,7 +213,7 @@ void *jas_realloc2(void *ptr, size_t num_elements, size_t element_size)
 /******************************************************************************\
 \******************************************************************************/
 
-JAS_DLLEXPORT
+JAS_EXPORT
 void jas_allocator_cleanup(jas_allocator_t *allocator)
 {
 	if (allocator->cleanup) {
@@ -224,14 +224,14 @@ void jas_allocator_cleanup(jas_allocator_t *allocator)
 /******************************************************************************\
 \******************************************************************************/
 
-JAS_DLLEXPORT
+JAS_EXPORT
 void *jas_std_alloc(jas_allocator_t *allocator, size_t size);
-JAS_DLLEXPORT
+JAS_EXPORT
 void *jas_std_realloc(jas_allocator_t *allocator, void *ptr, size_t size);
-JAS_DLLEXPORT
+JAS_EXPORT
 void jas_std_free(jas_allocator_t *allocator, void *ptr);
 
-JAS_DLLEXPORT
+JAS_EXPORT
 void jas_std_allocator_init(jas_std_allocator_t *allocator)
 {
 	JAS_CAST(void, allocator);
@@ -241,7 +241,7 @@ void jas_std_allocator_init(jas_std_allocator_t *allocator)
 	allocator->base.realloc = jas_std_realloc;
 }
 
-JAS_DLLEXPORT
+JAS_EXPORT
 void *jas_std_alloc(jas_allocator_t *allocator, size_t size)
 {
 	JAS_CAST(void, allocator);
@@ -251,7 +251,7 @@ void *jas_std_alloc(jas_allocator_t *allocator, size_t size)
 	return result;
 }
 
-JAS_DLLEXPORT
+JAS_EXPORT
 void *jas_std_realloc(jas_allocator_t *allocator, void *ptr, size_t size)
 {
 	JAS_CAST(void, allocator);
@@ -261,7 +261,7 @@ void *jas_std_realloc(jas_allocator_t *allocator, void *ptr, size_t size)
 	return result;
 }
 
-JAS_DLLEXPORT
+JAS_EXPORT
 void jas_std_free(jas_allocator_t *allocator, void *ptr)
 {
 	JAS_CAST(void, allocator);
@@ -272,13 +272,13 @@ void jas_std_free(jas_allocator_t *allocator, void *ptr)
 /******************************************************************************\
 \******************************************************************************/
 
-JAS_DLLEXPORT
+JAS_EXPORT
 void *jas_basic_alloc(jas_allocator_t *allocator, size_t size);
-JAS_DLLEXPORT
+JAS_EXPORT
 void *jas_basic_realloc(jas_allocator_t *allocator, void *ptr, size_t size);
-JAS_DLLEXPORT
+JAS_EXPORT
 void jas_basic_free(jas_allocator_t *allocator, void *ptr);
-JAS_DLLEXPORT
+JAS_EXPORT
 void jas_basic_cleanup(jas_allocator_t *allocator);
 
 #define JAS_BMA_MAGIC 0xdeadbeefULL
@@ -377,7 +377,7 @@ void jas_basic_allocator_init(jas_basic_allocator_t *allocator,
 #endif
 }
 
-JAS_DLLEXPORT
+JAS_EXPORT
 void jas_basic_cleanup(jas_allocator_t *allocator)
 {
 	jas_basic_allocator_t *a = JAS_CAST(jas_basic_allocator_t *,
@@ -390,7 +390,7 @@ void jas_basic_cleanup(jas_allocator_t *allocator)
 #endif
 }
 
-JAS_DLLEXPORT
+JAS_EXPORT
 void *jas_basic_alloc(jas_allocator_t *allocator, size_t size)
 {
 	void *result;
@@ -461,7 +461,7 @@ done:
 	return result;
 }
 
-JAS_DLLEXPORT
+JAS_EXPORT
 void *jas_basic_realloc(jas_allocator_t *allocator, void *ptr, size_t size)
 {
 	void *result;
@@ -550,7 +550,7 @@ done:
 	return result;
 }
 
-JAS_DLLEXPORT
+JAS_EXPORT
 void jas_basic_free(jas_allocator_t *allocator, void *ptr)
 {
 	jas_mb_t *mb;

@@ -117,49 +117,49 @@ int jas_getdbglevel(void)
 @brief
 Set the library debug level.
 */
-JAS_DLLEXPORT
+JAS_EXPORT
 int jas_setdbglevel(int dbglevel);
 
 /*!
 @brief
 Print formatted text for the standard error stream (i.e., stderr).
 */
-JAS_DLLEXPORT
+JAS_EXPORT
 int jas_eprintf(const char *fmt, ...);
 
 /*!
 @brief
 Generate a generic log message.
 */
-JAS_DLLEXPORT
+JAS_EXPORT
 int jas_logprintf(const char *fmt, ...);
 
 /*!
 @brief
 Generate an error log message.
 */
-JAS_DLLEXPORT
+JAS_EXPORT
 int jas_logerrorf(const char *fmt, ...);
 
 /*!
 @brief
 Generate a warning log message.
 */
-JAS_DLLEXPORT
+JAS_EXPORT
 int jas_logwarnf(const char *fmt, ...);
 
 /*!
 @brief
 Generate an informational log message.
 */
-JAS_DLLEXPORT
+JAS_EXPORT
 int jas_loginfof(const char *fmt, ...);
 
 /*!
 @brief
 Generate a debugging log message.
 */
-JAS_DLLEXPORT
+JAS_EXPORT
 int jas_logdebugf(int priority, const char *fmt, ...);
 
 int jas_logmemdump(const void *data, size_t len);
@@ -168,14 +168,14 @@ int jas_logmemdump(const void *data, size_t len);
 @brief
 Dump memory to a stream.
 */
-JAS_DLLEXPORT
+JAS_EXPORT
 int jas_memdump(FILE *out, const void *data, size_t len);
 
 /*!
 @brief
 Warn about the use of deprecated functionality.
 */
-JAS_DLLEXPORT
+JAS_EXPORT
 void jas_deprecated(const char *s);
 
 /*!

@@ -735,7 +735,7 @@ int jas_image_addfmt(int id, const char *name, const char *ext,
 
 /* This is for future consideration for addition to the library API. */
 #if 0
-JAS_DLLEXPORT
+JAS_EXPORT
 int jas_image_delfmt(int fmtid)
 {
 	if (fmtid < 0 || fmtid >= JAS_CAST(int, jas_image_numfmts)) {

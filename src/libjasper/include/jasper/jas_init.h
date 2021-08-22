@@ -202,7 +202,7 @@ prior to calling @c jas_initialize.
 If the initialization of the library is successful, zero is returned;
 otherwise, a nonzero value is returned.
 */
-JAS_DLLEXPORT
+JAS_EXPORT
 int jas_initialize(void);
 
 /*!
@@ -223,7 +223,7 @@ to configure and initialize the library.
 If the library is succesfully initialized, zero is returned;
 otherwise, a nonzero value is returned.
 */
-JAS_DLLEXPORT
+JAS_EXPORT
 int jas_init(void);
 
 /*!
@@ -232,7 +232,7 @@ int jas_init(void);
 @details
 This function performs any clean up for the JasPer library.
 */
-JAS_DLLEXPORT
+JAS_EXPORT
 void jas_cleanup(void);
 
 /*!
@@ -244,7 +244,7 @@ settings.
 These settings may be change via the @c jas_conf_* family of function
 prior to invoking @c jas_initialize.
 */
-JAS_DLLEXPORT
+JAS_EXPORT
 void jas_conf_clear(void);
 
 /*!
@@ -256,7 +256,7 @@ until @c jas_cleanup is invoked.
 How the memory in which @c *allocator reside is allocated is the
 responsibility of the caller.
 */
-JAS_DLLEXPORT
+JAS_EXPORT
 void jas_conf_set_allocator(jas_allocator_t *allocator);
 
 /*!
@@ -272,14 +272,14 @@ usage.
 Not placing a bound on the amount of memory used by the JasPer library
 would have many severe negative security implications.
 */
-JAS_DLLEXPORT
+JAS_EXPORT
 void jas_conf_set_allocator_wrapper(bool enable);
 
 /*!
 @brief Set the initial debug level for the library.
 @details
 */
-JAS_DLLEXPORT
+JAS_EXPORT
 void jas_conf_set_debug_level(int debug_level);
 
 /*!
@@ -288,7 +288,7 @@ void jas_conf_set_debug_level(int debug_level);
 
 @details
 */
-JAS_DLLEXPORT
+JAS_EXPORT
 void jas_conf_set_max_mem(size_t max_mem);
 
 /*!
@@ -297,7 +297,7 @@ allowed in an image to be decoded.
 
 @details
 */
-JAS_DLLEXPORT
+JAS_EXPORT
 void jas_conf_set_dec_default_max_samples(size_t max_samples);
 
 /*!
@@ -306,7 +306,7 @@ informational messages.
 
 @details
 */
-JAS_DLLEXPORT
+JAS_EXPORT
 void jas_conf_set_vlogmsgf(int (*func)(jas_logtype_t, const char *,
   va_list));
 
@@ -318,7 +318,7 @@ The entries for the image-format table that reside in the array pointed to
 by @c formats must have a lifetime that includes the point at which the
 JasPer library is cleaned up (via @c jas_cleanup).
 */
-JAS_DLLEXPORT
+JAS_EXPORT
 void jas_conf_set_image_format_table(const jas_image_fmt_t *,
   size_t num_formats);
 
@@ -326,13 +326,13 @@ void jas_conf_set_image_format_table(const jas_image_fmt_t *,
 @brief
 @details
 */
-JAS_DLLEXPORT
+JAS_EXPORT
 jas_context_t jas_context_create(void);
 
 /*!
 The context being destroyed must not be the current context.
 */
-JAS_DLLEXPORT
+JAS_EXPORT
 void jas_context_destroy(jas_context_t context);
 
 /*!
@@ -340,7 +340,7 @@ void jas_context_destroy(jas_context_t context);
 Get the current context for the calling thread.
 @details
 */
-JAS_DLLEXPORT
+JAS_EXPORT
 jas_context_t jas_get_context(void);
 
 /*!
@@ -348,7 +348,7 @@ jas_context_t jas_get_context(void);
 Set the current context for the calling thread.
 @details
 */
-JAS_DLLEXPORT
+JAS_EXPORT
 void jas_set_context(jas_context_t context);
 
 #if defined(JAS_INTERNAL_USE_ONLY)
@@ -364,7 +364,7 @@ static inline jas_ctx_t *jas_get_ctx(void)
 Set the debug level for a particular context.
 @details
 */
-JAS_DLLEXPORT
+JAS_EXPORT
 int jas_context_set_debug_level(jas_context_t context, int debug_level);
 
 /*!
@@ -374,7 +374,7 @@ process.
 
 @details
 */
-JAS_DLLEXPORT
+JAS_EXPORT
 void jas_context_set_dec_default_max_samples(jas_context_t context,
   size_t max_samples);
 
@@ -384,7 +384,7 @@ Set the function to be used for log messages.
 
 @details
 */
-JAS_DLLEXPORT
+JAS_EXPORT
 void jas_context_set_vlogmsgf(jas_context_t context,
   int (*func)(jas_logtype_t, const char *, va_list));
 
