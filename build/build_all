@@ -52,6 +52,12 @@ if [ -n "$RUNNER_OS" ]; then
 	esac
 fi
 
+cat <<- EOF
+================================================================================
+Operating System: $os
+================================================================================
+EOF
+
 global_options=()
 if [ "$crostini" -ne 0 ]; then
 	global_options+=(--crostini)
