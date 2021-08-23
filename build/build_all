@@ -52,6 +52,8 @@ if [ -n "$RUNNER_OS" ]; then
 	esac
 fi
 
+################################################################################
+
 cat <<- EOF
 ================================================================================
 Operating System: $os
@@ -68,31 +70,43 @@ macos)
 	lsan_option=();;
 esac
 
-cat <<- EOF
-================================================================================
-BUILD: Static Library Debug Build (ASan, LSan, UBSan)
-================================================================================
-EOF
-command=("$build_program")
-command+=("${global_options[@]}")
-command+=(--build-dir   "$build_dir/test_static_debug/build")
-command+=(--install-dir "$build_dir/test_static_debug/install")
-command+=(--static)
-command+=(--debug)
-command+=(--ubsan)
-command+=(--asan)
-command+=("${lsan_option[@]}")
-command+=(--test)
-command+=(--no-documentation)
-command+=(--multithread)
-echo "RUNNING: ${command[@]}"
-if [ "$enable" -ne 0 ]; then
-	"${command[@]}" || panic
-fi
+################################################################################
+
+for multithread in 0 1; do
+
+	cat <<- EOF
+	================================================================================
+	BUILD: Multi-Thread Static Library Debug Build (ASan, LSan, UBSan)
+	================================================================================
+	EOF
+	command=("$build_program")
+	command+=("${global_options[@]}")
+	command+=(--build-dir   "$build_dir/test_static_debug-$multithread/build")
+	command+=(--install-dir "$build_dir/test_static_debug-$multithread/install")
+	command+=(--static)
+	command+=(--debug)
+	command+=(--ubsan)
+	command+=(--asan)
+	command+=("${lsan_option[@]}")
+	command+=(--test)
+	command+=(--no-documentation)
+	if [ "$multithread" -ne 0 ]; then
+		command+=(--multithread)
+	else
+		command+=(--no-multithread)
+	fi
+	echo "RUNNING: ${command[@]}"
+	if [ "$enable" -ne 0 ]; then
+		"${command[@]}" || panic
+	fi
+
+done
+
+################################################################################
 
 cat <<- EOF
 ================================================================================
-BUILD: Static Library Debug Build (TSan, UBSan)
+BUILD: Multi-Thread Static Library Debug Build (TSan, UBSan)
 ================================================================================
 EOF
 command=("$build_program")
@@ -112,42 +126,64 @@ if [ "$enable" -ne 0 ]; then
 	"${command[@]}" || panic
 fi
 
-cat <<- EOF
-================================================================================
-BUILD: Shared Library Release Build
-================================================================================
-EOF
-command=("$build_program")
-command+=("${global_options[@]}")
-command+=(--build-dir   "$build_dir/shared_release/build")
-command+=(--install-dir "$build_dir/shared_release/install")
-command+=(--shared)
-command+=(--release)
-command+=(--documentation)
-command+=(--install)
-command+=(--test)
-command+=(--multithread)
-echo "RUNNING: ${command[@]}"
-if [ "$enable" -ne 0 ]; then
-	"${command[@]}" || panic
-fi
+################################################################################
 
-cat <<- EOF
-================================================================================
-BUILD: Static Library Release Build
-================================================================================
-EOF
-command=("$build_program")
-command+=("${global_options[@]}")
-command+=(--build-dir   "$build_dir/static_release/build")
-command+=(--install-dir "$build_dir/static_release/install")
-command+=(--static)
-command+=(--release)
-command+=(--documentation)
-command+=(--install)
-command+=(--test)
-command+=(--multithread)
-echo "RUNNING: ${command[@]}"
-if [ "$enable" -ne 0 ]; then
-	"${command[@]}" || panic
-fi
+for multithread in 0 1; do
+
+	cat <<- EOF
+	================================================================================
+	BUILD: Shared Library Release Build (Multithread $multithread)
+	================================================================================
+	EOF
+	command=("$build_program")
+	command+=("${global_options[@]}")
+	command+=(--build-dir   "$build_dir/shared_release-$multithread/build")
+	command+=(--install-dir "$build_dir/shared_release-$multithread/install")
+	command+=(--shared)
+	command+=(--release)
+	command+=(--documentation)
+	command+=(--install)
+	command+=(--test)
+	if [ "$multithread" -ne 0 ]; then
+		command+=(--multithread)
+	else
+		command+=(--no-multithread)
+	fi
+	echo "RUNNING: ${command[@]}"
+	if [ "$enable" -ne 0 ]; then
+		"${command[@]}" || panic
+	fi
+
+done
+
+################################################################################
+
+for multithread in 0 1; do
+
+	cat <<- EOF
+	================================================================================
+	BUILD: Multi-Thread Static Library Release Build
+	================================================================================
+	EOF
+	command=("$build_program")
+	command+=("${global_options[@]}")
+	command+=(--build-dir   "$build_dir/static_release-$multithread/build")
+	command+=(--install-dir "$build_dir/static_release-$multithread/install")
+	command+=(--static)
+	command+=(--release)
+	command+=(--documentation)
+	command+=(--install)
+	command+=(--test)
+	if [ "$multithread" -ne 0 ]; then
+		command+=(--multithread)
+	else
+		command+=(--no-multithread)
+	fi
+	echo "RUNNING: ${command[@]}"
+	if [ "$enable" -ne 0 ]; then
+		"${command[@]}" || panic
+	fi
+
+done
+
+################################################################################
