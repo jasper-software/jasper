@@ -88,6 +88,19 @@ CMAKE_BUILD_TYPE
     Specify the build type (i.e., release or debug).
     Valid values: Debug or Release
 
+JAS_ENABLE_MULTITHREADING_SUPPORT
+    Specify if the library should include multithreading support.
+    Valid values: true and false
+
+JAS_PREFER_PTHREAD
+    Specify if the POSIX Threads library should be preferred over native
+    C11 threading support.
+    Valid values: true and false
+
+JAS_ENABLE_PROGRAMS
+    Specify if the demo application programs should be built/installed.
+    Valid values: true and false
+
 JAS_ENABLE_DOC
     Enable the building of the documentation (which requires LaTeX).
     Valid values: true and false
@@ -115,11 +128,29 @@ JAS_ENABLE_32BIT
     the resulting library is not compatible with other builds.
     Valid values: true or false
 
+JAS_ENABLE_DEFAULT_MAX_MEM_USAGE
+    Specify the maximum amount of memory (in bytes) that may be used by
+    the library.
+    This value is only a default and can be overridden at run time.
+    Valid value: a (strictly) positive integer
+
+JAS_INCLUDE_BMP_CODEC
+JAS_INCLUDE_JP2_CODEC
+JAS_INCLUDE_JPC_CODEC
+JAS_INCLUDE_JPG_CODEC
+JAS_INCLUDE_MIF_CODEC
+JAS_INCLUDE_PGX_CODEC
+JAS_INCLUDE_PNM_CODEC
+JAS_INCLUDE_RAS_CODEC
+    Include support for the specified codec in the library.
+    (This support can still be disabled at run time.)
+    Valid values: true or false
+
 JAS_ENABLE_ASAN
     Enable the Address Sanitizer.
     Valid values: true or false
 
-JAS_ENABLE_USAN
+JAS_ENABLE_UBSAN
     Enable the Undefined-Behavior Sanitizer.
     Valid values: true or false
 

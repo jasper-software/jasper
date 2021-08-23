@@ -95,13 +95,13 @@
 #endif
 
 #ifdef __clang__
-#define JAS_ATTRIBUTE_DISABLE_USAN \
+#define JAS_ATTRIBUTE_DISABLE_UBSAN \
   __attribute__((no_sanitize("undefined")))
 #elif defined(__GNUC__) && __GNUC__ >= 6
-#define JAS_ATTRIBUTE_DISABLE_USAN \
+#define JAS_ATTRIBUTE_DISABLE_UBSAN \
   __attribute__((no_sanitize_undefined))
 #else
-#define JAS_ATTRIBUTE_DISABLE_USAN
+#define JAS_ATTRIBUTE_DISABLE_UBSAN
 #endif
 
 #ifdef __has_builtin

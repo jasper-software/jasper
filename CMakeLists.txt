@@ -101,14 +101,14 @@ option(JAS_ENABLE_MULTITHREADING_SUPPORT "Enable multithreading support" true)
 option(JAS_PREFER_PTHREAD
   "Prefer POSIX Threading Library (over C11) for threading support" false)
 
-option(JAS_INCLUDE_PNM_CODEC "Include PNM codec support" true)
 option(JAS_INCLUDE_BMP_CODEC "Include BMP codec support" true)
-option(JAS_INCLUDE_RAS_CODEC "Include RAS codec support" true)
 option(JAS_INCLUDE_JP2_CODEC "Include JP2 codec support" true)
 option(JAS_INCLUDE_JPC_CODEC "Include JPC codec support" true)
 option(JAS_INCLUDE_JPG_CODEC "Include JPG codec support" true)
-option(JAS_INCLUDE_PGX_CODEC "Include PGX codec support" true)
 option(JAS_INCLUDE_MIF_CODEC "Include MIF codec support" true)
+option(JAS_INCLUDE_PGX_CODEC "Include PGX codec support" true)
+option(JAS_INCLUDE_PNM_CODEC "Include PNM codec support" true)
+option(JAS_INCLUDE_RAS_CODEC "Include RAS codec support" true)
 
 set(JAS_ENABLE_DEFAULT_MAX_MEM_USAGE
   "1073741824"

@@ -228,7 +228,7 @@ if [ "$enable_lsan" -ne 0 ]; then
 	configure_opts+=("-DJAS_ENABLE_LSAN=true")
 fi
 if [ "$enable_ubsan" -ne 0 ]; then
-	configure_opts+=("-DJAS_ENABLE_USAN=true")
+	configure_opts+=("-DJAS_ENABLE_UBSAN=true")
 fi
 
 configure_opts+=("-DJAS_ENABLE_DANGEROUS_INTERNAL_TESTING_MODE=true")
