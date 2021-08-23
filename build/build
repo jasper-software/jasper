@@ -139,6 +139,17 @@ while [ $# -gt 0 ]; do
 		shift 1
 		[ $# -gt 0 ] || usage
 		case "$1" in
+		debug)
+			enable_asan=1
+			enable_ubsan=1
+			enable_lsan=1
+			enable_doc=0
+			use_pthread=0
+			enable_shared=0
+			enable_multithreading=1
+			enable_debug=1
+			shift 1
+			;;
 		*)
 			shift 1;;
 		esac

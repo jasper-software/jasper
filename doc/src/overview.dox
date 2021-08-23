@@ -52,8 +52,10 @@ configured (via `jas_conf_clear()`) but before it is initialized
   - `jas_conf_set_allocator()`
   - `jas_conf_set_allocator_wrapper()`
   - `jas_conf_set_debug_level()`
-  - `jas_conf_set_mem_limit()`
+  - `jas_conf_set_max_mem()`
   - `jas_conf_set_dec_default_max_samples()`
+  - `jas_conf_set_vlogmsgf()`
+  - `jas_conf_set_image_format_table()`
 
 \subsection init__state Library State
 
@@ -102,11 +104,34 @@ The global state for the library includes:
 The per-context state includes:
 
   - the debug level
-  - the vlogprintf function to be used for logging error/warning/informational
+  - the vlogmsgf function to be used for logging error/warning/informational
     messages
   - the image format table
   - the maximum number of samples in an image that a decoder is allowed to
     process
+
+\subsection init__contexts Contexts
+
+Contexts can be created and destroyed with the following functions:
+
+  - `jas_context_create()`
+  - `jas_context_destroy()`
+
+The current context for the calling thread can be set/queried with the
+following functions:
+
+  - `jas_get_context()`
+  - `jas_set_context()`
+
+The various per-context settings can be set/queried with the following
+functions:
+
+  - `jas_context_set_debug_level()`
+  - `jas_context_get_debug_level()`
+  - `jas_context_set_dec_default_max_samples()`
+  - `jas_context_get_dec_default_max_samples()`
+  - `jas_context_set_vlogmsgf()`
+  - `jas_context_get_vlogmsgf()`
 
 \subsection init_setup_example_1 Example of Code for Library Setup
 
@@ -299,14 +324,29 @@ This function is used in order to implement functions such as:
 
 \section overview_streams I/O Streams
 
-several types of streams:
+The library provides a type for representing a stream of characters
+for input/output.
+Such a stream is represented by the type `jas_stream_t`.
+Streams (in the JasPer library) are similar to I/O streams in the C standard
+library but have a few additional functionalities.
+In particular, with JasPer I/O streams, it is possible to:
 
-  - stdio stream (i.e., FILE)
-  - file descriptor stream
-  - memory stream
-  - temporary file stream
+  - set a limit on the number of characters that can be read from or
+    written to a stream;
+  - put back more than one character read from a stream;
+  - query the number of characters that have been read from or written to
+    a stream; and
+  - associate a stream with one of several different types of underlying
+    data sources/sinks (including buffers in memory and temporary files).
 
-open/closing streams:
+The possible underlying sources/sinks for a stream include:
+
+  - a stdio stream (i.e., FILE)
+  - a file descriptor
+  - a memory buffer
+  - a temporary file
+
+The following functions are used for opening/closing streams:
 
   - `jas_stream_fopen()`
   - `jas_stream_memopen2()`
@@ -316,7 +356,7 @@ open/closing streams:
   - `jas_stream_close()`
 
 
-reading/writing streams:
+The following functions are used for reading/writing streams:
 
   - `jas_stream_read()`
   - `jas_stream_write()`
@@ -331,14 +371,15 @@ reading/writing streams:
   - `jas_stream_gobble()`
   - `jas_stream_pad()`
 
-getting/setting position within stream:
+The following functions are used for getting/setting the position within a
+stream:
 
   - `jas_stream_isseekable()`
   - `jas_stream_seek()`
   - `jas_stream_tell()`
   - `jas_stream_rewind()`
 
-other:
+Numerous other functions for streams are also provided, including:
 
   - `jas_stream_flush()`
   - `jas_stream_copy()`

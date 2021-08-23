@@ -369,6 +369,17 @@ int jas_context_set_debug_level(jas_context_t context, int debug_level);
 
 /*!
 @brief
+Get the debug level for a particular context.
+@details
+*/
+static inline int jas_context_get_debug_level(jas_context_t context)
+{
+	jas_ctx_t *ctx = JAS_CAST(jas_ctx_t *, context);
+	return ctx->debug_level;
+}
+
+/*!
+@brief
 Set the default maximum number of samples that a decoder is permitted to
 process.
 
@@ -380,26 +391,36 @@ void jas_context_set_dec_default_max_samples(jas_context_t context,
 
 /*!
 @brief
-Set the function to be used for log messages.
+Get the default maximum number of samples that a decoder is permitted to
+process.
+*/
+static inline size_t jas_context_get_dec_default_max_samples(
+  jas_context_t context)
+{
+	jas_ctx_t *ctx = JAS_CAST(jas_ctx_t *, context);
+	return ctx->dec_default_max_samples;
+}
 
+/*!
+@brief
+Set the function to be used for log messages.
 @details
 */
 JAS_EXPORT
 void jas_context_set_vlogmsgf(jas_context_t context,
   int (*func)(jas_logtype_t, const char *, va_list));
 
-
-static inline int jas_context_get_debug_level(jas_context_t context)
+/*!
+@brief
+Get the function to be used for log messages.
+@details
+*/
+static inline
+int (*jas_context_get_vlogmsgf(jas_context_t context))(jas_logtype_t,
+  const char *, va_list)
 {
 	jas_ctx_t *ctx = JAS_CAST(jas_ctx_t *, context);
-	return ctx->debug_level;
-}
-
-static inline size_t jas_context_get_dec_default_max_samples(
-  jas_context_t context)
-{
-	jas_ctx_t *ctx = JAS_CAST(jas_ctx_t *, context);
-	return ctx->dec_default_max_samples;
+	return ctx->vlogmsgf;
 }
 
 /*!
