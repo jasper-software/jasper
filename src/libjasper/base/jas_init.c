@@ -341,6 +341,7 @@ static int jas_init_helper()
 
 #if defined(JAS_ENABLE_MULTITHREADING_SUPPORT)
 	if (jas_tss_create(&jas_tss, 0)) {
+		jas_eprintf("cannot create thread-specific storage\n");
 		return -1;
 	}
 #endif
@@ -350,6 +351,7 @@ static int jas_init_helper()
 	//jas_setdbglevel(jas_conf.debug_level);
 
 	if (jas_init_codecs(jas_global_ctx)) {
+		jas_eprintf("cannot initialize codecs\n");
 		return -1;
 	}
 
@@ -378,7 +380,10 @@ static int jas_init_codecs(jas_ctx_t *ctx)
 	fmtid = 0;
 	for (fmt = jas_conf.image_formats, i = 0; i < jas_conf.num_image_formats;
 	  ++fmt, ++i) {
-		char *buf = jas_strdup(fmt->exts);
+		char *buf;
+		if (!(buf = jas_strdup(fmt->exts))) {
+			return -1;
+		}
 		bool first = true;
 		for (;;) {
 			char *saveptr;
