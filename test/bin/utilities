@@ -74,7 +74,7 @@ function image_which()
 	local path="$1"
 	local file="$2"
 	#eecho "PATH=$path FILE=$file"
-	local dirs=($(echo "$path" | tr ':' ' ')) || return 1
+	local dirs=($(echo "$path" | tr ';' ' ')) || return 1
 	for dir in "${dirs[@]}"; do
 		local buffer="$dir/$file"
 		if [ -f "$buffer" ]; then

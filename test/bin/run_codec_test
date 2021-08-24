@@ -64,7 +64,7 @@ while getopts d:e:i:vBE: opt; do
 	e)
 		enc="$OPTARG";;
 	i)
-		image_path="$image_path:$OPTARG";;
+		image_path="$image_path;$OPTARG";;
 	v)
 		verbose=$((verbose + 1));;
 	B)
