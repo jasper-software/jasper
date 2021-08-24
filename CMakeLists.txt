@@ -2,16 +2,8 @@ cmake_minimum_required(VERSION 3.12)
 
 project(JasPer C)
 
-set(CMAKE_MODULE_PATH
-  ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/build/cmake/modules/")
-
-# This include should be placed as early as possible.
-include(InSourceBuild)
-
-include(CheckCCompilerFlag)
-
 ################################################################################
-# Version information.
+# Specify software and shared library version information.
 ################################################################################
 
 # The major, minor, and micro version numbers of the project.
@@ -19,50 +11,37 @@ set(JAS_VERSION_MAJOR 3)
 set(JAS_VERSION_MINOR 0)
 set(JAS_VERSION_PATCH 0)
 
-# The project version.
+# The shared library versioning information.
+# Guidelines on how to change this information can be found below.
+set(JAS_SO_VERSION 7)
+set(JAS_SO_MINOR 0)
+set(JAS_SO_RELEASE 0)
+
+# Guidelines for Updating the Shared Library Versioning Information
+# =================================================================
+#
+# If the code did not change (e.g., only documentation was updated):
+#     do not change the shared library versioning information.
+# If the code changed and the binary interface for the library did not change
+# from the previous release (e.g., most bug fixes):
+#     increment JAS_SO_RELEASE.
+# If the binary interface changed, but remains compatible with the previous
+# release (e.g., only new functions were added):
+#     - increment JAS_SO_MINOR; and
+#     - set JAS_SO_RELEASE to 0.
+# If the binary interface changed in a way that breaks compatibility with the
+# previous release (e.g., a function was deleted):
+#     - increment JAS_SO_VERSION; and
+#     - set both JAS_SO_MINOR and JAS_SO_RELEASE to 0.
+
+# Generate the project version.
 set(JAS_VERSION
 	"${JAS_VERSION_MAJOR}.${JAS_VERSION_MINOR}.${JAS_VERSION_PATCH}")
 
-message("Software version: ${JAS_VERSION}")
-
-# The shared library versioning information, which is specified by the
-# following variables: JAS_SO_VERSION, JAS_SO_MINOR, and JAS_SO_RELEASE.
-# Each new software release should update the values of these variables.
-#
-# Guidelines for updating this information:
-# If the code did not change (e.g., only documentation was updated), do
-# nothing.
-# If the code changed and the binary interface for the library did not change
-# from the previous release (e.g., most bug fixes), increment JAS_SO_RELEASE.
-# If the binary interface changed, but remains compatible with the previous
-# release (e.g., only new functions were added), increment JAS_SO_MINOR and
-# set JAS_SO_RELEASE to 0.
-# If the binary interface changed in a way that breaks compatibility with the
-# previous release (e.g., a function was deleted), increment JAS_SO_VERSION and
-# set both JAS_SO_MINOR and JAS_SO_RELEASE to 0.
-#
-# History of shared library versioning information:
-# JasPer 2.0.0: 4.0.0
-
-if (APPLE AND CMAKE_SYSTEM_NAME MATCHES "Darwin")
-	set(MACOSX true)
-else()
-	set(MACOSX false)
-endif()
-
-# To fix a problem with OSX, increase JAS_SO_VERSION to 6 (instead of 5)
-# when it is next increased.
-set(JAS_SO_VERSION 4)
-set(JAS_SO_MINOR 0)
-set(JAS_SO_RELEASE 0)
-# This is a temporary hack for OSX that should be removed when JAS_SO_VERSION
-# is next incremented.
-if (MACOSX)
-set(JAS_SO_NAME "5.${JAS_SO_MINOR}.${JAS_SO_RELEASE}")
-else()
+# Generate the shared library build version.
 set(JAS_SO_NAME "${JAS_SO_VERSION}.${JAS_SO_MINOR}.${JAS_SO_RELEASE}")
-endif()
 
+message("Software version: ${JAS_VERSION}")
 message("Shared library ABI version: ${JAS_SO_VERSION}")
 message("Shared library build version: ${JAS_SO_NAME}")
 
@@ -70,8 +49,13 @@ message("Shared library build version: ${JAS_SO_NAME}")
 # Include modules and set policies.
 ################################################################################
 
-# Prefer C11 (if available) but do not require it.
-set(CMAKE_C_STANDARD 11)
+set(CMAKE_MODULE_PATH
+  ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/build/cmake/modules/")
+
+# This include should be placed as early as possible.
+include(InSourceBuild)
+
+include(CheckCCompilerFlag)
 
 # Adhere to GNU filesystem layout conventions.
 include(GNUInstallDirs)
@@ -141,7 +125,14 @@ option(JAS_ENABLE_DANGEROUS_INTERNAL_TESTING_MODE
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS true)
 
+# Prefer C11 (if available) but do not require it.
 set(CMAKE_C_STANDARD 11)
+
+if (APPLE AND CMAKE_SYSTEM_NAME MATCHES "Darwin")
+	set(MACOSX true)
+else()
+	set(MACOSX false)
+endif()
 
 if ((CMAKE_GENERATOR MATCHES Xcode) OR
   (CMAKE_GENERATOR MATCHES "Visual Studio"))
@@ -162,10 +153,6 @@ endif()
 
 if (JAS_ENABLE_SHARED AND MACOSX)
 	set(CMAKE_MACOSX_RPATH true)
-endif()
-
-if (JAS_ENABLE_SHARED)
-	set(JAS_DLL 1)
 endif()
 
 # If a multiconfiguration generator is used, ensure that various output
@@ -200,6 +187,7 @@ set(CPACK_PACKAGE_FILE_NAME
 set(CPACK_GENERATOR "TGZ")
 include(CPack)
 
+# Customize the compiler flags for warning messages.
 if (CMAKE_C_COMPILER_ID STREQUAL "Clang" OR CMAKE_C_COMPILER_ID STREQUAL GNU)
 	check_c_compiler_flag("-Wno-stringop-truncation"
 	  JAS_GCC_WARN_NO_STRINGOP_TRUNCATION)
@@ -216,37 +204,79 @@ if (CMAKE_C_COMPILER_ID STREQUAL "Clang" OR CMAKE_C_COMPILER_ID STREQUAL GNU)
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wmissing-declarations")
 endif()
 
-#cmake_policy(SET CMP0063 NEW)
-if (JAS_ENABLE_HIDDEN AND NOT WIN32)
+if (JAS_ENABLE_HIDDEN)
 	set(CMAKE_C_VISIBILITY_PRESET hidden)
 	set(CMAKE_VISIBILITY_INLINES_HIDDEN 0)
+	if (NOT WIN32 AND NOT (CMAKE_BUILD_TYPE MATCHES "Debug"))
+		check_c_compiler_flag("-ffunction-sections" HAVE_FUNCTION_SECTIONS)
+		check_c_compiler_flag("-fdata-sections" HAVE_DATA_SECTIONS)
+		check_c_compiler_flag("-Wl,--gc-sections" HAVE_GC_SECTIONS)
+		if (HAVE_FUNCTION_SECTIONS AND HAVE_DATA_SECTIONS AND HAVE_GC_SECTIONS)
+			set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -ffunction-sections")
+			set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fdata-sections")
+			set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wl,--gc-sections")
+		endif()
+	endif()
 endif()
 
-# FIXME - Delete this obsolete stuff someday.
-#if (JAS_ENABLE_HIDDEN AND NOT WIN32)
-#	# don't export internal symbols
-#	check_c_compiler_flag("-fvisibility=hidden" JAS_HAVE_VISIBILITY)
-#	if (JAS_HAVE_VISIBILITY)
-#		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fvisibility=hidden -DJAS_HAVE_VISIBILITY")
-#	endif()
-#
-#	if (NOT (CMAKE_BUILD_TYPE MATCHES "Debug"))
-#		# remove unused internal symbols
-#		check_c_compiler_flag("-ffunction-sections" HAVE_FUNCTION_SECTIONS)
-#		check_c_compiler_flag("-fdata-sections" HAVE_DATA_SECTIONS)
-#		check_c_compiler_flag("-Wl,--gc-sections" HAVE_GC_SECTIONS)
-#
-#		if (HAVE_FUNCTION_SECTIONS AND HAVE_DATA_SECTIONS AND HAVE_GC_SECTIONS)
-#			set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -ffunction-sections -fdata-sections -Wl,--gc-sections")
-#		endif()
-#	endif()
-#endif()
-
 ################################################################################
-# Perform plaform checks.
+# Check for the OpenGL and GLUT libraries.
 ################################################################################
 
-include(JasOpenGL)
+if (JAS_ENABLE_OPENGL)
+	set(OpenGL_GL_PREFERENCE GLVND)
+	find_package(OpenGL ${JAS_REQUIRED})
+	message("OpenGL library found: ${OPENGL_FOUND}")
+else()
+	set(OPENGL_FOUND false)
+endif()
+if (JAS_ENABLE_OPENGL AND OPENGL_FOUND)
+	set(JAS_HAVE_OPENGL 0)
+	message("OpenGL include directory: ${OPENGL_INCLUDE_DIR}")
+	message("OpenGL libraries: ${OPENGL_LIBRARIES}")
+	find_package(GLUT ${JAS_REQUIRED})
+	message("GLUT library found: ${GLUT_FOUND}")
+	if (GLUT_FOUND)
+		message("GLUT include directory: ${GLUT_INCLUDE_DIR}")
+		message("GLUT libraries: ${GLUT_LIBRARIES}")
+		set(CMAKE_REQUIRED_INCLUDES ${GLUT_INCLUDE_DIR})
+		check_include_files(GL/glut.h JAS_HAVE_GL_GLUT_H)
+		check_include_files(glut.h JAS_HAVE_GLUT_H)
+		if (JAS_HAVE_GL_GLUT_H OR JAS_HAVE_GLUT_H)
+			set(JAS_HAVE_OPENGL 1)
+			include_directories(${GLUT_INCLUDE_DIR} ${OPENGL_INCLUDE_DIR})
+		else()
+			message(WARNING "The header files GL/glut.h and glut.h both appear to be missing.")
+			message(WARNING "Disabling OpenGL.")
+		endif()
+	endif()
+	# On some systems (e.g., Fedora 21), there is a bug in the cmake code
+	# that detects GLUT libraries.  The following ugliness is a workaround for 
+	# this problem.
+	if (NOT GLUT_Xmu_LIBRARY OR NOT GLUT_Xmi_LIBRARY)
+		if (NOT GLUT_Xmu_LIBRARY)
+			set(GLUT_Xmu_LIBRARY "")
+			message(WARNING "Clearing bogus value for GLUT_Xmu_LIBRARY.")
+			message(WARNING "Your version of CMake may be buggy.")
+		endif()
+		if (NOT GLUT_Xmi_LIBRARY)
+			set(GLUT_Xmi_LIBRARY "")
+			message(WARNING "Clearing bogus value for GLUT_Xmi_LIBRARY.")
+			message(WARNING "Your version of CMake may be buggy.")
+		endif()
+		set(GLUT_LIBRARIES "${GLUT_glut_LIBRARY}")
+	endif()
+else()
+	set(JAS_HAVE_OPENGL 0)
+	set(OPENGL_INCLUDE_DIR "")
+	set(OPENGL_LIBRARIES "")
+	set(GLUT_INCLUDE_DIR "")
+	set(GLUT_LIBRARIES "")
+endif()
+
+################################################################################
+# Perform platform checks.
+################################################################################
 
 find_program(BASH_PROGRAM bash)
 
@@ -266,16 +296,17 @@ check_function_exists(mkostemp JAS_HAVE_MKOSTEMP)
 ################################################################################
 
 if (JAS_INCLUDE_JP2_CODEC AND NOT JAS_INCLUDE_JPC_CODEC)
-	message(FATAL_ERROR "The JPC codec must be included in order to include the JP2 codec.")
+	message(FATAL_ERROR
+	  "The JPC codec must be included in order to include the JP2 codec.")
 endif()
 
 ################################################################################
-#
+# Configure threading support
 ################################################################################
 
 set(JAS_HAVE_THREADS false)
 if (JAS_ENABLE_MULTITHREADING_SUPPORT)
-	if (APPLE)
+	if (MACOSX)
 		set(THREADS_PREFER_PTHREAD_FLAG true)
 		set(CMAKE_HAVE_THREADS_LIBRARY 1)
 		set(CMAKE_THREAD_LIBS_INIT "-lpthread")
@@ -310,7 +341,9 @@ message("Threads library: ${THREAD_LIBRARY}")
 # Check for the JPEG library.
 ################################################################################
 
-if (APPLE)
+# The following is needed to prevent the incorrect version of the JPEG library
+# from being found.
+if (MACOSX)
 	set(CMAKE_FIND_FRAMEWORK LAST)
 endif()
 
@@ -320,6 +353,7 @@ if (JAS_ENABLE_LIBJPEG)
 else()
 	set(JPEG_FOUND false)
 endif()
+
 if (JAS_ENABLE_LIBJPEG AND JPEG_FOUND)
 	set(JAS_HAVE_LIBJPEG 0)
 	message("JPEG include directory: ${JPEG_INCLUDE_DIR}")
@@ -368,10 +402,10 @@ endif()
 #
 ################################################################################
 
-add_definitions("-D_GNU_SOURCE")
+#add_definitions("-D_GNU_SOURCE")
 
 ################################################################################
-#
+# Perform shared library setup.
 ################################################################################
 
 if (JAS_ENABLE_SHARED)
@@ -401,7 +435,7 @@ if (JAS_ENABLE_SHARED)
 endif()
 
 ################################################################################
-#
+# Miscellany.
 ################################################################################
 
 add_subdirectory(src/libjasper)
