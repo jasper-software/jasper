@@ -92,6 +92,7 @@
 #elif defined(JAS_THREADS_MSVC)
 #include <process.h>
 #include <windows.h>
+#include <processthreadsapi.h>
 #endif
 
 #endif
@@ -407,8 +408,12 @@ int jas_tss_create(jas_tss_t *tss, void (*destructor)(void *))
 	if (destructor) {
 		return -1;
 	}
-	*tss = TlsAlloc();
-	return (*tss != 0xffffffff);
+	DWORD id;
+	if ((id = TlsAlloc()) == TLS_OUT_OF_INDEXES) {
+		return -2;
+	}
+	*tss = id;
+	return 0;
 #endif
 }
 

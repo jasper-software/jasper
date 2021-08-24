@@ -340,8 +340,9 @@ static int jas_init_helper()
 	}
 
 #if defined(JAS_ENABLE_MULTITHREADING_SUPPORT)
-	if (jas_tss_create(&jas_tss, 0)) {
-		jas_eprintf("cannot create thread-specific storage\n");
+	int ret;
+	if ((ret = jas_tss_create(&jas_tss, 0))) {
+		jas_eprintf("cannot create thread-specific storage %d\n", ret);
 		return -1;
 	}
 #endif
