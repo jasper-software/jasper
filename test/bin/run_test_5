@@ -12,9 +12,11 @@ set_source_and_build_dirs || panic "cannot set source and build directories"
 #abs_build_dir="$2"
 
 top_dir="$cmd_dir/../.."
-data_dir="$top_dir/data"
+
+data_dir="$abs_top_srcdir/data"
 
 test_program="$abs_top_builddir/src/appl/multithread"
+jasper_program="$abs_top_builddir/src/appl/jasper"
 
 ################################################################################
 
@@ -27,17 +29,45 @@ tmp_dir=$(make_tmp_dir)
 
 log_file=$tmp_dir/log
 
+"$jasper_program" -l | grep -q jpg
+if [ $? -eq 0 ]; then
+	has_jpg_codec=1
+else
+	has_jpg_codec=0
+fi
+
+echo "supports JPEG codec: $has_jpg_codec"
+
 ################################################################################
 
 error_count=0
 
-for out_format in jp2 jpc jpg pnm bmp; do
-	out_format=jp2
+in_formats=()
+in_formats+=(bmp)
+if [ "$has_jpg_codec" -ne 0 ]; then
+	in_formats+=(jpg)
+fi
+in_formats+=(pnm)
+in_formats+=(ras)
+
+out_formats=()
+#in_formats+=(bmp)
+out_formats+=(jp2)
+#out_formats+=(pnm)
+#in_formats+=(ras)
+
+for out_format in "${out_formats[@]}"; do
 	command=("$test_program")
 	command+=(-f "$out_format")
 	command+=(-l 0)
 	command+=(-r 1)
-	command+=("$data_dir"/images/*.{pnm,jpg,bmp,ras})
+	for in_format in "${in_formats[@]}"; do
+		for file in "$data_dir"/images/*.$in_format; do
+			if [ -e "$file" ]; then
+				command+=("$file")
+			fi
+		done
+	done
 	if [ "$verbose" -gt 0 ]; then
 		echo "RUNNING: ${command[@]}"
 	fi

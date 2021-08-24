@@ -88,7 +88,7 @@
 * Types.
 \******************************************************************************/
 
-/* Encoder command line options. */
+/* Command line options. */
 
 typedef struct {
 
@@ -117,6 +117,8 @@ typedef struct {
 	int debug;
 
 	int version;
+
+	int list_codecs;
 
 	int_fast32_t cmptno;
 
@@ -176,6 +178,17 @@ int main(int argc, char **argv)
 	if (cmdopts->version) {
 		printf("%s\n", JAS_VERSION);
 		fprintf(stderr, "libjasper %s\n", jas_getversion());
+		exit(EXIT_SUCCESS);
+	}
+
+	if (cmdopts->list_codecs) {
+		const jas_image_fmt_t *formats;
+		size_t num_formats;
+		jas_get_image_format_table(&formats, &num_formats);
+		const jas_image_fmt_t *fmt;
+		for (fmt = formats, i = 0; i < JAS_CAST(int, num_formats); ++fmt, ++i) {
+			printf("%s\n", fmt->name);
+		}
 		exit(EXIT_SUCCESS);
 	}
 
@@ -361,7 +374,8 @@ cmdopts_t *cmdopts_parse(int argc, char **argv)
 		CMDOPT_DEBUG,
 		CMDOPT_CMPTNO,
 		CMDOPT_SRGB,
-		CMDOPT_MAXMEM
+		CMDOPT_MAXMEM,
+		CMDOPT_LIST_CODECS,
 	};
 
 	static const jas_opt_t cmdoptions[] = {
@@ -387,6 +401,7 @@ cmdopts_t *cmdopts_parse(int argc, char **argv)
 #if defined(JAS_DEFAULT_MAX_MEM_USAGE)
 		{CMDOPT_MAXMEM, "memory-limit", JAS_OPT_HASARG},
 #endif
+		{CMDOPT_LIST_CODECS, "l", 0},
 		{-1, 0, 0}
 	};
 
@@ -427,6 +442,9 @@ cmdopts_t *cmdopts_parse(int argc, char **argv)
 			break;
 		case CMDOPT_VERSION:
 			cmdopts->version = 1;
+			break;
+		case CMDOPT_LIST_CODECS:
+			cmdopts->list_codecs = 1;
 			break;
 		case CMDOPT_DEBUG:
 			cmdopts->debug = atoi(jas_optarg);
@@ -488,7 +506,7 @@ cmdopts_t *cmdopts_parse(int argc, char **argv)
 		++jas_optind;
 	}
 
-	if (cmdopts->version) {
+	if (cmdopts->version || cmdopts->list_codecs) {
 		goto done;
 	}
 
