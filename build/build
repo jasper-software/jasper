@@ -35,10 +35,17 @@ build_dir=
 install_dir=
 crostini=0
 clean_tmp_dir=0
+debug_level=0
 
 while [ $# -gt 0 ]; do
 	option="$1"
 	case "$option" in
+	--debug-level)
+		shift 1
+		[ $# -gt 0 ] || usage
+		debug_level="$1"
+		shift 1
+		;;
 	--clean-tmp-dir)
 		shift 1
 		clean_tmp_dir=1
@@ -162,6 +169,10 @@ while [ $# -gt 0 ]; do
 		;;
 	esac
 done
+
+if [ "$debug_level" -ge 1 ]; then
+	set -xv
+fi
 
 if [ "$crostini" -ne 0 ]; then
 	enable_tsan=0
