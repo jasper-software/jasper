@@ -36,6 +36,7 @@ install_dir=
 crostini=0
 clean_tmp_dir=0
 debug_level=0
+os=
 
 while [ $# -gt 0 ]; do
 	option="$1"
@@ -174,6 +175,21 @@ if [ "$debug_level" -ge 1 ]; then
 	set -xv
 fi
 
+if [ -z "$os" ]; then
+	if [ -n "$RUNNER_OS" ]; then
+		case "$RUNNER_OS" in
+		MacOS|macOS)
+			os=macos;;
+		Linux|linux)
+			os=linux;;
+		Windows|windows)
+			os=windows;;
+		esac
+	else
+		os=unknown
+	fi
+fi
+
 if [ "$crostini" -ne 0 ]; then
 	enable_tsan=0
 fi
@@ -187,9 +203,10 @@ if [ -z "$install_dir" ]; then
 	install_dir="$tmp_dir/install"
 fi
 
-echo "source directory $source_dir"
-echo "build directory $build_dir"
-echo "install directory $install_dir"
+echo "operating system: $os"
+echo "source directory: $source_dir"
+echo "build directory: $build_dir"
+echo "install directory: $install_dir"
 if [ -n "$CC" ]; then
 	echo "C compiler $CC"
 fi
@@ -210,8 +227,13 @@ fi
 ################################################################################
 
 configure_opts=()
+
 configure_opts+=(-B"$build_dir")
 configure_opts+=(-H"$source_dir")
+
+if [ "$os" = windows ]; then
+	configure_opts+=(-G "Visual Studio 12 2013 Win64")
+fi
 
 configure_opts+=("-DCMAKE_INSTALL_PREFIX=$install_dir")
 
