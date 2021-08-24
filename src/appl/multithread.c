@@ -82,6 +82,12 @@
 *
 \******************************************************************************/
 
+#if defined(_WIN32)
+#define DEV_NULL "NUL:"
+#else
+#define DEV_NULL "/dev/null"
+#endif
+
 typedef struct {
 	int id;
 	const char *in_file;
@@ -262,7 +268,7 @@ int main(int argc, char **argv)
 				break;
 			}
 			job->in_file = argv[i];
-			job->out_file = "/dev/null";
+			job->out_file = DEV_NULL;
 			job->out_format_str = out_format;
 			job->num_iters = num_iters;
 			job->id = num_jobs;
