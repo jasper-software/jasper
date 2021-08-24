@@ -6,11 +6,12 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [windows-latest]
+        #os: [windows-latest]
+        os: [windows-2016]
       fail-fast: false
     runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v2
     - name: testing
       shell: bash
-      run: build/build --debug-level 10 --shared --test
+      run: build/build --debug-level 10 --static --test

@@ -72,12 +72,14 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/../../test/bin/wrapper.in"
   "${CMAKE_CURRENT_BINARY_DIR}/../../test/bin/wrapper" @ONLY)
 
 if (BASH_PROGRAM)
-	add_test(run_test_1
-	  "${BASH_PROGRAM}" "${CMAKE_CURRENT_BINARY_DIR}/../../test/bin/wrapper"
-	  "${CMAKE_CURRENT_SOURCE_DIR}/../../test/bin/run_test_1" -v)
-	add_test(run_test_2
-	  "${BASH_PROGRAM}" "${CMAKE_CURRENT_BINARY_DIR}/../../test/bin/wrapper"
-	  "${CMAKE_CURRENT_SOURCE_DIR}/../../test/bin/run_test_2" -v)
+	if (NOT WIN32)
+		add_test(run_test_1
+		  "${BASH_PROGRAM}" "${CMAKE_CURRENT_BINARY_DIR}/../../test/bin/wrapper"
+		  "${CMAKE_CURRENT_SOURCE_DIR}/../../test/bin/run_test_1" -v)
+		add_test(run_test_2
+		  "${BASH_PROGRAM}" "${CMAKE_CURRENT_BINARY_DIR}/../../test/bin/wrapper"
+		  "${CMAKE_CURRENT_SOURCE_DIR}/../../test/bin/run_test_2" -v)
+	endif()
 	add_test(run_test_3
 	  "${BASH_PROGRAM}" "${CMAKE_CURRENT_BINARY_DIR}/../../test/bin/wrapper"
 	  "${CMAKE_CURRENT_SOURCE_DIR}/../../test/bin/run_test_3" -v)
