@@ -231,9 +231,9 @@ configure_opts=()
 configure_opts+=(-B"$build_dir")
 configure_opts+=(-H"$source_dir")
 
-if [ "$os" = windows ]; then
-	configure_opts+=(-G "Visual Studio 12 2013 Win64")
-fi
+#if [ "$os" = windows ]; then
+#	configure_opts+=(-G "Visual Studio 12 2013 Win64")
+#fi
 
 configure_opts+=("-DCMAKE_INSTALL_PREFIX=$install_dir")
 
