@@ -80,6 +80,9 @@
 #if defined(JAS_HAVE_FCNTL_H)
 #include <fcntl.h>
 #endif
+#if defined(JAS_HAVE_UNISTD_H)
+#include <unistd.h>
+#endif
 #include <jasper/jas_types.h>
 
 #ifdef __cplusplus
