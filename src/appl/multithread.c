@@ -142,7 +142,7 @@ int process_job(void *job_handle)
 		/* Get the input image data. */
 		jas_stream_t *in;
 		jas_stream_t *out;
-		if (!(in = jas_stream_fopen(job->in_file, "r"))) {
+		if (!(in = jas_stream_fopen(job->in_file, "rb"))) {
 			fprintf(stderr, "cannot open file %s\n", job->in_file);
 			result = -1;
 			goto done;
@@ -153,7 +153,7 @@ int process_job(void *job_handle)
 			goto done;
 		}
 
-		if (!(out = jas_stream_fopen(job->out_file, "w"))) {
+		if (!(out = jas_stream_fopen(job->out_file, "wb"))) {
 			fprintf(stderr, "cannot open output file %s\n", job->out_file);
 			result = -1;
 			goto done;
