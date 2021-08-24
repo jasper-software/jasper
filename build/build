@@ -346,6 +346,10 @@ fi
 
 test_opts=()
 
+if [ "$verbose" -ne 0 ]; then
+	test_opts+=(--verbose)
+fi
+
 test_opts+=(--output-on-failure)
 
 command=(ctest "${test_opts[@]}")

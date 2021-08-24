@@ -14,4 +14,4 @@ jobs:
     - uses: actions/checkout@v2
     - name: testing
       shell: bash
-      run: build/build --debug-level 10 --static --test
+      run: build/build --debug-level 10 --shared --test --verbose

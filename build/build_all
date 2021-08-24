@@ -61,6 +61,9 @@ Operating System: $os
 EOF
 
 global_options=()
+if [ "$verbose" -ge 1 ]; then
+	global_options+=(--verbose)
+fi
 if [ "$crostini" -ne 0 ]; then
 	global_options+=(--crostini)
 fi

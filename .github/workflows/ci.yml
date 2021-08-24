@@ -18,4 +18,4 @@ jobs:
       env:
         CC: ${{ matrix.compiler }}
       shell: bash
-      run: build/build_all
+      run: build/build_all -v
