@@ -1,0 +1,16 @@
+name: Windows Testing
+
+on: workflow_dispatch
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [windows-latest]
+      fail-fast: false
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: actions/checkout@v2
+    - name: testing
+      shell: bash
+      run: build/build --shared --test
