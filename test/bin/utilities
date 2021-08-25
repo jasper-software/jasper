@@ -100,34 +100,28 @@ function image_info()
 		eecho "cannot find command $imginfo"
 		return 1
 	fi
+	local buffer=$("$imginfo" < "$file" 2> /dev/null) || return 1
 	case "$key" in
 	format)
-		value=$("$imginfo" < "$file" 2> /dev/null | \
-		  awk '{print $1}') || return 1
+		value=$(awk '{print $1}' <<< "$buffer") || return 1
 		;;
 	num_components)
-		value=$("$imginfo" < "$file" 2> /dev/null | \
-		  awk '{print $2}') || return 1
+		value=$(awk '{print $2}' <<< "$buffer") || return 1
 		;;
 	width)
-		value=$("$imginfo" < "$file" 2> /dev/null | \
-		  awk '{print $3}') || return 1
+		value=$(awk '{print $3}' <<< "$buffer") || return 1
 		;;
 	height)
-		value=$("$imginfo" < "$file" 2> /dev/null | \
-		  awk '{print $4}') || return 1
+		value=$(awk '{print $4}' <<< "$buffer") || return 1
 		;;
 	depth)
-		value=$("$imginfo" < "$file" 2> /dev/null | \
-		  awk '{print $5}') || return 1
+		value=$(awk '{print $5}' <<< "$buffer") || return 1
 		;;
 	size)
-		value=$("$imginfo" < "$file" 2> /dev/null | \
-		  awk '{print $6}') || return 1
+		value=$(awk '{print $6}' <<< "$buffer") || return 1
 		;;
 	type)
-		local num_components=$("$imginfo" < "$file" \
-		  2> /dev/null | awk '{print $2}') || return 1
+		local num_components=$(awk '{print $2}' <<< "$buffer") || return 1
 		value=""
 		case "$num_components" in
 		1)

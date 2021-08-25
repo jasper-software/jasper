@@ -163,7 +163,7 @@ int main(int argc, char **argv)
 			break;
 		case OPT_VERSION:
 			printf("%s\n", JAS_VERSION);
-			exit(EXIT_SUCCESS);
+			return EXIT_SUCCESS;
 			break;
 		case OPT_DEBUG:
 			debug = atoi(jas_optarg);
@@ -202,7 +202,7 @@ int main(int argc, char **argv)
 	}
 	if (jas_init()) {
 		fprintf(stderr, "cannot initialize JasPer library\n");
-		exit(EXIT_FAILURE);
+		return EXIT_FAILURE;
 	}
 	jas_set_max_mem_usage(max_mem);
 	jas_setdbglevel(debug);
@@ -221,12 +221,12 @@ int main(int argc, char **argv)
 	}
 	if (jas_initialize()) {
 		fprintf(stderr, "cannot initialize JasPer library\n");
-		exit(EXIT_FAILURE);
+		return EXIT_FAILURE;
 	}
 	jas_context_t context;
 	if (!(context = jas_context_create())) {
 		fprintf(stderr, "cannot create context\n");
-		exit(EXIT_FAILURE);
+		return EXIT_FAILURE;
 	}
 	jas_set_context(context);
 	atexit(jas_cleanup);
@@ -240,13 +240,13 @@ int main(int argc, char **argv)
 		/* The image is to be read from a file. */
 		if (!(instream = jas_stream_fopen(infile, "rb"))) {
 			fprintf(stderr, "cannot open input image file %s\n", infile);
-			exit(EXIT_FAILURE);
+			return EXIT_FAILURE;
 		}
 	} else {
 		/* The image is to be read from standard input. */
 		if (!(instream = jas_stream_fdopen(0, "rb"))) {
 			fprintf(stderr, "cannot open standard input\n");
-			exit(EXIT_FAILURE);
+			return EXIT_FAILURE;
 		}
 	}
 
