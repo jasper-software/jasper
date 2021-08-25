@@ -33,7 +33,7 @@ else()
 	message("GLUT library not found; skipping build of jiv program")
 endif()
 
-if (JAS_ENABLE_MULTITHREADING_SUPPORT)
+if (JAS_THREADS)
 	# The multithread program
 	add_executable(multithread multithread.c)
 	target_link_libraries(multithread libjasper ${JPEG_LIBRARIES}
@@ -86,7 +86,7 @@ if (BASH_PROGRAM)
 		  "${BASH_PROGRAM}" "${CMAKE_CURRENT_BINARY_DIR}/../../test/bin/wrapper"
 		  "${CMAKE_CURRENT_SOURCE_DIR}/../../test/bin/run_test_4" -v)
 	endif()
-	if (JAS_ENABLE_MULTITHREADING_SUPPORT)
+	if (JAS_THREADS)
 		add_test(run_test_5
 		  "${BASH_PROGRAM}" "${CMAKE_CURRENT_BINARY_DIR}/../../test/bin/wrapper"
 		  "${CMAKE_CURRENT_SOURCE_DIR}/../../test/bin/run_test_5" -v)

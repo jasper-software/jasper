@@ -57,6 +57,8 @@ include(InSourceBuild)
 
 include(CheckCCompilerFlag)
 
+include(EnableAssertions)
+
 # Adhere to GNU filesystem layout conventions.
 include(GNUInstallDirs)
 
@@ -314,38 +316,83 @@ endif()
 # Configure threading support
 ################################################################################
 
-set(JAS_HAVE_THREADS false)
 if (JAS_ENABLE_MULTITHREADING_SUPPORT)
+
+	check_c_source_compiles("
+	#include <threads.h>
+	int main() {
+		thrd_t thread;
+		mtx_t mutex;
+		tss_t tss;
+	}
+	" JAS_TRY_COMPILE_C11_THREADS)
+	check_include_files(pthread.h JAS_HAVE_PTHREAD_H)
+
+	# Check for support for various threading libraries.
 	if (MACOSX)
 		set(THREADS_PREFER_PTHREAD_FLAG true)
 		set(CMAKE_HAVE_THREADS_LIBRARY 1)
 		set(CMAKE_THREAD_LIBS_INIT "-lpthread")
 		set(CMAKE_USE_WIN32_THREADS_INIT 0)
 		set(CMAKE_USE_PTHREADS_INIT 1)
+		set(Threads_FOUND 1)
 	else()
 		set(THREADS_PREFER_PTHREAD_FLAG true)
 		find_package(Threads)
 	endif()
 	if (Threads_FOUND)
-		set(JAS_HAVE_THREADS true)
+		if (CMAKE_USE_PTHREADS_INIT AND JAS_HAVE_PTHREAD_H)
+			set(JAS_HAVE_PTHREAD_THREADS true)
+		else()
+			set(JAS_HAVE_PTHREAD_THREADS false)
+		endif()
+		if (CMAKE_USE_WIN32_THREADS_INIT)
+			set(JAS_HAVE_WIN32_THREADS true)
+		else()
+			set(JAS_HAVE_WIN32_THREADS false)
+		endif()
+		set(THREAD_LIBRARY "${CMAKE_THREAD_LIBS_INIT}")
+		if (JAS_TRY_COMPILE_C11_THREADS)
+			set(JAS_HAVE_C11_THREADS true)
+		else()
+			set(JAS_HAVE_C11_THREADS false)
+		endif()
 	endif()
-	if (CMAKE_USE_PTHREADS_INIT)
-		set(JAS_HAVE_PTHREAD true)
+
+	# Apply preferences to select one particular threading library.
+	set(JAS_THREADS false)
+	set(JAS_THREADS_C11 false)
+	set(JAS_THREADS_PTHREAD false)
+	set(JAS_THREADS_WIN32 false)
+	if (JAS_HAVE_PTHREAD_THREADS AND JAS_PREFER_PTHREAD)
+		set(JAS_THREADS_PTHREAD true)
+	elseif (JAS_HAVE_C11_THREADS)
+		set(JAS_THREADS_C11 true)
+	elseif (JAS_HAVE_WIN32_THREADS)
+		set(JAS_THREADS_WIN32 true)
+	endif()
+	if (JAS_THREADS_C11 OR JAS_THREADS_PTHREAD OR JAS_THREADS_WIN32)
+		set(JAS_THREADS true)
 	else()
-		set(JAS_HAVE_PTHREAD false)
+		message(ERROR "No threading support found.")
 	endif()
-	if (CMAKE_USE_WIN32_THREADS_INIT)
-		set(JAS_HAVE_WIN32_THREADS true)
-	else()
-		set(JAS_HAVE_WIN32_THREADS false)
-	endif()
-	set(THREAD_LIBRARY "${CMAKE_THREAD_LIBS_INIT}")
+
+else()
+	set(JAS_THREADS false)
+	set(JAS_THREADS_C11 false)
+	set(JAS_THREADS_PTHREAD false)
+	set(JAS_THREADS_MSVC false)
 endif()
-message("Threads library found: ${JAS_HAVE_THREADS}")
-message("Prefer POSIX Threads library: ${JAS_PREFER_PTHREAD}")
-message("POSIX Threads library found: ${JAS_HAVE_PTHREAD}")
-message("Win32 Threads library found: ${JAS_HAVE_WIN32_THREADS}")
-message("Threads library: ${THREAD_LIBRARY}")
+
+message("Prefer POSIX threading support: ${JAS_PREFER_PTHREAD}")
+message("Threading support found: ${JAS_THREADS}")
+message("C11 threading support detected: ${JAS_HAVE_C11_THREADS}")
+message("POSIX threading support detected: ${JAS_HAVE_POSIX_THREADS}")
+message("WIN32 threading support detected: ${JAS_HAVE_WIN32_THREADS}")
+message("C11 threading support selected: ${JAS_THREADS_C11}")
+message("POSIX threading support selected: ${JAS_THREADS_PTHREAD}")
+message("Win32 threading support selected: ${JAS_THREADS_WIN32}")
+message("Threading library: ${THREAD_LIBRARY}")
 
 ################################################################################
 # Check for the JPEG library.

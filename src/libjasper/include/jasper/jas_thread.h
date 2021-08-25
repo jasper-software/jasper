@@ -79,7 +79,7 @@
 #include "jasper/jas_compiler.h"
 #include "jasper/jas_types.h"
 
-#if defined(JAS_ENABLE_MULTITHREADING_SUPPORT)
+#if defined(JAS_THREADS)
 
 #include <stdlib.h>
 #include <assert.h>
@@ -109,7 +109,7 @@ extern "C" {
  * @{
  */
 
-#if defined(JAS_ENABLE_MULTITHREADING_SUPPORT)
+#if defined(JAS_THREADS)
 
 #if defined(JAS_THREADS_C11)
 #	define JAS_THREADS_IMPL "C11"

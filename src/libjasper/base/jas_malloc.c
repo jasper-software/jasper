@@ -329,12 +329,12 @@ void jas_set_max_mem_usage(size_t max_mem)
 	assert(jas_allocator == JAS_CAST(jas_allocator_t*, &jas_basic_allocator));
 	jas_basic_allocator_t *allocator = JAS_CAST(jas_basic_allocator_t *,
 	  jas_allocator);
-#if defined(JAS_ENABLE_MULTITHREADING_SUPPORT)
+#if defined(JAS_THREADS)
 	jas_mutex_lock(&allocator->mutex);
 #endif
 	allocator->max_mem = (!max_mem || allocator->mem <= max_mem) ? max_mem :
 	  allocator->mem;
-#if defined(JAS_ENABLE_MULTITHREADING_SUPPORT)
+#if defined(JAS_THREADS)
 	jas_mutex_unlock(&allocator->mutex);
 #endif
 }
@@ -344,11 +344,11 @@ size_t jas_get_mem_usage()
 	assert(jas_allocator == JAS_CAST(jas_allocator_t*, &jas_basic_allocator));
 	jas_basic_allocator_t *allocator = JAS_CAST(jas_basic_allocator_t *,
 	  jas_allocator);
-#if defined(JAS_ENABLE_MULTITHREADING_SUPPORT)
+#if defined(JAS_THREADS)
 	jas_mutex_lock(&allocator->mutex);
 #endif
 	size_t result = allocator->mem;
-#if defined(JAS_ENABLE_MULTITHREADING_SUPPORT)
+#if defined(JAS_THREADS)
 	jas_mutex_unlock(&allocator->mutex);
 #endif
 	return result;
@@ -368,7 +368,7 @@ void jas_basic_allocator_init(jas_basic_allocator_t *allocator,
 	assert(allocator->base.realloc != delegate->realloc);
 	allocator->max_mem = max_mem;
 	allocator->mem = 0;
-#if defined(JAS_ENABLE_MULTITHREADING_SUPPORT)
+#if defined(JAS_THREADS)
 	if (jas_mutex_init(&allocator->mutex)) {
 		/* This line of code should never be reached. */
 		assert(0);
@@ -385,7 +385,7 @@ void jas_basic_cleanup(jas_allocator_t *allocator)
 	if (a->delegate->cleanup) {
 		(a->delegate->cleanup)(allocator);
 	}
-#if defined(JAS_ENABLE_MULTITHREADING_SUPPORT)
+#if defined(JAS_THREADS)
 	jas_mutex_cleanup(&a->mutex);
 #endif
 }
@@ -416,7 +416,7 @@ void *jas_basic_alloc(jas_allocator_t *allocator, size_t size)
 		goto done;
 	}
 
-#if defined(JAS_ENABLE_MULTITHREADING_SUPPORT)
+#if defined(JAS_THREADS)
 	jas_mutex_lock(&a->mutex);
 	has_lock = true;
 #endif
@@ -448,7 +448,7 @@ void *jas_basic_alloc(jas_allocator_t *allocator, size_t size)
 	}
 
 done:
-#if defined(JAS_ENABLE_MULTITHREADING_SUPPORT)
+#if defined(JAS_THREADS)
 	if (has_lock) {
 		jas_mutex_unlock(&a->mutex);
 	}
@@ -499,7 +499,7 @@ void *jas_basic_realloc(jas_allocator_t *allocator, void *ptr, size_t size)
 		goto done;
 	}
 
-#if defined(JAS_ENABLE_MULTITHREADING_SUPPORT)
+#if defined(JAS_THREADS)
 	jas_mutex_lock(&a->mutex);
 	has_lock = true;
 #endif
@@ -537,7 +537,7 @@ void *jas_basic_realloc(jas_allocator_t *allocator, void *ptr, size_t size)
 	}
 
 done:
-#if defined(JAS_ENABLE_MULTITHREADING_SUPPORT)
+#if defined(JAS_THREADS)
 	if (has_lock) {
 		jas_mutex_unlock(&a->mutex);
 	}
@@ -560,7 +560,7 @@ void jas_basic_free(jas_allocator_t *allocator, void *ptr)
 
 	JAS_LOGDEBUGF(100, "jas_basic_free(%p)\n", ptr);
 	if (ptr) {
-#if defined(JAS_ENABLE_MULTITHREADING_SUPPORT)
+#if defined(JAS_THREADS)
 		jas_mutex_lock(&a->mutex);
 #endif
 		mb = jas_get_mb(ptr);
@@ -577,7 +577,7 @@ void jas_basic_free(jas_allocator_t *allocator, void *ptr)
 		JAS_LOGDEBUGF(100, "jas_basic_free: free(%p, %p)\n", a->delegate, mb);
 		jas_mb_destroy(mb);
 		(a->delegate->free)(a->delegate, mb);
-#if defined(JAS_ENABLE_MULTITHREADING_SUPPORT)
+#if defined(JAS_THREADS)
 		jas_mutex_unlock(&a->mutex);
 #endif
 	}

@@ -207,7 +207,7 @@ jas_conf_t jas_conf = {
 	.initialized = 0,
 };
 
-#if defined(JAS_ENABLE_MULTITHREADING_SUPPORT)
+#if defined(JAS_THREADS)
 static jas_tss_t jas_tss;
 #endif
 
@@ -307,7 +307,7 @@ int jas_initialize()
 
 static int jas_init_helper()
 {
-#if defined(JAS_ENABLE_MULTITHREADING_SUPPORT)
+#if defined(JAS_THREADS)
 	memset(&jas_tss, 0, sizeof(jas_tss_t));
 #endif
 
@@ -339,7 +339,7 @@ static int jas_init_helper()
 		}
 	}
 
-#if defined(JAS_ENABLE_MULTITHREADING_SUPPORT)
+#if defined(JAS_THREADS)
 	int ret;
 	if ((ret = jas_tss_create(&jas_tss, 0))) {
 		jas_eprintf("cannot create thread-specific storage %d\n", ret);
@@ -418,7 +418,7 @@ void jas_cleanup()
 
 	JAS_LOGDEBUGF(10, "jas_cleanup returning\n");
 
-#if defined(JAS_ENABLE_MULTITHREADING_SUPPORT)
+#if defined(JAS_THREADS)
 	jas_tss_delete(jas_tss);
 #endif
 }
@@ -468,7 +468,7 @@ void jas_context_destroy(jas_context_t context)
 JAS_EXPORT
 jas_context_t jas_get_context()
 {
-#if defined(JAS_ENABLE_MULTITHREADING_SUPPORT)
+#if defined(JAS_THREADS)
 	jas_ctx_t *ctx = JAS_CAST(jas_context_t, jas_tss_get(jas_tss));
 	if (!ctx) {
 		ctx = jas_global_ctx;
@@ -483,7 +483,7 @@ jas_context_t jas_get_context()
 JAS_EXPORT
 void jas_set_context(jas_context_t context)
 {
-#if defined(JAS_ENABLE_MULTITHREADING_SUPPORT)
+#if defined(JAS_THREADS)
 	if (jas_tss_set(jas_tss, JAS_CAST(void *, context))) {
 		assert(0);
 		abort();

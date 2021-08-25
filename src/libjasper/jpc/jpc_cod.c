@@ -6,7 +6,7 @@
 
 static void jpc_init_helper(void);
 
-#if defined(JAS_ENABLE_MULTITHREADING_SUPPORT)
+#if defined(JAS_THREADS)
 jas_once_flag_t jpc_init_once = JAS_ONCE_FLAG_INIT;
 #else
 int jpc_init_once = 0;
@@ -14,7 +14,7 @@ int jpc_init_once = 0;
 
 void jpc_init(void)
 {
-#if defined(JAS_ENABLE_MULTITHREADING_SUPPORT)
+#if defined(JAS_THREADS)
 	jas_call_once(&jpc_init_once, jpc_init_helper);
 #else
 	if (!jpc_init_once) {

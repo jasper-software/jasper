@@ -169,7 +169,7 @@ typedef struct {
 	/* The current amount of memory in use by the allocator. */
 	size_t mem;
 
-#if defined(JAS_ENABLE_MULTITHREADING_SUPPORT)
+#if defined(JAS_THREADS)
 	/* A mutex for synchronized access to the allocator. */
 	jas_mutex_t mutex;
 #endif

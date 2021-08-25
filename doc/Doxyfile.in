@@ -1491,7 +1491,7 @@ INCLUDE_FILE_PATTERNS  =
 # instead of the = operator.
 
 PREDEFINED             = \
-  JAS_ENABLE_MULTITHREADING_SUPPORT=1 \
+  JAS_THREADS=1 \
   JAS_THREADS_C11=1 \
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then
