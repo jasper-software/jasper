@@ -20,6 +20,8 @@ set(JAS_HAVE_FSANITIZE_THREAD 1)
 
 check_c_compiler_flag("-fsanitize=undefined" JAS_HAVE_FSANITIZE_UNDEFINED)
 
+check_c_compiler_flag("/fsanitize=address" JAS_HAVE_MSVC_FSANITIZE_ADDRESS)
+
 if (JAS_ENABLE_MSAN)
 	if (CMAKE_C_COMPILER_ID STREQUAL "Clang" OR
 	  CMAKE_C_COMPILER_ID STREQUAL GNU)
@@ -34,11 +36,17 @@ endif()
 if (JAS_ENABLE_ASAN)
 	if (CMAKE_C_COMPILER_ID STREQUAL "Clang" OR
 	  CMAKE_C_COMPILER_ID STREQUAL GNU)
-		check_c_compiler_flag("-fsanitize=address" JAS_HAVE_FSANITIZE_ADDRESS)
 		if (JAS_HAVE_FSANITIZE_ADDRESS)
 			message("Enabling Address Sanitizer")
 			set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=address")
 			set(CMAKE_LD_FLAGS "${CMAKE_LD_FLAGS} -fsanitize=address")
+		endif()
+	endif()
+	elseif (CMAKE_C_COMPILER_ID STREQUAL "MSVC")
+		if (JAS_HAVE_MSVC_FSANITIZE_ADDRESS)
+			message("Enabling Address Sanitizer")
+			set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /fsanitize=address")
+			set(CMAKE_LD_FLAGS "${CMAKE_LD_FLAGS} /fsanitize=address")
 		endif()
 	endif()
 endif()
