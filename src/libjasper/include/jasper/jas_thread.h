@@ -89,7 +89,7 @@
 #elif defined(JAS_THREADS_PTHREAD)
 #include <pthread.h>
 #include <sched.h>
-#elif defined(JAS_THREADS_MSVC)
+#elif defined(JAS_THREADS_WIN32)
 #include <process.h>
 #include <windows.h>
 #include <processthreadsapi.h>
@@ -115,8 +115,8 @@ extern "C" {
 #	define JAS_THREADS_IMPL "C11"
 #elif defined(JAS_THREADS_PTHREAD)
 #	define JAS_THREADS_IMPL "PTHREAD"
-#elif defined(JAS_THREADS_MSVC)
-#	define JAS_THREADS_IMPL "MSVC"
+#elif defined(JAS_THREADS_WIN32)
+#	define JAS_THREADS_IMPL "WIN32"
 #endif
 
 /*!  Thread ID type. */
@@ -124,7 +124,7 @@ extern "C" {
 typedef thrd_t jas_thread_id_t;
 #elif defined(JAS_THREADS_PTHREAD)
 typedef pthread_t jas_thread_id_t;
-#elif defined(JAS_THREADS_MSVC)
+#elif defined(JAS_THREADS_WIN32)
 typedef HANDLE jas_thread_id_t;
 #endif
 
@@ -138,7 +138,7 @@ typedef struct {
 	void *arg;
 	int result;
 } jas_thread_t;
-#elif defined(JAS_THREADS_MSVC)
+#elif defined(JAS_THREADS_WIN32)
 typedef struct {
 	jas_thread_id_t id;
 	int (*func)(void *);
@@ -151,7 +151,7 @@ typedef struct {
 typedef mtx_t jas_mutex_t;
 #elif defined(JAS_THREADS_PTHREAD)
 typedef pthread_mutex_t jas_mutex_t;
-#elif defined(JAS_THREADS_MSVC)
+#elif defined(JAS_THREADS_WIN32)
 typedef CRITICAL_SECTION jas_mutex_t;
 #endif
 
@@ -160,7 +160,7 @@ typedef CRITICAL_SECTION jas_mutex_t;
 typedef tss_t jas_tss_t;
 #elif defined(JAS_THREADS_PTHREAD)
 typedef pthread_key_t jas_tss_t;
-#elif defined(JAS_THREADS_MSVC)
+#elif defined(JAS_THREADS_WIN32)
 typedef DWORD jas_tss_t;
 #endif
 
@@ -169,7 +169,7 @@ typedef DWORD jas_tss_t;
 typedef once_flag jas_once_flag_t;
 #elif defined(JAS_THREADS_PTHREAD)
 typedef pthread_once_t jas_once_flag_t;
-#elif defined(JAS_THREADS_MSVC)
+#elif defined(JAS_THREADS_WIN32)
 typedef struct {
 	volatile LONG status;
 } jas_once_flag_t;
@@ -180,7 +180,7 @@ typedef struct {
 #	define JAS_ONCE_FLAG_INIT ONCE_FLAG_INIT
 #elif defined(JAS_THREADS_PTHREAD)
 #	define JAS_ONCE_FLAG_INIT PTHREAD_ONCE_INIT
-#elif defined(JAS_THREADS_MSVC)
+#elif defined(JAS_THREADS_WIN32)
 #	define JAS_ONCE_FLAG_INIT {0}
 #endif
 
@@ -192,7 +192,7 @@ static void *thread_func_wrapper(void *thread_ptr)
 	thread->result = result;
 	return thread;
 }
-#elif defined(JAS_THREADS_MSVC)
+#elif defined(JAS_THREADS_WIN32)
 static unsigned __stdcall thread_func_wrapper(void *thread_ptr)
 {
 	jas_thread_t *thread = JAS_CAST(jas_thread_t *, thread_ptr);
@@ -211,7 +211,7 @@ int jas_thread_compare(jas_thread_id_t x, jas_thread_id_t y)
 	return thrd_equal(x, y);
 #elif defined(JAS_THREADS_PTHREAD)
 	return pthread_equal(x, y);
-#elif defined(JAS_THREADS_MSVC)
+#elif defined(JAS_THREADS_WIN32)
 	return GetThreadId(x) == GetThreadId(y);
 #endif
 }
@@ -231,7 +231,7 @@ int jas_thread_create(jas_thread_t *thread, int (*func)(void *), void *arg)
 	thread->arg = arg;
 	thread->result = 0;
 	return pthread_create(&thread->id, 0, thread_func_wrapper, thread);
-#elif defined(JAS_THREADS_MSVC)
+#elif defined(JAS_THREADS_WIN32)
 	uintptr_t handle;
 	thread->func = func;
 	thread->arg = arg;
@@ -264,7 +264,7 @@ int jas_thread_join(jas_thread_t *thread, int *result)
 		}
 	}
 	return ret;
-#elif defined(JAS_THREADS_MSVC)
+#elif defined(JAS_THREADS_WIN32)
 	DWORD w;
 	DWORD code;
 	if ((w = WaitForSingleObject(thread->id, INFINITE)) != WAIT_OBJECT_0) {
@@ -288,7 +288,7 @@ static inline void jas_thread_yield(void)
 	thrd_yield();
 #elif defined(JAS_THREADS_PTHREAD)
 	sched_yield();
-#elif defined(JAS_THREADS_MSVC)
+#elif defined(JAS_THREADS_WIN32)
 	SwitchToThread();
 #endif
 }
@@ -321,7 +321,7 @@ jas_thread_id_t jas_thread_current(void)
 	return thrd_current();
 #elif defined(JAS_THREADS_PTHREAD)
 	return pthread_self();
-#elif defined(JAS_THREADS_MSVC)
+#elif defined(JAS_THREADS_WIN32)
 	/* FIXME - NOT YET IMPLEMENTED. */
 	abort();
 #endif
@@ -338,7 +338,7 @@ static inline int jas_mutex_init(jas_mutex_t *mtx)
 	return mtx_init(mtx, mtx_plain) == thrd_success ? 0 : -1;
 #elif defined(JAS_THREADS_PTHREAD)
 	return pthread_mutex_init(mtx, 0);
-#elif defined(JAS_THREADS_MSVC)
+#elif defined(JAS_THREADS_WIN32)
 	InitializeCriticalSection(mtx);
 	return 0;
 #endif
@@ -355,7 +355,7 @@ static inline int jas_mutex_cleanup(jas_mutex_t *mtx)
 	return 0;
 #elif defined(JAS_THREADS_PTHREAD)
 	return pthread_mutex_destroy(mtx);
-#elif defined(JAS_THREADS_MSVC)
+#elif defined(JAS_THREADS_WIN32)
 	DeleteCriticalSection(mtx);
 	return 0;
 #endif
@@ -371,7 +371,7 @@ static inline int jas_mutex_lock(jas_mutex_t *mtx)
 	return mtx_lock(mtx);
 #elif defined(JAS_THREADS_PTHREAD)
 	return pthread_mutex_lock(mtx);
-#elif defined(JAS_THREADS_MSVC)
+#elif defined(JAS_THREADS_WIN32)
 	EnterCriticalSection(mtx);
 	return 0;
 #endif
@@ -387,7 +387,7 @@ static inline int jas_mutex_unlock(jas_mutex_t *mtx)
 	return mtx_unlock(mtx);
 #elif defined(JAS_THREADS_PTHREAD)
 	return pthread_mutex_unlock(mtx);
-#elif defined(JAS_THREADS_MSVC)
+#elif defined(JAS_THREADS_WIN32)
 	LeaveCriticalSection(mtx);
 	return 0;
 #endif
@@ -404,7 +404,7 @@ int jas_tss_create(jas_tss_t *tss, void (*destructor)(void *))
 	return tss_create(tss, destructor) == thrd_success ? 0 : -1;
 #elif defined(JAS_THREADS_PTHREAD)
 	return pthread_key_create(tss, destructor);
-#elif defined(JAS_THREADS_MSVC)
+#elif defined(JAS_THREADS_WIN32)
 	if (destructor) {
 		return -1;
 	}
@@ -427,7 +427,7 @@ void jas_tss_delete(jas_tss_t tss)
 	tss_delete(tss);
 #elif defined(JAS_THREADS_PTHREAD)
 	pthread_key_delete(tss);
-#elif defined(JAS_THREADS_MSVC)
+#elif defined(JAS_THREADS_WIN32)
 	TlsFree(tss);
 #endif
 }
@@ -442,7 +442,7 @@ void *jas_tss_get(jas_tss_t tss)
 	return tss_get(tss);
 #elif defined(JAS_THREADS_PTHREAD)
 	return pthread_getspecific(tss);
-#elif defined(JAS_THREADS_MSVC)
+#elif defined(JAS_THREADS_WIN32)
 	return TlsGetValue(tss);
 #endif
 }
@@ -457,7 +457,7 @@ int jas_tss_set(jas_tss_t tss, void *value)
 	return tss_set(tss, value) == thrd_success ? 0 : -1;
 #elif defined(JAS_THREADS_PTHREAD)
 	return pthread_setspecific(tss, value);
-#elif defined(JAS_THREADS_MSVC)
+#elif defined(JAS_THREADS_WIN32)
 	return TlsSetValue(tss, value) ? 0 : -1;
 #endif
 }
@@ -474,7 +474,7 @@ static inline int jas_call_once(jas_once_flag_t *flag, void (*func)(void))
 	return 0;
 #elif defined(JAS_THREADS_PTHREAD)
 	return pthread_once(flag, func);
-#elif defined(JAS_THREADS_MSVC)
+#elif defined(JAS_THREADS_WIN32)
 	if (InterlockedCompareExchange(&flag->status, 1, 0) == 0) {
 		(func)();
 		InterlockedExchange(&flag->status, 2);

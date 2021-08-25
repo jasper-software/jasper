@@ -377,22 +377,26 @@ if (JAS_ENABLE_MULTITHREADING_SUPPORT)
 		message(ERROR "No threading support found.")
 	endif()
 
+	message("Prefer POSIX threading support: ${JAS_PREFER_PTHREAD}")
+	message("Threading support found: ${JAS_THREADS}")
+	message("C11 threading support detected: ${JAS_HAVE_C11_THREADS}")
+	message("POSIX threading support detected: ${JAS_HAVE_POSIX_THREADS}")
+	message("WIN32 threading support detected: ${JAS_HAVE_WIN32_THREADS}")
+	message("C11 threading support selected: ${JAS_THREADS_C11}")
+	message("POSIX threading support selected: ${JAS_THREADS_PTHREAD}")
+	message("Win32 threading support selected: ${JAS_THREADS_WIN32}")
+	message("Threading library: ${THREAD_LIBRARY}")
+
 else()
+
 	set(JAS_THREADS false)
 	set(JAS_THREADS_C11 false)
 	set(JAS_THREADS_PTHREAD false)
-	set(JAS_THREADS_MSVC false)
-endif()
+	set(JAS_THREADS_WIN32 false)
 
-message("Prefer POSIX threading support: ${JAS_PREFER_PTHREAD}")
-message("Threading support found: ${JAS_THREADS}")
-message("C11 threading support detected: ${JAS_HAVE_C11_THREADS}")
-message("POSIX threading support detected: ${JAS_HAVE_POSIX_THREADS}")
-message("WIN32 threading support detected: ${JAS_HAVE_WIN32_THREADS}")
-message("C11 threading support selected: ${JAS_THREADS_C11}")
-message("POSIX threading support selected: ${JAS_THREADS_PTHREAD}")
-message("Win32 threading support selected: ${JAS_THREADS_WIN32}")
-message("Threading library: ${THREAD_LIBRARY}")
+	message("Threading support has been disabled.")
+
+endif()
 
 ################################################################################
 # Check for the JPEG library.
