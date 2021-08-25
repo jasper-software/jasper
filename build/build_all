@@ -11,6 +11,12 @@ jas_realpath="$program_dir/jas_realpath"
 abs_program_dir=$("$jas_realpath" "$program_dir") || panic
 build_program="$program_dir/build"
 
+list_directory()
+{
+	local dir="$1"
+	(cd "$dir" && find . -type f -printf "%M %010s %P\n" | sort -k3)
+}
+
 usage()
 {
 	echo "bad usage: $@"
@@ -90,16 +96,18 @@ for multithread in 0 1; do
 	BUILD: Multi-Thread Static Library Debug Build (ASan, LSan, UBSan)
 	================================================================================
 	EOF
+	base_dir="$build_dir/test_static_debug-$multithread"
 	command=("$build_program")
 	command+=("${global_options[@]}")
-	command+=(--build-dir   "$build_dir/test_static_debug-$multithread/build")
-	command+=(--install-dir "$build_dir/test_static_debug-$multithread/install")
+	command+=(--build-dir "$base_dir/build")
+	command+=(--install-dir "$base_dir/install")
 	command+=(--static)
 	command+=(--debug)
 	command+=(--ubsan)
 	command+=(--asan)
 	command+=("${lsan_option[@]}")
 	command+=(--test)
+	command+=(--install)
 	command+=(--no-documentation)
 	if [ "$multithread" -ne 0 ]; then
 		command+=(--multithread)
@@ -109,6 +117,10 @@ for multithread in 0 1; do
 	echo "RUNNING: ${command[@]}"
 	if [ "$enable" -ne 0 ]; then
 		"${command[@]}" || panic
+		echo "build directory:"
+		list_directory "$base_dir/build" || panic
+		echo "install directory:"
+		list_directory "$base_dir/install" || panic
 	fi
 
 done
@@ -120,21 +132,27 @@ cat <<- EOF
 BUILD: Multi-Thread Static Library Debug Build (TSan, UBSan)
 ================================================================================
 EOF
+base_dir="$build_dir/test_static_debug_tsan"
 command=("$build_program")
 command+=("${global_options[@]}")
-command+=(--build-dir   "$build_dir/test_static_debug_tsan/build")
-command+=(--install-dir "$build_dir/test_static_debug_tsan/install")
+command+=(--build-dir "$base_dir/build")
+command+=(--install-dir "$base_dir/install")
 command+=(--prefer-pthread)
 command+=(--static)
 command+=(--debug)
 command+=(--ubsan)
 command+=(--tsan)
 command+=(--test)
+command+=(--install)
 command+=(--no-documentation)
 command+=(--multithread)
 echo "RUNNING: ${command[@]}"
 if [ "$enable" -ne 0 ]; then
 	"${command[@]}" || panic
+	echo "build directory:"
+	list_directory "$base_dir/build" || panic
+	echo "install directory:"
+	list_directory "$base_dir/install" || panic
 fi
 
 ################################################################################
@@ -148,15 +166,16 @@ for multithread in 0 1; do
 	BUILD: Shared Library Release Build (Multithread $multithread)
 	================================================================================
 	EOF
+	base_dir="$build_dir/shared_release-$multithread"
 	command=("$build_program")
 	command+=("${global_options[@]}")
-	command+=(--build-dir   "$build_dir/shared_release-$multithread/build")
-	command+=(--install-dir "$build_dir/shared_release-$multithread/install")
+	command+=(--build-dir "$base_dir/build")
+	command+=(--install-dir "$base_dir/install")
 	command+=(--shared)
 	command+=(--release)
 	command+=(--documentation)
-	command+=(--install)
 	command+=(--test)
+	command+=(--install)
 	if [ "$multithread" -ne 0 ]; then
 		command+=(--multithread)
 	else
@@ -165,6 +184,10 @@ for multithread in 0 1; do
 	echo "RUNNING: ${command[@]}"
 	if [ "$enable" -ne 0 ]; then
 		"${command[@]}" || panic
+		echo "build directory:"
+		list_directory "$base_dir/build" || panic
+		echo "install directory:"
+		list_directory "$base_dir/install" || panic
 	fi
 
 done
@@ -180,15 +203,16 @@ for multithread in 0 1; do
 	BUILD: Multi-Thread Static Library Release Build
 	================================================================================
 	EOF
+	base_dir="$build_dir/static_release-$multithread"
 	command=("$build_program")
 	command+=("${global_options[@]}")
-	command+=(--build-dir   "$build_dir/static_release-$multithread/build")
-	command+=(--install-dir "$build_dir/static_release-$multithread/install")
+	command+=(--build-dir "$base_dir/build")
+	command+=(--install-dir "$base_dir/install")
 	command+=(--static)
 	command+=(--release)
 	command+=(--documentation)
-	command+=(--install)
 	command+=(--test)
+	command+=(--install)
 	if [ "$multithread" -ne 0 ]; then
 		command+=(--multithread)
 	else
@@ -197,16 +221,12 @@ for multithread in 0 1; do
 	echo "RUNNING: ${command[@]}"
 	if [ "$enable" -ne 0 ]; then
 		"${command[@]}" || panic
+		echo "build directory:"
+		list_directory "$base_dir/build" || panic
+		echo "install directory:"
+		list_directory "$base_dir/install" || panic
 	fi
 
 done
-
-################################################################################
-
-echo "BUILD DIRECTORY CONTENTS:"
-(cd "$build_dir" && find . -type f -printf "%M %010s %P\n" | sort -k3)
-
-echo "INSTALL DIRECTORY CONTENTS:"
-(cd "$install_dir" && find . -type f -printf "%M %010s %P\n" | sort -k3)
 
 ################################################################################
