@@ -21,8 +21,9 @@ verbose=0
 build_dir=
 crostini=0
 enable=1
+debug_level=0
 
-while getopts vb:cn option; do
+while getopts vb:cnd: option; do
 	case "$option" in
 	n)
 		enable=0;;
@@ -30,11 +31,17 @@ while getopts vb:cn option; do
 		crostini=1;;
 	b)
 		build_dir="$OPTARG";;
+	d)
+		debug_level="$OPTARG";;
 	v)
 		verbose=$((verbose + 1));
 	esac
 done
 shift $((OPTIND - 1))
+
+if [ "$debug_level" -ge 1 -a "$verbose" -eq 0 ]; then
+	verbose=1
+fi
 
 if [ -z "$build_dir" ]; then
 	build_dir="$abs_program_dir/../tmp_cmake"
@@ -67,6 +74,7 @@ fi
 if [ "$crostini" -ne 0 ]; then
 	global_options+=(--crostini)
 fi
+global_options+=(--debug-level "$debug_level")
 lsan_option=(--lsan)
 case "$os" in
 macos)

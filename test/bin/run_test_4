@@ -23,7 +23,7 @@ init
 cmd_name=$(basename "$0") || panic "cannot get command name"
 tmp_dir=$(make_tmp_dir "$cmd_name") || panic "cannot make temporary directory"
 
-debug_level=0
+debug_level="${JAS_DEBUG_LEVEL:-0}"
 verbose=0
 jas_jp2k_test_top_dir="$JAS_JP2K_TEST_TOP_DIR"
 
@@ -73,7 +73,7 @@ for testcase in "${testcases[@]}"; do
 	  panic "cannot get test case"
 
 	enc_file="$JAS_JP2K_TEST_TOP_DIR/${record[encoded_file]}"
-	if [ "$debug_level" -ne 0 ]; then
+	if [ "$debug_level" -ge 1 ]; then
 		imginfo_opts+=(--debug-level "$debug_level")
 	fi
 	if [ "$verbose" -ge 1 ]; then
@@ -111,7 +111,7 @@ for testcase in "${testcases[@]}"; do
 	orig_file="$JAS_JP2K_TEST_TOP_DIR/${record[decoded_file]}"
 	dec_file="$tmp_dir/decoded"
 	dec_opts=()
-	if [ "$debug_level" -ne 0 ]; then
+	if [ "$debug_level" -ge 1 ]; then
 		dec_opts+=(debug="$debug_level")
 	fi
 	if [ "$verbose" -ne 0 ]; then

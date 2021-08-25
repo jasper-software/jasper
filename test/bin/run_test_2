@@ -5,6 +5,11 @@
 cmd_dir=$(dirname $0) || exit 1
 source "$cmd_dir/utilities" || exit 1
 
+debug_level="${JAS_DEBUG_LEVEL:-0}"
+if [ "$debug_level" -ge 1 ]; then
+	set -xv
+fi
+
 ################################################################################
 
 set_source_and_build_dirs || panic "cannot set source and build directories"

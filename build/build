@@ -352,7 +352,11 @@ fi
 
 test_opts+=(--output-on-failure)
 
-command=(ctest "${test_opts[@]}")
+command=()
+if [ "$debug_level" -ge 2 ]; then
+	command+=(env JAS_DEBUG_LEVEL="$debug_level")
+fi
+command+=(ctest "${test_opts[@]}")
 if [ "$enable_test" -ne 0 ]; then
 	echo "============================================================"
 	echo "Testing"
