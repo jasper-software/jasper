@@ -24,6 +24,7 @@ verbose=0
 enable_asan=0
 enable_lsan=0
 enable_ubsan=0
+enable_msan=0
 enable_tsan=0
 enable_shared=1
 sde_top_dir=
@@ -90,6 +91,10 @@ while [ $# -gt 0 ]; do
 	--lsan)
 		shift 1
 		enable_lsan=1
+		;;
+	--msan)
+		shift 1
+		enable_msan=1
 		;;
 	--ubsan)
 		shift 1
@@ -262,6 +267,9 @@ if [ "$enable_lsan" -ne 0 ]; then
 fi
 if [ "$enable_ubsan" -ne 0 ]; then
 	configure_opts+=("-DJAS_ENABLE_UBSAN=true")
+fi
+if [ "$enable_msan" -ne 0 ]; then
+	configure_opts+=("-DJAS_ENABLE_MSAN=true")
 fi
 
 configure_opts+=("-DJAS_ENABLE_DANGEROUS_INTERNAL_TESTING_MODE=true")

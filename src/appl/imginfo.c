@@ -276,7 +276,7 @@ int main(int argc, char **argv)
 	jas_stream_close(instream);
 
 	if (!(fmtname = jas_image_fmttostr(fmtid))) {
-		jas_eprintf("format name lookup failed\n");
+		fprintf(stderr, "format name lookup failed\n");
 		return EXIT_FAILURE;
 	}
 

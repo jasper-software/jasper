@@ -202,3 +202,11 @@ for multithread in 0 1; do
 done
 
 ################################################################################
+
+echo "BUILD DIRECTORY CONTENTS:"
+(cd "$build_dir" && find . -type f -printf "%M %010s %P\n" | sort -k3)
+
+echo "INSTALL DIRECTORY CONTENTS:"
+(cd "$install_dir" && find . -type f -printf "%M %010s %P\n" | sort -k3)
+
+################################################################################

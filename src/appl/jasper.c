@@ -304,13 +304,13 @@ int main(int argc, char **argv)
 	if (cmdopts->srgb) {
 		jas_image_t *newimage;
 		jas_cmprof_t *outprof;
-		jas_eprintf("forcing conversion to sRGB\n");
+		fprintf(stderr, "forcing conversion to sRGB\n");
 		if (!(outprof = jas_cmprof_createfromclrspc(JAS_CLRSPC_SRGB))) {
-			jas_eprintf("cannot create sRGB profile\n");
+			fprintf(stderr, "cannot create sRGB profile\n");
 			exit(EXIT_FAILURE);
 		}
 		if (!(newimage = jas_image_chclrspc(image, outprof, JAS_CMXFORM_INTENT_PER))) {
-			jas_eprintf("cannot convert to sRGB\n");
+			fprintf(stderr, "cannot convert to sRGB\n");
 			exit(EXIT_FAILURE);
 		}
 		jas_image_destroy(image);
