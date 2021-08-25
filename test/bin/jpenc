@@ -1,6 +1,11 @@
 #! /bin/bash
 # Copyright (c) 2016 Michael David Adams
 
+debug_level="${JAS_DEBUG_LEVEL:-0}"
+if [ "$debug_level" -ge 1 ]; then
+	set -xv
+fi
+
 cmd_dir=$(dirname "$0") || exit 1
 source "$cmd_dir/utilities" || exit 1
 source "$cmd_dir/jpcod" || exit 1
