@@ -100,7 +100,8 @@ function image_info()
 		eecho "cannot find command $imginfo"
 		return 1
 	fi
-	local buffer=$("$imginfo" < "$file" 2> /dev/null) || return 1
+	#local buffer=$("$imginfo" < "$file" 2> /dev/null) || return 1
+	local buffer=$("$imginfo" < "$file") || return 1
 	case "$key" in
 	format)
 		value=$(awk '{print $1}' <<< "$buffer") || return 1
