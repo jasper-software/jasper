@@ -95,6 +95,7 @@ function image_info()
 	local key="$2"
 	local value
 	local imginfo="${IMGINFO_COMMAND:-imginfo}"
+	eecho "invoked image_info with file=$file key=$key"
 	if [ ! -x "$imginfo" ]; then
 		eecho "cannot find command $imginfo"
 		return 1
