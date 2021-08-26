@@ -289,8 +289,8 @@ typedef struct {
 } jas_mb_t;
 
 #define JAS_MB_ADJUST \
-  ((sizeof(jas_mb_t) + sizeof(max_align_t) - 1) / sizeof(max_align_t))
-#define JAS_MB_SIZE (JAS_MB_ADJUST * sizeof(max_align_t))
+  ((sizeof(jas_mb_t) + sizeof(jas_max_align_t) - 1) / sizeof(jas_max_align_t))
+#define JAS_MB_SIZE (JAS_MB_ADJUST * sizeof(jas_max_align_t))
 
 static void jas_mb_init(jas_mb_t *mb, size_t size)
 {
@@ -307,13 +307,13 @@ static void jas_mb_destroy(jas_mb_t *mb)
 static void *jas_mb_get_data(jas_mb_t *mb)
 {
 	assert(mb->magic == JAS_BMA_MAGIC);
-	return JAS_CAST(void *, JAS_CAST(max_align_t *, mb) + JAS_MB_ADJUST);
+	return JAS_CAST(void *, JAS_CAST(jas_max_align_t *, mb) + JAS_MB_ADJUST);
 }
 
 static jas_mb_t *jas_get_mb(void *ptr)
 {
 	jas_mb_t *mb = JAS_CAST(jas_mb_t *,
-	  JAS_CAST(max_align_t *, ptr) - JAS_MB_ADJUST);
+	  JAS_CAST(jas_max_align_t *, ptr) - JAS_MB_ADJUST);
 	assert(mb->magic == JAS_BMA_MAGIC);
 	/* This is one check that I do not want disabled with NDEBUG. */
 	if (mb->magic != JAS_BMA_MAGIC) {
