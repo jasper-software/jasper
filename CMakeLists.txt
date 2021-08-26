@@ -200,12 +200,9 @@ set(CPACK_GENERATOR "TGZ")
 include(CPack)
 
 message("CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
-message("CMAKE_C_COMPILER: ${CMAKE_C_COMPILER}")
 message("CMAKE_C_COMPILER_ID: ${CMAKE_C_COMPILER_ID}")
+message("CMAKE_C_COMPILER: ${CMAKE_C_COMPILER}")
 message("CMAKE_LINKER: ${CMAKE_LINKER}")
-message("CMAKE_C_FLAGS: ${CMAKE_C_FLAGS}")
-message("CMAKE_C_FLAGS_RELEASE: ${CMAKE_C_FLAGS_RELEASE}")
-message("CMAKE_C_FLAGS_DEBUG: ${CMAKE_C_FLAGS_DEBUG}")
 
 # Customize the compiler flags for warning messages.
 if (CMAKE_C_COMPILER_ID STREQUAL "Clang" OR CMAKE_C_COMPILER_ID STREQUAL GNU)
@@ -258,6 +255,10 @@ if (JAS_ENABLE_HIDDEN)
 		endif()
 	endif()
 endif()
+
+message("CMAKE_C_FLAGS: ${CMAKE_C_FLAGS}")
+message("CMAKE_C_FLAGS_RELEASE: ${CMAKE_C_FLAGS_RELEASE}")
+message("CMAKE_C_FLAGS_DEBUG: ${CMAKE_C_FLAGS_DEBUG}")
 
 ################################################################################
 # Check for the OpenGL and GLUT libraries.

@@ -40,6 +40,7 @@ debug_level=0
 os=
 use_jas_init=0
 enable_strict=0
+cmake_generator=
 
 while [ $# -gt 0 ]; do
 	option="$1"
@@ -49,6 +50,14 @@ while [ $# -gt 0 ]; do
 		[ $# -gt 0 ] || usage
 		debug_level="$1"
 		shift 1
+		;;
+	--make)
+		shift 1
+		cmake_generator="Unix Makefiles"
+		;;
+	--ninja)
+		shift 1
+		cmake_generator="Ninja"
 		;;
 	--strict)
 		shift 1
@@ -253,6 +262,10 @@ configure_opts=()
 
 configure_opts+=(-B"$build_dir")
 configure_opts+=(-H"$source_dir")
+
+if [ -n "$cmake_generator" ]; then
+	configure_opts+=(-G "$cmake_generator")
+fi
 
 #if [ "$os" = windows ]; then
 #	configure_opts+=(-G "Visual Studio 12 2013 Win64")
