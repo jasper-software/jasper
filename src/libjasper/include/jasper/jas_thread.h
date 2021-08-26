@@ -484,6 +484,7 @@ static inline int jas_call_once(jas_once_flag_t *flag, void (*func)(void))
 			jas_thread_yield();
 		}
 	}
+	return 0;
 #endif
 }
 
