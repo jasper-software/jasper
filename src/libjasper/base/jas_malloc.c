@@ -394,7 +394,7 @@ JAS_EXPORT
 void *jas_basic_alloc(jas_allocator_t *allocator, size_t size)
 {
 	void *result;
-	jas_mb_t *mb;
+	jas_mb_t *mb = 0;
 	size_t ext_size;
 	size_t mem;
 	jas_basic_allocator_t *a = JAS_CAST(jas_basic_allocator_t *, allocator);
@@ -467,7 +467,7 @@ void *jas_basic_realloc(jas_allocator_t *allocator, void *ptr, size_t size)
 	void *result;
 	jas_mb_t *old_mb;
 	size_t old_ext_size;
-	jas_mb_t *mb;
+	jas_mb_t *mb = 0;
 	size_t ext_size;
 	size_t mem;
 	jas_basic_allocator_t *a = JAS_CAST(jas_basic_allocator_t *, allocator);

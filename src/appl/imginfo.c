@@ -197,6 +197,7 @@ int main(int argc, char **argv)
 	}
 
 #if defined(JAS_USE_JAS_INIT)
+	JAS_UNUSED(special);
 	if (verbose >= 1) {
 		fprintf(stderr, "using jas_init\n");
 	}
