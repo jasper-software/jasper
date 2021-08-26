@@ -131,10 +131,19 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS true)
 set(CMAKE_C_STANDARD 11)
 
 if (APPLE AND CMAKE_SYSTEM_NAME MATCHES "Darwin")
-	set(MACOSX true)
+	set(MACOS true)
 else()
-	set(MACOSX false)
+	set(MACOS false)
 endif()
+
+if (CMAKE_SYSTEM_NAME MATCHES "Linux")
+	set(LINUX true)
+else()
+	set(LINUX false)
+endif()
+
+message("Linux: ${LINUX}")
+message("MacOS: ${MACOS}")
 
 if ((CMAKE_GENERATOR MATCHES Xcode) OR
   (CMAKE_GENERATOR MATCHES "Visual Studio"))
@@ -153,7 +162,7 @@ else()
 	set(JAS_REQUIRED "REQUIRED")
 endif()
 
-if (JAS_ENABLE_SHARED AND MACOSX)
+if (JAS_ENABLE_SHARED AND MACOS)
 	set(CMAKE_MACOSX_RPATH true)
 endif()
 
@@ -217,7 +226,7 @@ if (JAS_ENABLE_HIDDEN)
 	set(CMAKE_C_VISIBILITY_PRESET hidden)
 	set(CMAKE_VISIBILITY_INLINES_HIDDEN 0)
 	if (NOT (CMAKE_BUILD_TYPE MATCHES "Debug"))
-		if (NOT WIN32 AND NOT MACOSX)
+		if (LINUX)
 			check_c_compiler_flag("-ffunction-sections" HAVE_FUNCTION_SECTIONS)
 			check_c_compiler_flag("-fdata-sections" HAVE_DATA_SECTIONS)
 			check_c_compiler_flag("-Wl,--gc-sections" HAVE_GC_SECTIONS)
@@ -335,7 +344,7 @@ if (JAS_ENABLE_MULTITHREADING_SUPPORT)
 	check_include_files(pthread.h JAS_HAVE_PTHREAD_H)
 
 	# Check for support for various threading libraries.
-	if (MACOSX)
+	if (MACOS)
 		set(THREADS_PREFER_PTHREAD_FLAG true)
 		set(CMAKE_HAVE_THREADS_LIBRARY 1)
 		set(CMAKE_THREAD_LIBS_INIT "-lpthread")
@@ -410,7 +419,7 @@ endif()
 
 # The following is needed to prevent the incorrect version of the JPEG library
 # from being found.
-if (MACOSX)
+if (MACOS)
 	set(CMAKE_FIND_FRAMEWORK LAST)
 endif()
 
