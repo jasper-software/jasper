@@ -224,7 +224,7 @@ if (CMAKE_C_COMPILER_ID STREQUAL "Clang" OR CMAKE_C_COMPILER_ID STREQUAL "GNU")
 		# Treat all compiler warnings as errors.
 		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pedantic-errors")
 	endif()
-elseif (CMAKE_COMPILER_ID STREQUAL "MSVC")
+elseif (CMAKE_C_COMPILER_ID STREQUAL "MSVC")
 	message("adjusting compiler warning options for MSVC")
 	# possibly lossy conversion
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /wd4244")
