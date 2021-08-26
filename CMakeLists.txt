@@ -205,7 +205,8 @@ message("CMAKE_C_COMPILER: ${CMAKE_C_COMPILER}")
 message("CMAKE_LINKER: ${CMAKE_LINKER}")
 
 # Customize the compiler flags for warning messages.
-if (CMAKE_C_COMPILER_ID STREQUAL "Clang" OR CMAKE_C_COMPILER_ID STREQUAL GNU)
+if (CMAKE_C_COMPILER_ID STREQUAL "Clang" OR CMAKE_C_COMPILER_ID STREQUAL "GNU")
+	message("adjusting compiler warning options for GCC/Clang")
 	check_c_compiler_flag("-Wno-stringop-truncation"
 	  JAS_GCC_WARN_NO_STRINGOP_TRUNCATION)
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
@@ -224,6 +225,7 @@ if (CMAKE_C_COMPILER_ID STREQUAL "Clang" OR CMAKE_C_COMPILER_ID STREQUAL GNU)
 		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pedantic-errors")
 	endif()
 elseif (CMAKE_COMPILER_ID STREQUAL "MSVC")
+	message("adjusting compiler warning options for MSVC")
 	# possibly lossy conversion
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /wd4244")
 	# different const qualifiers
@@ -237,6 +239,10 @@ elseif (CMAKE_COMPILER_ID STREQUAL "MSVC")
 		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /WX")
 	endif()
 endif()
+
+message("CMAKE_C_FLAGS: ${CMAKE_C_FLAGS}")
+message("CMAKE_C_FLAGS_RELEASE: ${CMAKE_C_FLAGS_RELEASE}")
+message("CMAKE_C_FLAGS_DEBUG: ${CMAKE_C_FLAGS_DEBUG}")
 
 if (JAS_ENABLE_HIDDEN)
 	set(CMAKE_C_VISIBILITY_PRESET hidden)
