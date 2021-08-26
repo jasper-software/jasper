@@ -315,6 +315,10 @@ else()
 	set(GLUT_LIBRARIES "")
 endif()
 
+if (JAS_HAVE_OPENGL AND MACOS)
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DGL_SILENCE_DEPRECATION")
+endif()
+
 ################################################################################
 # Perform platform checks.
 ################################################################################
