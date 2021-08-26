@@ -304,7 +304,7 @@ int jas_init()
 	/* NOTE: The following three lines of code require that configuration,
 	  initialization, and cleanup of the library be performed on the
 	  same thread. */
-	assert(jas_conf.configured);
+	assert(!jas_conf.configured);
 	assert(!jas_conf.initialized);
 	assert(!jas_conf.atexitused);
 

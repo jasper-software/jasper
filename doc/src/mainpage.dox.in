@@ -13,6 +13,38 @@ This software was developed by
 from the Department of Electrical and Computer Engineering at the 
 University of Victoria, Victoria, BC, Canada.
 
+@section features Features
+
+Some of the features of the JasPer library are as follows:
+
+  - has multithreading support (e.g., supports per-thread contexts)
+  - native support for several image codecs, including:
+      - JPEG-2000 JP2 File Format Syntax (ISO/IEC 15444-1)
+      - JPEG-2000 Code Stream Syntax (ISO/IEC 15444-1)
+      - Portable Graymap/Pixmap (PNM)
+      - Microsoft Bitmap (BMP)
+      - Sun Rasterfile (RAS)
+      - JPEG-2000 VM Format (PGX)
+  - non-native support for following image codecs:
+      - JPEG (ISO/IEC 10918-1) via IJG JPEG Library
+  - can add new codecs (or disable codecs) at run time
+  - can provide custom memory allocator to be used by library
+  - can provide custom logging function to be used by library for
+    error, warning, informational, and debugging messages
+  - can place upper limit on total amount of memory used by library
+  - can manage ICC profiles
+  - portable code known to work on many platforms
+  - can autodetect image format during decoding
+
+Several application programs are also provided:
+
+  - an image transcoder program for converting between image formats
+  - a program for querying the properties of image, such as:
+    size, number of components, and the number of bits per sample
+  - a program for comparing two images using various distance metrics,
+    such as PAE, MAE, and PSNR
+  - an image viewer
+
 @section news News
 @verbinclude @CMAKE_SOURCE_DIR@/NEWS
 

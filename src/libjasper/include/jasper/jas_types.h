@@ -125,8 +125,16 @@
 /* NOTE: This could underestimate the size on some exotic architectures. */
 #define JAS_UINTFAST32_NUMBITS (8 * sizeof(uint_fast32_t))
 
+#if 0
 #ifdef _MSC_VER
 typedef long double max_align_t;
+#endif
+#endif
+
+#if defined(JAS_HAVE_MAX_ALIGN_T)
+#define	jas_max_align_t	max_align_t
+#else
+#define	jas_max_align_t	long double
 #endif
 
 #ifdef __cplusplus

@@ -303,6 +303,12 @@ check_function_exists(gettimeofday JAS_HAVE_GETTIMEOFDAY)
 check_function_exists(getrusage JAS_HAVE_GETRUSAGE)
 check_function_exists(mkostemp JAS_HAVE_MKOSTEMP)
 
+check_c_source_compiles("
+#include <stddef.h>
+max_align_t x;
+int main() {}
+" JAS_HAVE_MAX_ALIGN_T)
+
 ################################################################################
 # Check for invalid codec combinations.
 ################################################################################

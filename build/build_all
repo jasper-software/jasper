@@ -93,6 +93,45 @@ for multithread in 0 1; do
 
 	cat <<- EOF
 	================================================================================
+	BUILD: Multi-Thread Static Library Debug Build Using jas_init (ASan, LSan, UBSan)
+	================================================================================
+	EOF
+	base_dir="$build_dir/test_static_debug-$multithread"
+	command=("$build_program")
+	command+=("${global_options[@]}")
+	command+=(--build-dir "$base_dir/build")
+	command+=(--install-dir "$base_dir/install")
+	command+=(--static)
+	command+=(--debug)
+	command+=(--ubsan)
+	command+=(--asan)
+	command+=("${lsan_option[@]}")
+	command+=(--test)
+	command+=(--install)
+	command+=(--no-documentation)
+	command+=(--use-jas-init)
+	if [ "$multithread" -ne 0 ]; then
+		command+=(--multithread)
+	else
+		command+=(--no-multithread)
+	fi
+	echo "RUNNING: ${command[@]}"
+	if [ "$enable" -ne 0 ]; then
+		"${command[@]}" || panic
+		echo "build directory:"
+		list_directory "$base_dir/build" || panic
+		echo "install directory:"
+		list_directory "$base_dir/install" || panic
+	fi
+
+done
+
+################################################################################
+
+for multithread in 0 1; do
+
+	cat <<- EOF
+	================================================================================
 	BUILD: Multi-Thread Static Library Debug Build (ASan, LSan, UBSan)
 	================================================================================
 	EOF
@@ -109,6 +148,7 @@ for multithread in 0 1; do
 	command+=(--test)
 	command+=(--install)
 	command+=(--no-documentation)
+	command+=(--no-use-jas-init)
 	if [ "$multithread" -ne 0 ]; then
 		command+=(--multithread)
 	else
@@ -146,6 +186,7 @@ command+=(--test)
 command+=(--install)
 command+=(--no-documentation)
 command+=(--multithread)
+command+=(--no-use-jas-init)
 echo "RUNNING: ${command[@]}"
 if [ "$enable" -ne 0 ]; then
 	"${command[@]}" || panic
@@ -176,6 +217,7 @@ for multithread in 0 1; do
 	command+=(--documentation)
 	command+=(--test)
 	command+=(--install)
+	command+=(--no-use-jas-init)
 	if [ "$multithread" -ne 0 ]; then
 		command+=(--multithread)
 	else

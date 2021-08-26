@@ -70,6 +70,7 @@
 /* The configuration header file should be included first. */
 #include <jasper/jas_config.h>
 
+#include <jasper/jas_types.h>
 #include <jasper/jas_icc.h>
 
 #ifdef __cplusplus
@@ -224,8 +225,6 @@ typedef struct {
 	unsigned outclrspc;
 } jas_cmclrspcconv_t;
 
-#define	jas_align_t	double
-
 /*!
 */
 typedef struct jas_cmpxform_s {
@@ -234,7 +233,7 @@ typedef struct jas_cmpxform_s {
 	unsigned numinchans;
 	unsigned numoutchans;
 	union {
-		jas_align_t dummy;
+		jas_max_align_t dummy;
 		jas_cmshapmat_t shapmat;
 		jas_cmshaplut_t shaplut;
 		jas_cmclrspcconv_t clrspcconv;

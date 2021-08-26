@@ -38,6 +38,7 @@ crostini=0
 clean_tmp_dir=0
 debug_level=0
 os=
+use_jas_init=0
 
 while [ $# -gt 0 ]; do
 	option="$1"
@@ -47,6 +48,14 @@ while [ $# -gt 0 ]; do
 		[ $# -gt 0 ] || usage
 		debug_level="$1"
 		shift 1
+		;;
+	--use-jas-init)
+		shift 1
+		use_jas_init=1
+		;;
+	--no-use-jas-init)
+		shift 1
+		use_jas_init=0
 		;;
 	--clean-tmp-dir)
 		shift 1
@@ -280,6 +289,12 @@ else
 	configure_opts+=("-DJAS_ENABLE_DOC=false")
 fi
 
+if [ "$use_jas_init" -ne 0 ]; then
+	configure_opts+=("-DJAS_USE_JAS_INIT=true")
+else
+	configure_opts+=("-DJAS_USE_JAS_INIT=false")
+fi
+
 if [ "$enable_multithread" -ne 0 ]; then
 	configure_opts+=("-DJAS_ENABLE_MULTITHREADING_SUPPORT=true")
 else
@@ -366,6 +381,11 @@ if [ "$debug_level" -ge 2 ]; then
 	command+=(JAS_DEBUG_LEVEL="$debug_level")
 fi
 if [ "$os" = windows ]; then
+	# NOTE:
+	# Windows searches for DLLs in the directories specified by the PATH
+	# environment variable (and possibly a few system directories as well).
+	# So, the following line ensures that the directory containing the
+	# JasPer DLL will be found.
 	command+=(PATH="$PATH:$build_dir/src/libjasper")
 	echo "**********"
 	ls -al $build_dir/src/libjasper

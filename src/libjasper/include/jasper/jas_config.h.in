@@ -17,6 +17,7 @@
 #cmakedefine JAS_HAVE_UNISTD_H 1
 #cmakedefine JAS_HAVE_SYS_TIME_H 1
 #cmakedefine JAS_HAVE_SYS_TYPES_H 1
+#cmakedefine JAS_HAVE_MAX_ALIGN_T 1
 
 #cmakedefine JAS_HAVE_MKOSTEMP 1
 #cmakedefine JAS_HAVE_GETTIMEOFDAY 1
@@ -49,12 +50,6 @@
 #else
 #undef JAS_ENABLE_MIF_CODEC
 #endif
-
-/*
-#if defined(JAS_INCLUDE_JP2_CODEC) && !defined(JAS_INCLUDE_JPC_CODEC)
-#undef JAS_INCLUDE_JPC_CODEC
-#endif
-*/
 
 #ifdef _MSC_VER
 #undef JAS_HAVE_SNPRINTF
