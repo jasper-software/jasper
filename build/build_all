@@ -28,8 +28,9 @@ build_dir=
 crostini=0
 enable=1
 debug_level=0
+strict=1
 
-while getopts vb:cnd: option; do
+while getopts vb:cnd:s option; do
 	case "$option" in
 	n)
 		enable=0;;
@@ -40,7 +41,9 @@ while getopts vb:cnd: option; do
 	d)
 		debug_level="$OPTARG";;
 	v)
-		verbose=$((verbose + 1));
+		verbose=$((verbose + 1));;
+	s)
+		strict=1;;
 	esac
 done
 shift $((OPTIND - 1))
@@ -76,6 +79,9 @@ EOF
 global_options=()
 if [ "$verbose" -ge 1 ]; then
 	global_options+=(--verbose)
+fi
+if [ "$strict" -ge 1 ]; then
+	global_options+=(--strict)
 fi
 if [ "$crostini" -ne 0 ]; then
 	global_options+=(--crostini)

@@ -497,4 +497,5 @@ static int clrspctojp2(jas_clrspc_t clrspc)
 		assert(false);
 		JAS_UNREACHABLE();
 	}
+	JAS_UNREACHABLE();
 }

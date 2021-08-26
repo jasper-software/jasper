@@ -164,6 +164,7 @@ unsigned JPC_NOMINALGAIN(unsigned qmfbid, unsigned numlvls, unsigned lvlno, enum
 			JAS_UNREACHABLE();
 		}
 	}
+	JAS_UNREACHABLE();
 }
 
 /******************************************************************************\

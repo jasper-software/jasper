@@ -102,6 +102,8 @@
 #	else
 #		define JAS_UNREACHABLE()
 #	endif
+#elif defined(__clang__)
+#		define JAS_UNREACHABLE() __builtin_unreachable()
 #elif defined(_MSC_VER)
 #	define JAS_UNREACHABLE() __assume(0)
 #else
