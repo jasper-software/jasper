@@ -71,6 +71,12 @@
 * Includes.
 \******************************************************************************/
 
+#include "jasper/jas_config.h"
+/* This must come before any direct/indirect inclusion of stdlib.h. */
+#if defined(JAS_HAVE_MKOSTEMP)
+#define _GNU_SOURCE
+#endif
+
 #define JAS_INTERNAL_USE_ONLY
 
 #include "jasper/jas_stream.h"

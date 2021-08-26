@@ -86,6 +86,7 @@ option(JAS_ENABLE_PROGRAMS "Enable building of the programs" true)
 option(JAS_ENABLE_MULTITHREADING_SUPPORT "Enable multithreading support" true)
 option(JAS_PREFER_PTHREAD
   "Prefer POSIX Threading Library (over C11) for threading support" false)
+option(JAS_STRICT "Treat compiler warnings as errors" false)
 
 option(JAS_INCLUDE_BMP_CODEC "Include BMP codec support" true)
 option(JAS_INCLUDE_JP2_CODEC "Include JP2 codec support" true)
@@ -220,6 +221,23 @@ if (CMAKE_C_COMPILER_ID STREQUAL "Clang" OR CMAKE_C_COMPILER_ID STREQUAL GNU)
 		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-stringop-truncation")
 	endif()
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wmissing-declarations")
+	if (JAS_STRICT)
+		# Treat all compiler warnings as errors.
+		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pedantic-errors")
+	endif()
+elseif (CMAKE_COMPILER_ID STREQUAL "MSVC")
+	# possibly lossy conversion
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /wd4244")
+	# different const qualifiers
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /wd4090")
+	# signed/unsigned mismatch
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /wd4018")
+	# function may be unsafe (e.g., sprintf, strncat)
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /wd4996")
+	if (JAS_STRICT)
+		# Treat all compiler warnings as errors.
+		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /WX")
+	endif()
 endif()
 
 if (JAS_ENABLE_HIDDEN)

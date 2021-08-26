@@ -39,6 +39,7 @@ clean_tmp_dir=0
 debug_level=0
 os=
 use_jas_init=0
+enable_strict=0
 
 while [ $# -gt 0 ]; do
 	option="$1"
@@ -48,6 +49,14 @@ while [ $# -gt 0 ]; do
 		[ $# -gt 0 ] || usage
 		debug_level="$1"
 		shift 1
+		;;
+	--strict)
+		shift 1
+		enable_strict=1
+		;;
+	--no-strict)
+		shift 1
+		enable_strict=0
 		;;
 	--use-jas-init)
 		shift 1
@@ -293,6 +302,12 @@ if [ "$use_jas_init" -ne 0 ]; then
 	configure_opts+=("-DJAS_USE_JAS_INIT=true")
 else
 	configure_opts+=("-DJAS_USE_JAS_INIT=false")
+fi
+
+if [ "$enable_strict" -ne 0 ]; then
+	configure_opts+=("-DJAS_STRICT=true")
+else
+	configure_opts+=("-DJAS_STRICT=false")
 fi
 
 if [ "$enable_multithread" -ne 0 ]; then

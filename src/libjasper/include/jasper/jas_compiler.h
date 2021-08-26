@@ -66,42 +66,68 @@
 #include <jasper/jas_config.h>
 
 #ifdef _MSC_VER
-#ifndef __cplusplus
-#undef inline
-#define inline __inline
-#endif
-#endif
-
-#ifdef __GNUC__
-#define JAS_DEPRECATED __attribute__((deprecated))
-#define JAS_ATTRIBUTE_CONST __attribute__((const))
-#define JAS_ATTRIBUTE_PURE __attribute__((pure))
-#define JAS_FORCE_INLINE inline __attribute__((always_inline))
-#if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 5)
-#define JAS_UNREACHABLE() __builtin_unreachable()
-#else
-#define JAS_UNREACHABLE()
-#endif
-#define JAS_LIKELY(x) __builtin_expect (!!(x), 1)
-#define JAS_UNLIKELY(x) __builtin_expect (!!(x), 0)
-#else
-#define JAS_DEPRECATED
-#define JAS_ATTRIBUTE_CONST
-#define JAS_ATTRIBUTE_PURE
-#define JAS_FORCE_INLINE inline
-#define JAS_UNREACHABLE()
-#define JAS_LIKELY(x) (x)
-#define JAS_UNLIKELY(x) (x)
+#	ifndef __cplusplus
+#		undef inline
+#		define inline __inline
+#	endif
 #endif
 
-#ifdef __clang__
-#define JAS_ATTRIBUTE_DISABLE_UBSAN \
-  __attribute__((no_sanitize("undefined")))
-#elif defined(__GNUC__) && __GNUC__ >= 6
-#define JAS_ATTRIBUTE_DISABLE_UBSAN \
-  __attribute__((no_sanitize_undefined))
+#if defined(__GNUC__)
+#	define JAS_DEPRECATED __attribute__((deprecated))
 #else
-#define JAS_ATTRIBUTE_DISABLE_UBSAN
+#	define JAS_DEPRECATED
+#endif
+
+#if defined(__GNUC__)
+#	define JAS_ATTRIBUTE_CONST __attribute__((const))
+#else
+#	define JAS_ATTRIBUTE_CONST
+#endif
+
+#if defined(__GNUC__)
+#	define JAS_ATTRIBUTE_PURE __attribute__((pure))
+#else
+#	define JAS_ATTRIBUTE_PURE
+#endif
+
+#if defined(__GNUC__)
+#	define JAS_FORCE_INLINE inline __attribute__((always_inline))
+#else
+#	define JAS_FORCE_INLINE inline
+#endif
+
+#if defined(__GNUC__)
+#	if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 5)
+#		define JAS_UNREACHABLE() __builtin_unreachable()
+#	else
+#		define JAS_UNREACHABLE()
+#	endif
+#elif defined(_MSC_VER)
+#	define JAS_UNREACHABLE() __assume(0)
+#else
+#	define JAS_UNREACHABLE()
+#endif
+
+#if defined(__GNUC__)
+#	define JAS_LIKELY(x) __builtin_expect (!!(x), 1)
+#else
+#	define JAS_LIKELY(x) (x)
+#endif
+
+#if defined(__GNUC__)
+#	define JAS_UNLIKELY(x) __builtin_expect (!!(x), 0)
+#else
+#	define JAS_UNLIKELY(x) (x)
+#endif
+
+#if defined(__GNUC__) && __GNUC__ >= 6
+#	define JAS_ATTRIBUTE_DISABLE_UBSAN \
+	  __attribute__((no_sanitize_undefined))
+#elif defined(__clang__)
+#	define JAS_ATTRIBUTE_DISABLE_UBSAN \
+	  __attribute__((no_sanitize("undefined")))
+#else
+#	define JAS_ATTRIBUTE_DISABLE_UBSAN
 #endif
 
 #ifdef __has_builtin
