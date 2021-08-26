@@ -96,7 +96,15 @@ typedef struct {
 	A boolean flag indicating if the library has been configured
 	by invoking the jas_conf_clear function.
 	*/
+	bool configured;
+
+	/*
+	A boolean flag indicating that the library has been initialized
+	by invoking the jas_init or jas_initialize function.
+	*/
 	bool initialized;
+
+	bool atexitused;
 
 	/*
 	The allocator to be used by the library.
@@ -201,6 +209,10 @@ prior to calling @c jas_initialize.
 @returns
 If the initialization of the library is successful, zero is returned;
 otherwise, a nonzero value is returned.
+
+@warning
+Configuration, initialization, and cleanup of the library must be performed
+on the same thread.
 */
 JAS_EXPORT
 int jas_initialize(void);
@@ -222,6 +234,10 @@ to configure and initialize the library.
 @returns
 If the library is succesfully initialized, zero is returned;
 otherwise, a nonzero value is returned.
+
+@warning
+Configuration, initialization, and cleanup of the library must be performed
+on the same thread.
 */
 JAS_EXPORT
 int jas_init(void);
@@ -231,6 +247,10 @@ int jas_init(void);
 
 @details
 This function performs any clean up for the JasPer library.
+
+@warning
+Configuration, initialization, and cleanup of the library must be performed
+on the same thread.
 */
 JAS_EXPORT
 void jas_cleanup(void);
@@ -243,6 +263,10 @@ This function configures the JasPer library with the default configuration
 settings.
 These settings may be change via the @c jas_conf_* family of function
 prior to invoking @c jas_initialize.
+
+@warning
+Configuration, initialization, and cleanup of the library must be performed
+on the same thread.
 */
 JAS_EXPORT
 void jas_conf_clear(void);

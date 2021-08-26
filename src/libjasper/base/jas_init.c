@@ -204,7 +204,9 @@ static const jas_image_fmt_t jas_image_fmts[] = {
 Various user-configurable settings.
 */
 jas_conf_t jas_conf = {
+	.configured = 0,
 	.initialized = 0,
+	.atexitused = 0,
 };
 
 #if defined(JAS_THREADS)
@@ -230,8 +232,14 @@ void jas_get_image_format_table(const jas_image_fmt_t** formats,
 JAS_EXPORT
 void jas_conf_clear()
 {
+	/* NOTE: The following two lines of code require that configuration,
+	  initialization, and cleanup of the library be performed on the
+	  same thread. */
+	assert(!jas_conf.initialized);
+	assert(!jas_conf.atexitused);
+
 	memset(&jas_conf, 0, sizeof(jas_conf_t));
-	jas_conf.initialized = 1;
+	jas_conf.configured = 1;
 	jas_conf.allocator = 0;
 	jas_conf.enable_allocator_wrapper = 1;
 	jas_conf.max_mem = JAS_DEFAULT_MAX_MEM_USAGE;
@@ -293,15 +301,30 @@ void jas_conf_set_image_format_table(const jas_image_fmt_t *formats,
 JAS_EXPORT
 int jas_init()
 {
+	/* NOTE: The following three lines of code require that configuration,
+	  initialization, and cleanup of the library be performed on the
+	  same thread. */
+	assert(jas_conf.configured);
+	assert(!jas_conf.initialized);
+	assert(!jas_conf.atexitused);
+
 	jas_conf_clear();
+
 	jas_conf.enable_atexit_cleanup = 1;
+
 	return jas_init_helper();
 }
 
 JAS_EXPORT
 int jas_initialize()
 {
-	assert(jas_conf.initialized);
+	/* NOTE: The following three lines of code require that configuration,
+	  initialization, and cleanup of the library be performed on the
+	  same thread. */
+	assert(jas_conf.configured);
+	assert(!jas_conf.initialized);
+	assert(!jas_conf.atexitused);
+
 	return jas_init_helper();
 }
 
@@ -365,7 +388,16 @@ static int jas_init_helper()
 		debug memory allocator exit handler.
 		*/
 		atexit(jas_cleanup);
+		/* NOTE: The following two lines of code require that configuration,
+		  initialization, and cleanup of the library be performed on the
+		  same thread. */
+		jas_conf.atexitused = 1;
 	}
+
+	/* NOTE: The following line of code requires that configuration,
+	  initialization, and cleanup of the library be performed on the
+	  same thread. */
+	jas_conf.initialized = 1;
 
 	return 0;
 }
@@ -421,6 +453,12 @@ void jas_cleanup()
 #if defined(JAS_THREADS)
 	jas_tss_delete(jas_tss);
 #endif
+
+	/* NOTE: The following two lines of code require that configuration,
+	  initialization, and cleanup of the library be performed on the
+	  same thread. */
+	jas_conf.configured = 0;
+	jas_conf.initialized = 0;
 }
 
 /******************************************************************************\
