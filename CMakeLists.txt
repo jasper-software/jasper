@@ -220,7 +220,7 @@ if (CMAKE_C_COMPILER_ID STREQUAL "Clang" OR CMAKE_C_COMPILER_ID STREQUAL "GNU")
 	endif()
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wmissing-declarations")
 	if (CMAKE_C_COMPILER_ID STREQUAL "Clang")
-		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wunused-command-line-argument")
+		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-unused-command-line-argument")
 	endif()
 	if (JAS_STRICT)
 		# Treat all compiler warnings as errors.
