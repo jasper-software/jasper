@@ -108,6 +108,9 @@
 2.0.19 (2020-07-11)
 ===================
 
+* Fix CVE-2021-27845
+  https://github.com/mdadams/jasper/issues/194 (part 1)
+
 * Fix CVE-2018-9154
   https://github.com/jasper-software/jasper/issues/215
   https://github.com/jasper-software/jasper/issues/166
