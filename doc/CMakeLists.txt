@@ -5,15 +5,14 @@ find_package(LATEX COMPONENTS PDFLATEX)
 # On some (or maybe all?) systems, LATEX_FOUND is not set by FindLATEX.
 # So, instead, rely on LATEX_PDFLATEX_FOUND.
 message("PDFLATEX_COMPILER: ${PDFLATEX_COMPILER}")
-if ((NOT LATEX_FOUND) AND PDFLATEX_COMPILER)
-	message(WARNING "Setting LATEX_FOUND to true.")
+if((NOT LATEX_FOUND) AND PDFLATEX_COMPILER)
+	message(WARNING "Setting LATEX_FOUND to TRUE.")
 	message(WARNING "Your version of CMake may be buggy.")
-	set(LATEX_FOUND true)
+	set(LATEX_FOUND TRUE)
+	message("LATEX_FOUND ${LATEX_FOUND}")
 endif()
-message("LATEX_FOUND ${LATEX_FOUND}")
 
-if (DOXYGEN_FOUND)
-
+if(DOXYGEN_FOUND)
 	configure_file("${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in"
 	  "${CMAKE_CURRENT_BINARY_DIR}/Doxyfile" @ONLY)
 	configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/mainpage.dox.in"
@@ -23,30 +22,27 @@ if (DOXYGEN_FOUND)
 
 	file(GLOB_RECURSE DOXYGEN_DEPENDS "${CMAKE_SOURCE_DIR}/*.[ch]")
 	add_custom_command(OUTPUT "html/index.html" "latex/index.tex"
-		COMMAND ${DOXYGEN_EXECUTABLE} "Doxyfile"
-		BYPRODUCTS "html" "latex"
-		WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-		MAIN_DEPENDENCY "Doxyfile"
-		DEPENDS "${DOXYGEN_DEPENDS}"
-		COMMENT "Generating API documentation with Doxygen" VERBATIM
+	  COMMAND ${DOXYGEN_EXECUTABLE} "Doxyfile"
+	  BYPRODUCTS "html" "latex"
+	  WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+	  MAIN_DEPENDENCY "Doxyfile"
+	  DEPENDS "${DOXYGEN_DEPENDS}"
+	  COMMENT "Generating API documentation with Doxygen" VERBATIM
 	)
 
 	add_custom_target(doc ALL
 		DEPENDS "html/index.html"
 	)
 
-	if (LATEX_FOUND)
+	if(LATEX_FOUND)
 		add_custom_command(OUTPUT "latex/refman.pdf"
-		  COMMAND "${PDFLATEX_COMPILER}" refman.tex
-		  COMMAND "${PDFLATEX_COMPILER}" refman.tex
-		  COMMAND "${PDFLATEX_COMPILER}" refman.tex
 		  COMMAND "${PDFLATEX_COMPILER}" refman.tex
 		  WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/latex"
 		  DEPENDS "latex/index.tex"
 		)
 
 		add_custom_target(manual_pdf ALL
-			DEPENDS "latex/refman.pdf"
+		  DEPENDS "latex/refman.pdf"
 		)
 	endif()
 
@@ -57,7 +53,7 @@ if (DOXYGEN_FOUND)
 	  DESTINATION "${CMAKE_INSTALL_DOCDIR}")
 
 	# Install the PDF version of the manual built from LaTeX.
-	if (LATEX_FOUND)
+	if(LATEX_FOUND)
 		install(FILES "${CMAKE_CURRENT_BINARY_DIR}/latex/refman.pdf"
 		  DESTINATION "${CMAKE_INSTALL_DOCDIR}" RENAME manual.pdf)
 	endif()

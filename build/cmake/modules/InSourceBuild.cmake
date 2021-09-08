@@ -1,9 +1,9 @@
-option(ALLOW_IN_SOURCE_BUILD "Allow an in-source build" false)
+option(ALLOW_IN_SOURCE_BUILD "Allow an in-source build" OFF)
 
 function(prevent_in_source_build)
 	get_filename_component(source_dir "${CMAKE_SOURCE_DIR}" REALPATH)
 	get_filename_component(binary_dir "${CMAKE_BINARY_DIR}" REALPATH)
-	if("${source_dir}" STREQUAL "${binary_dir}")
+	if(source_dir STREQUAL binary_dir)
 		message(FATAL_ERROR
 			"The use of an in-source build is not recommended.  "
 			"For this reason, the use of in-source build is disabled by default.  "
@@ -12,6 +12,6 @@ function(prevent_in_source_build)
 	endif()
 endfunction()
 
-if (NOT ALLOW_IN_SOURCE_BUILD)
+if(NOT ALLOW_IN_SOURCE_BUILD)
 	prevent_in_source_build()
 endif()
