@@ -74,7 +74,11 @@ include(GenerateExportHeader)
 # Define options.
 ###############################################################################
 
-option(JAS_ENABLE_SHARED "Enable building of shared library" ON)
+if(DEFINED BUILD_SHARED_LIBS)
+	option(JAS_ENABLE_SHARED "Enable building of shared library" ${BUILD_SHARED_LIBS})
+else()
+	option(JAS_ENABLE_SHARED "Enable building of shared library" ON)
+endif()
 option(JAS_ENABLE_HIDDEN "Hide internal symbols" ON)
 option(JAS_ENABLE_32BIT "Use 32 bit integers on 64 bit CPUs" OFF)
 option(JAS_ENABLE_LIBJPEG "Enable the use of the JPEG Library" ON)
