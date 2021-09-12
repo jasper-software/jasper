@@ -107,9 +107,9 @@ typedef struct {
 
 	int verbose;
 
-#if defined(JAS_DEFAULT_MAX_MEM_USAGE)
+//#if defined(JAS_DEFAULT_MAX_MEM_USAGE)
 	size_t max_mem;
-#endif
+//#endif
 
 } cmdopts_t;
 
@@ -200,9 +200,9 @@ static const jas_opt_t opts[] = {
 	{'w', "wait", JAS_OPT_HASARG},
 	{'l', "loop", 0},
 	{'t', "title", JAS_OPT_HASARG},
-#if defined(JAS_DEFAULT_MAX_MEM_USAGE)
+//#if defined(JAS_DEFAULT_MAX_MEM_USAGE)
 	{'m', "memory-limit", JAS_OPT_HASARG},
-#endif
+//#endif
 	{-1, 0, 0}
 };
 
@@ -242,9 +242,9 @@ int main(int argc, char **argv)
 	cmdopts.tmout = 0;
 	cmdopts.loop = 0;
 	cmdopts.verbose = 0;
-#if defined(JAS_DEFAULT_MAX_MEM_USAGE)
+//#if defined(JAS_DEFAULT_MAX_MEM_USAGE)
 	cmdopts.max_mem = JAS_DEFAULT_MAX_MEM_USAGE;
-#endif
+//#endif
 
 	while ((c = jas_getopt(argc, argv, opts)) != EOF) {
 		switch (c) {
@@ -261,9 +261,9 @@ int main(int argc, char **argv)
 			cmdopts.verbose = 1;
 			break;
 		case 'm':
-#if defined(JAS_DEFAULT_MAX_MEM_USAGE)
+//#if defined(JAS_DEFAULT_MAX_MEM_USAGE)
 			cmdopts.max_mem = strtoull(jas_optarg, 0, 10);
-#endif
+//#endif
 			break;
 		case 'V':
 			printf("%s\n", JAS_VERSION);

@@ -398,9 +398,9 @@ cmdopts_t *cmdopts_parse(int argc, char **argv)
 		{CMDOPT_CMPTNO, "cmptno", JAS_OPT_HASARG},
 		{CMDOPT_SRGB, "force-srgb", 0},
 		{CMDOPT_SRGB, "S", 0},
-#if defined(JAS_DEFAULT_MAX_MEM_USAGE)
+//#if defined(JAS_DEFAULT_MAX_MEM_USAGE)
 		{CMDOPT_MAXMEM, "memory-limit", JAS_OPT_HASARG},
-#endif
+//#endif
 		{CMDOPT_LIST_CODECS, "l", 0},
 		{-1, 0, 0}
 	};
@@ -428,9 +428,9 @@ cmdopts_t *cmdopts_parse(int argc, char **argv)
 	cmdopts->cmptno = -1;
 	cmdopts->debug = 0;
 	cmdopts->srgb = 0;
-#if defined(JAS_DEFAULT_MAX_MEM_USAGE)
+//#if defined(JAS_DEFAULT_MAX_MEM_USAGE)
 	cmdopts->max_mem = JAS_DEFAULT_MAX_MEM_USAGE;
-#endif
+//#endif
 
 	while ((c = jas_getopt(argc, argv, cmdoptions)) != EOF) {
 		switch (c) {

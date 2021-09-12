@@ -128,7 +128,7 @@ JAS_ENABLE_32BIT
     the resulting library is not compatible with other builds.
     Valid values: true or false
 
-JAS_ENABLE_DEFAULT_MAX_MEM_USAGE
+JAS_DEFAULT_MAX_MEM_USAGE
     Specify the maximum amount of memory (in bytes) that may be used by
     the library.
     This value is only a default and can be overridden at run time.

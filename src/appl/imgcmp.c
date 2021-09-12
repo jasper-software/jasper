@@ -139,9 +139,9 @@ static const jas_opt_t opts[] = {
 	{OPT_MAXONLY, "max", 0},
 	{OPT_MINONLY, "min", 0},
 	{OPT_DIFFIMAGE, "d", JAS_OPT_HASARG},
-#if defined(JAS_DEFAULT_MAX_MEM_USAGE)
+//#if defined(JAS_DEFAULT_MAX_MEM_USAGE)
 	{OPT_MAXMEM, "memory-limit", JAS_OPT_HASARG},
-#endif
+//#endif
 	{-1, 0, 0}
 };
 
@@ -184,9 +184,9 @@ int main(int argc, char **argv)
 	diffpath = 0;
 	maxonly = 0;
 	minonly = 0;
-#if defined(JAS_DEFAULT_MAX_MEM_USAGE)
+//#if defined(JAS_DEFAULT_MAX_MEM_USAGE)
 	size_t max_mem = JAS_DEFAULT_MAX_MEM_USAGE;
-#endif
+//#endif
 
 	cmdname = argv[0];
 
@@ -219,9 +219,9 @@ int main(int argc, char **argv)
 			exit(EXIT_SUCCESS);
 			break;
 		case OPT_MAXMEM:
-#if defined(JAS_DEFAULT_MAX_MEM_USAGE)
+//#if defined(JAS_DEFAULT_MAX_MEM_USAGE)
 			max_mem = strtoull(jas_optarg, 0, 10);
-#endif
+//#endif
 			break;
 		case OPT_HELP:
 		default:
