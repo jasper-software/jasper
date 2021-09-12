@@ -33,7 +33,7 @@ else()
 	message("GLUT library not found; skipping build of jiv program")
 endif()
 
-if (JAS_THREADS)
+if(JAS_THREADS)
 	# The multithread program
 	add_executable(multithread multithread.c)
 	target_link_libraries(multithread libjasper ${JPEG_LIBRARIES}
@@ -41,21 +41,25 @@ if (JAS_THREADS)
 	set(programs "${programs}" multithread)
 endif()
 
-if (JAS_ENABLE_FUZZER)
+if(JAS_ENABLE_FUZZER)
 	add_executable(fuzz fuzz.c)
 	target_link_libraries(fuzz libjasper ${JPEG_LIBRARIES} ${MATH_LIBRARY}
 	  ${THREAD_LIBRARY})
 	set(programs "${programs}" fuzz)
-	set_target_properties(fuzz PROPERTIES COMPILE_FLAGS "-fsanitize=fuzzer")
-	set_target_properties(fuzz PROPERTIES LINK_FLAGS "-fsanitize=fuzzer")
+	target_compile_options(fuzz PRIVATE "-fsanitize=fuzzer")
+	if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.13)
+		target_link_options(fuzz PRIVATE "-fsanitize=fuzzer")
+	else()
+		set_target_properties(fuzz PROPERTIES LINK_FLAGS "-fsanitize=fuzzer")
+	endif()
 endif()
 
 # The JasPer include directories in the source and build tree must be included
 # before any other directories that may contain the include directory for an
 # already installed version of the JasPer library.
 include_directories(BEFORE
-	"${CMAKE_CURRENT_BINARY_DIR}/../libjasper/include"
-	"${CMAKE_CURRENT_SOURCE_DIR}/../libjasper/include"
+  "${CMAKE_CURRENT_BINARY_DIR}/../libjasper/include"
+  "${CMAKE_CURRENT_SOURCE_DIR}/../libjasper/include"
 )
 
 # Install of the the programs that were built.
@@ -71,8 +75,8 @@ install(FILES ${man_pages} DESTINATION "${CMAKE_INSTALL_MANDIR}/man1")
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/../../test/bin/wrapper.in"
   "${CMAKE_CURRENT_BINARY_DIR}/../../test/bin/wrapper" @ONLY)
 
-if (BASH_PROGRAM)
-	if (NOT WIN32)
+if(BASH_PROGRAM)
+	if(NOT WIN32)
 		add_test(run_test_1
 		  "${BASH_PROGRAM}" "${CMAKE_CURRENT_BINARY_DIR}/../../test/bin/wrapper"
 		  "${CMAKE_CURRENT_SOURCE_DIR}/../../test/bin/run_test_1" -v)
@@ -86,7 +90,7 @@ if (BASH_PROGRAM)
 		  "${BASH_PROGRAM}" "${CMAKE_CURRENT_BINARY_DIR}/../../test/bin/wrapper"
 		  "${CMAKE_CURRENT_SOURCE_DIR}/../../test/bin/run_test_4" -v)
 	endif()
-	if (JAS_THREADS)
+	if(JAS_THREADS)
 		add_test(run_test_5
 		  "${BASH_PROGRAM}" "${CMAKE_CURRENT_BINARY_DIR}/../../test/bin/wrapper"
 		  "${CMAKE_CURRENT_SOURCE_DIR}/../../test/bin/run_test_5" -v)

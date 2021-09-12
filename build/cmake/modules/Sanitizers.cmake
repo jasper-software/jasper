@@ -1,8 +1,8 @@
-option(JAS_ENABLE_ASAN "Enable Address Sanitizer" false)
-option(JAS_ENABLE_UBSAN "Enable Undefined-Behavior Sanitizer" false)
-option(JAS_ENABLE_LSAN "Enable Leak Sanitizer" false)
-option(JAS_ENABLE_MSAN "Enable Memory Sanitizer" false)
-option(JAS_ENABLE_TSAN "Enable Thread Sanitizer" false)
+option(JAS_ENABLE_ASAN "Enable Address Sanitizer" OFF)
+option(JAS_ENABLE_UBSAN "Enable Undefined-Behavior Sanitizer" OFF)
+option(JAS_ENABLE_LSAN "Enable Leak Sanitizer" OFF)
+option(JAS_ENABLE_MSAN "Enable Memory Sanitizer" OFF)
+option(JAS_ENABLE_TSAN "Enable Thread Sanitizer" OFF)
 
 # FIXME - This does not work.
 #check_c_compiler_flag("-fsanitize=address" JAS_HAVE_FSANITIZE_ADDRESS)
@@ -22,10 +22,10 @@ check_c_compiler_flag("-fsanitize=undefined" JAS_HAVE_FSANITIZE_UNDEFINED)
 
 check_c_compiler_flag("/fsanitize=address" JAS_HAVE_MSVC_FSANITIZE_ADDRESS)
 
-if (JAS_ENABLE_MSAN)
-	if (CMAKE_C_COMPILER_ID STREQUAL "Clang" OR
+if(JAS_ENABLE_MSAN)
+	if(CMAKE_C_COMPILER_ID STREQUAL "Clang" OR
 	  CMAKE_C_COMPILER_ID STREQUAL GNU)
-		if (JAS_HAVE_FSANITIZE_MEMORY)
+		if(JAS_HAVE_FSANITIZE_MEMORY)
 			message("Enabling Memory Sanitizer")
 			set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=memory")
 			set(CMAKE_LD_FLAGS "${CMAKE_LD_FLAGS} -fsanitize=memory")
@@ -33,16 +33,16 @@ if (JAS_ENABLE_MSAN)
 	endif()
 endif()
 
-if (JAS_ENABLE_ASAN)
-	if (CMAKE_C_COMPILER_ID STREQUAL "Clang" OR
+if(JAS_ENABLE_ASAN)
+	if(CMAKE_C_COMPILER_ID STREQUAL "Clang" OR
 	  CMAKE_C_COMPILER_ID STREQUAL GNU)
-		if (JAS_HAVE_FSANITIZE_ADDRESS)
+		if(JAS_HAVE_FSANITIZE_ADDRESS)
 			message("Enabling Address Sanitizer")
 			set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=address")
 			set(CMAKE_LD_FLAGS "${CMAKE_LD_FLAGS} -fsanitize=address")
 		endif()
-	elseif (CMAKE_C_COMPILER_ID STREQUAL "MSVC")
-		if (JAS_HAVE_MSVC_FSANITIZE_ADDRESS)
+	elseif(CMAKE_C_COMPILER_ID STREQUAL "MSVC")
+		if(JAS_HAVE_MSVC_FSANITIZE_ADDRESS)
 			message("Enabling Address Sanitizer")
 			set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /fsanitize=address")
 			set(CMAKE_LD_FLAGS "${CMAKE_LD_FLAGS} /fsanitize=address")
@@ -50,10 +50,10 @@ if (JAS_ENABLE_ASAN)
 	endif()
 endif()
 
-if (JAS_ENABLE_LSAN)
-	if (CMAKE_C_COMPILER_ID STREQUAL "Clang" OR
+if(JAS_ENABLE_LSAN)
+	if(CMAKE_C_COMPILER_ID STREQUAL "Clang" OR
 	  CMAKE_C_COMPILER_ID STREQUAL GNU)
-		if (JAS_HAVE_FSANITIZE_LEAK)
+		if(JAS_HAVE_FSANITIZE_LEAK)
 			message("Enabling Leak Sanitizer")
 			set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=leak")
 			set(CMAKE_LD_FLAGS "${CMAKE_LD_FLAGS} -fsanitize=leak")
@@ -61,10 +61,10 @@ if (JAS_ENABLE_LSAN)
 	endif()
 endif()
 
-if (JAS_ENABLE_UBSAN)
-	if (CMAKE_C_COMPILER_ID STREQUAL "Clang" OR
+if(JAS_ENABLE_UBSAN)
+	if(CMAKE_C_COMPILER_ID STREQUAL "Clang" OR
 	  CMAKE_C_COMPILER_ID STREQUAL GNU)
-		if (JAS_HAVE_FSANITIZE_UNDEFINED)
+		if(JAS_HAVE_FSANITIZE_UNDEFINED)
 			message("Enabling Undefined-Behavior Sanitizer")
 			set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=undefined")
 			set(CMAKE_LD_FLAGS "${CMAKE_LD_FLAGS} -fsanitize=undefined")
@@ -72,10 +72,10 @@ if (JAS_ENABLE_UBSAN)
 	endif()
 endif()
 
-if (JAS_ENABLE_TSAN)
-	if (CMAKE_C_COMPILER_ID STREQUAL "Clang" OR
+if(JAS_ENABLE_TSAN)
+	if(CMAKE_C_COMPILER_ID STREQUAL "Clang" OR
 	  CMAKE_C_COMPILER_ID STREQUAL GNU)
-		if (JAS_HAVE_FSANITIZE_THREAD)
+		if(JAS_HAVE_FSANITIZE_THREAD)
 			message("Enabling Thread Sanitizer")
 			set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=thread")
 			set(CMAKE_LD_FLAGS "${CMAKE_LD_FLAGS} -fsanitize=thread")

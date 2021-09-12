@@ -1,7 +1,5 @@
 cmake_minimum_required(VERSION 3.12)
 
-project(JasPer C)
-
 ################################################################################
 # Specify software and shared library version information.
 ################################################################################
@@ -45,12 +43,13 @@ message("Software version: ${JAS_VERSION}")
 message("Shared library ABI version: ${JAS_SO_VERSION}")
 message("Shared library build version: ${JAS_SO_NAME}")
 
+project(JasPer VERSION ${JAS_VERSION} LANGUAGES C)
+
 ################################################################################
 # Include modules and set policies.
 ################################################################################
 
-set(CMAKE_MODULE_PATH
-  ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/build/cmake/modules/")
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/build/cmake/modules)
 
 # This include should be placed as early as possible.
 include(InSourceBuild)
@@ -64,40 +63,45 @@ include(GNUInstallDirs)
 
 include(CheckIncludeFiles)
 include(CheckFunctionExists)
+include(CheckSymbolExists)
+include(CheckTypeSize)
 include(CheckCSourceCompiles)
 include(CTest)
 include(Sanitizers)
 include(GenerateExportHeader)
 
-cmake_policy(SET CMP0012 NEW)
-
 ################################################################################
 # Define options.
 ################################################################################
 
-option(JAS_ENABLE_SHARED "Enable building of shared library" true)
-option(JAS_ENABLE_HIDDEN "Hide internal symbols" true)
-option(JAS_ENABLE_32BIT "Use 32 bit integers on 64 bit CPUs" false)
-option(JAS_ENABLE_LIBJPEG "Enable the use of the JPEG Library" true)
-option(JAS_ENABLE_OPENGL "Enable the use of the OpenGL/GLUT Library" true)
-option(JAS_ENABLE_AUTOMATIC_DEPENDENCIES "Enable automatic dependencies" true)
-option(JAS_ENABLE_DOC "Enable building of the documentation" true)
-option(JAS_ENABLE_PROGRAMS "Enable building of the programs" true)
-option(JAS_ENABLE_MULTITHREADING_SUPPORT "Enable multithreading support" true)
+if(DEFINED BUILD_SHARED_LIBS)
+	option(JAS_ENABLE_SHARED "Enable building of shared library"
+	  ${BUILD_SHARED_LIBS})
+else()
+	option(JAS_ENABLE_SHARED "Enable building of shared library" ON)
+endif()
+option(JAS_ENABLE_HIDDEN "Hide internal symbols" ON)
+option(JAS_ENABLE_32BIT "Use 32 bit integers on 64 bit CPUs" OFF)
+option(JAS_ENABLE_LIBJPEG "Enable the use of the JPEG Library" ON)
+option(JAS_ENABLE_OPENGL "Enable the use of the OpenGL/GLUT Library" ON)
+option(JAS_ENABLE_AUTOMATIC_DEPENDENCIES "Enable automatic dependencies" ON)
+option(JAS_ENABLE_DOC "Enable building of the documentation" ON)
+option(JAS_ENABLE_PROGRAMS "Enable building of the programs" ON)
+option(JAS_ENABLE_MULTITHREADING_SUPPORT "Enable multithreading support" ON)
 option(JAS_PREFER_PTHREAD
-  "Prefer POSIX Threading Library (over C11) for threading support" false)
-option(JAS_STRICT "Treat compiler warnings as errors" false)
+  "Prefer POSIX Threading Library (over C11) for threading support" OFF)
+option(JAS_STRICT "Treat compiler warnings as errors" OFF)
 
-option(JAS_INCLUDE_BMP_CODEC "Include BMP codec support" true)
-option(JAS_INCLUDE_JP2_CODEC "Include JP2 codec support" true)
-option(JAS_INCLUDE_JPC_CODEC "Include JPC codec support" true)
-option(JAS_INCLUDE_JPG_CODEC "Include JPG codec support" true)
-option(JAS_INCLUDE_MIF_CODEC "Include MIF codec support" true)
-option(JAS_INCLUDE_PGX_CODEC "Include PGX codec support" true)
-option(JAS_INCLUDE_PNM_CODEC "Include PNM codec support" true)
-option(JAS_INCLUDE_RAS_CODEC "Include RAS codec support" true)
+option(JAS_INCLUDE_BMP_CODEC "Include BMP codec support" ON)
+option(JAS_INCLUDE_JP2_CODEC "Include JP2 codec support" ON)
+option(JAS_INCLUDE_JPC_CODEC "Include JPC codec support" ON)
+option(JAS_INCLUDE_JPG_CODEC "Include JPG codec support" ON)
+option(JAS_INCLUDE_MIF_CODEC "Include MIF codec support" ON)
+option(JAS_INCLUDE_PGX_CODEC "Include PGX codec support" ON)
+option(JAS_INCLUDE_PNM_CODEC "Include PNM codec support" ON)
+option(JAS_INCLUDE_RAS_CODEC "Include RAS codec support" ON)
 
-set(JAS_ENABLE_DEFAULT_MAX_MEM_USAGE
+set(JAS_DEFAULT_MAX_MEM_USAGE
   "1073741824"
   CACHE STRING
   "Set memory usage limit in bytes"
@@ -107,12 +111,12 @@ set(JAS_ENABLE_DEFAULT_MAX_MEM_USAGE
 # be changed by the developers of JasPer.
 option(JAS_USE_JAS_INIT
   "Use jas_init instead of jas_init_custom for initialization (should be false, except for testing)"
-  false)
+  OFF)
 option(JAS_ENABLE_NON_THREAD_SAFE_DEBUGGING
-  "Enable non-thread safe debug code" false)
+  "Enable non-thread safe debug code" OFF)
 
-if (JAS_USE_JAS_INIT)
-	add_definitions(-DJAS_USE_JAS_INIT)
+if(JAS_USE_JAS_INIT)
+	add_compile_definitions(JAS_USE_JAS_INIT)
 endif()
 
 # WARNING: THE FOLLOWING OPTION SHOULD ONLY BE ENABLED BY THE JASPER SOFTWARE
@@ -120,61 +124,66 @@ endif()
 # SIGNIFICANT SECURITY RISKS IF ENABLED.
 option(JAS_ENABLE_DANGEROUS_INTERNAL_TESTING_MODE
   "DO NOT ENABLE FOR SECURITY REASONS! (For internal use by JasPer development team only"
-  false)
+  OFF)
 
 ################################################################################
 #
 ################################################################################
 
-set(CMAKE_EXPORT_COMPILE_COMMANDS true)
+set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 
 # Prefer C11 (if available) but do not require it.
 set(CMAKE_C_STANDARD 11)
 
-if (APPLE AND CMAKE_SYSTEM_NAME MATCHES "Darwin")
-	set(MACOS true)
+if(APPLE AND CMAKE_SYSTEM_NAME MATCHES "Darwin")
+	set(MACOS TRUE)
 else()
-	set(MACOS false)
+	set(MACOS FALSE)
 endif()
 
-if (CMAKE_SYSTEM_NAME MATCHES "Linux")
-	set(LINUX true)
+if(CMAKE_SYSTEM_NAME MATCHES "Linux")
+	set(LINUX TRUE)
 else()
-	set(LINUX false)
+	set(LINUX FALSE)
 endif()
 
-message("Linux: ${LINUX}")
-message("MacOS: ${MACOS}")
-
-if ((CMAKE_GENERATOR MATCHES Xcode) OR
-  (CMAKE_GENERATOR MATCHES "Visual Studio"))
-	set(JAS_MULTICONFIGURATION_GENERATOR 1)
+if((CMAKE_GENERATOR MATCHES "Xcode") OR
+  (CMAKE_GENERATOR MATCHES "Visual Studio") OR
+  (CMAKE_GENERATOR STREQUAL "Ninja Multi-Config"))
+	set(JAS_MULTICONFIGURATION_GENERATOR TRUE)
+	message("JAS_MULTICONFIGURATION_GENERATOR ${JAS_MULTICONFIGURATION_GENERATOR}")
 else()
-	set(JAS_MULTICONFIGURATION_GENERATOR 0)
+	set(JAS_MULTICONFIGURATION_GENERATOR FALSE)
 endif()
 message("JAS_MULTICONFIGURATION_GENERATOR ${JAS_MULTICONFIGURATION_GENERATOR}")
 
-if (JAS_ENABLE_AUTOMATIC_DEPENDENCIES)
-	message(WARNING
-	  "If this software is being built as a package for a Linux distribution, "
-	  "you should probably set JAS_ENABLE_AUTOMATIC_DEPENDENCIES to false.")
+if(JAS_ENABLE_AUTOMATIC_DEPENDENCIES)
+	if(LINUX)
+		message(WARNING
+		  "If this software is being built as a package for a "
+		  "Linux distribution, you should probably set "
+		  "JAS_ENABLE_AUTOMATIC_DEPENDENCIES to false.")
+	endif()
 	set(JAS_REQUIRED "")
 else()
-	set(JAS_REQUIRED "REQUIRED")
+	set(JAS_REQUIRED REQUIRED)
 endif()
 
-if (JAS_ENABLE_SHARED AND MACOS)
-	set(CMAKE_MACOSX_RPATH true)
+if(JAS_ENABLE_SHARED AND MACOS)
+	set(CMAKE_MACOSX_RPATH TRUE)
 endif()
 
 # If a multiconfiguration generator is used, ensure that various output
 # files are not placed in subdirectories (such as Debug and Release)
 # as this will cause the CTest test suite to fail.
-if (JAS_MULTICONFIGURATION_GENERATOR)
+if(JAS_MULTICONFIGURATION_GENERATOR)
+	if(CMAKE_CONFIGURATION_TYPES)
+		set(CMAKE_DEBUG_POSTFIX d)
+	endif()
 	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY .)
 	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY .)
 	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY .)
-	foreach (config ${CMAKE_CONFIGURATION_TYPES})
+	foreach(config ${CMAKE_CONFIGURATION_TYPES})
 		string(TOUPPER "${config}" config)
 		set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_${config} .)
 		set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_${config} .)
@@ -199,61 +208,65 @@ set(CPACK_PACKAGE_FILE_NAME
 set(CPACK_GENERATOR "TGZ")
 include(CPack)
 
-message("CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
+if(CMAKE_BUILD_TYPE)
+	message("CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
+elseif(CMAKE_CONFIGURATION_TYPES)
+	message("CMAKE_CONFIGURATION_TYPES: ${CMAKE_CONFIGURATION_TYPES}")
+endif()
 message("CMAKE_C_COMPILER_ID: ${CMAKE_C_COMPILER_ID}")
 message("CMAKE_C_COMPILER: ${CMAKE_C_COMPILER}")
 message("CMAKE_LINKER: ${CMAKE_LINKER}")
 
 # Customize the compiler flags for warning messages.
-if (CMAKE_C_COMPILER_ID STREQUAL "Clang" OR CMAKE_C_COMPILER_ID STREQUAL "GNU")
+if(CMAKE_C_COMPILER_ID STREQUAL "Clang" OR CMAKE_C_COMPILER_ID STREQUAL "GNU")
 	check_c_compiler_flag("-Wno-stringop-truncation"
 	  JAS_GCC_WARN_NO_STRINGOP_TRUNCATION)
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pedantic")
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -W")
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-sign-compare")
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wformat")
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wmissing-prototypes")
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wstrict-prototypes")
-	if (JAS_GCC_WARN_NO_STRINGOP_TRUNCATION)
-		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-stringop-truncation")
+	add_compile_options(-Wall)
+	add_compile_options(-pedantic)
+	add_compile_options(-W)
+	add_compile_options(-Wno-sign-compare)
+	add_compile_options(-Wformat)
+	add_compile_options(-Wmissing-prototypes)
+	add_compile_options(-Wstrict-prototypes)
+	if(JAS_GCC_WARN_NO_STRINGOP_TRUNCATION)
+		add_compile_options(-Wno-stringop-truncation)
 	endif()
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wmissing-declarations")
-	if (CMAKE_C_COMPILER_ID STREQUAL "Clang")
-		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-unused-command-line-argument")
+	add_compile_options(-Wmissing-declarations)
+	if(CMAKE_C_COMPILER_ID STREQUAL "Clang")
+		add_compile_options(-Wno-unused-command-line-argument)
 	endif()
-	if (JAS_STRICT)
+	if(JAS_STRICT)
 		# Treat all compiler warnings as errors.
-		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pedantic-errors")
+		add_compile_options(-pedantic-errors)
 	endif()
-elseif (CMAKE_C_COMPILER_ID STREQUAL "MSVC")
+elseif(CMAKE_C_COMPILER_ID STREQUAL "MSVC")
 	# possibly lossy conversion
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /wd4244")
+	add_compile_options(/wd4244)
 	# different const qualifiers
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /wd4090")
+	add_compile_options(/wd4090)
 	# signed/unsigned mismatch
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /wd4018")
+	add_compile_options(/wd4018)
 	# function may be unsafe (e.g., sprintf, strncat)
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /wd4996")
-	if (JAS_STRICT)
+	add_compile_options(/wd4996)
+	if(JAS_STRICT)
 		# Treat all compiler warnings as errors.
-		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /WX")
+		add_compile_options(/WX)
 	endif()
 endif()
 
-if (JAS_ENABLE_HIDDEN)
+if(JAS_ENABLE_HIDDEN)
 	set(CMAKE_C_VISIBILITY_PRESET hidden)
 	set(CMAKE_VISIBILITY_INLINES_HIDDEN 0)
-	if (NOT (CMAKE_BUILD_TYPE MATCHES "Debug"))
-		if (LINUX)
+	if(NOT (CMAKE_BUILD_TYPE MATCHES "Debug"))
+		if(LINUX)
 			check_c_compiler_flag("-ffunction-sections" HAVE_FUNCTION_SECTIONS)
 			check_c_compiler_flag("-fdata-sections" HAVE_DATA_SECTIONS)
 			check_c_compiler_flag("-Wl,--gc-sections" HAVE_GC_SECTIONS)
-			if (HAVE_FUNCTION_SECTIONS AND HAVE_DATA_SECTIONS AND
-			 HAVE_GC_SECTIONS)
-				set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -ffunction-sections")
-				set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fdata-sections")
-				set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wl,--gc-sections")
+			if(HAVE_FUNCTION_SECTIONS AND HAVE_DATA_SECTIONS AND
+			  HAVE_GC_SECTIONS)
+				add_compile_options(-ffunction-sections)
+				add_compile_options(-fdata-sections)
+				add_compile_options(-Wl,--gc-sections)
 			endif()
 		endif()
 	endif()
@@ -267,26 +280,26 @@ message("CMAKE_C_FLAGS_DEBUG: ${CMAKE_C_FLAGS_DEBUG}")
 # Check for the OpenGL and GLUT libraries.
 ################################################################################
 
-if (JAS_ENABLE_OPENGL)
+if(JAS_ENABLE_OPENGL)
 	set(OpenGL_GL_PREFERENCE GLVND)
 	find_package(OpenGL ${JAS_REQUIRED})
 	message("OpenGL library found: ${OPENGL_FOUND}")
 else()
 	set(OPENGL_FOUND false)
 endif()
-if (JAS_ENABLE_OPENGL AND OPENGL_FOUND)
+if(JAS_ENABLE_OPENGL AND OPENGL_FOUND)
 	set(JAS_HAVE_OPENGL 0)
 	message("OpenGL include directory: ${OPENGL_INCLUDE_DIR}")
 	message("OpenGL libraries: ${OPENGL_LIBRARIES}")
 	find_package(GLUT ${JAS_REQUIRED})
 	message("GLUT library found: ${GLUT_FOUND}")
-	if (GLUT_FOUND)
+	if(GLUT_FOUND)
 		message("GLUT include directory: ${GLUT_INCLUDE_DIR}")
 		message("GLUT libraries: ${GLUT_LIBRARIES}")
 		set(CMAKE_REQUIRED_INCLUDES ${GLUT_INCLUDE_DIR})
 		check_include_files(GL/glut.h JAS_HAVE_GL_GLUT_H)
 		check_include_files(glut.h JAS_HAVE_GLUT_H)
-		if (JAS_HAVE_GL_GLUT_H OR JAS_HAVE_GLUT_H)
+		if(JAS_HAVE_GL_GLUT_H OR JAS_HAVE_GLUT_H)
 			set(JAS_HAVE_OPENGL 1)
 			include_directories(${GLUT_INCLUDE_DIR} ${OPENGL_INCLUDE_DIR})
 		else()
@@ -297,13 +310,13 @@ if (JAS_ENABLE_OPENGL AND OPENGL_FOUND)
 	# On some systems (e.g., Fedora 21), there is a bug in the cmake code
 	# that detects GLUT libraries.  The following ugliness is a workaround for 
 	# this problem.
-	if (NOT GLUT_Xmu_LIBRARY OR NOT GLUT_Xmi_LIBRARY)
-		if (NOT GLUT_Xmu_LIBRARY)
+	if(NOT GLUT_Xmu_LIBRARY OR NOT GLUT_Xmi_LIBRARY)
+		if(NOT GLUT_Xmu_LIBRARY)
 			set(GLUT_Xmu_LIBRARY "")
 			message(WARNING "Clearing bogus value for GLUT_Xmu_LIBRARY.")
 			message(WARNING "Your version of CMake may be buggy.")
 		endif()
-		if (NOT GLUT_Xmi_LIBRARY)
+		if(NOT GLUT_Xmi_LIBRARY)
 			set(GLUT_Xmi_LIBRARY "")
 			message(WARNING "Clearing bogus value for GLUT_Xmi_LIBRARY.")
 			message(WARNING "Your version of CMake may be buggy.")
@@ -318,8 +331,8 @@ else()
 	set(GLUT_LIBRARIES "")
 endif()
 
-if (JAS_HAVE_OPENGL AND MACOS)
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DGL_SILENCE_DEPRECATION")
+if(JAS_HAVE_OPENGL AND MACOS)
+	add_compile_definitions(GL_SILENCE_DEPRECATION)
 endif()
 
 ################################################################################
@@ -328,28 +341,33 @@ endif()
 
 find_program(BASH_PROGRAM bash)
 
-check_include_files(threads.h JAS_HAVE_THREADS_H)
 check_include_files(fcntl.h JAS_HAVE_FCNTL_H)
 check_include_files(io.h JAS_HAVE_IO_H)
 check_include_files(unistd.h JAS_HAVE_UNISTD_H)
 check_include_files(sys/time.h JAS_HAVE_SYS_TIME_H)
 check_include_files(sys/types.h JAS_HAVE_SYS_TYPES_H)
 
+check_type_size(max_align_t MAX_ALIGN_T)
+if(HAVE_MAX_ALIGN_T)
+	set(JAS_HAVE_MAX_ALIGN_T 1 CACHE INTERNAL "Test JAS_HAVE_MAX_ALIGN_T")
+else()
+	set(JAS_HAVE_MAX_ALIGN_T CACHE INTERNAL "Test JAS_HAVE_MAX_ALIGN_T")
+endif()
+
 check_function_exists(gettimeofday JAS_HAVE_GETTIMEOFDAY)
 check_function_exists(getrusage JAS_HAVE_GETRUSAGE)
 check_function_exists(mkostemp JAS_HAVE_MKOSTEMP)
-
-check_c_source_compiles("
-#include <stddef.h>
-max_align_t x;
-int main() {}
-" JAS_HAVE_MAX_ALIGN_T)
+if(MSVC)
+	check_symbol_exists(snprintf stdio.h JAS_HAVE_SNPRINTF)
+else()
+	check_function_exists(snprintf JAS_HAVE_SNPRINTF)
+endif()
 
 ################################################################################
 # Check for invalid codec combinations.
 ################################################################################
 
-if (JAS_INCLUDE_JP2_CODEC AND NOT JAS_INCLUDE_JPC_CODEC)
+if(JAS_INCLUDE_JP2_CODEC AND NOT JAS_INCLUDE_JPC_CODEC)
 	message(FATAL_ERROR
 	  "The JPC codec must be included in order to include the JP2 codec.")
 endif()
@@ -358,8 +376,11 @@ endif()
 # Configure threading support
 ################################################################################
 
-if (JAS_ENABLE_MULTITHREADING_SUPPORT)
-
+set(JAS_THREADS FALSE)
+set(JAS_THREADS_C11 FALSE)
+set(JAS_THREADS_PTHREAD FALSE)
+set(JAS_THREADS_WIN32 FALSE)
+if(JAS_ENABLE_MULTITHREADING_SUPPORT)
 	check_c_source_compiles("
 	#include <threads.h>
 	int main() {
@@ -371,50 +392,41 @@ if (JAS_ENABLE_MULTITHREADING_SUPPORT)
 	check_include_files(pthread.h JAS_HAVE_PTHREAD_H)
 
 	# Check for support for various threading libraries.
-	if (MACOS)
-		set(THREADS_PREFER_PTHREAD_FLAG true)
+	if(MACOS)
+		set(THREADS_PREFER_PTHREAD_FLAG TRUE)
 		set(CMAKE_HAVE_THREADS_LIBRARY 1)
 		set(CMAKE_THREAD_LIBS_INIT "-lpthread")
 		set(CMAKE_USE_WIN32_THREADS_INIT 0)
 		set(CMAKE_USE_PTHREADS_INIT 1)
-		set(Threads_FOUND 1)
+		set(Threads_FOUND TRUE)
 	else()
-		set(THREADS_PREFER_PTHREAD_FLAG true)
+		set(THREADS_PREFER_PTHREAD_FLAG TRUE)
 		find_package(Threads)
 	endif()
-	if (Threads_FOUND)
-		if (CMAKE_USE_PTHREADS_INIT AND JAS_HAVE_PTHREAD_H)
-			set(JAS_HAVE_PTHREAD_THREADS true)
-		else()
-			set(JAS_HAVE_PTHREAD_THREADS false)
+	if(Threads_FOUND)
+		if(CMAKE_USE_PTHREADS_INIT AND JAS_HAVE_PTHREAD_H)
+			set(JAS_HAVE_PTHREAD_THREADS TRUE)
 		endif()
-		if (CMAKE_USE_WIN32_THREADS_INIT)
-			set(JAS_HAVE_WIN32_THREADS true)
-		else()
-			set(JAS_HAVE_WIN32_THREADS false)
+		if(CMAKE_USE_WIN32_THREADS_INIT)
+			set(JAS_HAVE_WIN32_THREADS TRUE)
 		endif()
 		set(THREAD_LIBRARY "${CMAKE_THREAD_LIBS_INIT}")
-		if (JAS_TRY_COMPILE_C11_THREADS)
-			set(JAS_HAVE_C11_THREADS true)
-		else()
-			set(JAS_HAVE_C11_THREADS false)
+		if(JAS_TRY_COMPILE_C11_THREADS)
+			set(JAS_HAVE_C11_THREADS TRUE)
 		endif()
 	endif()
 
 	# Apply preferences to select one particular threading library.
-	set(JAS_THREADS false)
-	set(JAS_THREADS_C11 false)
-	set(JAS_THREADS_PTHREAD false)
-	set(JAS_THREADS_WIN32 false)
-	if (JAS_HAVE_PTHREAD_THREADS AND JAS_PREFER_PTHREAD)
-		set(JAS_THREADS_PTHREAD true)
-	elseif (JAS_HAVE_C11_THREADS)
-		set(JAS_THREADS_C11 true)
-	elseif (JAS_HAVE_WIN32_THREADS)
-		set(JAS_THREADS_WIN32 true)
+	if(JAS_HAVE_PTHREAD_THREADS AND JAS_PREFER_PTHREAD)
+		set(JAS_THREADS_PTHREAD TRUE)
+	elseif(JAS_HAVE_C11_THREADS)
+		set(JAS_THREADS_C11 TRUE)
+	elseif(JAS_HAVE_WIN32_THREADS)
+		set(JAS_THREADS_WIN32 TRUE)
 	endif()
-	if (JAS_THREADS_C11 OR JAS_THREADS_PTHREAD OR JAS_THREADS_WIN32)
-		set(JAS_THREADS true)
+	if(JAS_THREADS_C11 OR JAS_THREADS_PTHREAD OR JAS_THREADS_WIN32)
+		set(JAS_THREADS TRUE)
+		message("Threading support enabled.")
 	else()
 		message(ERROR "No threading support found.")
 	endif()
@@ -422,22 +434,14 @@ if (JAS_ENABLE_MULTITHREADING_SUPPORT)
 	message("Prefer POSIX threading support: ${JAS_PREFER_PTHREAD}")
 	message("Threading support found: ${JAS_THREADS}")
 	message("C11 threading support detected: ${JAS_HAVE_C11_THREADS}")
-	message("POSIX threading support detected: ${JAS_HAVE_POSIX_THREADS}")
+	message("POSIX threading support detected: ${JAS_HAVE_PTHREAD_THREADS}")
 	message("WIN32 threading support detected: ${JAS_HAVE_WIN32_THREADS}")
 	message("C11 threading support selected: ${JAS_THREADS_C11}")
 	message("POSIX threading support selected: ${JAS_THREADS_PTHREAD}")
 	message("Win32 threading support selected: ${JAS_THREADS_WIN32}")
 	message("Threading library: ${THREAD_LIBRARY}")
-
 else()
-
-	set(JAS_THREADS false)
-	set(JAS_THREADS_C11 false)
-	set(JAS_THREADS_PTHREAD false)
-	set(JAS_THREADS_WIN32 false)
-
 	message("Threading support has been disabled.")
-
 endif()
 
 ################################################################################
@@ -446,19 +450,19 @@ endif()
 
 # The following is needed to prevent the incorrect version of the JPEG library
 # from being found.
-if (MACOS)
+if(MACOS)
 	set(CMAKE_FIND_FRAMEWORK LAST)
 endif()
 
-if (JAS_ENABLE_LIBJPEG)
+if(JAS_ENABLE_LIBJPEG)
 	find_package(JPEG ${JAS_LIBJPEG_REQUIRED})
 	message("JPEG library found: ${JPEG_FOUND}")
 else()
-	set(JPEG_FOUND false)
+	set(JPEG_FOUND FALSE)
 endif()
 
-if (JAS_ENABLE_LIBJPEG AND JPEG_FOUND)
-	set(JAS_HAVE_LIBJPEG 0)
+set(JAS_HAVE_LIBJPEG 0)
+if(JAS_ENABLE_LIBJPEG AND JPEG_FOUND)
 	message("JPEG include directory: ${JPEG_INCLUDE_DIR}")
 	message("JPEG libraries: ${JPEG_LIBRARIES}")
 	# In some versions of the JPEG library, the header file jpeglib.h
@@ -478,17 +482,16 @@ if (JAS_ENABLE_LIBJPEG AND JPEG_FOUND)
 	else()
 		message(WARNING "The header file jpeglib.h appears to be missing.")
 		message(WARNING "Disabling LIBJPEG.")
-		set(JPEG_FOUND false)
+		set(JPEG_FOUND FALSE)
 		set(JPEG_LIBRARIES "")
 		set(JPEG_INCLUDE_DIR "")
 		set(JAS_ENABLE_LIBJPEG 0)
 	endif()
 else()
-	set(JAS_HAVE_LIBJPEG 0)
 	set(JPEG_INCLUDE_DIR "")
 	set(JPEG_LIBRARIES "")
 endif()
-if (NOT JAS_HAVE_LIBJPEG)
+if(NOT JAS_HAVE_LIBJPEG)
 	set(JAS_INCLUDE_JPG_CODEC 0)
 endif()
 
@@ -497,28 +500,21 @@ endif()
 ################################################################################
 
 find_library(MATH_LIBRARY m)
-if (NOT MATH_LIBRARY)
+if(NOT MATH_LIBRARY)
 	set(MATH_LIBRARY "")
 endif()
-
-################################################################################
-#
-################################################################################
-
-#add_definitions("-D_GNU_SOURCE")
 
 ################################################################################
 # Perform shared library setup.
 ################################################################################
 
-if (JAS_ENABLE_SHARED)
-
+if(JAS_ENABLE_SHARED)
 	# use, i.e. don't skip the full RPATH for the build tree
 	set(CMAKE_SKIP_BUILD_RPATH FALSE)
 
 	# when building, don't use the install RPATH already
 	# (but later on when installing)
-	set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE) 
+	set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
 
 	set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 
@@ -530,11 +526,10 @@ if (JAS_ENABLE_SHARED)
 	# system directory
 	list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES
 	  "${CMAKE_INSTALL_PREFIX}/lib" isSystemDir)
-	if("${isSystemDir}" STREQUAL "-1")
+	if(isSystemDir EQUAL -1)
 	   set(CMAKE_INSTALL_RPATH
 		  "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
-	endif("${isSystemDir}" STREQUAL "-1")
-
+	endif()
 endif()
 
 ################################################################################
@@ -542,12 +537,12 @@ endif()
 ################################################################################
 
 add_subdirectory(src/libjasper)
-if (JAS_ENABLE_PROGRAMS)
+if(JAS_ENABLE_PROGRAMS)
     add_subdirectory(src/appl)
-endif ()
-if (JAS_ENABLE_DOC)
+endif()
+if(JAS_ENABLE_DOC)
 	add_subdirectory(doc)
-endif ()
+endif()
 
 # The package configuation (pc) file should be installed in
 # ${CMAKE_INSTALL_PREFIX}/lib/pkgconfig.
