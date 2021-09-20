@@ -240,6 +240,7 @@ int main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	}
 	jas_set_max_mem_usage(max_mem);
+	atexit(jas_cleanup);
 #else
 	jas_conf_clear();
 	static jas_std_allocator_t allocator;

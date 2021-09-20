@@ -30,7 +30,7 @@ enable=1
 debug_level=0
 strict=1
 
-while getopts vb:cnd:s option; do
+while getopts vb:cnd:sw option; do
 	case "$option" in
 	n)
 		enable=0;;
@@ -42,6 +42,8 @@ while getopts vb:cnd:s option; do
 		debug_level="$OPTARG";;
 	v)
 		verbose=$((verbose + 1));;
+	w)
+		strict=0;;
 	s)
 		strict=1;;
 	esac

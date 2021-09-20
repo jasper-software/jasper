@@ -199,6 +199,7 @@ int main(int argc, char **argv)
 	}
 	jas_set_max_mem_usage(cmdopts->max_mem);
 	jas_setdbglevel(cmdopts->debug);
+	atexit(jas_cleanup);
 #else
 	jas_conf_clear();
 	static jas_std_allocator_t allocator;

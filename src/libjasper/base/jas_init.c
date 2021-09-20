@@ -310,7 +310,11 @@ int jas_init()
 
 	jas_conf_clear();
 
-	jas_conf.enable_atexit_cleanup = 1;
+	/* Note: By commenting out the following line, the behavior of the
+	  jas_init function has been changed from past releases.  Now, the
+	  library user is responsible for invoking jas_cleanup through some
+	  appropriate means. */
+	/* jas_conf.enable_atexit_cleanup = 1; */
 
 	return jas_init_helper();
 }

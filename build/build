@@ -13,6 +13,31 @@ abs_program_dir=$("$jas_realpath" "$program_dir") || panic
 usage()
 {
 	echo "bad usage: $@"
+	cat <<- EOF
+	Options
+	=======
+
+	--build-dir
+	--install-dir
+
+	--multithread
+	--no-multithread
+
+	--use-jas-init
+	--no-use-jas-init
+
+	--release
+	--debug
+
+	--documentation
+	--no-documentation
+
+	--asan
+	--lsan
+	--tsan
+	--ubsan
+	--msan
+	EOF
 	exit 2
 }
 

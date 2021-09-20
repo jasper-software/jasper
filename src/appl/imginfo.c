@@ -207,6 +207,7 @@ int main(int argc, char **argv)
 	}
 	jas_set_max_mem_usage(max_mem);
 	jas_setdbglevel(debug);
+	atexit(jas_cleanup);
 #else
 	if (verbose >= 1) {
 		fprintf(stderr, "using jas_init_custom\n");

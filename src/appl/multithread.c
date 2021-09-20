@@ -297,6 +297,7 @@ int main(int argc, char **argv)
 	jas_context_t context = jas_get_context();
 	assert(context);
 	jas_context_set_debug_level(context, 0);
+	atexit(jas_cleanup);
 
 #else
 
