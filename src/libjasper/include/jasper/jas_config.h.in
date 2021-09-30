@@ -18,6 +18,7 @@
 #cmakedefine JAS_HAVE_SYS_TIME_H
 #cmakedefine JAS_HAVE_SYS_TYPES_H
 #cmakedefine JAS_HAVE_MAX_ALIGN_T
+#cmakedefine JAS_HAVE_SSIZE_T
 
 #cmakedefine JAS_HAVE_MKOSTEMP
 #cmakedefine JAS_HAVE_GETTIMEOFDAY
@@ -46,6 +47,7 @@
 #cmakedefine JAS_ENABLE_NON_THREAD_SAFE_DEBUGGING
 
 #cmakedefine JAS_HAVE_SNPRINTF
+
 
 #if defined(JAS_ENABLE_DANGEROUS_INTERNAL_TESTING_MODE)
 #define JAS_ENABLE_MIF_CODEC 1

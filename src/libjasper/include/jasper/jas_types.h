@@ -75,6 +75,7 @@
 /* Note: The immediately following header files should eventually be removed. */
 #include <stddef.h> /* IWYU pragma: export */
 #include <stdint.h> /* IWYU pragma: export */
+#include <limits.h> /* IWYU pragma: export */
 
 #if defined(JAS_HAVE_SYS_TYPES_H)
 #include <sys/types.h> /* IWYU pragma: export */
@@ -89,6 +90,14 @@ extern "C" {
 #define jas_ulong unsigned long
 #define jas_longlong long long
 #define jas_ulonglong unsigned long long
+
+#if defined(JAS_HAVE_SSIZE_T)
+#define JAS_SSIZE_T ssize_t
+#define JAS_SSIZE_MAX SSIZE_MAX
+#else
+#define JAS_SSIZE_T jas_longlong
+#define JAS_SSIZE_MAX LLONG_MAX
+#endif
 
 #if defined(_MSC_VER) && (_MSC_VER < 1800)
 #define bool  int
