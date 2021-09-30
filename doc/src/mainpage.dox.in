@@ -48,14 +48,24 @@ Several application programs are also provided:
 @section news News
 
 In release 3 of JasPer, the following notable changes were made to the API
-and/or behavior of the library relative to earlier releases:
+and/or behavior of the library relative to earlier releases (and therefore
+impact backward compatibility):
 
-  - the jas_init function no longer registers jas_cleanup as an atexit
+  - the jas_init() function no longer registers jas_cleanup() as an atexit
     handler;
-    so, the library user is now responsible for invoking jas_cleanup at
+    so, the library user is now responsible for invoking jas_cleanup() at
     an appropriate time;
-    this change was needed in order to better support the use of the library
-    on some platforms
+    this change was needed in order to better support the use of the JasPer
+    library on some platforms
+  - some of the integral types used in the parameter/return types of the
+    following functions were changed to use @c size_t/@c ssize_t in order to
+    address some longstanding API issues:
+
+      - jas_stream_memopen()
+      - jas_stream_read()
+      - jas_stream_write()
+      - jas_stream_copy()
+  - the jas_stream_memopen2() function has been deprecated
 
 @verbinclude @CMAKE_SOURCE_DIR@/NEWS
 

@@ -4,15 +4,16 @@
 * Add support for multithreading.
 * Add support for customizing some library behavior, such as allowing the
   library user to control the memory allocator to be employed by the library).
+* Fix some longstanding issues in the JasPer I/O streams API.
 * Fix numerous bugs.
 
-IMPORTANT NOTE:
+VERY IMPORTANT NOTE:
 This release of the JasPer software introduced some changes in the API
 and/or behavior of the library relative to earlier releases, which may
 necessitate some small changes in code using the library (e.g., to avoid
-memory leaks).  Please refer to the "News" section of the JasPer Reference
-Manual for more details.  For convenience, this manual is available online
-(for various JasPer releases) at:
+memory leaks or other problems).  Please refer to the "News" section
+of the JasPer Reference Manual for more details.  For convenience,
+this manual is available online (for various JasPer releases) at:
     https://jasper-software.github.io/jasper-manual
 
 2.0.33 (2021-08-01)

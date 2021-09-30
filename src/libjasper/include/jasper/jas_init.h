@@ -203,8 +203,8 @@ typedef void *jas_context_t;
 @brief Initialize the JasPer library with the current configuration settings.
 
 @details
-The library must be configured by invoking the @c jas_conf_clear function
-prior to calling @c jas_initialize.
+The library must be configured by invoking the jas_conf_clear() function
+prior to calling jas_initialize().
 
 @returns
 If the initialization of the library is successful, zero is returned;
@@ -222,17 +222,17 @@ int jas_initialize(void);
 configuration settings.
 
 @details
-The @c jas_init function initializes the JasPer library.
+The jas_init() function initializes the JasPer library.
 The library must be initialized before most code in the library can be used.
 
-The @ jas_init function exists only for reasons of backward compatibility
+The jas_init() function exists only for reasons of backward compatibility
 with earlier versions of the library.
 It is recommended that this function not be used.
-Instead, the @c jas_conf_clear and @c jas_initialize functions should be used
+Instead, the jas_conf_clear() and jas_initialize() functions should be used
 to configure and initialize the library.
 
 @returns
-If the library is succesfully initialized, zero is returned;
+If the library is successfully initialized, zero is returned;
 otherwise, a nonzero value is returned.
 
 @warning
@@ -262,7 +262,7 @@ void jas_cleanup(void);
 This function configures the JasPer library with the default configuration
 settings.
 These settings may be change via the @c jas_conf_* family of function
-prior to invoking @c jas_initialize.
+prior to invoking jas_initialize().
 
 @warning
 Configuration, initialization, and cleanup of the library must be performed
@@ -276,7 +276,7 @@ void jas_conf_clear(void);
 
 @details
 The object referenced by @c allocator must have a live at least
-until @c jas_cleanup is invoked.
+until jas_cleanup() is invoked.
 How the memory in which @c *allocator reside is allocated is the
 responsibility of the caller.
 */
