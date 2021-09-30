@@ -1141,31 +1141,41 @@ static int jas_icctxtdesc_input(jas_iccattrval_t *attrval, jas_stream_t *in,
 	jas_icctxtdesc_t *txtdesc = &attrval->data.txtdesc;
 	txtdesc->ascdata = 0;
 	txtdesc->ucdata = 0;
-	if (jas_iccgetuint32(in, &txtdesc->asclen))
+	if (jas_iccgetuint32(in, &txtdesc->asclen)) {
 		goto error;
-	if (txtdesc->asclen < 1)
+	}
+	if (txtdesc->asclen < 1) {
 		goto error;
-	if (!(txtdesc->ascdata = jas_malloc(txtdesc->asclen)))
+	}
+	if (!(txtdesc->ascdata = jas_malloc(txtdesc->asclen))) {
 		goto error;
+	}
 	if (jas_stream_read(in, txtdesc->ascdata, txtdesc->asclen) !=
-	  txtdesc->asclen)
+	  txtdesc->asclen) {
 		goto error;
+	}
 	txtdesc->ascdata[txtdesc->asclen - 1] = '\0';
 	if (jas_iccgetuint32(in, &txtdesc->uclangcode) ||
-	  jas_iccgetuint32(in, &txtdesc->uclen))
+	  jas_iccgetuint32(in, &txtdesc->uclen)) {
 		goto error;
-	if (!(txtdesc->ucdata = jas_alloc2(txtdesc->uclen, 2)))
+	}
+	if (!(txtdesc->ucdata = jas_alloc2(txtdesc->uclen, 2))) {
 		goto error;
+	}
 	if (jas_stream_read(in, txtdesc->ucdata, txtdesc->uclen * 2) !=
-	  txtdesc->uclen * 2)
+	  txtdesc->uclen * 2) {
 		goto error;
-	if (jas_iccgetuint16(in, &txtdesc->sccode))
+	}
+	if (jas_iccgetuint16(in, &txtdesc->sccode)) {
 		goto error;
-	if ((c = jas_stream_getc(in)) == EOF)
+	}
+	if ((c = jas_stream_getc(in)) == EOF) {
 		goto error;
+	}
 	txtdesc->maclen = c;
-	if (jas_stream_read(in, txtdesc->macdata, 67) != 67)
+	if (jas_stream_read(in, txtdesc->macdata, 67) != 67) {
 		goto error;
+	}
 	txtdesc->asclen = JAS_CAST(jas_iccuint32_t, strlen(txtdesc->ascdata) + 1);
 #define WORKAROUND_BAD_PROFILES
 #ifdef WORKAROUND_BAD_PROFILES
@@ -1174,12 +1184,14 @@ static int jas_icctxtdesc_input(jas_iccattrval_t *attrval, jas_stream_t *in,
 		return -1;
 	}
 	if (n < cnt) {
-		if (jas_stream_gobble(in, cnt - n) != (int)(cnt - n))
+		if (jas_stream_gobble(in, cnt - n) != (int)(cnt - n)) {
 			goto error;
+		}
 	}
 #else
-	if (txtdesc->asclen + txtdesc->uclen * 2 + 15 + 67 != cnt)
+	if (txtdesc->asclen + txtdesc->uclen * 2 + 15 + 67 != cnt) {
 		return -1;
+	}
 #endif
 	return 0;
 error:
@@ -1255,13 +1267,16 @@ static int jas_icctxt_input(jas_iccattrval_t *attrval, jas_stream_t *in,
 {
 	jas_icctxt_t *txt = &attrval->data.txt;
 	txt->string = 0;
-	if (!(txt->string = jas_malloc(cnt)))
+	if (!(txt->string = jas_malloc(cnt))) {
 		goto error;
-	if (jas_stream_read(in, txt->string, cnt) != cnt)
+	}
+	if (jas_stream_read(in, txt->string, cnt) != cnt) {
 		goto error;
+	}
 	txt->string[cnt - 1] = '\0';
-	if (strlen(txt->string) + 1 != cnt)
+	if (strlen(txt->string) + 1 != cnt) {
 		goto error;
+	}
 	return 0;
 error:
 	jas_icctxt_destroy(attrval);
@@ -1741,15 +1756,18 @@ jas_iccprof_t *jas_iccprof_createfrombuf(const jas_uchar *buf, unsigned len)
 {
 	jas_stream_t *in;
 	jas_iccprof_t *prof;
-	if (!(in = jas_stream_memopen(JAS_CAST(char *, buf), len)))
+	if (!(in = jas_stream_memopen(JAS_CAST(char *, buf), len))) {
 		goto error;
-	if (!(prof = jas_iccprof_load(in)))
+	}
+	if (!(prof = jas_iccprof_load(in))) {
 		goto error;
+	}
 	jas_stream_close(in);
 	return prof;
 error:
-	if (in)
+	if (in) {
 		jas_stream_close(in);
+	}
 	return 0;
 }
 

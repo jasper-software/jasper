@@ -194,17 +194,12 @@ static jas_stream_t *jas_stream_create()
 	return stream;
 }
 
-/*
-This function will eventually replace jas_stream_memopen.
-For documentation of the interface for this function, see jas_stream.h.
-*/
-
-jas_stream_t *jas_stream_memopen2(char *buf, size_t bufsize)
+jas_stream_t *jas_stream_memopen(char *buf, size_t bufsize)
 {
 	jas_stream_t *stream;
 	jas_stream_memobj_t *obj;
 
-	JAS_LOGDEBUGF(100, "jas_stream_memopen2(%p, %zu)\n", buf, bufsize);
+	JAS_LOGDEBUGF(100, "jas_stream_memopen(%p, %zu)\n", buf, bufsize);
 
 	assert((buf && bufsize > 0) || (!buf));
 
@@ -253,7 +248,7 @@ jas_stream_t *jas_stream_memopen2(char *buf, size_t bufsize)
 		jas_stream_close(stream);
 		return 0;
 	}
-	JAS_LOGDEBUGF(100, "jas_stream_memopen2 buffer buf=%p myalloc=%d\n",
+	JAS_LOGDEBUGF(100, "jas_stream_memopen buffer buf=%p myalloc=%d\n",
 	  obj->buf_, obj->myalloc_);
 
 	if (bufsize > 0 && buf) {
@@ -270,45 +265,12 @@ jas_stream_t *jas_stream_memopen2(char *buf, size_t bufsize)
 }
 
 /*
-NOTE:
-The version of the function jas_stream_memopen only exists for backwards
-compatibility.
-Eventually, it should be replaced by jas_stream_memopen2.
-In retrospect, it was a very poor choice to have specified the buffer
-size parameter (bufsize) to have type int.  On some machines, int may only
-be a 16-bit integer.  This precludes larger-sized buffer allocations, which
-are needed in practice.
-
-If bufsize <= 0, the buffer is growable; otherwise, the buffer has a fixed
-size of bufsize.
-If buf is 0, the buffer is dynamically allocated with jas_malloc.
-If buf is not 0 and bufsize <= 0 (which is not permitted in any
-circumstances), bad things will happen (especially if the buf was not
-allocated with jas_malloc).
+This function is deprecated.
+It will be removed eventually.
 */
-jas_stream_t *jas_stream_memopen(char *buf, int bufsize)
+jas_stream_t *jas_stream_memopen2(char *buf, size_t bufsize)
 {
-	char *new_buf;
-	size_t new_bufsize;
-
-	JAS_LOGDEBUGF(100, "jas_stream_memopen(%p, %d)\n", buf, bufsize);
-	if (bufsize < 0) {
-		jas_deprecated("negative buffer size for jas_stream_memopen");
-	}
-	if (buf && bufsize <= 0) {
-		// This was never a valid thing to do with the old API.
-		jas_logerrorf("Invalid use of jas_stream_memopen detected.\n");
-		jas_deprecated("A user-provided buffer for "
-		  "jas_stream_memopen cannot be growable.\n");
-	}
-	if (bufsize <= 0) {
-		new_bufsize = 0;
-		new_buf = 0;
-	} else {
-		new_bufsize = bufsize;
-		new_buf = buf;
-	}
-	return jas_stream_memopen2(new_buf, new_bufsize);
+	return jas_stream_memopen(buf, bufsize);
 }
 
 jas_stream_t *jas_stream_fopen(const char *filename, const char *mode)
@@ -678,13 +640,12 @@ int jas_stream_ungetc(jas_stream_t *stream, int c)
 	return 0;
 }
 
-/* FIXME integral type */
-unsigned jas_stream_read(jas_stream_t *stream, void *buf, unsigned cnt)
+size_t jas_stream_read(jas_stream_t *stream, void *buf, size_t cnt)
 {
 	int c;
 	char *bufptr;
 
-	JAS_LOGDEBUGF(100, "jas_stream_read(%p, %p, %u)\n", stream, buf, cnt);
+	JAS_LOGDEBUGF(100, "jas_stream_read(%p, %p, %zu)\n", stream, buf, cnt);
 
 	if (cnt == 0)
 		return 0;
@@ -743,12 +704,11 @@ unsigned jas_stream_peek(jas_stream_t *stream, void *buf, size_t cnt)
 	return n;
 }
 
-/* FIXME integral type */
-unsigned jas_stream_write(jas_stream_t *stream, const void *buf, unsigned cnt)
+size_t jas_stream_write(jas_stream_t *stream, const void *buf, size_t cnt)
 {
 	const char *bufptr;
 
-	JAS_LOGDEBUGF(100, "jas_stream_write(%p, %p, %d)\n", stream, buf, cnt);
+	JAS_LOGDEBUGF(100, "jas_stream_write(%p, %p, %zu)\n", stream, buf, cnt);
 
 	if (cnt == 0)
 		return 0;
@@ -1136,10 +1096,9 @@ static int jas_strtoopenmode(const char *s)
 	return openmode;
 }
 
-/* FIXME integral type */
-int jas_stream_copy(jas_stream_t *out, jas_stream_t *in, int n)
+int jas_stream_copy(jas_stream_t *out, jas_stream_t *in, ssize_t n)
 {
-	int m;
+	ssize_t m;
 
 	const bool all = n < 0;
 
@@ -1147,14 +1106,14 @@ int jas_stream_copy(jas_stream_t *out, jas_stream_t *in, int n)
 
 	m = n;
 	while (all || m > 0) {
-		unsigned nbytes = jas_stream_read(in, buffer,
-						  JAS_MIN((size_t)m, sizeof(buffer)));
-		if (nbytes == 0)
+		size_t nbytes = jas_stream_read(in, buffer,
+		  JAS_MIN((size_t)m, sizeof(buffer)));
+		if (nbytes == 0) {
 			return !all || jas_stream_error(in) ? -1 : 0;
-
-		if (jas_stream_write(out, buffer, nbytes) != nbytes)
+		}
+		if (jas_stream_write(out, buffer, nbytes) != nbytes) {
 			return -1;
-
+		}
 		m -= nbytes;
 	}
 

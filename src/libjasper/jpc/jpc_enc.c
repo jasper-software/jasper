@@ -1659,7 +1659,6 @@ int rateallocate(jpc_enc_t *enc, unsigned numlyrs, uint_fast32_t *cumlens)
 		return -1;
 	}
 
-
 	/* Find minimum and maximum R-D slope values. */
 	mnrdslope = DBL_MAX;
 	mxrdslope = 0;

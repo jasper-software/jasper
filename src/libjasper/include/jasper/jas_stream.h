@@ -329,25 +329,17 @@ If buffer is not 0:
 buffer_size (which, in this case, is not currently allowed to be zero) is
 the size of the (nongrowable) buffer pointed to by buffer.
 </ul>
-
-@warning
-TODO/FIXME: The type of the buffer_size parameter will be
-changed to size_t in the future.
-
-@warning
-TODO/FIXME:
-In a later release, this function will be changed to have the same
-prototype as jas_stream_memopen2, at which point jas_stream_memopen2
-will be removed.
 */
 JAS_EXPORT
-jas_stream_t *jas_stream_memopen(char *buffer, int buffer_size);
+jas_stream_t *jas_stream_memopen(char *buffer, size_t buffer_size);
 
 /*!
 @warning
-This function will be renamed jas_stream_memopen in a future release.
 Do not use this function.
+This function is deprecated.
+Use jas_stream_memopen instead.
 */
+JAS_DEPRECATED
 JAS_EXPORT
 jas_stream_t *jas_stream_memopen2(char *buffer, size_t buffer_size);
 
@@ -585,13 +577,9 @@ TODO/CHECK: can items 1 and 2 be distinguished currently?
 @warning
 TODO/FIXME/CHECK: jas_stream_error should be true if RWLIMIT exceeded?
 or need a jas_stream_rwlimit predicate?
-
-@warning
-TODO/FIXME: In the future, the type of the count parameter and the
-return type will be changed to size_t.
 */
 JAS_EXPORT
-unsigned jas_stream_read(jas_stream_t *stream, void *buffer, unsigned count);
+size_t jas_stream_read(jas_stream_t *stream, void *buffer, size_t count);
 
 /*!
 @brief Attempt to retrieve one or more pending characters of input
@@ -644,15 +632,10 @@ of which does not currently exist?) can be used to distinguish between:
 <li>failure due to an I/O error
 <li>failure due to the read/write limit being exceeded
 </ol>
-
-@warning
-TODO/FIXME:
-The type of the count parameter should be size_t.
-The return type should be size_t.
 */
 JAS_EXPORT
-unsigned jas_stream_write(jas_stream_t *stream, const void *buffer,
-  unsigned count);
+size_t jas_stream_write(jas_stream_t *stream, const void *buffer,
+  size_t count);
 
 /*!
 @brief Write formatted output to a stream.
@@ -873,14 +856,23 @@ The number of characters to copy.
 @details
 The function copies the specified number of characters from the
 source stream to the destination stream.
+In particular, if @c count is nonnegative, @c count characters are
+copied from the source stream @c source to the destination stream
+@c destination.
+Otherwise (i.e., if @c count is negative), the entire source
+stream @c source (i.e., until EOF is reached) is copied to the
+destination stream @destination.
 
 @return
 Upon success, 0 is returned; otherwise, -1 is returned.
 
 @todo
-TODO/FIXME: count should probably be a size_t; return type ssize_t?
+TODO/FIXME: should return type be ssize_t and the return value be
+the count of the characters copied?
 */
-JAS_EXPORT int jas_stream_copy(jas_stream_t *destination, jas_stream_t *source, int count);
+JAS_EXPORT
+int jas_stream_copy(jas_stream_t *destination, jas_stream_t *source,
+  ssize_t count);
 
 /*!
 @brief Print a hex dump of data read from a stream.

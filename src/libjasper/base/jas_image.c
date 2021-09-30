@@ -370,7 +370,7 @@ static jas_image_cmpt_t *jas_image_cmpt_create(int_fast32_t tlx,
 	if (!jas_safe_size_mul3(cmpt->width_, cmpt->height_, cmpt->cps_, &size)) {
 		goto error;
 	}
-	cmpt->stream_ = (inmem) ? jas_stream_memopen2(0, size) :
+	cmpt->stream_ = (inmem) ? jas_stream_memopen(0, size) :
 	  jas_stream_tmpfile();
 	if (!cmpt->stream_) {
 		goto error;
@@ -549,11 +549,13 @@ int jas_image_readcmpt(jas_image_t *image, unsigned cmptno, jas_image_coord_t x,
 			jas_uchar buffer[width];
 #endif
 
-			if (jas_stream_read(stream, buffer, width) != width)
+			if (jas_stream_read(stream, buffer, width) != width) {
 				return -1;
+			}
 
-			for (j = 0; j < width; ++j)
+			for (j = 0; j < width; ++j) {
 				d[j] = buffer[j];
+			}
 
 			continue;
 		}

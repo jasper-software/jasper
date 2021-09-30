@@ -87,19 +87,22 @@ int LLVMFuzzerInitialize(int *argc, char ***argv)
 
 int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
-	if (size == 0)
+	if (size == 0) {
 		/* avoid the assertion failure */
 		data = NULL;
+	}
 
-	jas_stream_t *stream = jas_stream_memopen((char *)data, size);
-	if (stream == NULL)
+	jas_stream_t *stream = jas_stream_memopen(JAS_CAST(char *, data), size);
+	if (stream == NULL) {
 		abort();
+	}
 
 	jas_image_t *image = jas_image_decode(stream, -1, NULL);
 	jas_stream_close(stream);
 
-	if (image != NULL)
+	if (image != NULL) {
 		jas_image_destroy(image);
+	}
 
 	return 0;
 }
