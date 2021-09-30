@@ -75,6 +75,7 @@
 
 #include "jasper/jas_malloc.h"
 #include "jasper/jas_debug.h"
+#include "jasper/jas_types.h"
 
 #include <assert.h>
 #include <string.h>
@@ -299,7 +300,7 @@ jp2_box_t *jp2_box_get(jas_stream_t *in)
 	if (box->len != 0 && box->len < 8) {
 		goto error;
 	}
-	if (box->len > SSIZE_MAX) {
+	if (box->len > JAS_SSIZE_MAX) {
 		/* This limit is the largest value which can be passed to
 		  jas_stream_copy() without overflowing. */
 		goto error;
