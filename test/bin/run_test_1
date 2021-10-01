@@ -74,6 +74,7 @@ enc_list=()
 enc_list+=("$data_dir"/test/good/109-PoC.jp2)
 
 error_count=0
+failed_tests=()
 
 jpeg_turbo_lib_version=$("$imginfo" -o version \
   < "$data_dir/images/goldenears.jpg" | \
@@ -101,6 +102,7 @@ for in_file in "${good_list[@]}"; do
 		echo "ERROR: imginfo command had unexpected exit status " \
 		  "(expected $expected_status got $status)"
 		error_count=$((error_count + 1))
+		failed_tests+=("part1-$in_file")
 	fi
 done
 echo "############################################################"
@@ -172,6 +174,7 @@ for in_file in "${bad_list[@]}"; do
 		echo "ERROR: imginfo command had unexpected exit status " \
 		  "(expected $expected_status got $status)"
 		error_count=$((error_count + 1))
+		failed_tests+=("part2-$in_file")
 	fi
 done
 echo "############################################################"
@@ -198,14 +201,19 @@ for in_file in "${enc_list[@]}"; do
 		echo "ERROR: imginfo command had unexpected exit status " \
 		  "(expected $expected_status got $status)"
 		error_count=$((error_count + 1))
+		failed_tests+=("part3-$in_file")
 	fi
 done
 echo "############################################################"
 
 echo "############################################################"
 
-echo "error count: $error_count"
 if [ "$error_count" -gt 0 ]; then
+	echo "The following test cases failed:"
+	for failed_test in "${failed_tests[@]}"; do
+		echo "    $failed_test"
+	done
+	echo "Number of failed test cases: $error_count"
 	echo "STATUS: FAILED"
 	panic "FAILED"
 fi
