@@ -35,24 +35,53 @@ while IFS= read -r line; do
 	if [ -z "$line" ]; then
 		continue
 	fi
-	file=$(awk '{print $1;}' <<< "$line") || panic
-	expected_format=$(awk '{print $2;}' <<< "$line") || panic
-	expected_num_components=$(awk '{print $3;}' <<< "$line") || panic
-	expected_width=$(awk '{print $4;}' <<< "$line") || panic
-	expected_height=$(awk '{print $5;}' <<< "$line") || panic
-	expected_depth=$(awk '{print $6;}' <<< "$line") || panic
-	expected_size=$(awk '{print $7;}' <<< "$line") || panic
+	file=$(awk '{print $1;}' <<< "$line") || panic "cannot get file"
+	expected_format=$(awk '{print $2;}' <<< "$line") || \
+	  panic "cannot get expected format"
+	expected_num_components=$(awk '{print $3;}' <<< "$line") || \
+	  panic "cannot get expected number of components"
+	expected_width=$(awk '{print $4;}' <<< "$line") || \
+	  panic "cannot get expected width"
+	expected_height=$(awk '{print $5;}' <<< "$line") || \
+	  panic "cannot get expected height"
+	expected_depth=$(awk '{print $6;}' <<< "$line") || \
+	  panic "cannot get expected depth"
+	expected_size=$(awk '{print $7;}' <<< "$line") || \
+	  panic "cannot get expected size"
 	image_file="$data_dir/$file"
 	if [ "$verbose" -ge 2 ]; then
 		echo "Running $imginfo < $image_file"
 	fi
-	buffer=$("$imginfo" < "$image_file" 2> /dev/null) || panic
-	actual_format=$(awk '{print $1;}' <<< "$buffer") || panic
-	actual_num_components=$(awk '{print $2;}' <<< "$buffer") || panic
-	actual_width=$(awk '{print $3;}' <<< "$buffer") || panic
-	actual_height=$(awk '{print $4;}' <<< "$buffer") || panic
-	actual_depth=$(awk '{print $5;}' <<< "$buffer") || panic
-	actual_size=$(awk '{print $6;}' <<< "$buffer") || panic
+	buffer=$("$imginfo" < "$image_file")
+	status=$?
+	if [ "$status" -ne 0 ]; then
+		failed_test+=("$file")
+		echo "imginfo failed ($status)"
+		continue
+	fi
+	actual_format=$(awk '{print $1;}' <<< "$buffer") || \
+	  actual_format=
+	actual_num_components=$(awk '{print $2;}' <<< "$buffer") || \
+	  actual_num_components=
+	actual_width=$(awk '{print $3;}' <<< "$buffer") || \
+	  actual_width=
+	actual_height=$(awk '{print $4;}' <<< "$buffer") || \
+	  actual_height=
+	actual_depth=$(awk '{print $5;}' <<< "$buffer") || \
+	  actual_depth=
+	actual_size=$(awk '{print $6;}' <<< "$buffer") || \
+	  actual_size=
+	if [ -z "$actual_format" -o \
+	  -z "$actual_num_components" -o \
+	  -z "$actual_width" -o \
+	  -z "$actual_height" -o \
+	  -z "$actual_depth" -o \
+	  -z "$actual_size" \
+	  ]; then
+		failed_test+=("$file")
+		echo "cannot parse imginfo output"
+		continue
+	fi
 	if [ "$actual_format" != "$expected_format" -o \
 	  "$actual_num_components" -ne "$expected_num_components" -o \
 	  "$actual_width" -ne "$expected_width" -o \
@@ -65,7 +94,9 @@ while IFS= read -r line; do
 		echo "     ACTUAL: $buffer"
 		failed_tests+=("$file")
 	fi
+
 done <<< "
+
 images/example.mif mif 2 32 64 8 4096
 images/feep2.pnm pnm 1 24 7 1 21
 images/feep.pnm pnm 1 24 7 1 21
@@ -85,7 +116,6 @@ images/stawamuschief.pnm pnm 3 199 149 8 88953
 images/test.pnm pnm 1 8 8 12 96
 test/good/109-PoC.jp2 jp2 1 32 32 4 512
 
-test/good/109-PoC.jp2 jp2 1 32 32 4 511
 "
 
 if [ "${#failed_tests[@]}" -gt 0 ]; then
