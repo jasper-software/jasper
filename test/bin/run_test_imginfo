@@ -55,8 +55,8 @@ while IFS= read -r line; do
 	buffer=$("$imginfo" < "$image_file")
 	status=$?
 	if [ "$status" -ne 0 ]; then
-		failed_test+=("$file")
-		echo "imginfo failed ($status)"
+		failed_tests+=("$file")
+		echo "imginfo failed for $file ($status)"
 		continue
 	fi
 	actual_format=$(awk '{print $1;}' <<< "$buffer") || \
@@ -78,8 +78,8 @@ while IFS= read -r line; do
 	  -z "$actual_depth" -o \
 	  -z "$actual_size" \
 	  ]; then
-		failed_test+=("$file")
-		echo "cannot parse imginfo output"
+		failed_tests+=("$file")
+		echo "cannot parse imginfo output for $file"
 		continue
 	fi
 	if [ "$actual_format" != "$expected_format" -o \
@@ -114,7 +114,10 @@ images/small_1x1.pnm pnm 1 1 1 8 1
 images/stawamuschief_gray.pnm pnm 1 199 149 8 29651
 images/stawamuschief.pnm pnm 3 199 149 8 88953
 images/test.pnm pnm 1 8 8 12 96
+
+test/good/105-PoC1.jp2 jp2 2 1 32 8 288
 test/good/109-PoC.jp2 jp2 1 32 32 4 512
+test/good/jasper-nullptr-jpc_pi_destroy.jp2 jpc 1 20 20 8 400
 
 "
 
