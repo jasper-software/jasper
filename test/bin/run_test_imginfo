@@ -1,0 +1,97 @@
+#! /usr/bin/env bash
+################################################################################
+
+################################################################################
+
+cmd_dir=$(dirname "$0") || exit 1
+source "$cmd_dir"/utilities || exit 1
+
+debug_level="${JAS_DEBUG_LEVEL:-0}"
+if [ "$debug_level" -ge 1 ]; then
+	set -xv
+fi
+
+################################################################################
+
+set_source_and_build_dirs || panic "cannot set source and build directories"
+
+imginfo="$abs_top_builddir/src/appl/imginfo"
+
+data_dir="$abs_top_srcdir/data"
+
+################################################################################
+
+verbose=0
+if [ $# -ge 1 ]; then
+	verbose=1
+fi
+
+################################################################################
+
+failed_tests=()
+
+image_name=
+while IFS= read -r line; do
+	if [ -z "$line" ]; then
+		continue
+	fi
+	file=$(awk '{print $1;}' <<< "$line") || panic
+	expected_format=$(awk '{print $2;}' <<< "$line") || panic
+	expected_num_components=$(awk '{print $3;}' <<< "$line") || panic
+	expected_width=$(awk '{print $4;}' <<< "$line") || panic
+	expected_height=$(awk '{print $5;}' <<< "$line") || panic
+	expected_depth=$(awk '{print $6;}' <<< "$line") || panic
+	expected_size=$(awk '{print $7;}' <<< "$line") || panic
+	image_file="$data_dir/$file"
+	if [ "$verbose" -ge 2 ]; then
+		echo "Running $imginfo < $image_file"
+	fi
+	buffer=$("$imginfo" < "$image_file" 2> /dev/null) || panic
+	actual_format=$(awk '{print $1;}' <<< "$buffer") || panic
+	actual_num_components=$(awk '{print $2;}' <<< "$buffer") || panic
+	actual_width=$(awk '{print $3;}' <<< "$buffer") || panic
+	actual_height=$(awk '{print $4;}' <<< "$buffer") || panic
+	actual_depth=$(awk '{print $5;}' <<< "$buffer") || panic
+	actual_size=$(awk '{print $6;}' <<< "$buffer") || panic
+	if [ "$actual_format" != "$expected_format" -o \
+	  "$actual_num_components" -ne "$expected_num_components" -o \
+	  "$actual_width" -ne "$expected_width" -o \
+	  "$actual_height" -ne "$expected_height" -o \
+	  "$actual_depth" -ne "$expected_depth" -o \
+	  "$actual_size" -ne "$expected_size" \
+	  ]; then
+		echo "FAILED TEST: $file"
+		echo "   EXPECTED: $expected_format $expected_num_components $expected_width $expected_height $expected_depth $expected_size"
+		echo "     ACTUAL: $buffer"
+		failed_tests+=("$file")
+	fi
+done <<< "
+images/example.mif mif 2 32 64 8 4096
+images/feep2.pnm pnm 1 24 7 1 21
+images/feep.pnm pnm 1 24 7 1 21
+images/goldenears.bmp bmp 3 128 96 8 36864
+images/goldenears_gray.jpg jpg 1 128 96 8 12288
+images/goldenears_gray.ras ras 1 128 96 8 12288
+images/goldenears.jpg jpg 3 128 96 8 36864
+images/goldenears.pnm pnm 3 128 96 8 36864
+images/goldenears.ras ras 3 128 96 8 36864
+images/signed_12.pgx pgx 1 8 8 12 96
+images/signed_16.pgx pgx 1 8 8 16 128
+images/signed_8.pgx pgx 1 8 8 8 64
+images/small_16x1.pnm pnm 1 16 1 8 16
+images/small_1x1.pnm pnm 1 1 1 8 1
+images/stawamuschief_gray.pnm pnm 1 199 149 8 29651
+images/stawamuschief.pnm pnm 3 199 149 8 88953
+images/test.pnm pnm 1 8 8 12 96
+test/good/109-PoC.jp2 jp2 1 32 32 4 512
+
+test/good/109-PoC.jp2 jp2 1 32 32 4 511
+"
+
+if [ "${#failed_tests[@]}" -gt 0 ]; then
+	echo "The following tests failed:"
+	for failed_test in "${failed_tests[@]}"; do
+		echo "    $failed_test"
+	done
+	panic "one or more tests failed"
+fi
