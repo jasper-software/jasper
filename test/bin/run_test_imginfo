@@ -16,6 +16,7 @@ fi
 set_source_and_build_dirs || panic "cannot set source and build directories"
 
 imginfo="$abs_top_builddir/src/appl/imginfo"
+jasper="$abs_top_builddir/src/appl/jasper"
 
 data_dir="$abs_top_srcdir/data"
 
@@ -28,6 +29,30 @@ fi
 
 ################################################################################
 
+is_supported_format()
+{
+	local format="$1"
+	local supported=0
+	"$jasper" -l | grep -q '^'"$format"'$' && supported=1
+	echo "$supported"
+}
+
+formats=($("$jasper" -l)) || panic "cannot get supported formats"
+if [ "$verbose" -ge 2 ]; then
+	echo "The following formats are supported:"
+	for format in "${formats[@]}"; do
+		echo "    $format"
+	done
+fi
+has_jpg=$(is_supported_format jpg) || panic
+has_mif=$(is_supported_format mif) || panic
+#has_png=$(is_supported_format png) || panic
+if [ "$verbose" -ge 1 ]; then
+	echo "JPG: $has_jpg"
+	echo "MIF: $has_mif"
+	#echo "PNG: $has_png"
+fi
+
 failed_tests=()
 
 image_name=
@@ -35,7 +60,9 @@ while IFS= read -r line; do
 	if [ -z "$line" ]; then
 		continue
 	fi
+
 	file=$(awk '{print $1;}' <<< "$line") || panic "cannot get file"
+
 	expected_format=$(awk '{print $2;}' <<< "$line") || \
 	  panic "cannot get expected format"
 	expected_num_components=$(awk '{print $3;}' <<< "$line") || \
@@ -48,6 +75,25 @@ while IFS= read -r line; do
 	  panic "cannot get expected depth"
 	expected_size=$(awk '{print $7;}' <<< "$line") || \
 	  panic "cannot get expected size"
+
+	skip=0
+	case "$expected_format" in
+	jpg)
+		if [ "$has_jpg" -eq 0 ]; then
+			skip=1
+		fi
+		;;
+	mif)
+		if [ "$has_mif" -eq 0 ]; then
+			skip=1
+		fi
+		;;
+	esac
+	if [ "$skip" -ne 0 ]; then
+		echo "SKIPPING: unsupported format ($expected_format)"
+		continue
+	fi
+
 	image_file="$data_dir/$file"
 	if [ "$verbose" -ge 2 ]; then
 		echo "Running $imginfo < $image_file"
