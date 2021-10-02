@@ -30,6 +30,16 @@ jasper="$abs_top_builddir/src/appl/jasper"
 
 ################################################################################
 
+is_supported_format()
+{
+	local format="$1"
+	local supported=0
+	"$jasper" -l | grep -q '^'"$format"'$' && supported=1
+	echo "$supported"
+}
+
+################################################################################
+
 internal_testing_mode="${JAS_INTERNAL_TESTING_MODE:-0}"
 
 verbose=0
@@ -39,34 +49,62 @@ fi
 
 ################################################################################
 
+has_jpg="$(is_supported_format jpg)" || panic
+has_mif="$(is_supported_format mif)" || panic
+
+if [ "$internal_testing_mode" -ne 0 -a "$has_mif" -eq 0 ]; then
+	echo "warning: MIF support is missing"
+fi
+if [ "$has_jpg" -eq 0 ]; then
+	echo "warning: JPEG support is missing"
+fi
+
 # Decoder tests for valid data.
 good_list=()
 for file in "$data_dir"/test/good/*.*; do
+
 	skip=0
-	if [ "$internal_testing_mode" -eq 0 ]; then
-		case "$file" in
-		*.mif)
-			skip=1;;
-		esac
-	fi
+	case "$file" in
+	*.jpg)
+		if [ "$has_jpg" -eq 0 ]; then
+			skip=1
+		fi
+		;;
+	*.mif)
+		if [ "$has_mif" -eq 0 ]; then
+			skip=1
+		fi
+		;;
+	esac
+
 	if [ "$skip" -eq 0 ]; then
 		good_list+=("$file")
 	fi
+
 done
 
 # Decoder tests for invalid data.
 bad_list=()
 for file in "$data_dir"/test/bad/*.*; do
+
 	skip=0
-	if [ "$internal_testing_mode" -eq 0 ]; then
-		case "$file" in
-		*.mif)
-			skip=1;;
-		esac
-	fi
+	case "$file" in
+	*.jpg)
+		if [ "$has_jpg" -eq 0 ]; then
+			skip=1
+		fi
+		;;
+	*.mif)
+		if [ "$has_mif" -eq 0 ]; then
+			skip=1
+		fi
+		;;
+	esac
+
 	if [ "$skip" -eq 0 ]; then
 		bad_list+=("$file")
 	fi
+
 done
 
 # Encoder tests that should fail.
@@ -74,6 +112,7 @@ enc_list=()
 enc_list+=("$data_dir"/test/good/109-PoC.jp2)
 
 error_count=0
+failed_tests=()
 
 jpeg_turbo_lib_version=$("$imginfo" -o version \
   < "$data_dir/images/goldenears.jpg" | \
@@ -92,6 +131,7 @@ echo "############################################################"
 for in_file in "${good_list[@]}"; do
 	echo "############################################################"
 	expected_status=0
+	test_case="part1-$(basename "$in_file")"
 	echo "Input file: $in_file"
 	"$imginfo" < "$in_file"
 	status=$?
@@ -101,6 +141,7 @@ for in_file in "${good_list[@]}"; do
 		echo "ERROR: imginfo command had unexpected exit status " \
 		  "(expected $expected_status got $status)"
 		error_count=$((error_count + 1))
+		failed_tests+=("$test_case")
 	fi
 done
 echo "############################################################"
@@ -111,6 +152,7 @@ echo "############################################################"
 
 for in_file in "${bad_list[@]}"; do
 	name=$(basename "$in_file")
+	test_case="part2-$name"
 	echo "############################################################"
 
 	# Select the maximum number of samples that is allowed to be decoded.
@@ -172,6 +214,7 @@ for in_file in "${bad_list[@]}"; do
 		echo "ERROR: imginfo command had unexpected exit status " \
 		  "(expected $expected_status got $status)"
 		error_count=$((error_count + 1))
+		failed_tests+=("$test_case")
 	fi
 done
 echo "############################################################"
@@ -181,31 +224,39 @@ echo "PART 3: Encoder tests"
 echo "############################################################"
 
 for in_file in "${enc_list[@]}"; do
+	test_case="part3-$(basename "$in_file")"
 	echo "############################################################"
 	echo "Input file: $in_file"
-	special_asan_options=()
-	special_asan_options+=(exitcode=10)
-	special_asan_options+=(allocator_may_return_null=true)
-	special_asan_options+=(detect_leaks=false)
+#	special_asan_options=()
+#	special_asan_options+=(exitcode=10)
+#	special_asan_options+=(allocator_may_return_null=true)
+#	special_asan_options+=(detect_leaks=false)
 	expected_status=1
 	if [ "$verbose" -ge 1 ]; then
-		echo "Running ASAN_OPTIONS=${special_asan_options[*]} $jasper -f $in_file -T jp2 -F - > /dev/null"
+		#echo "Running ASAN_OPTIONS=${special_asan_options[*]} $jasper -f $in_file -T jp2 -F - > /dev/null"
+		echo "Running $jasper -f $in_file -T jp2 -F - > /dev/null"
 	fi
-	ASAN_OPTIONS="${special_asan_options[*]}" \
-	  "$jasper" -f "$in_file" -T jp2 -F - > /dev/null
+	#ASAN_OPTIONS="${special_asan_options[*]}" \
+	#  "$jasper" -f "$in_file" -T jp2 -F - > /dev/null
+	"$jasper" -f "$in_file" -T jp2 -F - > /dev/null
 	status=$?
 	if [ "$status" -ne "$expected_status" ]; then
 		echo "ERROR: imginfo command had unexpected exit status " \
 		  "(expected $expected_status got $status)"
 		error_count=$((error_count + 1))
+		failed_tests+=("$test_case")
 	fi
 done
 echo "############################################################"
 
 echo "############################################################"
 
-echo "error count: $error_count"
 if [ "$error_count" -gt 0 ]; then
+	echo "The following test cases failed:"
+	for failed_test in "${failed_tests[@]}"; do
+		echo "    $failed_test"
+	done
+	echo "Number of failed test cases: $error_count"
 	echo "STATUS: FAILED"
 	panic "FAILED"
 fi

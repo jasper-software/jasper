@@ -97,11 +97,23 @@ esac
 
 ################################################################################
 
+#if [ "$os" = windows ]; then
+	cat <<- EOF
+	================================================================================
+	File System Mount Information
+	================================================================================
+	EOF
+	mount || panic "mount failed"
+#fi
+
+################################################################################
+
 for multithread in 0 1; do
 
 	cat <<- EOF
 	================================================================================
-	BUILD: Multi-Thread Static Library Debug Build Using jas_init (ASan, LSan, UBSan)
+	BUILD: Static Library Debug Build Using jas_init (ASan, LSan, UBSan)
+	(Multithread $multithread)
 	================================================================================
 	EOF
 	base_dir="$build_dir/test_static_debug-$multithread"
@@ -140,7 +152,8 @@ for multithread in 0 1; do
 
 	cat <<- EOF
 	================================================================================
-	BUILD: Multi-Thread Static Library Debug Build (ASan, LSan, UBSan)
+	BUILD: Static Library Debug Build (ASan, LSan, UBSan)
+	(Multithread $multithread)
 	================================================================================
 	EOF
 	base_dir="$build_dir/test_static_debug-$multithread"
@@ -206,13 +219,12 @@ fi
 
 ################################################################################
 
-#if [ "$os" != windows ]; then
-
 for multithread in 0 1; do
 
 	cat <<- EOF
 	================================================================================
-	BUILD: Shared Library Release Build (Multithread $multithread)
+	BUILD: Shared Library Release Build
+	(Multithread $multithread)
 	================================================================================
 	EOF
 	base_dir="$build_dir/shared_release-$multithread"
@@ -242,15 +254,14 @@ for multithread in 0 1; do
 
 done
 
-#fi
-
 ################################################################################
 
 for multithread in 0 1; do
 
 	cat <<- EOF
 	================================================================================
-	BUILD: Multi-Thread Static Library Release Build
+	BUILD: Static Library Release Build
+	(Multithread $multithread)
 	================================================================================
 	EOF
 	base_dir="$build_dir/static_release-$multithread"
