@@ -105,8 +105,13 @@ for in_file_base in "${in_files[@]}"; do
 		"$jasper" "${enc_opts[@]}" | \
 		  "$jasper" "${dec_opts[@]}" > "$tmp_file"
 		pae=$("$imgcmp" -f "$in_file" -F "$tmp_file" -m pae --max \
-		  2> /dev/null) || \
-		  panic "cannot compare image files $in_file and $tmp_file"
+		  2> /dev/null) || pae=
+		if [ -z "$pae" ]; then
+			echo "cannot compare image files $in_file and $tmp_file"
+			error_count=$((error_count + 1))
+			failed_tests+=("$in_file_base-$image_format")
+			continue
+		fi
 		if [ "$pae" != 0 ]; then
 			echo "ERROR: $image_format $in_file_base NOT LOSSLESS (PAE=$pae)"
 			error_count=$((error_count + 1))
