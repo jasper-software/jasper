@@ -224,16 +224,18 @@ echo "############################################################"
 for in_file in "${enc_list[@]}"; do
 	echo "############################################################"
 	echo "Input file: $in_file"
-	special_asan_options=()
-	special_asan_options+=(exitcode=10)
-	special_asan_options+=(allocator_may_return_null=true)
-	special_asan_options+=(detect_leaks=false)
+#	special_asan_options=()
+#	special_asan_options+=(exitcode=10)
+#	special_asan_options+=(allocator_may_return_null=true)
+#	special_asan_options+=(detect_leaks=false)
 	expected_status=1
 	if [ "$verbose" -ge 1 ]; then
-		echo "Running ASAN_OPTIONS=${special_asan_options[*]} $jasper -f $in_file -T jp2 -F - > /dev/null"
+		#echo "Running ASAN_OPTIONS=${special_asan_options[*]} $jasper -f $in_file -T jp2 -F - > /dev/null"
+		echo "Running $jasper -f $in_file -T jp2 -F - > /dev/null"
 	fi
-	ASAN_OPTIONS="${special_asan_options[*]}" \
-	  "$jasper" -f "$in_file" -T jp2 -F - > /dev/null
+	#ASAN_OPTIONS="${special_asan_options[*]}" \
+	#  "$jasper" -f "$in_file" -T jp2 -F - > /dev/null
+	"$jasper" -f "$in_file" -T jp2 -F - > /dev/null
 	status=$?
 	if [ "$status" -ne "$expected_status" ]; then
 		echo "ERROR: imginfo command had unexpected exit status " \
