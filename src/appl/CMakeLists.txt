@@ -76,13 +76,13 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/../../test/bin/wrapper.in"
   "${CMAKE_CURRENT_BINARY_DIR}/../../test/bin/wrapper" @ONLY)
 
 if(BASH_PROGRAM)
-	#if(NOT WIN32)
 	add_test(run_test_imginfo
 	  "${BASH_PROGRAM}" "${CMAKE_CURRENT_BINARY_DIR}/../../test/bin/wrapper"
 	  "${CMAKE_CURRENT_SOURCE_DIR}/../../test/bin/run_test_imginfo" -v)
 	add_test(run_test_imgcmp
 	  "${BASH_PROGRAM}" "${CMAKE_CURRENT_BINARY_DIR}/../../test/bin/wrapper"
 	  "${CMAKE_CURRENT_SOURCE_DIR}/../../test/bin/run_test_imgcmp" -v)
+if(NOT WIN32)
 	add_test(run_test_1
 	  "${BASH_PROGRAM}" "${CMAKE_CURRENT_BINARY_DIR}/../../test/bin/wrapper"
 	  "${CMAKE_CURRENT_SOURCE_DIR}/../../test/bin/run_test_1" -v)
@@ -95,7 +95,7 @@ if(BASH_PROGRAM)
 	add_test(run_test_4
 	  "${BASH_PROGRAM}" "${CMAKE_CURRENT_BINARY_DIR}/../../test/bin/wrapper"
 	  "${CMAKE_CURRENT_SOURCE_DIR}/../../test/bin/run_test_4" -v)
-	#endif()
+endif()
 	if(JAS_THREADS)
 		add_test(run_test_5
 		  "${BASH_PROGRAM}" "${CMAKE_CURRENT_BINARY_DIR}/../../test/bin/wrapper"
