@@ -131,6 +131,7 @@ echo "############################################################"
 for in_file in "${good_list[@]}"; do
 	echo "############################################################"
 	expected_status=0
+	test_case="part1-$(basename "$in_file")"
 	echo "Input file: $in_file"
 	"$imginfo" < "$in_file"
 	status=$?
@@ -140,7 +141,7 @@ for in_file in "${good_list[@]}"; do
 		echo "ERROR: imginfo command had unexpected exit status " \
 		  "(expected $expected_status got $status)"
 		error_count=$((error_count + 1))
-		failed_tests+=("part1-$in_file")
+		failed_tests+=("$test_case")
 	fi
 done
 echo "############################################################"
@@ -151,6 +152,7 @@ echo "############################################################"
 
 for in_file in "${bad_list[@]}"; do
 	name=$(basename "$in_file")
+	test_case="part2-$name"
 	echo "############################################################"
 
 	# Select the maximum number of samples that is allowed to be decoded.
@@ -212,7 +214,7 @@ for in_file in "${bad_list[@]}"; do
 		echo "ERROR: imginfo command had unexpected exit status " \
 		  "(expected $expected_status got $status)"
 		error_count=$((error_count + 1))
-		failed_tests+=("part2-$in_file")
+		failed_tests+=("$test_case")
 	fi
 done
 echo "############################################################"
@@ -222,6 +224,7 @@ echo "PART 3: Encoder tests"
 echo "############################################################"
 
 for in_file in "${enc_list[@]}"; do
+	test_case="part3-$(basename "$in_file")"
 	echo "############################################################"
 	echo "Input file: $in_file"
 #	special_asan_options=()
@@ -241,7 +244,7 @@ for in_file in "${enc_list[@]}"; do
 		echo "ERROR: imginfo command had unexpected exit status " \
 		  "(expected $expected_status got $status)"
 		error_count=$((error_count + 1))
-		failed_tests+=("part3-$in_file")
+		failed_tests+=("$test_case")
 	fi
 done
 echo "############################################################"
