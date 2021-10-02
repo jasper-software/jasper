@@ -107,6 +107,8 @@ for in_file_base in "${in_files[@]}"; do
 		  panic "cannot find image $in_file_base"
 		image_type=$(image_info "$in_file" "type") || \
 		  panic "cannot get image type $in_file"
+		image_fmt=$(image_info "$in_file" "format") || \
+		  panic "cannot get image format $in_file"
 		image_prec=$(image_info "$in_file" "depth") || \
 		  panic "cannot get image depth $in_file"
 		echo "input: $in_file_base"
@@ -139,6 +141,19 @@ for in_file_base in "${in_files[@]}"; do
 		pae=$("$imgcmp" -f "$in_file" -F "$tmp_file" -m pae --max \
 		  2> /dev/null)
 		status=$?
+##########
+if [ "$status" -ne 0 ]; then
+	if [ "$image_fmt" = "$image_format" ]; then
+		echo "SAME FORMAT"
+	fi
+	ls -l "$in_file" "$tmp_file"
+	echo "========================================"
+	od -t x1 "$in_file" | head -25
+	echo "========================================"
+	od -t x1 "$tmp_file" | head -25
+	echo "========================================"
+fi
+##########
 		if [ "$status" -ne 0 ]; then
 			echo "imgcmp failed ($status) for $in_file and $tmp_file"
 			error_count=$((error_count + 1))
