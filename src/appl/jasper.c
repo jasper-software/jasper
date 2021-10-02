@@ -429,6 +429,7 @@ cmdopts_t *cmdopts_parse(int argc, char **argv)
 	cmdopts->cmptno = -1;
 	cmdopts->debug = 0;
 	cmdopts->srgb = 0;
+	cmdopts->list_codecs = 0;
 //#if defined(JAS_DEFAULT_MAX_MEM_USAGE)
 	cmdopts->max_mem = JAS_DEFAULT_MAX_MEM_USAGE;
 //#endif
