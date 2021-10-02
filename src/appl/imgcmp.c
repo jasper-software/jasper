@@ -80,6 +80,11 @@
 *
 \******************************************************************************/
 
+#define EXIT_OK 0
+#define EXIT_DIFFER 1
+#define EXIT_USAGE 2
+#define EXIT_ERROR 3
+
 typedef enum {
 	OPT_HELP,
 	OPT_VERSION,
@@ -216,7 +221,7 @@ int main(int argc, char **argv)
 			break;
 		case OPT_VERSION:
 			printf("%s\n", JAS_VERSION);
-			exit(EXIT_SUCCESS);
+			exit(EXIT_OK);
 			break;
 		case OPT_MAXMEM:
 //#if defined(JAS_DEFAULT_MAX_MEM_USAGE)
@@ -237,7 +242,7 @@ int main(int argc, char **argv)
 #if defined(JAS_USE_JAS_INIT)
 	if (jas_init()) {
 		fprintf(stderr, "cannot initialize JasPer library\n");
-		exit(EXIT_FAILURE);
+		exit(EXIT_ERROR);
 	}
 	jas_set_max_mem_usage(max_mem);
 	atexit(jas_cleanup);
@@ -250,13 +255,13 @@ int main(int argc, char **argv)
 	//jas_conf_set_debug_level(debug);
 	if (jas_initialize()) {
 		fprintf(stderr, "cannot initialize JasPer library\n");
-		exit(EXIT_FAILURE);
+		exit(EXIT_ERROR);
 	}
 
 	jas_context_t context;
 	if (!(context = jas_context_create())) {
 		fprintf(stderr, "cannot create context\n");
-		exit(EXIT_FAILURE);
+		exit(EXIT_ERROR);
 	}
 	jas_set_context(context);
 
@@ -280,25 +285,25 @@ int main(int argc, char **argv)
 	/* Open the original image file. */
 	if (!(origstream = jas_stream_fopen(origpath, "rb"))) {
 		fprintf(stderr, "cannot open %s\n", origpath);
-		return EXIT_FAILURE;
+		return EXIT_ERROR;
 	}
 
 	/* Open the reconstructed image file. */
 	if (!(reconstream = jas_stream_fopen(reconpath, "rb"))) {
 		fprintf(stderr, "cannot open %s\n", reconpath);
-		return EXIT_FAILURE;
+		return EXIT_ERROR;
 	}
 
 	/* Decode the original image. */
 	if (!(origimage = jas_image_decode(origstream, -1, 0))) {
 		fprintf(stderr, "cannot load original image\n");
-		return EXIT_FAILURE;
+		return EXIT_ERROR;
 	}
 
 	/* Decoder the reconstructed image. */
 	if (!(reconimage = jas_image_decode(reconstream, -1, 0))) {
 		fprintf(stderr, "cannot load reconstructed image\n");
-		return EXIT_FAILURE;
+		return EXIT_ERROR;
 	}
 
 	/* Close the original image file. */
@@ -312,7 +317,7 @@ int main(int argc, char **argv)
 	if (jas_image_numcmpts(reconimage) != numcomps) {
 		fprintf(stderr, "number of components differ (%d != %d)\n",
 		  numcomps, jas_image_numcmpts(reconimage));
-		return EXIT_FAILURE;
+		return EXIT_DIFFER;
 	}
 
 	/* Compute the difference for each component. */
@@ -325,45 +330,45 @@ int main(int argc, char **argv)
 		if (jas_image_cmptwidth(reconimage, compno) != width ||
 		 jas_image_cmptheight(reconimage, compno) != height) {
 			fprintf(stderr, "image dimensions differ\n");
-			return EXIT_FAILURE;
+			return EXIT_DIFFER;
 		}
 		if (jas_image_cmptprec(reconimage, compno) != depth) {
 			fprintf(stderr, "precisions differ\n");
-			return EXIT_FAILURE;
+			return EXIT_DIFFER;
 		}
 
 		if (!(origdata = jas_matrix_create(height, width))) {
 			fprintf(stderr, "internal error\n");
-			return EXIT_FAILURE;
+			return EXIT_ERROR;
 		}
 		if (!(recondata = jas_matrix_create(height, width))) {
 			fprintf(stderr, "internal error\n");
-			return EXIT_FAILURE;
+			return EXIT_ERROR;
 		}
 		if (jas_image_readcmpt(origimage, compno, 0, 0, width, height,
 		  origdata)) {
 			fprintf(stderr, "cannot read component data\n");
-			return EXIT_FAILURE;
+			return EXIT_ERROR;
 		}
 		if (jas_image_readcmpt(reconimage, compno, 0, 0, width, height,
 		  recondata)) {
 			fprintf(stderr, "cannot read component data\n");
-			return EXIT_FAILURE;
+			return EXIT_ERROR;
 		}
 
 		if (diffpath) {
 			if (!(diffstream = jas_stream_fopen(diffpath, "rwb"))) {
 				fprintf(stderr, "cannot open diff stream\n");
-				return EXIT_FAILURE;
+				return EXIT_ERROR;
 			}
 			if (!(diffimage = makediffimage(origdata, recondata))) {
 				fprintf(stderr, "cannot make diff image\n");
-				return EXIT_FAILURE;
+				return EXIT_ERROR;
 			}
 			fmtid = jas_image_strtofmt("pnm");
 			if (jas_image_encode(diffimage, diffstream, fmtid, 0)) {
 				fprintf(stderr, "cannot save\n");
-				return EXIT_FAILURE;
+				return EXIT_ERROR;
 			}
 			jas_stream_close(diffstream);
 			jas_image_destroy(diffimage);
@@ -422,7 +427,7 @@ int main(int argc, char **argv)
 	jas_context_destroy(context);
 #endif
 
-	return EXIT_SUCCESS;
+	return EXIT_OK;
 }
 
 /******************************************************************************\
@@ -620,5 +625,5 @@ void usage()
 	  "    mae ..... mean absolute error\n"
 	  "    equal ... equality (boolean)\n"
 	  );
-	exit(EXIT_FAILURE);
+	exit(EXIT_USAGE);
 }
