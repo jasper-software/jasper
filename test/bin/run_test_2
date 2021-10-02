@@ -141,21 +141,6 @@ for in_file_base in "${in_files[@]}"; do
 		pae=$("$imgcmp" -f "$in_file" -F "$tmp_file" -m pae --max \
 		  2> /dev/null)
 		status=$?
-##########
-if [ "$status" -ne 0 ]; then
-	if [ "$image_fmt" = "$image_format" ]; then
-		echo "SAME FORMAT"
-	fi
-	ls -l "$in_file" "$tmp_file"
-	echo "========================================"
-	od -t x1 "$in_file" | head -25
-	od -c "$in_file" | head -25
-	echo "========================================"
-	od -t x1 "$tmp_file" | head -25
-	od -c "$tmp_file" | head -25
-	echo "========================================"
-fi
-##########
 		if [ "$status" -ne 0 ]; then
 			echo "imgcmp failed ($status) for $in_file and $tmp_file"
 			error_count=$((error_count + 1))
