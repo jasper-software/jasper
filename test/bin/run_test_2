@@ -149,8 +149,10 @@ if [ "$status" -ne 0 ]; then
 	ls -l "$in_file" "$tmp_file"
 	echo "========================================"
 	od -t x1 "$in_file" | head -25
+	od -c "$in_file" | head -25
 	echo "========================================"
 	od -t x1 "$tmp_file" | head -25
+	od -c "$tmp_file" | head -25
 	echo "========================================"
 fi
 ##########
