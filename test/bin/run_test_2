@@ -15,6 +15,14 @@ fi
 set_source_and_build_dirs || panic "cannot set source and build directories"
 tmp_dir=$(make_tmp_dir)
 
+is_supported_format()
+{
+	local format="$1"
+	local supported=0
+	"$jasper" -l | grep -q '^'"$format"'$' && supported=1
+	echo "$supported"
+}
+
 ################################################################################
 
 #abs_source_dir="$1"
@@ -35,6 +43,9 @@ internal_testing_mode="${JAS_INTERNAL_TESTING_MODE:-0}"
 debug=0
 
 image_path="$data_dir/images"
+
+has_jpg=$(is_supported_format jpg) || panic
+has_mif=$(is_supported_format mif) || panic
 
 in_files=()
 #in_files+=(feep2.pnm)
@@ -69,6 +80,25 @@ error_count=0
 failed_tests=()
 
 for in_file_base in "${in_files[@]}"; do
+
+	skip=0
+	case "$in_file_base" in
+	*.jpg|*.jpeg)
+		if [ "$has_jpg" -eq 0 ]; then
+			skip=1
+		fi
+		;;
+	*.mif)
+		if [ "$has_mif" -eq 0 ]; then
+			skip=1
+		fi
+		;;
+	esac
+	if [ "$skip" -ne 0 ]; then
+		echo "SKIPPING: $in_file_base"
+		continue
+	fi
+
 	for image_format in "${image_formats[@]}"; do
 		echo "############################################################"
 		in_file=$(image_which "$image_path" "$in_file_base") || \
