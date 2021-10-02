@@ -66,6 +66,7 @@ fi
 #image_formats+=(jpg)
 
 error_count=0
+failed_tests=()
 
 for in_file_base in "${in_files[@]}"; do
 	for image_format in "${image_formats[@]}"; do
@@ -109,6 +110,7 @@ for in_file_base in "${in_files[@]}"; do
 		if [ "$pae" != 0 ]; then
 			echo "ERROR: $image_format $in_file_base NOT LOSSLESS (PAE=$pae)"
 			error_count=$((error_count + 1))
+			failed_tests+=("$in_file_base-$image_format")
 			#"$jiv" $tmp_file $in_file
 		fi
 		echo "STATUS: OK"
@@ -116,8 +118,12 @@ for in_file_base in "${in_files[@]}"; do
 done
 
 echo "############################################################"
-echo "error count: $error_count"
 if [ "$error_count" -gt 0 ]; then
+	echo "The following test cases failed:"
+	for failed_test in "${failed_tests[@]}"; do
+		echo "    $failed_test"
+	done
+	echo "Number of failed test cases: $error_count"
 	echo "STATUS: FAILED"
 	exit 1
 fi
