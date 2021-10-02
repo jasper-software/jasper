@@ -9,7 +9,6 @@ debug_level="${JAS_DEBUG_LEVEL:-0}"
 if [ "$debug_level" -ge 1 ]; then
 	set -xv
 fi
-set -xv
 
 ################################################################################
 
