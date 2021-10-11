@@ -519,6 +519,9 @@ if(HEIF_LIBRARY AND JAS_HAVE_HEIF_H)
 	set(JAS_HAVE_LIBHEIF 1)
 	set(HEIF_LIBRARIES "${HEIF_LIBRARY}")
 endif()
+if(NOT JAS_HAVE_LIBHEIF)
+	set(JAS_INCLUDE_HEIF_CODEC 0)
+endif()
 message("LIBHEIF ${JAS_HAVE_LIBHEIF}")
 
 ################################################################################
