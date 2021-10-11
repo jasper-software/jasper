@@ -220,6 +220,7 @@ static inline bool jas_matrix_empty(const jas_matrix_t *matrix)
 JAS_ATTRIBUTE_PURE
 static inline jas_seqent_t jas_matrix_get(const jas_matrix_t *matrix, jas_matind_t i, jas_matind_t j)
 {
+	assert(i >= 0 && i < matrix->numrows_ && j >= 0 && j < matrix->numcols_);
 	return matrix->rows_[i][j];
 }
 
@@ -228,6 +229,7 @@ Set a matrix element.
 */
 static inline void jas_matrix_set(jas_matrix_t *matrix, jas_matind_t i, jas_matind_t j, jas_seqent_t v)
 {
+	assert(i >= 0 && i < matrix->numrows_ && j >= 0 && j < matrix->numcols_);
 	matrix->rows_[i][j] = v;
 }
 

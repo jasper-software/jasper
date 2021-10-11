@@ -102,6 +102,16 @@ else()
 	set(libjasper_jpg_sources "")
 endif()
 
+if(JAS_INCLUDE_HEIC_CODEC)
+	set(libjasper_heic_sources
+		heic/heic_val.c
+		heic/heic_dec.c
+		heic/heic_enc.c
+	)
+else()
+	set(libjasper_heic_sources "")
+endif()
+
 if(JAS_INCLUDE_MIF_CODEC)
 	set(libjasper_mif_sources
 		mif/mif_cod.c
@@ -151,6 +161,7 @@ add_library(libjasper ${libjasper_type}
 	${libjasper_jp2_sources}
 	${libjasper_jpc_sources}
 	${libjasper_jpg_sources}
+	${libjasper_heic_sources}
 	${libjasper_mif_sources}
 	${libjasper_pgx_sources}
 	${libjasper_pnm_sources}
@@ -194,7 +205,8 @@ endif()
 # I am not sure why the following line is needed for building a library, but
 # MacOSX does cannot build a shared library without this line.
 # Also, try adding MATH_LIBRARY to fix a Gentoo problem.
-target_link_libraries(libjasper PUBLIC ${JPEG_LIBRARIES} ${MATH_LIBRARY})
+target_link_libraries(libjasper PUBLIC ${JPEG_LIBRARIES} ${HEIF_LIBRARIES}
+  ${MATH_LIBRARY})
 
 generate_export_header(libjasper
   EXPORT_FILE_NAME include/jasper/jas_export_cmake.h

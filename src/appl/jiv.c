@@ -797,7 +797,6 @@ static int loadimage()
 		gs.cmptno = 0;
 	}
 
-
 	if (cmdopts.verbose) {
 		fprintf(stderr, "num of components %d\n", jas_image_numcmpts(gs.image));
 		fprintf(stderr, "dimensions %"PRIiFAST32" %"PRIiFAST32"\n",

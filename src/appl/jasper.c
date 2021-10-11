@@ -229,10 +229,22 @@ int main(int argc, char **argv)
 	} else {
 		cmdopts->infmt = -1;
 	}
-	if ((cmdopts->outfmt = jas_image_strtofmt(cmdopts->outfmt_str)) < 0) {
-		fprintf(stderr, "error: invalid output format %s\n",
-		cmdopts->outfmt_str);
-		badusage();
+	if (cmdopts->outfmt_str) {
+		if ((cmdopts->outfmt = jas_image_strtofmt(cmdopts->outfmt_str)) < 0) {
+			fprintf(stderr, "error: invalid output format %s\n",
+			cmdopts->outfmt_str);
+			exit(EXIT_FAILURE);
+		}
+	} else {
+		if (cmdopts->outfmt < 0 && cmdopts->outfile) {
+			if ((cmdopts->outfmt = jas_image_fmtfromname(cmdopts->outfile)) < 0) {
+				cmdopts->outfmt = -1;
+			}
+		}
+	}
+	if (cmdopts->outfmt < 0) {
+		fprintf(stderr, "error: cannot determine output image format\n");
+		exit(EXIT_FAILURE);
 	}
 
 	if (cmdopts->verbose) {
@@ -512,12 +524,14 @@ cmdopts_t *cmdopts_parse(int argc, char **argv)
 		goto done;
 	}
 
+#if 0
 	if (cmdopts->outfmt < 0 && cmdopts->outfile) {
 		if ((cmdopts->outfmt = jas_image_fmtfromname(cmdopts->outfile)) < 0) {
 			fprintf(stderr,
 			  "error: cannot guess image format from output file name\n");
 		}
 	}
+#endif
 
 #if 0
 	if (cmdopts->outfmt < 0) {
@@ -525,8 +539,8 @@ cmdopts_t *cmdopts_parse(int argc, char **argv)
 		badusage();
 	}
 #else
-	if (!cmdopts->outfmt_str) {
-		fprintf(stderr, "error: no output format specified\n");
+	if (!cmdopts->outfmt_str && !cmdopts->outfile) {
+		fprintf(stderr, "error: cannot determine output format\n");
 		badusage();
 	}
 #endif

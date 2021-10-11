@@ -83,6 +83,7 @@ endif()
 option(JAS_ENABLE_HIDDEN "Hide internal symbols" ON)
 option(JAS_ENABLE_32BIT "Use 32 bit integers on 64 bit CPUs" OFF)
 option(JAS_ENABLE_LIBJPEG "Enable the use of the JPEG Library" ON)
+option(JAS_ENABLE_LIBHEIF "Enable the use of the HEIF Library" ON)
 option(JAS_ENABLE_OPENGL "Enable the use of the OpenGL/GLUT Library" ON)
 option(JAS_ENABLE_AUTOMATIC_DEPENDENCIES "Enable automatic dependencies" ON)
 option(JAS_ENABLE_DOC "Enable building of the documentation" ON)
@@ -96,6 +97,7 @@ option(JAS_INCLUDE_BMP_CODEC "Include BMP codec support" ON)
 option(JAS_INCLUDE_JP2_CODEC "Include JP2 codec support" ON)
 option(JAS_INCLUDE_JPC_CODEC "Include JPC codec support" ON)
 option(JAS_INCLUDE_JPG_CODEC "Include JPG codec support" ON)
+option(JAS_INCLUDE_HEIC_CODEC "Include experimental HEIC codec support" ON)
 option(JAS_INCLUDE_MIF_CODEC "Include MIF codec support" ON)
 option(JAS_INCLUDE_PGX_CODEC "Include PGX codec support" ON)
 option(JAS_INCLUDE_PNM_CODEC "Include PNM codec support" ON)
@@ -503,6 +505,21 @@ endif()
 if(NOT JAS_HAVE_LIBJPEG)
 	set(JAS_INCLUDE_JPG_CODEC 0)
 endif()
+
+################################################################################
+# Check for the HEIF library.
+################################################################################
+
+set(JAS_HAVE_LIBHEIF 0)
+if(JAS_ENABLE_LIBHEIF)
+	find_library(HEIF_LIBRARY heif)
+	check_include_files(libheif/heif.h JAS_HAVE_HEIF_H)
+endif()
+if(HEIF_LIBRARY AND JAS_HAVE_HEIF_H)
+	set(JAS_HAVE_LIBHEIF 1)
+	set(HEIF_LIBRARIES "${HEIF_LIBRARY}")
+endif()
+message("LIBHEIF ${JAS_HAVE_LIBHEIF}")
 
 ################################################################################
 # Check for the Math library.

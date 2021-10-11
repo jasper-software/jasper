@@ -185,6 +185,19 @@ static const jas_image_fmt_t jas_image_fmts[] = {
 	},
 #endif
 
+#if defined(JAS_INCLUDE_HEIC_CODEC)
+	{
+		"heic",
+		"HEIC (ISO/IEC 23008-12)",
+		"heic heif",
+		{
+			.decode = jas_heic_decode,
+			.encode = jas_heic_encode,
+			.validate = jas_heic_validate
+		}
+	},
+#endif
+
 #if defined(JAS_INCLUDE_PGX_CODEC)
 	{
 		"pgx",

@@ -758,6 +758,14 @@ JAS_EXPORT int jpg_encode(jas_image_t *image, jas_stream_t *out, const char *opt
 JAS_EXPORT int jpg_validate(jas_stream_t *in);
 #endif
 
+#if defined(JAS_INCLUDE_HEIC_CODEC)
+/* Format-dependent operations for HEIC support. */
+JAS_EXPORT jas_image_t *jas_heic_decode(jas_stream_t *in, const char *optstr);
+JAS_EXPORT int jas_heic_encode(jas_image_t *image, jas_stream_t *out,
+  const char *optstr);
+JAS_EXPORT int jas_heic_validate(jas_stream_t *in);
+#endif
+
 #if defined(JAS_INCLUDE_MIF_CODEC)
 /* Format-dependent operations for MIF support. */
 JAS_EXPORT jas_image_t *mif_decode(jas_stream_t *in, const char *optstr);

@@ -14,6 +14,7 @@ this manual is available online (for various JasPer releases) at:
 * Add some customization points in the library, such as the memory allocator
   and error logging function.
 * Add improved memory usage tracking and limiting.
+* Add partial decoding support for the HEIC format.
 * Fix some longstanding issues in the JasPer I/O streams API.
 * Add the running of the full test suite in CI builds for the Windows platform.
   (Previously, the full test suite was only run for CI builds on Unix-based
