@@ -76,6 +76,7 @@ Some projects known to use JasPer include:
  - [MATLAB toolbox for JasPer](http://www.mathworks.com/matlabcentral/fileexchange/loadFile.do?objectId=2682&objectType=FILE)
  - [Ziproxy](http://ziproxy.sourceforge.net)
  - [FBI Improved (FIM)](https://savannah.nongnu.org/projects/fbi-improved)
+ - [SAIL](https://github.com/HappySeaFox/sail)
 
 # Historical Perspective
 
