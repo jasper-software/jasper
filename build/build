@@ -37,6 +37,11 @@ usage()
 	--tsan
 	--ubsan
 	--msan
+
+	Examples
+	========
+
+	$0 --mode debug
 	EOF
 	exit 2
 }

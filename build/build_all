@@ -46,9 +46,15 @@ while getopts vb:cnd:sw option; do
 		strict=0;;
 	s)
 		strict=1;;
+	*)
+		usage "invalid option $option";;
 	esac
 done
 shift $((OPTIND - 1))
+
+if [ $# -ne 0 ]; then
+	usage "unexpected command-line arguments"
+fi
 
 if [ "$debug_level" -ge 1 -a "$verbose" -eq 0 ]; then
 	verbose=1
