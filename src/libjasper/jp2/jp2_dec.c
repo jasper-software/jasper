@@ -157,6 +157,7 @@ jas_image_t *jp2_decode(jas_stream_t *in, const char *optstr)
 
 	/* Get the second box.  This should be a FTYP box. */
 	if (!(box = jp2_box_get(in))) {
+		jas_logerrorf("error: cannot get box\n");
 		goto error;
 	}
 	if (box->type != JP2_BOX_FTYP) {
@@ -323,6 +324,7 @@ jas_image_t *jp2_decode(jas_stream_t *in, const char *optstr)
 		dec->image->cmprof_ = jas_cmprof_createfromiccprof(iccprof);
 		if (!dec->image->cmprof_) {
 			jas_iccprof_destroy(iccprof);
+			jas_logerrorf("error: cannot create CM profile from ICC profile\n");
 			goto error;
 		}
 		jas_iccprof_destroy(iccprof);
@@ -396,10 +398,12 @@ jas_image_t *jp2_decode(jas_stream_t *in, const char *optstr)
 				dec->chantocmptlut[channo] = channo;
 			} else if (cmapent->map == JP2_CMAP_PALETTE) {
 				if (!pclrd->numlutents) {
+					jas_logerrorf("error: empty LUT\n");
 					goto error;
 				}
 				if (!(lutents = jas_alloc2(pclrd->numlutents,
 				  sizeof(int_fast32_t)))) {
+					jas_logerrorf("error: cannot allocate LUT\n");
 					goto error;
 				}
 				for (i = 0; i < pclrd->numlutents; ++i) {
@@ -411,6 +415,7 @@ jas_image_t *jp2_decode(jas_stream_t *in, const char *optstr)
 				  JP2_BPCTODTYPE(pclrd->bpc[cmapent->pcol]), newcmptno)) {
 					jas_logerrorf("jas_image_depalettize failed\n");
 					jas_free(lutents);
+					jas_logerrorf("error: depalettize failed\n");
 					goto error;
 				}
 				dec->chantocmptlut[channo] = newcmptno;

@@ -106,8 +106,10 @@ static int jas_cmpxformseq_appendcnvt(jas_cmpxformseq_t *pxformseq,
   unsigned, unsigned);
 static int jas_cmpxformseq_resize(jas_cmpxformseq_t *pxformseq, unsigned n);
 
-static int mono(const jas_iccprof_t *prof, int op, jas_cmpxformseq_t **pxformseq);
-static int triclr(const jas_iccprof_t *prof, int op, jas_cmpxformseq_t **retpxformseq);
+static int mono(const jas_iccprof_t *prof, int op,
+  jas_cmpxformseq_t **pxformseq);
+static int triclr(const jas_iccprof_t *prof, int op,
+  jas_cmpxformseq_t **retpxformseq);
 
 static void jas_cmpxformseq_destroy(jas_cmpxformseq_t *pxformseq);
 static int jas_cmpxformseq_delete(jas_cmpxformseq_t *pxformseq, unsigned i);
@@ -272,26 +274,38 @@ jas_cmprof_t *jas_cmprof_createfromiccprof(const jas_iccprof_t *iccprof)
 	fwdpxformseq = 0;
 	revpxformseq = 0;
 
-	if (!(prof = jas_cmprof_create()))
+	if (!(prof = jas_cmprof_create())) {
+		jas_logerrorf("error: cannot create CM profile\n");
 		goto error;
+	}
 	jas_iccprof_gethdr(iccprof, &icchdr);
-	if (!(prof->iccprof = jas_iccprof_copy(iccprof)))
+	if (!(prof->iccprof = jas_iccprof_copy(iccprof))) {
+		jas_logerrorf("error: cannot copy ICC profile\n");
 		goto error;
+	}
 	prof->clrspc = icctoclrspc(icchdr.colorspc, 0);
 	prof->refclrspc = icctoclrspc(icchdr.refcolorspc, 1);
 	prof->numchans = jas_clrspc_numchans(prof->clrspc);
 	prof->numrefchans = jas_clrspc_numchans(prof->refclrspc);
 
 	if (prof->numchans == 1) {
-		if (mono(prof->iccprof, 0, &fwdpxformseq))
+		if (mono(prof->iccprof, 0, &fwdpxformseq)) {
+			jas_logerrorf("error: mono failed 1\n");
 			goto error;
-		if (mono(prof->iccprof, 1, &revpxformseq))
+		}
+		if (mono(prof->iccprof, 1, &revpxformseq)) {
+			jas_logerrorf("error: mono failed 2\n");
 			goto error;
+		}
 	} else if (prof->numchans == 3) {
-		if (triclr(prof->iccprof, 0, &fwdpxformseq))
+		if (triclr(prof->iccprof, 0, &fwdpxformseq)) {
+			jas_logerrorf("error: triclr failed 1\n");
 			goto error;
-		if (triclr(prof->iccprof, 1, &revpxformseq))
+		}
+		if (triclr(prof->iccprof, 1, &revpxformseq)) {
+			jas_logerrorf("error: triclr failed 2\n");
 			goto error;
+		}
 	}
 	prof->pxformseqs[SEQFWD(0)] = fwdpxformseq;
 	prof->pxformseqs[SEQREV(0)] = revpxformseq;
@@ -1010,8 +1024,10 @@ static int jas_cmshapmat_invmat(jas_cmreal_t out[3][4], jas_cmreal_t in[3][4])
 #if 0
 	jas_eprintf("delta=%f\n", d);
 #endif
-	if (JAS_ABS(d) < 1e-6)
+	if (JAS_ABS(d) < 1e-6) {
+		jas_logerrorf("jas_cmshapmat_invmat: matrix is not invertible\n");
 		return -1;
+	}
 	out[0][0] = (in[1][1] * in[2][2] - in[1][2] * in[2][1]) / d;
 	out[1][0] = -(in[1][0] * in[2][2] - in[1][2] * in[2][0]) / d;
 	out[2][0] = (in[1][0] * in[2][1] - in[1][1] * in[2][0]) / d;
@@ -1076,15 +1092,19 @@ static int mono(const jas_iccprof_t *iccprof, int op, jas_cmpxformseq_t **retpxf
 
 	jas_cmshapmatlut_init(&lut);
 	if (!(graytrc = jas_iccprof_getattr(iccprof, JAS_ICC_TAG_GRYTRC)) ||
-	  graytrc->type != JAS_ICC_TYPE_CURV)
+	  graytrc->type != JAS_ICC_TYPE_CURV) {
 		goto error;
-	if (!(pxform = jas_cmpxform_createshapmat()))
+	}
+	if (!(pxform = jas_cmpxform_createshapmat())) {
 		goto error;
+	}
 	shapmat = &pxform->data.shapmat;
-	if (!(pxformseq = jas_cmpxformseq_create()))
+	if (!(pxformseq = jas_cmpxformseq_create())) {
 		goto error;
-	if (jas_cmpxformseq_insertpxform(pxformseq, -1, pxform))
+	}
+	if (jas_cmpxformseq_insertpxform(pxformseq, -1, pxform)) {
 		goto error;
+	}
 
 	pxform->numinchans = 1;
 	pxform->numoutchans = 3;
@@ -1097,18 +1117,21 @@ static int mono(const jas_iccprof_t *iccprof, int op, jas_cmpxformseq_t **retpxf
 		shapmat->mat[0][0] = 0.9642;
 		shapmat->mat[1][0] = 1.0;
 		shapmat->mat[2][0] = 0.8249;
-		if (jas_cmshapmatlut_set(&shapmat->luts[0], &graytrc->data.curv))
+		if (jas_cmshapmatlut_set(&shapmat->luts[0], &graytrc->data.curv)) {
 			goto error;
+		}
 	} else {
 		shapmat->order = 1;
 		shapmat->mat[0][0] = 1.0 / 0.9642;
 		shapmat->mat[1][0] = 1.0;
 		shapmat->mat[2][0] = 1.0 / 0.8249;
 		jas_cmshapmatlut_init(&lut);
-		if (jas_cmshapmatlut_set(&lut, &graytrc->data.curv))
+		if (jas_cmshapmatlut_set(&lut, &graytrc->data.curv)) {
 			goto error;
-		if (jas_cmshapmatlut_invert(&shapmat->luts[0], &lut, lut.size))
+		}
+		if (jas_cmshapmatlut_invert(&shapmat->luts[0], &lut, lut.size)) {
 			goto error;
+		}
 		jas_cmshapmatlut_cleanup(&lut);
 	}
 	jas_iccattrval_destroy(graytrc);
@@ -1125,7 +1148,8 @@ error:
 	return -1;
 }
 
-static int triclr(const jas_iccprof_t *iccprof, int op, jas_cmpxformseq_t **retpxformseq)
+static int triclr(const jas_iccprof_t *iccprof, int op,
+  jas_cmpxformseq_t **retpxformseq)
 {
 	jas_iccattrval_t *trcs[3];
 	jas_iccattrval_t *cols[3];
@@ -1148,22 +1172,32 @@ static int triclr(const jas_iccprof_t *iccprof, int op, jas_cmpxformseq_t **retp
 	  !(trcs[2] = jas_iccprof_getattr(iccprof, JAS_ICC_TAG_BLUTRC)) ||
 	  !(cols[0] = jas_iccprof_getattr(iccprof, JAS_ICC_TAG_REDMATCOL)) ||
 	  !(cols[1] = jas_iccprof_getattr(iccprof, JAS_ICC_TAG_GRNMATCOL)) ||
-	  !(cols[2] = jas_iccprof_getattr(iccprof, JAS_ICC_TAG_BLUMATCOL)))
+	  !(cols[2] = jas_iccprof_getattr(iccprof, JAS_ICC_TAG_BLUMATCOL))) {
+		jas_logerrorf("error: unexpected attribute value\n");
 		goto error;
+	}
 	for (unsigned i = 0; i < 3; ++i) {
 		if (trcs[i]->type != JAS_ICC_TYPE_CURV ||
-		  cols[i]->type != JAS_ICC_TYPE_XYZ)
+		  cols[i]->type != JAS_ICC_TYPE_XYZ) {
+			jas_logerrorf("error: unexpected ICC profile type\n");
 			goto error;
+		}
 	}
-	if (!(pxform = jas_cmpxform_createshapmat()))
+	if (!(pxform = jas_cmpxform_createshapmat())) {
+		jas_logerrorf("error: jas_cmpxform_createshapmat failed\n");
 		goto error;
+	}
 	pxform->numinchans = 3;
 	pxform->numoutchans = 3;
 	shapmat = &pxform->data.shapmat;
-	if (!(pxformseq = jas_cmpxformseq_create()))
+	if (!(pxformseq = jas_cmpxformseq_create())) {
+		jas_logerrorf("error: jas_cmpxformseq_create failed\n");
 		goto error;
-	if (jas_cmpxformseq_insertpxform(pxformseq, -1, pxform))
+	}
+	if (jas_cmpxformseq_insertpxform(pxformseq, -1, pxform)) {
+		jas_logerrorf("error: jas_cmpxformseq_insertpxform failed\n");
 		goto error;
+	}
 	shapmat->mono = 0;
 	shapmat->useluts = 1;
 	shapmat->usemat = 1;
@@ -1177,8 +1211,10 @@ static int triclr(const jas_iccprof_t *iccprof, int op, jas_cmpxformseq_t **retp
 		for (unsigned i = 0; i < 3; ++i)
 			shapmat->mat[i][3] = 0.0;
 		for (unsigned i = 0; i < 3; ++i) {
-			if (jas_cmshapmatlut_set(&shapmat->luts[i], &trcs[i]->data.curv))
+			if (jas_cmshapmatlut_set(&shapmat->luts[i], &trcs[i]->data.curv)) {
+				jas_logerrorf("error: jas_cmshapmatlut_set failed\n");
 				goto error;
+			}
 		}
 	} else {
 		shapmat->order = 1;
@@ -1189,14 +1225,20 @@ static int triclr(const jas_iccprof_t *iccprof, int op, jas_cmpxformseq_t **retp
 		}
 		for (unsigned i = 0; i < 3; ++i)
 			mat[i][3] = 0.0;
-		if (jas_cmshapmat_invmat(shapmat->mat, mat))
+		if (jas_cmshapmat_invmat(shapmat->mat, mat)) {
+			jas_logerrorf("error: jas_cmshapmat_invmat failed\n");
 			goto error;
+		}
 		for (unsigned i = 0; i < 3; ++i) {
 			jas_cmshapmatlut_init(&lut);
-			if (jas_cmshapmatlut_set(&lut, &trcs[i]->data.curv))
+			if (jas_cmshapmatlut_set(&lut, &trcs[i]->data.curv)) {
+				jas_logerrorf("error: jas_cmshapmatlut_set failed\n");
 				goto error;
-			if (jas_cmshapmatlut_invert(&shapmat->luts[i], &lut, lut.size))
+			}
+			if (jas_cmshapmatlut_invert(&shapmat->luts[i], &lut, lut.size)) {
+				jas_logerrorf("error: jas_cmshapmatlut_invert failed\n");
 				goto error;
+			}
 			jas_cmshapmatlut_cleanup(&lut);
 		}
 	}
