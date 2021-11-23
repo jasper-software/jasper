@@ -204,9 +204,10 @@ endif()
 
 # I am not sure why the following line is needed for building a library, but
 # MacOSX does cannot build a shared library without this line.
-# Also, try adding MATH_LIBRARY to fix a Gentoo problem.
+# I think that this might be needed in order for a shared library to
+# be marked as having a dependency on another shared library.
 target_link_libraries(libjasper PUBLIC ${JPEG_LIBRARIES} ${HEIF_LIBRARIES}
-  ${MATH_LIBRARY})
+  ${MATH_LIBRARY} ${THREAD_LIBRARY})
 
 generate_export_header(libjasper
   EXPORT_FILE_NAME include/jasper/jas_export_cmake.h
