@@ -312,6 +312,7 @@ static void *jas_mb_get_data(jas_mb_t *mb)
 
 static jas_mb_t *jas_get_mb(void *ptr)
 {
+	assert(ptr);
 	jas_mb_t *mb = JAS_CAST(jas_mb_t *,
 	  JAS_CAST(jas_max_align_t *, ptr) - JAS_MB_ADJUST);
 	assert(mb->magic == JAS_BMA_MAGIC);
