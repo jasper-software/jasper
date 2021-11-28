@@ -456,23 +456,33 @@ static int jp2_colr_getdata(jp2_box_t *box, jas_stream_t *in)
 
 	if (jp2_getuint8(in, &colr->method) || jp2_getuint8(in, &colr->pri) ||
 	  jp2_getuint8(in, &colr->approx)) {
+		jas_logerrorf("cannot get COLR box data\n");
 		return -1;
 	}
 	switch (colr->method) {
 	case JP2_COLR_ENUM:
 		if (jp2_getuint32(in, &colr->csid)) {
+			jas_logerrorf("cannot get CSID\n");
 			return -1;
 		}
 		break;
 	case JP2_COLR_ICC:
+		if (box->datalen <= 3) {
+			jas_logerrorf("empty ICC profile data\n");
+			return -1;
+		}
+		assert(box->datalen >= 3);
 		colr->iccplen = box->datalen - 3;
-		if (colr->iccplen > 1024 * 1024)
+#if 0
+		if (colr->iccplen > 1024 * 1024) {
 			/* refuse to read ICC profiles larger than 1
 			   MB (I have no idea how large ICC profiles
 			   can get, but I believe this limit might be
 			   very pessimistic and should be lowered
 			   further) */
 			return -1;
+		}
+#endif
 		if (!(colr->iccp = jas_alloc2(colr->iccplen, sizeof(uint_fast8_t)))) {
 			return -1;
 		}

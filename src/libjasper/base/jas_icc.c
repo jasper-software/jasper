@@ -1754,6 +1754,8 @@ static unsigned jas_iccpowi(unsigned x, unsigned n)
 
 jas_iccprof_t *jas_iccprof_createfrombuf(const jas_uchar *buf, unsigned len)
 {
+	assert(buf);
+	assert(len > 0);
 	jas_stream_t *in;
 	jas_iccprof_t *prof;
 	if (!(in = jas_stream_memopen(JAS_CAST(char *, buf), len))) {
