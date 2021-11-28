@@ -349,7 +349,7 @@ debug)
 	configure_opts+=("-DCMAKE_BUILD_TYPE=Debug");;
 release)
 	configure_opts+=("-DCMAKE_BUILD_TYPE=Release");;
-relwithdebuginfo)
+relwithdebinfo)
 	configure_opts+=("-DCMAKE_BUILD_TYPE=RelWithDebInfo");;
 esac
 
