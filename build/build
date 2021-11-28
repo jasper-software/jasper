@@ -351,6 +351,8 @@ release)
 	configure_opts+=("-DCMAKE_BUILD_TYPE=Release");;
 relwithdebinfo)
 	configure_opts+=("-DCMAKE_BUILD_TYPE=RelWithDebInfo");;
+*)
+	panic "unknown build type $build_type";;
 esac
 
 if [ "$enable_shared" -ne 0 ]; then
