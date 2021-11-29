@@ -1,3 +1,11 @@
-# Consider all PNM files to be binary.
+# Consider all image files to be binary.
+*.bmp binary
+*.jp2 binary
+*.jpc binary
+*.jpg binary
+*.mif binary
+*.pgx binary
 *.pnm binary
+*.ras binary
+
 #* merge=verify
