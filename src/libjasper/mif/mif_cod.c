@@ -169,6 +169,7 @@ jas_image_t *mif_decode(jas_stream_t *in, const char *optstr)
 	tmpstream = 0;
 	data = 0;
 
+	JAS_LOGDEBUGF(10, "getting MIF header\n");
 	if (!(hdr = mif_hdr_get(in))) {
 		jas_logerrorf("cannot get MIF header\n");
 		goto error;
@@ -180,12 +181,15 @@ jas_image_t *mif_decode(jas_stream_t *in, const char *optstr)
 	}
 
 	for (cmptno = 0; cmptno < hdr->numcmpts; ++cmptno) {
+		JAS_LOGDEBUGF(10, "processing component %d of %d\n", cmptno,
+		  hdr->numcmpts);
 		cmpt = hdr->cmpts[cmptno];
 		tmpstream = cmpt->data ? jas_stream_fopen(cmpt->data, "rb") : in;
 		if (!tmpstream) {
 			jas_logerrorf("cannot open component file %s\n", cmpt->data);
 			goto error;
 		}
+		JAS_LOGDEBUGF(10, "decoding component %d\n", cmptno);
 		if (!(tmpimage = jas_image_decode(tmpstream, -1, "allow_trunc=1"))) {
 			jas_logerrorf("cannot decode image\n");
 			goto error;
@@ -214,14 +218,17 @@ jas_image_t *mif_decode(jas_stream_t *in, const char *optstr)
 		cmptparm.height = cmpt->height;
 		cmptparm.prec = cmpt->prec;
 		cmptparm.sgnd = cmpt->sgnd;
+		JAS_LOGDEBUGF(10, "adding component %d\n", cmptno);
 		if (jas_image_addcmpt(image, jas_image_numcmpts(image), &cmptparm)) {
 			jas_logerrorf("cannot add component\n");
 			goto error;
 		}
+		JAS_LOGDEBUGF(10, "copying component %d\n", cmptno);
 		if (!(data = jas_seq2d_create(0, 0, cmpt->width, cmpt->height))) {
 			jas_logerrorf("cannot create sequence\n");
 			goto error;
 		}
+		JAS_LOGDEBUGF(10, "reading component %d\n", cmptno);
 		if (jas_image_readcmpt(tmpimage, 0, 0, 0, cmpt->width, cmpt->height,
 		  data)) {
 			jas_logerrorf("cannot read component\n");
@@ -235,6 +242,7 @@ jas_image_t *mif_decode(jas_stream_t *in, const char *optstr)
 				}
 			}
 		}
+		JAS_LOGDEBUGF(10, "writing component %d\n", cmptno);
 		if (jas_image_writecmpt(image, jas_image_numcmpts(image) - 1, 0, 0,
 		  cmpt->width, cmpt->height, data)) {
 			jas_logerrorf("cannot write component\n");
@@ -499,6 +507,7 @@ static mif_hdr_t *mif_hdr_get(jas_stream_t *in)
 
 	done = false;
 	do {
+		JAS_LOGDEBUGF(10, "mif_hdr_get: top of loop\n");
 		if (!mif_getline(in, buf, sizeof(buf))) {
 			jas_logerrorf("mif_getline failed\n");
 			goto error;
@@ -536,9 +545,11 @@ static mif_hdr_t *mif_hdr_get(jas_stream_t *in)
 		}
 	} while (!done);
 
+	JAS_LOGDEBUGF(10, "mif_hdr_get: returning (success)\n");
 	return hdr;
 
 error:
+	JAS_LOGDEBUGF(10, "mif_hdr_get: returning (failure)\n");
 	if (hdr) {
 		mif_hdr_destroy(hdr);
 	}
