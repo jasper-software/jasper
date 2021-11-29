@@ -4,8 +4,10 @@
 *.jpc binary
 *.jpg binary
 *.mif binary
+*.mif0 binary
 *.pgx binary
 *.pnm binary
 *.ras binary
+*.icm binary
 
 #* merge=verify
