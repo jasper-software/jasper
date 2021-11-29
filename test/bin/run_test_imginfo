@@ -11,7 +11,7 @@ if [ "$debug_level" -ge 1 ]; then
 	set -xv
 	imginfo_debug_level=20
 fi
-imginfo_debug_level=20
+#imginfo_debug_level=20
 
 ################################################################################
 
