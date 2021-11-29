@@ -250,6 +250,8 @@ elseif(CMAKE_C_COMPILER_ID STREQUAL "MSVC")
 	add_compile_options(/wd4018)
 	# function may be unsafe (e.g., sprintf, strncat)
 	add_compile_options(/wd4996)
+	# avoid bogus warnings from some MSVC header files
+	add_compile_options(/Wv:18)
 	if(JAS_STRICT)
 		# Treat all compiler warnings as errors.
 		add_compile_options(/WX)
