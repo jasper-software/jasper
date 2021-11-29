@@ -172,7 +172,7 @@ jas_image_t *ras_decode(jas_stream_t *in, const char *optstr)
 
 	image = 0;
 
-	JAS_LOGDEBUGF(10, "ras_decode(%p, %p, \"%s\"\n", in, optstr ? optstr : "");
+	JAS_LOGDEBUGF(10, "ras_decode(%p, \"%s\")\n", in, (optstr ? optstr : ""));
 
 	if (ras_dec_parseopts(optstr, &opts)) {
 		goto error;
