@@ -397,8 +397,11 @@ int mif_validate(jas_stream_t *in)
 
 	/* Read the validation data (i.e., the data used for detecting
 	  the format). */
-	if (jas_stream_peek(in, buf, sizeof(buf)) != sizeof(buf))
+	if (jas_stream_peek(in, buf, sizeof(buf)) != sizeof(buf)) {
+		JAS_LOGDEBUGF(10, "mif_validate peek failed\n");
 		return -1;
+	}
+
 
 	/* Compute the signature value. */
 	magic = (JAS_CAST(uint_fast32_t, buf[0]) << 24) |
@@ -408,6 +411,8 @@ int mif_validate(jas_stream_t *in)
 
 	/* Ensure that the signature is correct for this format. */
 	if (magic != MIF_MAGIC) {
+		JAS_LOGDEBUGF(10, "mif_validate magic mismatch %x %x\n", magic,
+		  MIF_MAGIC);
 		return -1;
 	}
 
