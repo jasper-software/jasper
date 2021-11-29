@@ -252,6 +252,8 @@ elseif(CMAKE_C_COMPILER_ID STREQUAL "MSVC")
 	add_compile_options(/wd4996)
 	# avoid bogus warnings from some MSVC header files
 	add_compile_options(/Wv:18)
+	# allow some kinds of narrowing conversions
+	add_compile_options(/wd4267)
 	if(JAS_STRICT)
 		# Treat all compiler warnings as errors.
 		add_compile_options(/WX)
