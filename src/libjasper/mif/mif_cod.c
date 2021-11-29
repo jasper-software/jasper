@@ -160,8 +160,11 @@ jas_image_t *mif_decode(jas_stream_t *in, const char *optstr)
 	int_fast32_t y;
 	int bias;
 
+	JAS_LOGDEBUGF(10, "mif_decode(%p, \"%s\")\n", image,
+	  (optstr ? optstr : ""));
+
 	/* Avoid warnings about unused parameters. */
-	(void)optstr;
+	JAS_UNUSED(optstr);
 
 	hdr = 0;
 	image = 0;
@@ -296,6 +299,9 @@ int mif_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 	int_fast32_t y;
 	int bias;
 
+	JAS_LOGDEBUGF(10, "mif_encode(%p, %p, \"%s\")\n", image, out,
+	  (optstr ? optstr : ""));
+
 	hdr = 0;
 	tmpimage = 0;
 	data = 0;
@@ -401,6 +407,8 @@ int mif_validate(jas_stream_t *in)
 	jas_uchar buf[MIF_MAGICLEN];
 	uint_fast32_t magic;
 
+	JAS_LOGDEBUGF(10, "mif_validate(%p)\n", in);
+
 	assert(JAS_STREAM_MAXPUTBACK >= MIF_MAGICLEN);
 
 	/* Read the validation data (i.e., the data used for detecting
@@ -433,6 +441,8 @@ int mif_validate(jas_stream_t *in)
 
 static mif_hdr_t *mif_hdr_create(int maxcmpts)
 {
+	JAS_LOGDEBUGF(10, "mif_hdr_create(%d)\n", maxcmpts);
+
 	mif_hdr_t *hdr;
 	if (!(hdr = jas_malloc(sizeof(mif_hdr_t)))) {
 		return 0;
@@ -449,6 +459,7 @@ static mif_hdr_t *mif_hdr_create(int maxcmpts)
 
 static void mif_hdr_destroy(mif_hdr_t *hdr)
 {
+	JAS_LOGDEBUGF(10, "mif_hdr_destroy(%p)\n", hdr);
 	int cmptno;
 	if (hdr->cmpts) {
 		for (cmptno = 0; cmptno < hdr->numcmpts; ++cmptno) {
@@ -461,6 +472,8 @@ static void mif_hdr_destroy(mif_hdr_t *hdr)
 
 static int mif_hdr_growcmpts(mif_hdr_t *hdr, int maxcmpts)
 {
+	JAS_LOGDEBUGF(10, "mif_hdr_growcmpts(%p, %d)\n", hdr, maxcmpts);
+
 	int cmptno;
 	mif_cmpt_t **newcmpts;
 	assert(maxcmpts >= hdr->numcmpts);
@@ -486,6 +499,8 @@ static mif_hdr_t *mif_hdr_get(jas_stream_t *in)
 	jas_tvparser_t *tvp;
 	int id;
 
+	JAS_LOGDEBUGF(10, "mif_hdr_get(%p)\n", in);
+
 	hdr = 0;
 	tvp = 0;
 
@@ -496,7 +511,7 @@ static mif_hdr_t *mif_hdr_get(jas_stream_t *in)
 	if (magicbuf[0] != (MIF_MAGIC >> 24) || magicbuf[1] != ((MIF_MAGIC >> 16) &
 	  0xff) || magicbuf[2] != ((MIF_MAGIC >> 8) & 0xff) || magicbuf[3] !=
 	  (MIF_MAGIC & 0xff)) {
-		jas_logerrorf("error: bad signature\n");
+		jas_logerrorf("bad signature\n");
 		goto error;
 	}
 
@@ -507,9 +522,9 @@ static mif_hdr_t *mif_hdr_get(jas_stream_t *in)
 
 	done = false;
 	do {
-		JAS_LOGDEBUGF(10, "mif_hdr_get: top of loop\n");
+		JAS_LOGDEBUGF(10, "top of loop\n");
 		if (!mif_getline(in, buf, sizeof(buf))) {
-			jas_logerrorf("mif_getline failed\n");
+			jas_logerrorf("mif_hdr_get: mif_getline failed\n");
 			goto error;
 		}
 		if (buf[0] == '\0') {
@@ -517,13 +532,15 @@ static mif_hdr_t *mif_hdr_get(jas_stream_t *in)
 		}
 		JAS_LOGDEBUGF(10, "header line: len=%d; %s\n", strlen(buf), buf);
 		if (!(tvp = jas_tvparser_create(buf))) {
-			jas_logerrorf("jas_tvparser_create failed\n");
+			jas_logerrorf("mif_hdr_get: jas_tvparser_create failed\n");
 			goto error;
 		}
+		JAS_LOGDEBUGF(10, "mif_hdr_get: invoking jas_tvparser_next\n");
 		if (jas_tvparser_next(tvp)) {
 			jas_logerrorf("cannot get record type\n");
 			goto error;
 		}
+		JAS_LOGDEBUGF(10, "mif_hdr_get: looking up tag\n");
 		id = jas_taginfo_nonull(jas_taginfos_lookup(mif_tags2,
 		  jas_tvparser_gettag(tvp)))->id;
 		jas_tvparser_destroy(tvp);
@@ -567,6 +584,8 @@ static int mif_process_cmpt(mif_hdr_t *hdr, char *buf)
 
 	cmpt = 0;
 	tvp = 0;
+
+	JAS_LOGDEBUGF(10, "mif_process_cmpt(%p, %p)\n", hdr, buf);
 
 	if (!(cmpt = mif_cmpt_create())) {
 		jas_logerrorf("cannot create component\n");
@@ -643,6 +662,8 @@ static int mif_process_cmpt(mif_hdr_t *hdr, char *buf)
 		goto error;
 	}
 	jas_tvparser_destroy(tvp);
+
+	JAS_LOGDEBUGF(10, "mif_process_cmpt returning (success)\n");
 	return 0;
 
 error:
@@ -652,6 +673,7 @@ error:
 	if (tvp) {
 		jas_tvparser_destroy(tvp);
 	}
+	JAS_LOGDEBUGF(10, "mif_process_cmpt returning (error)\n");
 	return -1;
 }
 
@@ -659,6 +681,8 @@ static int mif_hdr_put(mif_hdr_t *hdr, jas_stream_t *out)
 {
 	int cmptno;
 	mif_cmpt_t *cmpt;
+
+	JAS_LOGDEBUGF(10, "mif_hdr_put(%p, %p)\n", hdr, out);
 
 	/* Output signature. */
 	if (jas_stream_putc(out, (MIF_MAGIC >> 24) & 0xff) == EOF ||
@@ -689,7 +713,9 @@ static int mif_hdr_put(mif_hdr_t *hdr, jas_stream_t *out)
 static int mif_hdr_addcmpt(mif_hdr_t *hdr, int cmptno, mif_cmpt_t *cmpt)
 {
 	assert(cmptno >= hdr->numcmpts);
-	(void)cmptno;
+
+	JAS_LOGDEBUGF(10, "mif_hdr_addcmpt(%p, %d, %p)\n", hdr, cmptno, cmpt);
+	JAS_UNUSED(cmptno);
 
 	if (hdr->numcmpts >= hdr->maxcmpts) {
 		if (mif_hdr_growcmpts(hdr, hdr->numcmpts + 128)) {
@@ -707,6 +733,7 @@ static int mif_hdr_addcmpt(mif_hdr_t *hdr, int cmptno, mif_cmpt_t *cmpt)
 
 static mif_cmpt_t *mif_cmpt_create()
 {
+	JAS_LOGDEBUGF(10, "mif_cmpt_create()\n");
 	mif_cmpt_t *cmpt;
 	if (!(cmpt = jas_malloc(sizeof(mif_cmpt_t)))) {
 		return 0;
@@ -717,6 +744,7 @@ static mif_cmpt_t *mif_cmpt_create()
 
 static void mif_cmpt_destroy(mif_cmpt_t *cmpt)
 {
+	JAS_LOGDEBUGF(10, "mif_cmpt_destroy(%p)\n", cmpt);
 	if (cmpt->data) {
 		jas_free(cmpt->data);
 	}
@@ -732,6 +760,8 @@ static char *mif_getline(jas_stream_t *stream, char *buf, int bufsize)
 	int c;
 	char *bufptr;
 	assert(bufsize > 0);
+
+	JAS_LOGDEBUGF(10, "mif_getline(%p, %p, %d)\n", stream, buf, bufsize);
 
 	bufptr = buf;
 	while (bufsize > 1) {
@@ -756,6 +786,8 @@ static int mif_getc(jas_stream_t *in)
 {
 	int c;
 	bool done;
+
+	JAS_LOGDEBUGF(10, "mif_getc(%p)\n", in);
 
 	done = false;
 	do {
@@ -786,6 +818,8 @@ static int mif_getc(jas_stream_t *in)
 		}
 	} while (!done);
 
+	JAS_LOGDEBUGF(10, "mif_getc(%p) returning %d\n", in, c);
+
 	return c;
 }
 
@@ -798,6 +832,8 @@ static mif_hdr_t *mif_makehdrfromimage(jas_image_t *image)
 	mif_hdr_t *hdr;
 	int cmptno;
 	mif_cmpt_t *cmpt;
+
+	JAS_LOGDEBUGF(10, "mif_makehdrfromimage(%p)\n", image);
 
 	if (!(hdr = mif_hdr_create(jas_image_numcmpts(image)))) {
 		return 0;
