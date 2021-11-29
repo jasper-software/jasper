@@ -482,6 +482,7 @@ static mif_hdr_t *mif_hdr_get(jas_stream_t *in)
 	tvp = 0;
 
 	if (jas_stream_read(in, magicbuf, MIF_MAGICLEN) != MIF_MAGICLEN) {
+		jas_logerrorf("cannot read MIF signature\n");
 		goto error;
 	}
 	if (magicbuf[0] != (MIF_MAGIC >> 24) || magicbuf[1] != ((MIF_MAGIC >> 16) &
@@ -492,6 +493,7 @@ static mif_hdr_t *mif_hdr_get(jas_stream_t *in)
 	}
 
 	if (!(hdr = mif_hdr_create(0))) {
+		jas_logerrorf("cannot create MIF header\n");
 		goto error;
 	}
 

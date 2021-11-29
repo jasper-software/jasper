@@ -191,6 +191,14 @@ for in_file in "${bad_list[@]}"; do
 		max_samples=0;;
 	esac
 
+	# The following allows for extra debugging for certain specific test cases.
+	imginfo_debug_level=
+	case "$name" in
+	*abort*)
+		imginfo_debug_level=20
+		;;
+	esac
+
 	echo "Input file: $in_file"
 	case "$name" in
 	*.jpg)
@@ -199,6 +207,10 @@ for in_file in "${bad_list[@]}"; do
 	esac
 	imginfo_opts=()
 	imginfo_opts+=(--max-samples "$max_samples")
+	if [ -n "$imginfo_debug_level" ]; then
+		echo "Setting imginfo debug level to $imginfo_debug_level"
+		imginfo_opts+=(--debug-level "$imginfo_debug_level")
+	fi
 	special_asan_options=()
 	special_asan_options+=(exitcode=10)
 	special_asan_options+=(allocator_may_return_null=true)
