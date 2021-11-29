@@ -96,9 +96,14 @@ if [ "$crostini" -ne 0 ]; then
 fi
 global_options+=(--debug-level "$debug_level")
 lsan_option=(--lsan)
+asan_option=(--asan)
 case "$os" in
 macos)
-	lsan_option=();;
+	lsan_option=()
+	;;
+windows)
+	asan_option=()
+	;;
 esac
 
 ################################################################################
@@ -130,7 +135,7 @@ for multithread in 0 1; do
 	command+=(--static)
 	command+=(--debug)
 	command+=(--ubsan)
-	command+=(--asan)
+	command+=("${asan_option[@]}")
 	command+=("${lsan_option[@]}")
 	command+=(--test)
 	command+=(--install)
@@ -170,7 +175,7 @@ for multithread in 0 1; do
 	command+=(--static)
 	command+=(--debug)
 	command+=(--ubsan)
-	command+=(--asan)
+	command+=("${asan_option[@]}")
 	command+=("${lsan_option[@]}")
 	command+=(--test)
 	command+=(--install)
