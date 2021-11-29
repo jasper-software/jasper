@@ -170,10 +170,12 @@ jas_image_t *mif_decode(jas_stream_t *in, const char *optstr)
 	data = 0;
 
 	if (!(hdr = mif_hdr_get(in))) {
+		jas_logerrorf("cannot get MIF header\n");
 		goto error;
 	}
 
 	if (!(image = jas_image_create0())) {
+		jas_logerrorf("cannot create image\n");
 		goto error;
 	}
 
@@ -185,6 +187,7 @@ jas_image_t *mif_decode(jas_stream_t *in, const char *optstr)
 			goto error;
 		}
 		if (!(tmpimage = jas_image_decode(tmpstream, -1, "allow_trunc=1"))) {
+			jas_logerrorf("cannot decode image\n");
 			goto error;
 		}
 		if (tmpstream != in) {
@@ -212,13 +215,16 @@ jas_image_t *mif_decode(jas_stream_t *in, const char *optstr)
 		cmptparm.prec = cmpt->prec;
 		cmptparm.sgnd = cmpt->sgnd;
 		if (jas_image_addcmpt(image, jas_image_numcmpts(image), &cmptparm)) {
+			jas_logerrorf("cannot add component\n");
 			goto error;
 		}
 		if (!(data = jas_seq2d_create(0, 0, cmpt->width, cmpt->height))) {
+			jas_logerrorf("cannot create sequence\n");
 			goto error;
 		}
 		if (jas_image_readcmpt(tmpimage, 0, 0, 0, cmpt->width, cmpt->height,
 		  data)) {
+			jas_logerrorf("cannot read component\n");
 			goto error;
 		}
 		if (cmpt->sgnd) {
@@ -231,6 +237,7 @@ jas_image_t *mif_decode(jas_stream_t *in, const char *optstr)
 		}
 		if (jas_image_writecmpt(image, jas_image_numcmpts(image) - 1, 0, 0,
 		  cmpt->width, cmpt->height, data)) {
+			jas_logerrorf("cannot write component\n");
 			goto error;
 		}
 		jas_seq2d_destroy(data);
@@ -295,9 +302,11 @@ int mif_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 	}
 
 	if (!(hdr = mif_makehdrfromimage(image))) {
+		jas_logerrorf("cannot make MIF header\n");
 		goto error;
 	}
 	if (mif_hdr_put(hdr, out)) {
+		jas_logerrorf("cannot write MIF header\n");
 		goto error;
 	}
 
@@ -306,6 +315,7 @@ int mif_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 		cmpt = hdr->cmpts[cmptno];
 		if (!cmpt->data) {
 			if (!(tmpimage = jas_image_create0())) {
+				jas_logerrorf("cannot create image\n");
 				goto error;
 			}	
 			cmptparm.tlx = 0;
@@ -318,16 +328,19 @@ int mif_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 			cmptparm.sgnd = false;
 			if (jas_image_addcmpt(tmpimage, jas_image_numcmpts(tmpimage),
 			  &cmptparm)) {
+				jas_logerrorf("cannot add component\n");
 				goto error;
 			}
 			jas_image_setclrspc(tmpimage, JAS_CLRSPC_SGRAY);
 			jas_image_setcmpttype(tmpimage, 0,
 			  JAS_IMAGE_CT_COLOR(JAS_CLRSPC_CHANIND_GRAY_Y));
 			if (!(data = jas_seq2d_create(0, 0, cmpt->width, cmpt->height))) {
+				jas_logerrorf("cannot create sequence\n");
 				goto error;
 			}
 			if (jas_image_readcmpt(image, cmptno, 0, 0, cmpt->width,
 			  cmpt->height, data)) {
+				jas_logerrorf("cannot read component\n");
 				goto error;
 			}
 			if (cmpt->sgnd) {
@@ -340,11 +353,13 @@ int mif_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 			}
 			if (jas_image_writecmpt(tmpimage, 0, 0, 0, cmpt->width,
 			  cmpt->height, data)) {
+				jas_logerrorf("cannot write component\n");
 				goto error;
 			}
 			jas_seq2d_destroy(data);
 			data = 0;
 			if (jas_image_encode(tmpimage, out, fmt, 0)) {
+				jas_logerrorf("cannot encode image\n");
 				goto error;
 			}
 			jas_image_destroy(tmpimage);

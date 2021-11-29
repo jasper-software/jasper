@@ -9,7 +9,9 @@ source "$cmd_dir"/utilities || exit 1
 debug_level="${JAS_DEBUG_LEVEL:-0}"
 if [ "$debug_level" -ge 1 ]; then
 	set -xv
+	imginfo_debug_level=20
 fi
+imginfo_debug_level=20
 
 ################################################################################
 
@@ -44,9 +46,9 @@ if [ "$verbose" -ge 2 ]; then
 		echo "    $format"
 	done
 fi
-has_jpg=$(is_supported_format jpg) || panic
-has_mif=$(is_supported_format mif) || panic
-#has_png=$(is_supported_format png) || panic
+has_jpg=$(is_supported_format jpg) || panic "cannot check if JPG supported"
+has_mif=$(is_supported_format mif) || panic "cannot check if MIF supported"
+#has_png=$(is_supported_format png) || panic "cannot check if PNG supported"
 if [ "$verbose" -ge 1 ]; then
 	echo "JPG: $has_jpg"
 	echo "MIF: $has_mif"
@@ -94,11 +96,15 @@ while IFS= read -r line; do
 		continue
 	fi
 
+	imginfo_options=()
+	if [ -n "$imginfo_debug_level" ]; then
+		imginfo_options+=(--debug-level "$imginfo_debug_level")
+	fi
 	image_file="$data_dir/$file"
 	if [ "$verbose" -ge 2 ]; then
 		echo "Running $imginfo < $image_file"
 	fi
-	buffer=$("$imginfo" < "$image_file")
+	buffer=$("$imginfo" "${imginfo_options[@]}" < "$image_file")
 	status=$?
 	if [ "$status" -ne 0 ]; then
 		failed_tests+=("$file")
