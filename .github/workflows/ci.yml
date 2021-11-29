@@ -9,7 +9,7 @@ jobs:
         os: [ubuntu-latest, macos-latest]
         compiler: [gcc, clang]
         include:
-          - os: [windows-2016]
+          - os: [windows-2019]
       fail-fast: false
     runs-on: ${{ matrix.os }}
     steps:
