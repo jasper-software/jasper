@@ -1728,7 +1728,8 @@ static char *jas_iccsigtostr(unsigned sig, char *buf)
 	bufptr = buf;
 	for (unsigned n = 4; n > 0; --n) {
 		c = (sig >> 24) & 0xff;
-		if (isalpha(c) || isdigit(c)) {
+		if (isalpha(JAS_CAST(unsigned char, c)) ||
+		  isdigit(JAS_CAST(unsigned char, c))) {
 			*bufptr++ = c;
 		}
 		sig <<= 8;

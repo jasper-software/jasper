@@ -551,11 +551,11 @@ static int pnm_getuintstr(jas_stream_t *in, uint_fast32_t *val)
 		if ((c = pnm_getc(in)) == EOF) {
 			return -1;
 		}
-	} while (isspace(c));
+	} while (isspace(JAS_CAST(unsigned char, c)));
 
 	/* Parse the number. */
 	v = 0;
-	while (isdigit(c)) {
+	while (isdigit(JAS_CAST(unsigned char, c))) {
 		v = 10 * v + c - '0';
 		if ((c = pnm_getc(in)) < 0) {
 			return -1;
@@ -563,7 +563,7 @@ static int pnm_getuintstr(jas_stream_t *in, uint_fast32_t *val)
 	}
 
 	/* The number must be followed by whitespace. */
-	if (!isspace(c)) {
+	if (!isspace(JAS_CAST(unsigned char, c))) {
 		return -1;
 	}
 
@@ -584,7 +584,7 @@ static int pnm_getsintstr(jas_stream_t *in, int_fast32_t *val)
 		if ((c = pnm_getc(in)) == EOF) {
 			return -1;
 		}
-	} while (isspace(c));
+	} while (isspace(JAS_CAST(unsigned char, c)));
 
 	/* Get the number, allowing for a negative sign. */
 	s = 1;
@@ -599,7 +599,7 @@ static int pnm_getsintstr(jas_stream_t *in, int_fast32_t *val)
 		}
 	}
 	v = 0;
-	while (isdigit(c)) {
+	while (isdigit(JAS_CAST(unsigned char, c))) {
 		v = 10 * v + c - '0';
 		if ((c = pnm_getc(in)) < 0) {
 			return -1;
@@ -607,7 +607,7 @@ static int pnm_getsintstr(jas_stream_t *in, int_fast32_t *val)
 	}
 
 	/* The number must be followed by whitespace. */
-	if (!isspace(c)) {
+	if (!isspace(JAS_CAST(unsigned char, c))) {
 		return -1;
 	}
 

@@ -274,7 +274,7 @@ static int pgx_gethdr(jas_stream_t *in, pgx_hdr_t *hdr)
 		jas_logerrorf("invalid PGX signature\n");
 		goto error;
 	}
-	if ((c = pgx_getc(in)) == EOF || !isspace(c)) {
+	if ((c = pgx_getc(in)) == EOF || !isspace(JAS_CAST(unsigned char, c))) {
 		goto error;
 	}
 	if (pgx_getbyteorder(in, &hdr->bigendian)) {
@@ -398,7 +398,7 @@ static int pgx_getbyteorder(jas_stream_t *in, bool *bigendian)
 		if ((c = pgx_getc(in)) == EOF) {
 			return -1;
 		}
-	} while (isspace(c));
+	} while (isspace(JAS_CAST(unsigned char, c)));
 
 	buf[0] = c;
 	if ((c = pgx_getc(in)) == EOF) {
@@ -413,7 +413,7 @@ static int pgx_getbyteorder(jas_stream_t *in, bool *bigendian)
 		goto error;
 	}
 
-	while ((c = pgx_getc(in)) != EOF && !isspace(c)) {
+	while ((c = pgx_getc(in)) != EOF && !isspace(JAS_CAST(unsigned char, c))) {
 		;
 	}
 	if (c == EOF) {
@@ -433,7 +433,7 @@ static int pgx_getsgnd(jas_stream_t *in, bool *sgnd)
 		if ((c = pgx_getc(in)) == EOF) {
 			return -1;
 		}
-	} while (isspace(c));
+	} while (isspace(JAS_CAST(unsigned char, c)));
 
 #if 0
 	if (c == '+') {
@@ -448,7 +448,7 @@ static int pgx_getsgnd(jas_stream_t *in, bool *sgnd)
 		return 0;
 	}
 
-	while ((c = pgx_getc(in)) != EOF && !isspace(c)) {
+	while ((c = pgx_getc(in)) != EOF && !isspace(JAS_CAST(unsigned char, c))) {
 		;
 	}
 	if (c == EOF) {
@@ -457,7 +457,8 @@ static int pgx_getsgnd(jas_stream_t *in, bool *sgnd)
 #else
 	if (c == '+' || c == '-') {
 		*sgnd = (c == '-');
-		while ((c = pgx_getc(in)) != EOF && !isspace(c)) {
+		while ((c = pgx_getc(in)) != EOF && !isspace(JAS_CAST(unsigned char,
+		  c))) {
 			;
 		}
 		if (c == EOF) {
@@ -486,16 +487,16 @@ static int pgx_getuint32(jas_stream_t *in, uint_fast32_t *val)
 		if ((c = pgx_getc(in)) == EOF) {
 			return -1;
 		}
-	} while (isspace(c));
+	} while (isspace(JAS_CAST(unsigned char, c)));
 
 	v = 0;
-	while (isdigit(c)) {
+	while (isdigit(JAS_CAST(unsigned char, c))) {
 		v = 10 * v + c - '0';
 		if ((c = pgx_getc(in)) < 0) {
 			return -1;
 		}
 	}
-	if (!isspace(c)) {
+	if (!isspace(JAS_CAST(unsigned char, c))) {
 		return -1;
 	}
 	*val = v;
