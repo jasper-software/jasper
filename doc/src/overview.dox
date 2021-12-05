@@ -312,7 +312,7 @@ The function has the following signature:
   - `int (*vlogprintf)(jas_logtype_t type, const char *format, va_list ap);`
 
     The function formats and outputs a log message.
-    The interface of this function is somewhat similar to to vprintf.
+    The interface of this function is somewhat similar to vprintf.
     In addition to a format string and items used for formatting, the
     function also takes a specification of the type of message being
     generated (e.g., error, warning, etc.).
