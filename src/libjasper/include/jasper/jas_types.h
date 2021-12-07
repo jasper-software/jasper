@@ -144,6 +144,18 @@ extern "C" {
 #define	jas_max_align_t	long double
 #endif
 
+#if defined(JAS_HAVE_UINTMAX_T)
+#define jas_uintmax_t uintmax_t
+#else
+#define jas_uintmax_t uint_fast64_t
+#endif
+
+#if defined(JAS_HAVE_INTMAX_T)
+#define jas_intmax_t intmax_t
+#else
+#define jas_intmax_t int_fast64_t
+#endif
+
 #ifdef __cplusplus
 }
 #endif

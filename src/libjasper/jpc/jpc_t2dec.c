@@ -454,7 +454,8 @@ int jpc_dec_decodepkts(jpc_dec_t *dec, jas_stream_t *pkthdrstream, jas_stream_t 
 	tile = dec->curtile;
 	pi = tile->pi;
 	for (;;) {
-		if (!tile->pkthdrstream || jas_stream_peekc(tile->pkthdrstream) == EOF) {
+		if (!tile->pkthdrstream ||
+		  jas_stream_peekc(tile->pkthdrstream) == EOF) {
 			switch (jpc_dec_lookahead(in)) {
 			case JPC_MS_EOC:
 			case JPC_MS_SOT:
@@ -464,10 +465,14 @@ int jpc_dec_decodepkts(jpc_dec_t *dec, jas_stream_t *pkthdrstream, jas_stream_t 
 			case 0:
 				break;
 			default:
+				jas_logerrorf("jpc_dec_lookahead failed\n");
 				return -1;
 			}
 		}
 		if ((ret = jpc_pi_next(pi))) {
+			if (ret < 0) {
+				jas_logerrorf("jpc_pi_next failed\n");
+			}
 			return ret;
 		}
 		if (dec->maxpkts >= 0 && dec->numpkts >= (unsigned)dec->maxpkts) {
@@ -482,6 +487,7 @@ int jpc_dec_decodepkts(jpc_dec_t *dec, jas_stream_t *pkthdrstream, jas_stream_t 
 		}
 		if (jpc_dec_decodepkt(dec, pkthdrstream, in, jpc_pi_cmptno(pi),
 		  jpc_pi_rlvlno(pi), jpc_pi_prcno(pi), jpc_pi_lyrno(pi))) {
+			jas_logerrorf("jpc_dec_decodepkt failed\n");
 			return -1;
 		}
 		++dec->numpkts;

@@ -77,6 +77,7 @@
 
 #include "jasper/jas_math.h"
 #include "jasper/jas_malloc.h"
+#include "jasper/jas_debug.h"
 
 #include <assert.h>
 
@@ -109,11 +110,14 @@ int jpc_pi_next(jpc_pi_t *pi)
 			pi->prcno = 0;
 			pi->lyrno = 0;
 			pi->prgvolfirst = true;
-			if ((unsigned)pi->pchgno < jpc_pchglist_numpchgs(pi->pchglist)) {
+			if (JAS_CAST(unsigned, pi->pchgno) <
+			  jpc_pchglist_numpchgs(pi->pchglist)) {
 				pi->pchg = jpc_pchglist_get(pi->pchglist, pi->pchgno);
-			} else if ((unsigned)pi->pchgno == jpc_pchglist_numpchgs(pi->pchglist)) {
+			} else if (JAS_CAST(unsigned, pi->pchgno) ==
+			  jpc_pchglist_numpchgs(pi->pchglist)) {
 				pi->pchg = &pi->defaultpchg;
 			} else {
+				JAS_LOGDEBUGF(10, "jpc_pi_next returning 1\n");
 				return 1;
 			}
 		}
@@ -274,9 +278,11 @@ static int jpc_pi_nextrpcl(register jpc_pi_t *pi)
 		pi->prgvolfirst = 0;
 	}
 
-	if (pi->xstep == 0 || pi->ystep == 0)
+	if (pi->xstep == 0 || pi->ystep == 0) {
 		/* avoid division by zero */
+		jas_logerrorf("xstep and ystep must be nonzero\n");
 		return -1;
+	}
 
 	for (pi->rlvlno = pchg->rlvlnostart; pi->rlvlno < pchg->rlvlnoend &&
 	  pi->rlvlno < pi->maxrlvls; ++pi->rlvlno) {
@@ -378,9 +384,11 @@ static int jpc_pi_nextpcrl(register jpc_pi_t *pi)
 		pi->prgvolfirst = 0;
 	}
 
-	if (pi->xstep == 0 || pi->ystep == 0)
+	if (pi->xstep == 0 || pi->ystep == 0) {
 		/* avoid division by zero */
+		jas_logerrorf("xstep and ystep must be nonzero\n");
 		return -1;
+	}
 
 	for (pi->y = pi->ystart; pi->y < pi->yend; pi->y += pi->ystep -
 	  (pi->y % pi->ystep)) {
@@ -453,9 +461,11 @@ static int jpc_pi_nextcprl(register jpc_pi_t *pi)
 		pi->prgvolfirst = 0;
 	}
 
-	if (pi->xstep == 0 || pi->ystep == 0)
-		/* avoid division by zero */
+	if (pi->xstep == 0 || pi->ystep == 0) {
+		/* avoid later division by zero */
+		jas_logerrorf("xstep and ystep must be nonzero\n");
 		return -1;
+	}
 
 	for (pi->compno = pchg->compnostart, pi->picomp = &pi->picomps[pi->compno];
 	  pi->compno < pchg->compnoend && pi->compno < pi->numcomps;
@@ -466,6 +476,7 @@ static int jpc_pi_nextcprl(register jpc_pi_t *pi)
 		  JAS_UINTFAST32_NUMBITS - 2 ||
 		  pirlvl->prcheightexpn + pi->picomp->numrlvls >
 		  JAS_UINTFAST32_NUMBITS - 2) {
+			jas_logerrorf("overflow detected\n");
 			return -1;
 		}
 		pi->xstep = pi->picomp->hsamp * (JAS_CAST(uint_fast32_t, 1) <<
@@ -474,12 +485,37 @@ static int jpc_pi_nextcprl(register jpc_pi_t *pi)
 		  (pirlvl->prcheightexpn + pi->picomp->numrlvls - 1));
 		for (rlvlno = 1, pirlvl = &pi->picomp->pirlvls[1];
 		  rlvlno < pi->picomp->numrlvls; ++rlvlno, ++pirlvl) {
+			/* Perform the following calculation in an overflow-safe manner,
+			setting the result to zero upon overflow:
 			pi->xstep = JAS_MIN(pi->xstep, pi->picomp->hsamp *
 			  (JAS_CAST(uint_fast32_t, 1) << (pirlvl->prcwidthexpn +
 			  pi->picomp->numrlvls - rlvlno - 1)));
+			*/
+			pi->xstep = JAS_MIN(pi->xstep, jas_safeui64_to_int(
+			  jas_safeui64_mul(
+			    jas_safeui64_from_intmax(pi->picomp->hsamp),
+			    jas_safeui64_pow2_intmax(pirlvl->prcwidthexpn +
+			      pi->picomp->numrlvls - rlvlno - 1)), 0));
+			if (!pi->xstep) {
+				jas_logerrorf("overflow in x-step calculation\n");
+				return -1;
+			}
+
+			/* Perform the following calculation in an overflow-safe manner,
+			setting the result to zero upon overflow:
 			pi->ystep = JAS_MIN(pi->ystep, pi->picomp->vsamp *
 			  (JAS_CAST(uint_fast32_t, 1) << (pirlvl->prcheightexpn +
 			  pi->picomp->numrlvls - rlvlno - 1)));
+			*/
+			pi->ystep = JAS_MIN(pi->ystep, jas_safeui64_to_int(
+			  jas_safeui64_mul(
+			    jas_safeui64_from_intmax(pi->picomp->vsamp),
+			    jas_safeui64_pow2_intmax(pirlvl->prcheightexpn +
+			      pi->picomp->numrlvls - rlvlno - 1)), 0));
+			if (!pi->ystep) {
+				jas_logerrorf("overflow in y-step calculation\n");
+				return -1;
+			}
 		}
 		for (pi->y = pi->ystart; pi->y < pi->yend;
 		  pi->y += pi->ystep - (pi->y % pi->ystep)) {

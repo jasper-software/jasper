@@ -103,6 +103,7 @@ os=
 use_jas_init=0
 enable_strict=0
 cmake_generator=
+enable_32bit=0
 
 while [ $# -gt 0 ]; do
 	option="$1"
@@ -260,6 +261,10 @@ while [ $# -gt 0 ]; do
 			shift 1;;
 		esac
 		;;
+	--32bit)
+		shift 1
+		enable_32bit=1
+		;;
 	--help)
 		usage
 		;;
@@ -375,6 +380,9 @@ if [ "$enable_ubsan" -ne 0 ]; then
 fi
 if [ "$enable_msan" -ne 0 ]; then
 	configure_opts+=("-DJAS_ENABLE_MSAN=true")
+fi
+if [ "$enable_32bit" -ne 0 ]; then
+	configure_opts+=("-DJAS_ENABLE_32BIT=true")
 fi
 
 configure_opts+=("-DJAS_ENABLE_DANGEROUS_INTERNAL_TESTING_MODE=true")
