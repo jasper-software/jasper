@@ -26,11 +26,9 @@ set(man_pages "${man_pages}" imgcmp.1)
 # The jiv program (which requires GLUT)
 if(JAS_HAVE_OPENGL)
 	add_executable(jiv jiv.c)
-	target_include_directories(jiv PUBLIC
-	  ${GLUT_INCLUDE_DIR} ${OPENGL_INCLUDE_DIR})
 	target_link_libraries(jiv libjasper
-	  ${JPEG_LIBRARIES} ${HEIF_LIBRARIES} ${GLUT_LIBRARIES}
-	  ${OPENGL_LIBRARIES} ${MATH_LIBRARY} ${THREAD_LIBRARY})
+	  ${JPEG_LIBRARIES} ${HEIF_LIBRARIES} ${JAS_OPENGL_TARGETS}
+	  ${JAS_OPENGL_TARGETS} ${MATH_LIBRARY} ${THREAD_LIBRARY})
 	set(programs "${programs}" jiv)
 	set(man_pages "${man_pages}" jiv.1)
 else()
