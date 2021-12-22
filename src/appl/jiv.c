@@ -71,6 +71,8 @@
 
 #if defined(JAS_HAVE_GL_GLUT_H)
 #include <GL/glut.h>
+#elif defined(JAS_HAVE_GLUT_GLUT_H)
+#include <GLUT/glut.h>
 #else
 #include <glut.h>
 #endif

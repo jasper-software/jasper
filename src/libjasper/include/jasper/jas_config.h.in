@@ -27,6 +27,7 @@
 #cmakedefine JAS_HAVE_GETRUSAGE
 
 #cmakedefine JAS_HAVE_GL_GLUT_H
+#cmakedefine JAS_HAVE_GLUT_GLUT_H
 #cmakedefine JAS_HAVE_GLUT_H
 
 #cmakedefine JAS_INCLUDE_PNM_CODEC
