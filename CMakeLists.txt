@@ -1,4 +1,6 @@
 cmake_minimum_required(VERSION 3.12)
+# Version 3.10 needed for FindOpenGL imported targets.
+# Version 3.1 needed for FindGLUT imported targets.
 
 ################################################################################
 # Specify software and shared library version information.
@@ -69,6 +71,7 @@ include(CheckCSourceCompiles)
 include(CTest)
 include(Sanitizers)
 include(GenerateExportHeader)
+include(JasGetIncludes)
 
 ################################################################################
 # Define options.
@@ -299,6 +302,9 @@ if(JAS_ENABLE_OPENGL)
 		message("GLUT libraries: ${GLUT_LIBRARIES}")
 	endif()
 	if((TARGET OpenGL::GL) AND (TARGET GLUT::GLUT))
+		jas_get_includes_from_targets(CMAKE_REQUIRE_INCLUDES
+		  OpenGL::GL OpenGL::GLU GLUT::GLUT)
+	  message("CMAKE_REQUIRE_INCLUDES ${CMAKE_REQUIRE_INCLUDES}")
 		check_include_files(GL/glut.h JAS_HAVE_GL_GLUT_H)
 		check_include_files(glut.h JAS_HAVE_GLUT_H)
 		if(JAS_HAVE_GL_GLUT_H OR JAS_HAVE_GLUT_H)
