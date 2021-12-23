@@ -206,7 +206,7 @@ endif()
 # MacOSX does cannot build a shared library without this line.
 # I think that this might be needed in order for a shared library to
 # be marked as having a dependency on another shared library.
-target_link_libraries(libjasper PUBLIC ${JPEG_LIBRARIES} ${HEIF_LIBRARIES}
+target_link_libraries(libjasper PUBLIC ${JAS_LIBJPEG_TARGET} ${HEIF_LIBRARIES}
   ${MATH_LIBRARY} ${THREAD_LIBRARY})
 
 generate_export_header(libjasper
