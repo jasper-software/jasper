@@ -56,7 +56,9 @@ if [ -f "$out_file" ]; then
 	rm -f "$out_file" || panic "cannot remove file $out_file"
 fi
 
-#touch "$out_file" || panic "cannot create file $out_file"
+dirname=$(dirname "$out_file")
+ls -al "$dirname"
+touch "$out_file" || panic "cannot create file $out_file"
 
 case "$os" in
 linux)
