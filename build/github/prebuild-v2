@@ -53,11 +53,14 @@ fi
 echo "OS: $os"
 
 if [ -f "$out_file" ]; then
-	rm -f "$out_file" || panic
+	rm -f "$out_file" || panic "cannot remove file $out_file"
 fi
-touch "$out_file"
+touch "$out_file" || panic "cannot create file $out_file"
+ls -al "$out_file"
 
 case "$os" in
+linux)
+	;;
 macos-fake)
 	cat >> "$out_file" <<- EOF
 	export PATH=\$(brew --prefix)/opt/findutils/libexec/gnubin:\$PATH
@@ -70,11 +73,13 @@ macos)
 	EOF
 	[ $? -eq 0 ] || panic "failed"
 	;;
-linux)
-	;;
 windows)
 	;;
 *)
 	panic "invalid OS"
 	;;
 esac
+
+ls -al "$out_file"
+
+exit 0
