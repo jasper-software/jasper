@@ -77,7 +77,7 @@ install(FILES ${man_pages} DESTINATION "${CMAKE_INSTALL_MANDIR}/man1")
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/../../test/bin/wrapper.in"
   "${CMAKE_CURRENT_BINARY_DIR}/../../test/bin/wrapper" @ONLY)
 
-if(BASH_PROGRAM)
+if(BASH_PROGRAM AND JAS_HAVE_ALL_NATIVE_CODECS)
 	add_test(run_test_imginfo
 	  "${BASH_PROGRAM}" "${CMAKE_CURRENT_BINARY_DIR}/../../test/bin/wrapper"
 	  "${CMAKE_CURRENT_SOURCE_DIR}/../../test/bin/run_test_imginfo" -v)
@@ -107,4 +107,12 @@ if(BASH_PROGRAM)
 	add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS
 	  ${programs} ${extra_programs}
 	  "${CMAKE_CURRENT_BINARY_DIR}/../../test/bin/wrapper") 
+else()
+	if (NOT JAS_HAVE_ALL_NATIVE_CODECS)
+		message(WARNING
+		  "The test suite has been disabled "
+		  "due to missing native codec support.")
+	else()
+		message(WARNING "The test suite has been disabled.")
+	endif()
 endif()

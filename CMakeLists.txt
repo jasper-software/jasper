@@ -95,15 +95,17 @@ option(JAS_PREFER_PTHREAD
   "Prefer POSIX Threading Library (over C11) for threading support" OFF)
 option(JAS_STRICT "Treat compiler warnings as errors" OFF)
 
-option(JAS_INCLUDE_BMP_CODEC "Include BMP codec support" ON)
-option(JAS_INCLUDE_JP2_CODEC "Include JP2 codec support" ON)
-option(JAS_INCLUDE_JPC_CODEC "Include JPC codec support" ON)
-option(JAS_INCLUDE_JPG_CODEC "Include JPG codec support" ON)
-option(JAS_INCLUDE_HEIC_CODEC "Include experimental HEIC codec support" ON)
-option(JAS_INCLUDE_MIF_CODEC "Include MIF codec support" ON)
-option(JAS_INCLUDE_PGX_CODEC "Include PGX codec support" ON)
-option(JAS_INCLUDE_PNM_CODEC "Include PNM codec support" ON)
-option(JAS_INCLUDE_RAS_CODEC "Include RAS codec support" ON)
+option(JAS_INCLUDE_BMP_CODEC "Include (native) BMP codec support" ON)
+option(JAS_INCLUDE_JP2_CODEC "Include (native) JP2 codec support" ON)
+option(JAS_INCLUDE_JPC_CODEC "Include (native) JPC codec support" ON)
+option(JAS_INCLUDE_JPG_CODEC
+  "Include JPG codec support (via IJG JPEG Library)" ON)
+option(JAS_INCLUDE_HEIC_CODEC
+	"Include experimental HEIC codec support (via Libheif Library)" ON)
+option(JAS_INCLUDE_MIF_CODEC "Include (native) MIF codec support" ON)
+option(JAS_INCLUDE_PGX_CODEC "Include (native) PGX codec support" ON)
+option(JAS_INCLUDE_PNM_CODEC "Include (native) PNM codec support" ON)
+option(JAS_INCLUDE_RAS_CODEC "Include (native) RAS codec support" ON)
 
 set(JAS_DEFAULT_MAX_MEM_USAGE
   "1073741824"
@@ -326,6 +328,22 @@ endif()
 ################################################################################
 # Check for invalid codec combinations.
 ################################################################################
+
+if (JAS_INCLUDE_BMP_CODEC AND
+  JAS_INCLUDE_JP2_CODEC AND
+  JAS_INCLUDE_JPC_CODEC AND
+  JAS_INCLUDE_PGX_CODEC AND
+  JAS_INCLUDE_PNM_CODEC AND
+  JAS_INCLUDE_RAS_CODEC)
+	message("Support for all native codecs has been included.")
+	set(JAS_HAVE_ALL_NATIVE_CODECS 1)
+else()
+	message(WARNING
+	  "Support for one or more native codecs has been excluded.  "
+	  "The inclusion of support for all native codecs is "
+	  "STRONGLY RECOMMENDED.")
+	set(JAS_HAVE_ALL_NATIVE_CODECS 0)
+endif()
 
 if(JAS_INCLUDE_JP2_CODEC AND NOT JAS_INCLUDE_JPC_CODEC)
 	message(FATAL_ERROR
