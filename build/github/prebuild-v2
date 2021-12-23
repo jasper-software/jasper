@@ -57,8 +57,6 @@ if [ -f "$out_file" ]; then
 fi
 
 #touch "$out_file" || panic "cannot create file $out_file"
-echo -n "" > "$out_file" || panic "cannot create file $out_file"
-ls -al "$out_file"
 
 case "$os" in
 linux)
@@ -76,6 +74,9 @@ macos)
 	[ $? -eq 0 ] || panic "failed"
 	;;
 windows)
+	# Windows does not like an empty file, apparently.
+	echo "" >> "$out_file" || panic "cannot create file"
+	ls -al "$out_file"
 	;;
 *)
 	panic "invalid OS"
