@@ -14,9 +14,15 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v2
+    ############################################################
+    - name: prebuild
+      shell: bash
+      run: build/github/prebuild-v2 -c ${{runner.temp}}/commands
+    ############################################################
     - name: testing
       env:
         CC: ${{ matrix.compiler }}
       shell: bash
       #run: build/build_all -v -d 2
-      run: build/build_all
+      run: build/build_all -C ${{runner.temp}}/commands
+    ############################################################

@@ -1,0 +1,80 @@
+#! /usr/bin/env bash
+
+panic()
+{
+	echo "ERROR: $@"
+	exit 1
+}
+
+usage()
+{
+	echo "bad usage: $@"
+	exit 2
+}
+
+verbose=0
+out_file=
+os=
+
+while getopts vc:s: opt; do
+	case $opt in
+	s)
+		os="$OPTARG";;
+	c)
+		out_file="$OPTARG";;
+	v)
+		verbose=$((verbose + 1));;
+	\?)
+		usage
+		break;;
+	esac
+done
+shift $((OPTIND - 1))
+
+if [ -z "$out_file" ]; then
+	panic "no output file specified"
+fi
+
+if [ -z "$os" ]; then
+	if [ -n "$RUNNER_OS" ]; then
+		case "$RUNNER_OS" in
+		MacOS|macOS)
+			os=macos;;
+		Linux|linux)
+			os=linux;;
+		Windows|windows)
+			os=windows;;
+		*)
+			os=unknown;;
+		esac
+	fi
+fi
+
+echo "OS: $os"
+
+if [ -f "$out_file" ]; then
+	rm -f "$out_file" || panic
+fi
+touch "$out_file"
+
+case "$os" in
+macos-fake)
+	cat >> "$out_file" <<- EOF
+	export PATH=\$(brew --prefix)/opt/findutils/libexec/gnubin:\$PATH
+	EOF
+	;;
+macos)
+	brew install findutils || panic "brew install failed"
+	cat >> "$out_file" <<- EOF
+	export PATH=\$(brew --prefix)/opt/findutils/libexec/gnubin:\$PATH
+	EOF
+	[ $? -eq 0 ] || panic "failed"
+	;;
+linux)
+	;;
+windows)
+	;;
+*)
+	panic "invalid OS"
+	;;
+esac

@@ -29,13 +29,16 @@ crostini=0
 enable=1
 debug_level=0
 strict=1
+command_file=
 
-while getopts vb:cnd:sw option; do
+while getopts vb:cnd:swC: option; do
 	case "$option" in
 	n)
 		enable=0;;
 	c)
 		crostini=1;;
+	C)
+		command_file="$OPTARG";;
 	b)
 		build_dir="$OPTARG";;
 	d)
@@ -62,6 +65,10 @@ fi
 
 if [ -z "$build_dir" ]; then
 	build_dir="$abs_program_dir/../tmp_cmake"
+fi
+
+if [ -n "$command_file" ]; then
+	source "$command_file" || panic "source failed"
 fi
 
 os=unknown
