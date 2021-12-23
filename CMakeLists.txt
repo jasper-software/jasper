@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.12)
+# Version 3.12 needed for FindJPEG imported targets.
 # Version 3.10 needed for FindOpenGL imported targets.
 # Version 3.1 needed for FindGLUT imported targets.
 
@@ -57,7 +58,6 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/build/cmake/modules)
 include(InSourceBuild)
 
 include(CheckCCompilerFlag)
-
 include(EnableAssertions)
 
 # Adhere to GNU filesystem layout conventions.
@@ -88,7 +88,6 @@ option(JAS_ENABLE_32BIT "Use 32 bit integers on 64 bit CPUs" OFF)
 option(JAS_ENABLE_LIBJPEG "Enable the use of the JPEG Library" ON)
 option(JAS_ENABLE_LIBHEIF "Enable the use of the HEIF Library" ON)
 option(JAS_ENABLE_OPENGL "Enable the use of the OpenGL/GLUT Library" ON)
-option(JAS_ENABLE_AUTOMATIC_DEPENDENCIES "Enable automatic dependencies" ON)
 option(JAS_ENABLE_DOC "Enable building of the documentation" ON)
 option(JAS_ENABLE_PROGRAMS "Enable building of the programs" ON)
 option(JAS_ENABLE_MULTITHREADING_SUPPORT "Enable multithreading support" ON)
@@ -161,18 +160,6 @@ else()
 	set(JAS_MULTICONFIGURATION_GENERATOR FALSE)
 endif()
 message("JAS_MULTICONFIGURATION_GENERATOR ${JAS_MULTICONFIGURATION_GENERATOR}")
-
-if(JAS_ENABLE_AUTOMATIC_DEPENDENCIES)
-	if(LINUX)
-		message(WARNING
-		  "If this software is being built as a package for a "
-		  "Linux distribution, you should probably set "
-		  "JAS_ENABLE_AUTOMATIC_DEPENDENCIES to false.")
-	endif()
-	set(JAS_REQUIRED "")
-else()
-	set(JAS_REQUIRED REQUIRED)
-endif()
 
 if(JAS_ENABLE_SHARED AND MACOS)
 	set(CMAKE_MACOSX_RPATH TRUE)
@@ -282,48 +269,6 @@ endif()
 message("CMAKE_C_FLAGS: ${CMAKE_C_FLAGS}")
 message("CMAKE_C_FLAGS_RELEASE: ${CMAKE_C_FLAGS_RELEASE}")
 message("CMAKE_C_FLAGS_DEBUG: ${CMAKE_C_FLAGS_DEBUG}")
-
-################################################################################
-# Check for the OpenGL and GLUT libraries.
-################################################################################
-
-set(JAS_HAVE_OPENGL 0)
-if(JAS_ENABLE_OPENGL)
-	set(OpenGL_GL_PREFERENCE GLVND)
-	find_package(OpenGL ${JAS_REQUIRED})
-	if (TARGET OpenGL::GL)
-		message("OpenGL library found: ${OPENGL_FOUND}")
-		message("OpenGL include directory: ${OPENGL_INCLUDE_DIR}")
-		message("OpenGL libraries: ${OPENGL_LIBRARIES}")
-	endif()
-	find_package(GLUT ${JAS_REQUIRED})
-	if (TARGET GLUT::GLUT)
-		message("GLUT include directory: ${GLUT_INCLUDE_DIR}")
-		message("GLUT libraries: ${GLUT_LIBRARIES}")
-	endif()
-	if((TARGET OpenGL::GL) AND (TARGET GLUT::GLUT))
-		jas_get_includes_from_targets(CMAKE_REQUIRE_INCLUDES
-		  OpenGL::GL OpenGL::GLU GLUT::GLUT)
-	  message("CMAKE_REQUIRE_INCLUDES ${CMAKE_REQUIRE_INCLUDES}")
-		check_include_files(GL/glut.h JAS_HAVE_GL_GLUT_H)
-		check_include_files(glut.h JAS_HAVE_GLUT_H)
-		check_include_files(GLUT/glut.h JAS_HAVE_GLUT_GLUT_H)
-		if(JAS_HAVE_GL_GLUT_H OR JAS_HAVE_GLUT_GLUT_H OR JAS_HAVE_GLUT_H)
-			set(JAS_OPENGL_TARGETS GLUT::GLUT OpenGL::GL)
-			if (TARGET OpenGL::GLU)
-				set(JAS_OPENGL_TARGETS ${JAS_OPENGL_TARGETS} OpenGL::GLU)
-			endif()
-			set(JAS_HAVE_OPENGL 1)
-		else()
-			message(WARNING "The glut.h header file is missing.")
-			message(WARNING "Disabling OpenGL.")
-		endif()
-	endif()
-endif()
-
-if(JAS_HAVE_OPENGL AND MACOS)
-	add_compile_definitions(GL_SILENCE_DEPRECATION)
-endif()
 
 ################################################################################
 # Perform platform checks.
@@ -462,6 +407,40 @@ else()
 endif()
 
 ################################################################################
+# Check for the OpenGL and GLUT libraries.
+################################################################################
+
+set(JAS_HAVE_OPENGL 0)
+set(JAS_OPENGL_TARGETS)
+if(JAS_ENABLE_OPENGL)
+	set(OpenGL_GL_PREFERENCE GLVND)
+	find_package(OpenGL)
+	find_package(GLUT)
+	if((TARGET OpenGL::GL) AND (TARGET GLUT::GLUT))
+		jas_get_includes_from_targets(CMAKE_REQUIRE_INCLUDES
+		  OpenGL::GL OpenGL::GLU GLUT::GLUT)
+		message("CMAKE_REQUIRE_INCLUDES ${CMAKE_REQUIRE_INCLUDES}")
+		check_include_files(GL/glut.h JAS_HAVE_GL_GLUT_H)
+		check_include_files(GLUT/glut.h JAS_HAVE_GLUT_GLUT_H)
+		check_include_files(glut.h JAS_HAVE_GLUT_H)
+		if(JAS_HAVE_GL_GLUT_H OR JAS_HAVE_GLUT_GLUT_H OR JAS_HAVE_GLUT_H)
+			set(JAS_OPENGL_TARGETS GLUT::GLUT OpenGL::GL)
+			if (TARGET OpenGL::GLU)
+				set(JAS_OPENGL_TARGETS ${JAS_OPENGL_TARGETS} OpenGL::GLU)
+			endif()
+			set(JAS_HAVE_OPENGL 1)
+		else()
+			message(WARNING "The glut.h header file is missing.")
+			message(WARNING "Disabling OpenGL.")
+		endif()
+	endif()
+endif()
+
+if(JAS_HAVE_OPENGL AND MACOS)
+	add_compile_definitions(GL_SILENCE_DEPRECATION)
+endif()
+
+################################################################################
 # Check for the JPEG library.
 ################################################################################
 
@@ -471,46 +450,36 @@ if(MACOS)
 	set(CMAKE_FIND_FRAMEWORK LAST)
 endif()
 
+set(JAS_HAVE_LIBJPEG 0)
+set(JAS_LIBJPEG_TARGET)
 if(JAS_ENABLE_LIBJPEG)
-	find_package(JPEG ${JAS_LIBJPEG_REQUIRED})
-	message("JPEG library found: ${JPEG_FOUND}")
-else()
-	set(JPEG_FOUND FALSE)
+	find_package(JPEG)
+	if (TARGET JPEG::JPEG)
+		# In some versions of the JPEG library, the header file jpeglib.h
+		# does not include some of the header files upon which it depends
+		# (e.g., stdio.h and stdint.h).  So, we cannot reliably use
+		# check_include_file here.
+		jas_get_includes_from_targets(CMAKE_REQUIRED_INCLUDES JPEG::JPEG)
+		check_c_source_compiles("
+			#include <stdio.h>
+			#include <stdint.h>
+			#include <jpeglib.h>
+			int main() {}
+		" JAS_HAVE_JPEGLIB_H)
+		if(JAS_HAVE_JPEGLIB_H)
+			set(JAS_HAVE_LIBJPEG 1)
+			set(JAS_LIBJPEG_TARGET JPEG::JPEG)
+		else()
+			message(WARNING "The header file jpeglib.h is missing.")
+			message(WARNING "Disabling LIBJPEG.")
+		endif()
+	endif()
 endif()
 
-set(JAS_HAVE_LIBJPEG 0)
-if(JAS_ENABLE_LIBJPEG AND JPEG_FOUND)
-	message("JPEG include directory: ${JPEG_INCLUDE_DIR}")
-	message("JPEG libraries: ${JPEG_LIBRARIES}")
-	# In some versions of the JPEG library, the header file jpeglib.h
-	# does not include some of the header files upon which it depends
-	# (e.g., stdio.h and stdint.h).  So, we cannot reliably use
-	# check_include_file here.
-	set(CMAKE_REQUIRED_INCLUDES ${JPEG_INCLUDE_DIR})
-	check_c_source_compiles("
-		#include <stdio.h>
-		#include <stdint.h>
-		#include <jpeglib.h>
-		int main() {}
-	" JAS_HAVE_JPEGLIB_H)
-	if(JAS_HAVE_JPEGLIB_H)
-		set(JAS_HAVE_LIBJPEG 1)
-		include_directories(${JPEG_INCLUDE_DIR})
-	else()
-		message(WARNING "The header file jpeglib.h appears to be missing.")
-		message(WARNING "Disabling LIBJPEG.")
-		set(JPEG_FOUND FALSE)
-		set(JPEG_LIBRARIES "")
-		set(JPEG_INCLUDE_DIR "")
-		set(JAS_ENABLE_LIBJPEG 0)
-	endif()
-else()
-	set(JPEG_INCLUDE_DIR "")
-	set(JPEG_LIBRARIES "")
-endif()
 if(NOT JAS_HAVE_LIBJPEG)
 	set(JAS_INCLUDE_JPG_CODEC 0)
 endif()
+message("JAS_INCLUDE_JPG_CODEC: ${JAS_INCLUDE_JPG_CODEC}")
 
 ################################################################################
 # Check for the HEIF library.
@@ -520,15 +489,15 @@ set(JAS_HAVE_LIBHEIF 0)
 if(JAS_ENABLE_LIBHEIF)
 	find_library(HEIF_LIBRARY heif)
 	check_include_files(libheif/heif.h JAS_HAVE_HEIF_H)
-endif()
-if(HEIF_LIBRARY AND JAS_HAVE_HEIF_H)
-	set(JAS_HAVE_LIBHEIF 1)
-	set(HEIF_LIBRARIES "${HEIF_LIBRARY}")
+	if(HEIF_LIBRARY AND JAS_HAVE_HEIF_H)
+		set(JAS_HAVE_LIBHEIF 1)
+		set(HEIF_LIBRARIES "${HEIF_LIBRARY}")
+	endif()
 endif()
 if(NOT JAS_HAVE_LIBHEIF)
 	set(JAS_INCLUDE_HEIC_CODEC 0)
 endif()
-message("LIBHEIF ${JAS_HAVE_LIBHEIF}")
+message("JAS_INCLUDE_HEIC_CODEC: ${JAS_INCLUDE_HEIC_CODEC}")
 
 ################################################################################
 # Check for the Math library.

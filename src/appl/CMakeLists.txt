@@ -4,22 +4,22 @@ set(extra_programs "")
 
 # The jasper program
 add_executable(jasper jasper.c)
-target_link_libraries(jasper libjasper
-  ${JPEG_LIBRARIES} ${HEIF_LIBRARIES} ${MATH_LIBRARY} ${THREAD_LIBRARY})
+target_link_libraries(jasper libjasper ${LIBJPEG_TARGET} ${HEIF_LIBRARIES}
+  ${MATH_LIBRARY} ${THREAD_LIBRARY})
 set(programs "${programs}" jasper)
 set(man_pages "${man_pages}" jasper.1)
 
 # The imginfo program
 add_executable(imginfo imginfo.c)
-target_link_libraries(imginfo libjasper
-  ${JPEG_LIBRARIES} ${HEIF_LIBRARIES} ${MATH_LIBRARY} ${THREAD_LIBRARY})
+target_link_libraries(imginfo libjasper ${LIBJPEG_TARGET} ${HEIF_LIBRARIES}
+  ${MATH_LIBRARY} ${THREAD_LIBRARY})
 set(programs "${programs}" imginfo)
 set(man_pages "${man_pages}" imginfo.1)
 
 # The imgcmp program
 add_executable(imgcmp imgcmp.c)
-target_link_libraries(imgcmp libjasper
-  ${JPEG_LIBRARIES} ${HEIF_LIBRARIES} ${MATH_LIBRARY} ${THREAD_LIBRARY})
+target_link_libraries(imgcmp libjasper ${LIBJPEG_TARGET} ${HEIF_LIBRARIES}
+  ${MATH_LIBRARY} ${THREAD_LIBRARY})
 set(programs "${programs}" imgcmp)
 set(man_pages "${man_pages}" imgcmp.1)
 
@@ -27,7 +27,7 @@ set(man_pages "${man_pages}" imgcmp.1)
 if(JAS_HAVE_OPENGL)
 	add_executable(jiv jiv.c)
 	target_link_libraries(jiv libjasper
-	  ${JPEG_LIBRARIES} ${HEIF_LIBRARIES} ${JAS_OPENGL_TARGETS}
+	  ${LIBJPEG_TARGET} ${HEIF_LIBRARIES} ${JAS_OPENGL_TARGETS}
 	  ${JAS_OPENGL_TARGETS} ${MATH_LIBRARY} ${THREAD_LIBRARY})
 	set(programs "${programs}" jiv)
 	set(man_pages "${man_pages}" jiv.1)
@@ -38,14 +38,14 @@ endif()
 if(JAS_THREADS)
 	# The multithread program
 	add_executable(multithread multithread.c)
-	target_link_libraries(multithread libjasper ${JPEG_LIBRARIES}
+	target_link_libraries(multithread libjasper ${LIBJPEG_TARGET}
 	  ${MATH_LIBRARY} ${THREAD_LIBRARY})
 	set(programs "${programs}" multithread)
 endif()
 
 if(JAS_ENABLE_FUZZER)
 	add_executable(fuzz fuzz.c)
-	target_link_libraries(fuzz libjasper ${JPEG_LIBRARIES} ${MATH_LIBRARY}
+	target_link_libraries(fuzz libjasper ${LIBJPEG_TARGET} ${MATH_LIBRARY}
 	  ${THREAD_LIBRARY})
 	set(programs "${programs}" fuzz)
 	target_compile_options(fuzz PRIVATE "-fsanitize=fuzzer")
