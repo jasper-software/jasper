@@ -1,0 +1,50 @@
+#! /usr/bin/env bash
+
+panic()
+{
+	echo "$@"
+	exit 1
+}
+
+program_dir=$(dirname "$0") || exit 1
+
+start=0
+step=64
+end=4294967296
+
+imginfo_program="$program_dir/../../tmp_cmake/build/src/appl/imginfo"
+image_file=
+
+while getopts s:e:d:p:i: opt; do
+	case "$opt" in
+	s)
+		start="$OPTARG";;
+	e)
+		end="$OPTARG";;
+	d)
+		step="$OPTARG";;
+	i)
+		image_file="$OPTARG";;
+	p)
+		imginfo_program="$OPTARG";;
+	esac
+done
+shift $((OPTIND - 1))
+
+i="$start"
+while [ $i -lt "$end" ]; do
+	echo "max mem $i"
+	command=(env ASAN_OPTIONS="exitcode=10" "$imginfo_program" --memory-limit "$i")
+	echo "RUN ${command[@]} < $image_file"
+	${command[@]} < "$image_file" > /dev/null
+	status=$?
+	if [ "$status" -eq 0 ]; then
+		echo "OK"
+		exit 0
+	elif [ "$status" -eq 1 ]; then
+		echo "ERROR"
+	else
+		panic "exit status $status"
+	fi
+	i=$((i + step))
+done

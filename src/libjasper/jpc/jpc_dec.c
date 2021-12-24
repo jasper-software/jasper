@@ -1070,65 +1070,58 @@ static int jpc_dec_tilefini(jpc_dec_t *dec, jpc_dec_tile_t *tile)
 	}
 
 	if (tile->tcomps) {
-
 		unsigned compno;
 		for (compno = 0, tcomp = tile->tcomps; compno < dec->numcomps;
 		  ++compno, ++tcomp) {
-			const jpc_dec_rlvl_t *rlvl;
-			for (rlvlno = 0, rlvl = tcomp->rlvls; rlvlno < tcomp->numrlvls;
-			  ++rlvlno, ++rlvl) {
-				if (!rlvl->bands) {
-					continue;
-				}
-				unsigned bandno;
-				const jpc_dec_band_t *band;
-				for (bandno = 0, band = rlvl->bands; bandno < rlvl->numbands;
-				  ++bandno, ++band) {
-					if (band->prcs) {
-						unsigned prcno;
-						const jpc_dec_prc_t *prc;
-						for (prcno = 0, prc = band->prcs; prcno <
-						  rlvl->numprcs; ++prcno, ++prc) {
-							if (!prc->cblks) {
-								continue;
-							}
-							unsigned cblkno;
-							for (cblkno = 0, cblk = prc->cblks; cblkno <
-							  prc->numcblks; ++cblkno, ++cblk) {
-
-								while (cblk->segs.head) {
-									seg = cblk->segs.head;
-									jpc_seglist_remove(&cblk->segs, seg);
-									jpc_seg_destroy(seg);
+			if (tcomp->rlvls) {
+				const jpc_dec_rlvl_t *rlvl;
+				for (rlvlno = 0, rlvl = tcomp->rlvls; rlvlno < tcomp->numrlvls;
+				  ++rlvlno, ++rlvl) {
+					if (!rlvl->bands) {
+						continue;
+					}
+					unsigned bandno;
+					const jpc_dec_band_t *band;
+					for (bandno = 0, band = rlvl->bands; bandno < rlvl->numbands;
+					  ++bandno, ++band) {
+						if (band->prcs) {
+							unsigned prcno;
+							const jpc_dec_prc_t *prc;
+							for (prcno = 0, prc = band->prcs; prcno <
+							  rlvl->numprcs; ++prcno, ++prc) {
+								if (prc->cblks) {
+									unsigned cblkno;
+									for (cblkno = 0, cblk = prc->cblks; cblkno <
+									  prc->numcblks; ++cblkno, ++cblk) {
+										while (cblk->segs.head) {
+											seg = cblk->segs.head;
+											jpc_seglist_remove(&cblk->segs, seg);
+											jpc_seg_destroy(seg);
+										}
+										if (cblk->data) {
+											jas_matrix_destroy(cblk->data);
+										}
+									}
+									jas_free(prc->cblks);
 								}
-#if 0
-								jas_matrix_destroy(cblk->data);
-#else
-								if (cblk->data) {
-									jas_matrix_destroy(cblk->data);
+								if (prc->incltagtree) {
+									jpc_tagtree_destroy(prc->incltagtree);
 								}
-#endif
-							}
-							if (prc->incltagtree) {
-								jpc_tagtree_destroy(prc->incltagtree);
-							}
-							if (prc->numimsbstagtree) {
-								jpc_tagtree_destroy(prc->numimsbstagtree);
-							}
-							if (prc->cblks) {
-								jas_free(prc->cblks);
+								if (prc->numimsbstagtree) {
+									jpc_tagtree_destroy(prc->numimsbstagtree);
+								}
 							}
 						}
+						if (band->data) {
+							jas_matrix_destroy(band->data);
+						}
+						if (band->prcs) {
+							jas_free(band->prcs);
+						}
 					}
-					if (band->data) {
-						jas_matrix_destroy(band->data);
+					if (rlvl->bands) {
+						jas_free(rlvl->bands);
 					}
-					if (band->prcs) {
-						jas_free(band->prcs);
-					}
-				}
-				if (rlvl->bands) {
-					jas_free(rlvl->bands);
 				}
 			}
 			if (tcomp->rlvls) {
@@ -1745,6 +1738,7 @@ static jpc_dec_cp_t *jpc_dec_cp_create(uint_fast16_t numcomps)
 	cp->numlyrs = 0;
 	cp->mctid = 0;
 	cp->csty = 0;
+	cp->pchglist = 0;
 	if (!(cp->ccps = jas_alloc2(cp->numcomps, sizeof(jpc_dec_ccp_t)))) {
 		goto error;
 	}

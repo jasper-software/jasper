@@ -138,15 +138,27 @@ void *jas_realloc(void *ptr, size_t size)
 	assert(jas_allocator);
 	void *result;
 	JAS_LOGDEBUGF(101, "jas_realloc(%p, %zu)\n", ptr, size);
-	if (!ptr && !size) {
+	if (!size) {
+		jas_logwarnf("warning: zero size reallocations are unwise "
+		  "(and have undefined behavior as of C23)\n");
+	}
+	if (!ptr) {
+		if (size) {
+			/* Handle a new allocation of nonzero size. */
+			result = (jas_allocator->alloc)(jas_allocator, size);
+			JAS_LOGDEBUGF(101, "jas_realloc: alloc(%p, %zu) -> %p\n",
+			  jas_allocator, size, result);
+		} else {
+			/* Handle a new allocation of zero size. */
 #if defined(JAS_MALLOC_RETURN_NULL_PTR_FOR_ZERO_SIZE)
-		result = 0;
-		JAS_LOGDEBUGF(101, "jas_realloc: no-op -> %p\n", result);
+			result = 0;
+			JAS_LOGDEBUGF(101, "jas_realloc: no-op -> %p\n", result);
 #else
-		result = (jas_allocator->alloc)(jas_allocator, 1);
-		JAS_LOGDEBUGF(101, "jas_realloc: alloc(%p, %p, %zu) -> %p\n",
-		  jas_allocator, ptr, size, result);
+			result = (jas_allocator->alloc)(jas_allocator, 1);
+			JAS_LOGDEBUGF(101, "jas_realloc: alloc(%p, %p, %zu) -> %p\n",
+			  jas_allocator, ptr, size, result);
 #endif
+		}
 	} else {
 		result = (jas_allocator->realloc)(jas_allocator, ptr, size);
 		JAS_LOGDEBUGF(100, "jas_realloc: realloc(%p, %p, %zu) -> %p\n",
@@ -486,16 +498,23 @@ void *jas_basic_realloc(jas_allocator_t *allocator, void *ptr, size_t size)
 		goto done;
 	}
 	/*
-	Check for a realloc operation that is equivalent to a free operation.
+	Check for a realloc operation that is equivalent to a zero-sized
+	allocation/reallocation.
 	*/
 	if (ptr && !size) {
+#if defined(JAS_MALLOC_RETURN_NULL_PTR_FOR_ZERO_SIZE)
 		jas_basic_free(allocator, ptr);
 		result = 0;
+#else
+        if ((result = jas_basic_alloc(allocator, 1))) {
+			jas_basic_free(allocator, ptr);
+		}
+#endif
 		goto done;
 	}
 
 	if (!jas_safe_size_add(size, JAS_MB_SIZE, &ext_size)) {
-		jas_logerrorf("requested memory size is too large\n");
+		jas_logerrorf("requested memory size is too large (%zu)\n", size);
 		result = 0;
 		goto done;
 	}
@@ -534,6 +553,7 @@ void *jas_basic_realloc(jas_allocator_t *allocator, void *ptr, size_t size)
 		result = jas_mb_get_data(mb);
 		a->mem = mem;
 	} else {
+		jas_mb_init(old_mb, old_ext_size);
 		result = 0;
 	}
 
