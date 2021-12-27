@@ -773,16 +773,18 @@ static jas_cmpxform_t *jas_cmpxform_createshapmat()
 {
 	jas_cmpxform_t *pxform;
 	jas_cmshapmat_t *shapmat;
-	if (!(pxform = jas_cmpxform_create0()))
+	if (!(pxform = jas_cmpxform_create0())) {
 		return 0;
+	}
 	pxform->ops = &shapmat_ops;
 	shapmat = &pxform->data.shapmat;
 	shapmat->mono = 0;
 	shapmat->order = 0;
 	shapmat->useluts = 0;
 	shapmat->usemat = 0;
-	for (unsigned i = 0; i < 3; ++i)
+	for (unsigned i = 0; i < 3; ++i) {
 		jas_cmshapmatlut_init(&shapmat->luts[i]);
+	}
 	for (unsigned i = 0; i < 3; ++i) {
 		for (unsigned j = 0; j < 4; ++j)
 			shapmat->mat[i][j] = 0.0;
@@ -794,8 +796,9 @@ static jas_cmpxform_t *jas_cmpxform_createshapmat()
 static void jas_cmshapmat_destroy(jas_cmpxform_t *pxform)
 {
 	jas_cmshapmat_t *shapmat = &pxform->data.shapmat;
-	for (unsigned i = 0; i < 3; ++i)
+	for (unsigned i = 0; i < 3; ++i) {
 		jas_cmshapmatlut_cleanup(&shapmat->luts[i]);
+	}
 }
 
 static int jas_cmshapmat_apply(const jas_cmpxform_t *pxform, const jas_cmreal_t *in,
@@ -906,22 +909,25 @@ static int jas_cmshapmatlut_set(jas_cmshapmatlut_t *lut, const jas_icccurv_t *cu
 	jas_cmshapmatlut_cleanup(lut);
 	if (curv->numents == 0) {
 		lut->size = 2;
-		if (!(lut->data = jas_alloc2(lut->size, sizeof(jas_cmreal_t))))
+		if (!(lut->data = jas_alloc2(lut->size, sizeof(jas_cmreal_t)))) {
 			goto error;
+		}
 		lut->data[0] = 0.0;
 		lut->data[1] = 1.0;
 	} else if (curv->numents == 1) {
 		lut->size = 256;
-		if (!(lut->data = jas_alloc2(lut->size, sizeof(jas_cmreal_t))))
+		if (!(lut->data = jas_alloc2(lut->size, sizeof(jas_cmreal_t)))) {
 			goto error;
+		}
 		gamma = (jas_cmreal_t)curv->ents[0] / 256.0;
 		for (unsigned i = 0; i < lut->size; ++i) {
 			lut->data[i] = gammafn(i / (double) (lut->size - 1), gamma);
 		}
 	} else {
 		lut->size = curv->numents;
-		if (!(lut->data = jas_alloc2(lut->size, sizeof(jas_cmreal_t))))
+		if (!(lut->data = jas_alloc2(lut->size, sizeof(jas_cmreal_t)))) {
 			goto error;
+		}
 		for (unsigned i = 0; i < lut->size; ++i) {
 			lut->data[i] = (jas_cmreal_t)curv->ents[i] / 65535.0;
 		}
@@ -1158,6 +1164,7 @@ static int triclr(const jas_iccprof_t *iccprof, int op,
 	jas_cmpxformseq_t *pxformseq;
 	jas_cmreal_t mat[3][4];
 	jas_cmshapmatlut_t lut;
+	jas_cmshapmatlut_init(&lut);
 
 	pxform = 0;
 	pxformseq = 0;
@@ -1252,6 +1259,7 @@ static int triclr(const jas_iccprof_t *iccprof, int op,
 
 error:
 
+	jas_cmshapmatlut_cleanup(&lut);
 	for (unsigned i = 0; i < 3; ++i) {
 		if (trcs[i]) {
 			jas_iccattrval_destroy(trcs[i]);

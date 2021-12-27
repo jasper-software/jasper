@@ -274,15 +274,17 @@ static jas_iccprof_t *jas_iccprof_create()
 	if (!(prof = jas_malloc(sizeof(jas_iccprof_t)))) {
 		goto error;
 	}
-	if (!(prof->attrtab = jas_iccattrtab_create()))
-		goto error;
-	memset(&prof->hdr, 0, sizeof(jas_icchdr_t));
 	prof->tagtab.numents = 0;
 	prof->tagtab.ents = 0;
+	if (!(prof->attrtab = jas_iccattrtab_create())) {
+		goto error;
+	}
+	memset(&prof->hdr, 0, sizeof(jas_icchdr_t));
 	return prof;
 error:
-	if (prof)
+	if (prof) {
 		jas_iccprof_destroy(prof);
+	}
 	return 0;
 }
 
@@ -290,28 +292,33 @@ jas_iccprof_t *jas_iccprof_copy(const jas_iccprof_t *prof)
 {
 	jas_iccprof_t *newprof;
 	newprof = 0;
-	if (!(newprof = jas_iccprof_create()))
+	if (!(newprof = jas_iccprof_create())) {
 		goto error;
+	}
 	newprof->hdr = prof->hdr;
 	newprof->tagtab.numents = 0;
 	newprof->tagtab.ents = 0;
 	assert(newprof->attrtab);
 	jas_iccattrtab_destroy(newprof->attrtab);
-	if (!(newprof->attrtab = jas_iccattrtab_copy(prof->attrtab)))
+	if (!(newprof->attrtab = jas_iccattrtab_copy(prof->attrtab))) {
 		goto error;
+	}
 	return newprof;
 error:
-	if (newprof)
+	if (newprof) {
 		jas_iccprof_destroy(newprof);
+	}
 	return 0;
 }
 
 void jas_iccprof_destroy(jas_iccprof_t *prof)
 {
-	if (prof->attrtab)
+	if (prof->attrtab) {
 		jas_iccattrtab_destroy(prof->attrtab);
-	if (prof->tagtab.ents)
+	}
+	if (prof->tagtab.ents) {
 		jas_free(prof->tagtab.ents);
+	}
 	jas_free(prof);
 }
 
@@ -728,17 +735,20 @@ static jas_iccattrtab_t *jas_iccattrtab_create()
 {
 	jas_iccattrtab_t *tab;
 	tab = 0;
-	if (!(tab = jas_malloc(sizeof(jas_iccattrtab_t))))
+	if (!(tab = jas_malloc(sizeof(jas_iccattrtab_t)))) {
 		goto error;
+	}
 	tab->maxattrs = 0;
 	tab->numattrs = 0;
 	tab->attrs = 0;
-	if (jas_iccattrtab_resize(tab, 32))
+	if (jas_iccattrtab_resize(tab, 32)) {
 		goto error;
+	}
 	return tab;
 error:
-	if (tab)
+	if (tab) {
 		jas_iccattrtab_destroy(tab);
+	}
 	return 0;
 }
 

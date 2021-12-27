@@ -8,6 +8,12 @@ panic()
 
 program_dir=$(dirname "$0") || exit 1
 
+usage()
+{
+	echo "bad usage: $@"
+	exit 2
+}
+
 start=0
 step=64
 end=4294967296
@@ -30,6 +36,10 @@ while getopts s:e:d:p:i: opt; do
 	esac
 done
 shift $((OPTIND - 1))
+
+if [ -z "$image_file" ]; then
+	usage "no image file specified"
+fi
 
 i="$start"
 while [ $i -lt "$end" ]; do
