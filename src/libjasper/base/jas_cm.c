@@ -934,6 +934,7 @@ static int jas_cmshapmatlut_set(jas_cmshapmatlut_t *lut, const jas_icccurv_t *cu
 	}
 	return 0;
 error:
+	jas_cmshapmatlut_cleanup(lut);
 	return -1;
 }
 
@@ -1145,6 +1146,7 @@ static int mono(const jas_iccprof_t *iccprof, int op, jas_cmpxformseq_t **retpxf
 	*retpxformseq = pxformseq;
 	return 0;
 error:
+	jas_cmshapmatlut_cleanup(&lut);
 	if (graytrc)
 		jas_iccattrval_destroy(graytrc);
 	if (pxform)

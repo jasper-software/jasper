@@ -209,6 +209,7 @@ jas_image_t *jpg_decode(jas_stream_t *in, const char *optstr)
 	int ret;
 	jpg_dec_importopts_t opts;
 	size_t num_samples;
+	bool cinfo_initialized = false;
 
 	// In theory, the two memset calls that follow are not needed.
 	// They are only here to make the code more predictable in the event
@@ -250,6 +251,7 @@ jas_image_t *jpg_decode(jas_stream_t *in, const char *optstr)
 	cinfo.err = jpeg_std_error(&jerr);
 	JAS_LOGDEBUGF(10, "jpeg_create_decompress(%p)\n", &cinfo);
 	jpeg_create_decompress(&cinfo);
+	cinfo_initialized = 1;
 
 	/* Specify the data source for decompression. */
 	JAS_LOGDEBUGF(10, "jpeg_stdio_src(%p, %p)\n", &cinfo, input_file);
@@ -333,6 +335,7 @@ jas_image_t *jpg_decode(jas_stream_t *in, const char *optstr)
 	/* Destroy the JPEG decompression object. */
 	JAS_LOGDEBUGF(10, "jpeg_destroy_decompress(%p)\n", &cinfo);
 	jpeg_destroy_decompress(&cinfo);
+	cinfo_initialized = 0;
 
 	jas_matrix_destroy(dest_mgr->data);
 
@@ -348,6 +351,9 @@ jas_image_t *jpg_decode(jas_stream_t *in, const char *optstr)
 	return image;
 
 error:
+	if (cinfo_initialized) {
+		jpeg_destroy_decompress(&cinfo);
+	}
 	if (dest_mgr->data) {
 		jas_matrix_destroy(dest_mgr->data);
 	}
