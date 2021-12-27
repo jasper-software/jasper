@@ -745,7 +745,7 @@ JAS_EXPORT jas_image_t *jas_image_chclrspc(jas_image_t *image, const jas_cmprof_
 /*!
 @brief Dump the information for an image (for debugging).
 */
-JAS_EXPORT void jas_image_dump(jas_image_t *image, FILE *out);
+JAS_EXPORT int jas_image_dump(jas_image_t *image, FILE *out);
 
 /******************************************************************************\
 * Image format-dependent operations.

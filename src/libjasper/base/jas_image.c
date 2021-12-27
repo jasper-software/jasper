@@ -1024,7 +1024,7 @@ int jas_image_copycmpt(jas_image_t *dstimage, unsigned dstcmptno,
 	return 0;
 }
 
-void jas_image_dump(jas_image_t *image, FILE *out)
+int jas_image_dump(jas_image_t *image, FILE *out)
 {
 	long buf[1024];
 	jas_image_cmpt_t *cmpt;
@@ -1036,20 +1036,21 @@ void jas_image_dump(jas_image_t *image, FILE *out)
 		const unsigned height = jas_image_cmptheight(image, cmptno);
 		const unsigned n = JAS_MIN(16, width);
 		if (jas_image_readcmpt2(image, cmptno, 0, 0, n, 1, buf)) {
-			abort();
+			return -1;
 		}
 		for (unsigned i = 0; i < n; ++i) {
 			fprintf(out, " f(%d,%d)=%ld", i, 0, buf[i]);
 		}
 		fprintf(out, "\n");
 		if (jas_image_readcmpt2(image, cmptno, width - n, height - 1, n, 1, buf)) {
-			abort();
+			return -1;
 		}
 		for (unsigned i = 0; i < n; ++i) {
 			fprintf(out, " f(%d,%d)=%ld", width - n + i, height - 1, buf[i]);
 		}
 		fprintf(out, "\n");
 	}
+	return 0;
 }
 
 int jas_image_depalettize(jas_image_t *image, unsigned cmptno, unsigned numlutents,

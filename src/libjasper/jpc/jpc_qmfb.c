@@ -82,6 +82,7 @@
 #include "jpc_math.h"
 
 #include "jasper/jas_malloc.h"
+#include "jasper/jas_math.h"
 
 #include <stdlib.h>
 
@@ -89,8 +90,7 @@
 *
 \******************************************************************************/
 
-#define QMFB_SPLITBUFSIZE	4096
-#define	QMFB_JOINBUFSIZE	4096
+#define QMFB_SPLITJOINBUFSIZE 1024
 
 static int jpc_ft_analyze(jpc_fix_t *a, int xstart, int ystart, int width, int height,
   int stride);
@@ -123,15 +123,15 @@ static void jpc_ns_invlift_colgrp(jpc_fix_t *a, unsigned numrows, unsigned strid
 static void jpc_ns_invlift_colres(jpc_fix_t *a, unsigned numrows, unsigned numcols, unsigned stride,
   bool parity);
 
-static void jpc_qmfb_split_row(jpc_fix_t *a, unsigned numrows, bool parity);
-static void jpc_qmfb_split_colgrp(jpc_fix_t *a, unsigned numrows, unsigned stride, bool parity);
+static void jpc_qmfb_split_row(jpc_fix_t *a, unsigned numrows, bool parity, jpc_fix_t*, unsigned);
+static void jpc_qmfb_split_colgrp(jpc_fix_t *a, unsigned numrows, unsigned stride, bool parity, jpc_fix_t*, unsigned);
 static void jpc_qmfb_split_colres(jpc_fix_t *a, unsigned numrows, unsigned numcols, unsigned stride,
-  bool parity);
+  bool parity, jpc_fix_t*, unsigned);
 
-static void jpc_qmfb_join_row(jpc_fix_t *a, unsigned numcols, bool parity);
-static void jpc_qmfb_join_colgrp(jpc_fix_t *a, unsigned numrows, unsigned stride, bool parity);
+static void jpc_qmfb_join_row(jpc_fix_t *a, unsigned numcols, bool parity, jpc_fix_t*, unsigned);
+static void jpc_qmfb_join_colgrp(jpc_fix_t *a, unsigned numrows, unsigned stride, bool parity, jpc_fix_t*, unsigned);
 static void jpc_qmfb_join_colres(jpc_fix_t *a, unsigned numrows, unsigned numcols, unsigned stride,
-  bool parity);
+  bool parity, jpc_fix_t*, unsigned);
 
 /******************************************************************************\
 * Data.
@@ -298,21 +298,15 @@ const jpc_qmfb2d_t jpc_ns_qmfb2d = {
 * generic
 \******************************************************************************/
 
-static void jpc_qmfb_split_row(jpc_fix_t *a, unsigned numcols, bool parity)
+static void jpc_qmfb_split_row(jpc_fix_t *a, unsigned numcols, bool parity,
+  jpc_fix_t *buffer, unsigned buffersize)
 {
-	jpc_fix_t splitbuf[QMFB_SPLITBUFSIZE];
-	jpc_fix_t *buf = splitbuf;
+	jpc_fix_t *buf = buffer;
 	register jpc_fix_t *srcptr;
 	register jpc_fix_t *dstptr;
 
-	/* Get a buffer. */
 	const size_t bufsize = JPC_CEILDIVPOW2(numcols, 1);
-	if (bufsize > QMFB_SPLITBUFSIZE) {
-		if (!(buf = jas_alloc2(bufsize, sizeof(jpc_fix_t)))) {
-			/* We have no choice but to commit suicide in this case. */
-			abort();
-		}
-	}
+	assert(buffersize >= bufsize);
 
 	if (numcols >= 2) {
 		const unsigned hstartcol = (numcols + !parity) >> 1;
@@ -344,34 +338,20 @@ static void jpc_qmfb_split_row(jpc_fix_t *a, unsigned numcols, bool parity)
 			++srcptr;
 		}
 	}
-
-	/* If the split buffer was allocated on the heap, free this memory. */
-	if (buf != splitbuf) {
-		jas_free(buf);
-	}
-
 }
 
 static void jpc_qmfb_split_colgrp(jpc_fix_t *a, unsigned numrows, unsigned stride,
-  bool parity)
+  bool parity,
+  jpc_fix_t *buffer, unsigned buffersize)
 {
-
-	jpc_fix_t splitbuf[QMFB_SPLITBUFSIZE * JPC_QMFB_COLGRPSIZE];
-	jpc_fix_t *buf = splitbuf;
+	jpc_fix_t *buf = buffer;
 	jpc_fix_t *srcptr;
 	jpc_fix_t *dstptr;
 	register jpc_fix_t *srcptr2;
 	register jpc_fix_t *dstptr2;
 
-	/* Get a buffer. */
-	const size_t bufsize = JPC_CEILDIVPOW2(numrows, 1);
-	if (bufsize > QMFB_SPLITBUFSIZE) {
-		if (!(buf = jas_alloc3(bufsize, JPC_QMFB_COLGRPSIZE,
-		  sizeof(jpc_fix_t)))) {
-			/* We have no choice but to commit suicide in this case. */
-			abort();
-		}
-	}
+	const size_t bufsize = JPC_QMFB_COLGRPSIZE * JPC_CEILDIVPOW2(numrows, 1);
+	assert(buffersize >= bufsize);
 
 	if (numrows >= 2) {
 		const unsigned hstartrow = (numrows + !parity) >> 1;
@@ -421,33 +401,20 @@ static void jpc_qmfb_split_colgrp(jpc_fix_t *a, unsigned numrows, unsigned strid
 			srcptr += JPC_QMFB_COLGRPSIZE;
 		}
 	}
-
-	/* If the split buffer was allocated on the heap, free this memory. */
-	if (buf != splitbuf) {
-		jas_free(buf);
-	}
-
 }
 
 static void jpc_qmfb_split_colres(jpc_fix_t *a, unsigned numrows, unsigned numcols,
-  unsigned stride, bool parity)
+  unsigned stride, bool parity,
+  jpc_fix_t *buffer, unsigned buffersize)
 {
-
-	jpc_fix_t splitbuf[QMFB_SPLITBUFSIZE * JPC_QMFB_COLGRPSIZE];
-	jpc_fix_t *buf = splitbuf;
+	jpc_fix_t *buf = buffer;
 	jpc_fix_t *srcptr;
 	jpc_fix_t *dstptr;
 	register jpc_fix_t *srcptr2;
 	register jpc_fix_t *dstptr2;
 
-	/* Get a buffer. */
-	const size_t bufsize = JPC_CEILDIVPOW2(numrows, 1);
-	if (bufsize > QMFB_SPLITBUFSIZE) {
-		if (!(buf = jas_alloc3(bufsize, numcols, sizeof(jpc_fix_t)))) {
-			/* We have no choice but to commit suicide in this case. */
-			abort();
-		}
-	}
+	const size_t bufsize = numcols * JPC_CEILDIVPOW2(numrows, 1);
+	assert(buffersize >= bufsize);
 
 	if (numrows >= 2) {
 		const unsigned hstartcol = (numrows + !parity) >> 1;
@@ -497,30 +464,18 @@ static void jpc_qmfb_split_colres(jpc_fix_t *a, unsigned numrows, unsigned numco
 			srcptr += numcols;
 		}
 	}
-
-	/* If the split buffer was allocated on the heap, free this memory. */
-	if (buf != splitbuf) {
-		jas_free(buf);
-	}
-
 }
 
-void jpc_qmfb_join_row(jpc_fix_t *a, unsigned numcols, bool parity)
+void jpc_qmfb_join_row(jpc_fix_t *a, unsigned numcols, bool parity,
+  jpc_fix_t *buffer, unsigned buffersize)
 {
-
-	jpc_fix_t joinbuf[QMFB_JOINBUFSIZE];
-	jpc_fix_t *buf = joinbuf;
+	jpc_fix_t *buf = buffer;
 	register jpc_fix_t *srcptr;
 	register jpc_fix_t *dstptr;
 
 	/* Allocate memory for the join buffer from the heap. */
 	const size_t bufsize = JPC_CEILDIVPOW2(numcols, 1);
-	if (bufsize > QMFB_JOINBUFSIZE) {
-		if (!(buf = jas_alloc2(bufsize, sizeof(jpc_fix_t)))) {
-			/* We have no choice but to commit suicide. */
-			abort();
-		}
-	}
+	assert(buffersize >= bufsize);
 
 	const unsigned hstartcol = (numcols + !parity) >> 1;
 
@@ -548,34 +503,20 @@ void jpc_qmfb_join_row(jpc_fix_t *a, unsigned numcols, bool parity)
 		dstptr += 2;
 		++srcptr;
 	}
-
-	/* If the join buffer was allocated on the heap, free this memory. */
-	if (buf != joinbuf) {
-		jas_free(buf);
-	}
-
 }
 
 static void jpc_qmfb_join_colgrp(jpc_fix_t *a, unsigned numrows, unsigned stride,
-  bool parity)
+  bool parity,
+  jpc_fix_t *buffer, unsigned buffersize)
 {
-
-	jpc_fix_t joinbuf[QMFB_JOINBUFSIZE * JPC_QMFB_COLGRPSIZE];
-	jpc_fix_t *buf = joinbuf;
+	jpc_fix_t *buf = buffer;
 	jpc_fix_t *srcptr;
 	jpc_fix_t *dstptr;
 	register jpc_fix_t *srcptr2;
 	register jpc_fix_t *dstptr2;
 
-	/* Allocate memory for the join buffer from the heap. */
-	const size_t bufsize = JPC_CEILDIVPOW2(numrows, 1);
-	if (bufsize > QMFB_JOINBUFSIZE) {
-		if (!(buf = jas_alloc3(bufsize, JPC_QMFB_COLGRPSIZE,
-		  sizeof(jpc_fix_t)))) {
-			/* We have no choice but to commit suicide. */
-			abort();
-		}
-	}
+	const size_t bufsize = JPC_QMFB_COLGRPSIZE * JPC_CEILDIVPOW2(numrows, 1);
+	assert(buffersize >= bufsize);
 
 	const unsigned hstartcol = (numrows + !parity) >> 1;
 
@@ -621,33 +562,21 @@ static void jpc_qmfb_join_colgrp(jpc_fix_t *a, unsigned numrows, unsigned stride
 		dstptr += 2 * stride;
 		srcptr += JPC_QMFB_COLGRPSIZE;
 	}
-
-	/* If the join buffer was allocated on the heap, free this memory. */
-	if (buf != joinbuf) {
-		jas_free(buf);
-	}
-
 }
 
 static void jpc_qmfb_join_colres(jpc_fix_t *a, unsigned numrows, unsigned numcols,
-  unsigned stride, bool parity)
+  unsigned stride, bool parity,
+  jpc_fix_t *buffer, unsigned buffersize)
 {
-
-	jpc_fix_t joinbuf[QMFB_JOINBUFSIZE * JPC_QMFB_COLGRPSIZE];
-	jpc_fix_t *buf = joinbuf;
+	jpc_fix_t *buf = buffer;
 	jpc_fix_t *srcptr;
 	jpc_fix_t *dstptr;
 	register jpc_fix_t *srcptr2;
 	register jpc_fix_t *dstptr2;
 
 	/* Allocate memory for the join buffer from the heap. */
-	const size_t bufsize = JPC_CEILDIVPOW2(numrows, 1);
-	if (bufsize > QMFB_JOINBUFSIZE) {
-		if (!(buf = jas_alloc3(bufsize, numcols, sizeof(jpc_fix_t)))) {
-			/* We have no choice but to commit suicide. */
-			abort();
-		}
-	}
+	const size_t bufsize = numcols * JPC_CEILDIVPOW2(numrows, 1);
+	assert(buffersize >= bufsize);
 
 	const unsigned hstartcol = (numrows + !parity) >> 1;
 
@@ -693,12 +622,6 @@ static void jpc_qmfb_join_colres(jpc_fix_t *a, unsigned numrows, unsigned numcol
 		dstptr += 2 * stride;
 		srcptr += numcols;
 	}
-
-	/* If the join buffer was allocated on the heap, free this memory. */
-	if (buf != joinbuf) {
-		jas_free(buf);
-	}
-
 }
 
 /******************************************************************************\
@@ -1228,6 +1151,9 @@ static void jpc_ft_invlift_colres(jpc_fix_t *a, unsigned numrows, unsigned numco
 int jpc_ft_analyze(jpc_fix_t *a, int xstart, int ystart, int width, int height,
   int stride)
 {
+	jpc_fix_t localbuf[QMFB_SPLITJOINBUFSIZE];
+	unsigned bufsize;
+	jpc_fix_t *buf;
 	const unsigned numrows = height;
 	const unsigned numcols = width;
 	const unsigned rowparity = ystart & 1;
@@ -1235,24 +1161,38 @@ int jpc_ft_analyze(jpc_fix_t *a, int xstart, int ystart, int width, int height,
 	jpc_fix_t *startptr;
 
 	const unsigned maxcols = (numcols / JPC_QMFB_COLGRPSIZE) * JPC_QMFB_COLGRPSIZE;
+	bufsize = JAS_MAX(width, JPC_QMFB_COLGRPSIZE * height);
+	if (bufsize > QMFB_SPLITJOINBUFSIZE) {
+		if (!(buf = jas_alloc2(bufsize, sizeof(jpc_fix_t)))) {
+			return -1;
+		}
+	} else {
+		buf = localbuf;
+		bufsize = QMFB_SPLITJOINBUFSIZE;
+	}
+
 	startptr = &a[0];
 	for (unsigned i = 0; i < maxcols; i += JPC_QMFB_COLGRPSIZE) {
-		jpc_qmfb_split_colgrp(startptr, numrows, stride, rowparity);
+		jpc_qmfb_split_colgrp(startptr, numrows, stride, rowparity, buf, bufsize);
 		jpc_ft_fwdlift_colgrp(startptr, numrows, stride, rowparity);
 		startptr += JPC_QMFB_COLGRPSIZE;
 	}
 	if (maxcols < numcols) {
 		jpc_qmfb_split_colres(startptr, numrows, numcols - maxcols, stride,
-		  rowparity);
+		  rowparity, buf, bufsize);
 		jpc_ft_fwdlift_colres(startptr, numrows, numcols - maxcols, stride,
 		  rowparity);
 	}
 
 	startptr = &a[0];
 	for (unsigned i = 0; i < numrows; ++i) {
-		jpc_qmfb_split_row(startptr, numcols, colparity);
+		jpc_qmfb_split_row(startptr, numcols, colparity, buf, bufsize);
 		jpc_ft_fwdlift_row(startptr, numcols, colparity);
 		startptr += stride;
+	}
+
+	if (buf != localbuf) {
+		jas_free(buf);
 	}
 
 	return 0;
@@ -1262,36 +1202,51 @@ int jpc_ft_analyze(jpc_fix_t *a, int xstart, int ystart, int width, int height,
 int jpc_ft_synthesize(jpc_fix_t *a, int xstart, int ystart, int width, int height,
   int stride)
 {
+	jpc_fix_t localbuf[QMFB_SPLITJOINBUFSIZE];
+	unsigned bufsize;
+	jpc_fix_t *buf;
 	const unsigned numrows = height;
 	const unsigned numcols = width;
 	const unsigned rowparity = ystart & 1;
 	const unsigned colparity = xstart & 1;
-
 	jpc_fix_t *startptr;
+
+	const unsigned maxcols = (numcols / JPC_QMFB_COLGRPSIZE) * JPC_QMFB_COLGRPSIZE;
+	bufsize = JAS_MAX(width, JPC_QMFB_COLGRPSIZE * height);
+	if (bufsize > QMFB_SPLITJOINBUFSIZE) {
+		if (!(buf = jas_alloc2(bufsize, sizeof(jpc_fix_t)))) {
+			return -1;
+		}
+	} else {
+		buf = localbuf;
+		bufsize = QMFB_SPLITJOINBUFSIZE;
+	}
 
 	startptr = &a[0];
 	for (unsigned i = 0; i < numrows; ++i) {
 		jpc_ft_invlift_row(startptr, numcols, colparity);
-		jpc_qmfb_join_row(startptr, numcols, colparity);
+		jpc_qmfb_join_row(startptr, numcols, colparity, buf, bufsize);
 		startptr += stride;
 	}
 
-	const unsigned maxcols = (numcols / JPC_QMFB_COLGRPSIZE) * JPC_QMFB_COLGRPSIZE;
 	startptr = &a[0];
 	for (unsigned i = 0; i < maxcols; i += JPC_QMFB_COLGRPSIZE) {
 		jpc_ft_invlift_colgrp(startptr, numrows, stride, rowparity);
-		jpc_qmfb_join_colgrp(startptr, numrows, stride, rowparity);
+		jpc_qmfb_join_colgrp(startptr, numrows, stride, rowparity, buf, bufsize);
 		startptr += JPC_QMFB_COLGRPSIZE;
 	}
 	if (maxcols < numcols) {
 		jpc_ft_invlift_colres(startptr, numrows, numcols - maxcols, stride,
 		  rowparity);
 		jpc_qmfb_join_colres(startptr, numrows, numcols - maxcols, stride,
-		  rowparity);
+		  rowparity, buf, bufsize);
+	}
+
+	if (buf != localbuf) {
+		jas_free(buf);
 	}
 
 	return 0;
-
 }
 
 /******************************************************************************\
@@ -2144,41 +2099,60 @@ static void jpc_ns_invlift_colres(jpc_fix_t *a, unsigned numrows, unsigned numco
 int jpc_ns_analyze(jpc_fix_t *a, int xstart, int ystart, int width, int height,
   int stride)
 {
+	jpc_fix_t localbuf[QMFB_SPLITJOINBUFSIZE];
+	unsigned bufsize;
+	jpc_fix_t *buf;
 
 	const unsigned numrows = height;
 	const unsigned numcols = width;
 	const unsigned rowparity = ystart & 1;
 	const unsigned colparity = xstart & 1;
 	jpc_fix_t *startptr;
-
 	const unsigned maxcols = (numcols / JPC_QMFB_COLGRPSIZE) * JPC_QMFB_COLGRPSIZE;
+
+	bufsize = JAS_MAX(width, JPC_QMFB_COLGRPSIZE * height);
+	if (bufsize > QMFB_SPLITJOINBUFSIZE) {
+		if (!(buf = jas_alloc2(bufsize, sizeof(jpc_fix_t)))) {
+			return -1;
+		}
+	} else {
+		buf = localbuf;
+		bufsize = QMFB_SPLITJOINBUFSIZE;
+	}
+
 	startptr = &a[0];
 	for (unsigned i = 0; i < maxcols; i += JPC_QMFB_COLGRPSIZE) {
-		jpc_qmfb_split_colgrp(startptr, numrows, stride, rowparity);
+		jpc_qmfb_split_colgrp(startptr, numrows, stride, rowparity, buf, bufsize);
 		jpc_ns_fwdlift_colgrp(startptr, numrows, stride, rowparity);
 		startptr += JPC_QMFB_COLGRPSIZE;
 	}
 	if (maxcols < numcols) {
 		jpc_qmfb_split_colres(startptr, numrows, numcols - maxcols, stride,
-		  rowparity);
+		  rowparity, buf, bufsize);
 		jpc_ns_fwdlift_colres(startptr, numrows, numcols - maxcols, stride,
 		  rowparity);
 	}
 
 	startptr = &a[0];
 	for (unsigned i = 0; i < numrows; ++i) {
-		jpc_qmfb_split_row(startptr, numcols, colparity);
+		jpc_qmfb_split_row(startptr, numcols, colparity, buf, bufsize);
 		jpc_ns_fwdlift_row(startptr, numcols, colparity);
 		startptr += stride;
 	}
 
-	return 0;
+	if (buf != localbuf) {
+		jas_free(buf);
+	}
 
+	return 0;
 }
 
 int jpc_ns_synthesize(jpc_fix_t *a, int xstart, int ystart, int width,
   int height, int stride)
 {
+	jpc_fix_t localbuf[QMFB_SPLITJOINBUFSIZE];
+	unsigned bufsize;
+	jpc_fix_t *buf;
 
 	const unsigned numrows = height;
 	const unsigned numcols = width;
@@ -2186,28 +2160,40 @@ int jpc_ns_synthesize(jpc_fix_t *a, int xstart, int ystart, int width,
 	const unsigned colparity = xstart & 1;
 	jpc_fix_t *startptr;
 
+	const unsigned maxcols = (numcols / JPC_QMFB_COLGRPSIZE) * JPC_QMFB_COLGRPSIZE;
+	bufsize = JAS_MAX(width, JPC_QMFB_COLGRPSIZE * height);
+	if (bufsize > QMFB_SPLITJOINBUFSIZE) {
+		if (!(buf = jas_alloc2(bufsize, sizeof(jpc_fix_t)))) {
+			return -1;
+		}
+	} else {
+		buf = localbuf;
+		bufsize = QMFB_SPLITJOINBUFSIZE;
+	}
+
 	startptr = &a[0];
 	for (unsigned i = 0; i < numrows; ++i) {
 		jpc_ns_invlift_row(startptr, numcols, colparity);
-		jpc_qmfb_join_row(startptr, numcols, colparity);
+		jpc_qmfb_join_row(startptr, numcols, colparity, buf, bufsize);
 		startptr += stride;
 	}
 
-	const unsigned maxcols = (numcols / JPC_QMFB_COLGRPSIZE) * JPC_QMFB_COLGRPSIZE;
 	startptr = &a[0];
 	for (unsigned i = 0; i < maxcols; i += JPC_QMFB_COLGRPSIZE) {
 		jpc_ns_invlift_colgrp(startptr, numrows, stride, rowparity);
-		jpc_qmfb_join_colgrp(startptr, numrows, stride, rowparity);
+		jpc_qmfb_join_colgrp(startptr, numrows, stride, rowparity, buf, bufsize);
 		startptr += JPC_QMFB_COLGRPSIZE;
 	}
 	if (maxcols < numcols) {
 		jpc_ns_invlift_colres(startptr, numrows, numcols - maxcols, stride,
 		  rowparity);
 		jpc_qmfb_join_colres(startptr, numrows, numcols - maxcols, stride,
-		  rowparity);
+		  rowparity, buf, bufsize);
+	}
+
+	if (buf != localbuf) {
+		jas_free(buf);
 	}
 
 	return 0;
-
 }
-
