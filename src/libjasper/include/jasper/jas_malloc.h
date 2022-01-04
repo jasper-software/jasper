@@ -331,6 +331,9 @@ void jas_basic_allocator_init(jas_basic_allocator_t *allocator,
 
 #endif
 
+JAS_EXPORT
+size_t jas_get_total_mem_size(void);
+
 /*!
  * @}
  */

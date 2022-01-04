@@ -85,6 +85,15 @@
 /* We need the prototype for memset. */
 #include <string.h>
 
+#if defined(__linux__)
+#	include <sys/sysinfo.h>
+#elif defined(__APPLE__)
+#	include <unistd.h>
+#elif defined(_WIN32)
+#	include <WinDef.h>
+#	include <sysinfoapi.h>
+#endif
+
 /******************************************************************************\
 * Data.
 \******************************************************************************/
@@ -604,4 +613,38 @@ void jas_basic_free(jas_allocator_t *allocator, void *ptr)
 	}
 	JAS_LOGDEBUGF(102, "max_mem=%zu; mem=%zu\n", a->max_mem, a->mem);
 
+}
+
+/******************************************************************************\
+\******************************************************************************/
+
+size_t jas_get_total_mem_size()
+{
+#if defined(__linux__)
+	struct sysinfo buf;
+	if (sysinfo(&buf)) {
+		return 0;
+	}
+	return buf.totalram * buf.mem_unit;
+#elif defined(__APPLE__)
+	int mib[] = {CTL_HW, HW_MEMSIZE};
+	uint64_t value = 0;
+	size_t length = sizeof(value);
+	if (sysctl(mib, 2, &value, &length, 0, 0)) {
+		return 0;
+	}
+	return JAS_CAST(size_t, value);
+#elif defined(_WIN32)
+	/*
+	Reference:
+	https://docs.microsoft.com/en-us/windows/win32/api/sysinfoapi/nf-sysinfoapi-getphysicallyinstalledsystemmemory
+	*/
+	ULONGLONG size;
+	if (!GetPhysicallyInstalledSystemMemory(&size)) {
+		return 0;
+	}
+	return 1024 * size;
+#else
+	return 0;
+#endif
 }

@@ -391,6 +391,8 @@ static int jas_init_helper()
 	jas_global_ctx->debug_level = jas_conf.debug_level;
 	//jas_setdbglevel(jas_conf.debug_level);
 
+	JAS_LOGDEBUGF(1, "memory size: %zu\n", jas_get_total_mem_size());
+
 	if (jas_init_codecs(jas_global_ctx)) {
 		jas_eprintf("cannot initialize codecs\n");
 		return -1;
