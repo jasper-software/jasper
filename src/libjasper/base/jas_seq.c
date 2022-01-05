@@ -140,9 +140,7 @@ jas_matrix_t *jas_matrix_create(jas_matind_t numrows, jas_matind_t numcols)
 		  sizeof(jas_seqent_t)))) {
 			goto error;
 		}
-
-		memset(matrix->data_, 0,
-		       matrix->datasize_ * sizeof(jas_seqent_t));
+		memset(matrix->data_, 0, matrix->datasize_ * sizeof(jas_seqent_t));
 	}
 
 	for (i = 0; i < numrows; ++i) {
@@ -209,11 +207,11 @@ int jas_seq2d_bindsub(jas_matrix_t *s, jas_matrix_t *s1, jas_matind_t xstart,
   jas_matind_t ystart, jas_matind_t xend, jas_matind_t yend)
 {
 	if (xstart < s1->xstart_ || ystart < s1->ystart_ ||
-	    xend > s1->xend_ || yend > s1->yend_)
+	    xend > s1->xend_ || yend > s1->yend_) {
 		return -1;
-
-	return jas_matrix_bindsub(s, s1, ystart - s1->ystart_, xstart - s1->xstart_,
-				  yend - s1->ystart_ - 1, xend - s1->xstart_ - 1);
+	}
+	return jas_matrix_bindsub(s, s1, ystart - s1->ystart_,
+	  xstart - s1->xstart_, yend - s1->ystart_ - 1, xend - s1->xstart_ - 1);
 }
 
 int jas_matrix_bindsub(jas_matrix_t *mat0, jas_matrix_t *mat1,

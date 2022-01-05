@@ -80,6 +80,11 @@
 extern "C" {
 #endif
 
+/*!
+ * @addtogroup string
+ * @{
+ */
+
 /******************************************************************************\
 * Functions.
 \******************************************************************************/
@@ -102,6 +107,10 @@ This function has a similar behavior as @c strtok_r in the POSIX standard.
 */
 JAS_EXPORT
 char *jas_strtok(char *str, const char *delim, char **saveptr);
+
+/*!
+ * @}
+ */
 
 #ifdef __cplusplus
 }

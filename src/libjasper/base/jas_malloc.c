@@ -88,7 +88,6 @@
 #if defined(__linux__)
 #	include <sys/sysinfo.h>
 #elif defined(__APPLE__)
-//#	include <unistd.h>
 #	include <sys/types.h>
 #	include <sys/sysctl.h>
 #elif defined(_WIN32)

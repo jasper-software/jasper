@@ -76,31 +76,40 @@ extern "C" {
 /* The configuration header file should be included first. */
 #include <jasper/jas_config.h>
 
+/*!
+ * @addtogroup getopt
+ * @{
+ */
+
 /******************************************************************************\
 * Constants.
 \******************************************************************************/
 
+/*! Last CLI option. */
 #define	JAS_GETOPT_EOF	(-1)
+/*! Error while processing CLI options. */
 #define	JAS_GETOPT_ERR	'?'
 
-/* option flags. */
+/*! Option has argument. */
 #define	JAS_OPT_HASARG	0x01	/* option has argument */
 
 /******************************************************************************\
 * Types.
 \******************************************************************************/
 
-/* Command line option type. */
+/*!
+Command line option type.
+*/
 typedef struct {
 
-	int id;
 	/* The unique identifier for this option. */
+	int id;
 
-	const char *name;
 	/* The name of this option. */
+	const char *name;
 
-	int flags;
 	/* option flags. */
+	int flags;
 
 } jas_opt_t;
 
@@ -108,21 +117,41 @@ typedef struct {
 * External data.
 \******************************************************************************/
 
-/* The current option index. */
+/*!
+The current option index.
+*/
 JAS_EXPORT extern int jas_optind;
 
-/* The current option argument. */
+/*!
+The current option argument.
+*/
 JAS_EXPORT extern const char *jas_optarg;
 
-/* The debug level. */
+/*!
+The debug level.
+*/
 JAS_EXPORT extern int jas_opterr;
 
 /******************************************************************************\
 * Prototypes.
 \******************************************************************************/
 
-/* Get the next option. */
+/*!
+@brief
+Get the next option.
+
+@details
+Gets the next CLI option.
+
+@warning
+This function is not thread safe, due to its use of @c jas_optind,
+@c jas_optarg, and @c jas_opterr.
+*/
 JAS_EXPORT int jas_getopt(int argc, char **argv, const jas_opt_t *opts);
+
+/*!
+ * @}
+ */
 
 #ifdef __cplusplus
 }

@@ -213,6 +213,7 @@ static const jas_image_fmt_t jas_image_fmts[] = {
 
 };
 
+/* MUTABLE_SHARED_STATE_TAG: This is mutable shared state. */
 /*
 Various user-configurable settings.
 */
@@ -223,11 +224,14 @@ jas_conf_t jas_conf = {
 };
 
 #if defined(JAS_THREADS)
+/* MUTABLE_SHARED_STATE_TAG: This is mutable shared state. */
 static jas_tss_t jas_tss;
 #endif
 
+/* MUTABLE_SHARED_STATE_TAG: This is mutable shared state. */
 static jas_ctx_t *jas_global_ctx = 0;
 
+/* MUTABLE_SHARED_STATE_TAG: This is mutable shared state. */
 static jas_ctx_t jas_global_ctx_buf;
 
 /******************************************************************************\

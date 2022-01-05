@@ -83,6 +83,7 @@
 * Global data.
 \******************************************************************************/
 
+/* MUTABLE_SHARED_STATE_TAG: This is mutable shared state. */
 int jas_optind = 0;
 int jas_opterr = 1;
 const char *jas_optarg = 0;

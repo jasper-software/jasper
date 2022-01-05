@@ -156,7 +156,11 @@ static jas_cmprof_t *jas_cmprof_createsycc(void);
 *
 \******************************************************************************/
 
-static const jas_cmpxformops_t shapmat_ops = {jas_cmshapmat_destroy, jas_cmshapmat_apply, 0};
+static const jas_cmpxformops_t shapmat_ops = {
+	jas_cmshapmat_destroy,
+	jas_cmshapmat_apply,
+	0
+};
 
 /******************************************************************************\
 * Color profile class.
@@ -171,24 +175,29 @@ jas_cmprof_t *jas_cmprof_createfromclrspc(jas_clrspc_t clrspc)
 	prof = 0;
 	switch (clrspc) {
 	case JAS_CLRSPC_SYCBCR:
-		if (!(prof = jas_cmprof_createsycc()))
+		if (!(prof = jas_cmprof_createsycc())) {
 			goto error;
+		}
 		break;
 	default:
-		if (!(iccprof = jas_iccprof_createfromclrspc(clrspc)))
+		if (!(iccprof = jas_iccprof_createfromclrspc(clrspc))) {
 			goto error;
-		if (!(prof = jas_cmprof_createfromiccprof(iccprof)))
+		}
+		if (!(prof = jas_cmprof_createfromiccprof(iccprof))) {
 			goto error;
+		}
 		jas_iccprof_destroy(iccprof);
 		iccprof = 0;
-		if (!jas_clrspc_isgeneric(clrspc))
+		if (!jas_clrspc_isgeneric(clrspc)) {
 			prof->clrspc = clrspc;
+		}
 		break;
 	}
 	return prof;
 error:
-	if (iccprof)
+	if (iccprof) {
 		jas_iccprof_destroy(iccprof);
+	}
 	return 0;
 }
 
@@ -200,13 +209,15 @@ static jas_cmprof_t *jas_cmprof_createsycc()
 	jas_cmshapmat_t *fwdshapmat;
 	jas_cmshapmat_t *revshapmat;
 
-	if (!(prof = jas_cmprof_createfromclrspc(JAS_CLRSPC_SRGB)))
+	if (!(prof = jas_cmprof_createfromclrspc(JAS_CLRSPC_SRGB))) {
 		goto error;
+	}
 	prof->clrspc = JAS_CLRSPC_SYCBCR;
 	assert(prof->numchans == 3 && prof->numrefchans == 3);
 	assert(prof->refclrspc == JAS_CLRSPC_CIEXYZ);
-	if (!(fwdpxform = jas_cmpxform_createshapmat()))
+	if (!(fwdpxform = jas_cmpxform_createshapmat())) {
 		goto error;
+	}
 	fwdpxform->numinchans = 3;
 	fwdpxform->numoutchans = 3;
 	fwdshapmat = &fwdpxform->data.shapmat;
@@ -226,8 +237,9 @@ static jas_cmprof_t *jas_cmprof_createsycc()
 	fwdshapmat->mat[0][3] = -0.5 * (1.402);
 	fwdshapmat->mat[1][3] = -0.5 * (-0.34413 - 0.71414);
 	fwdshapmat->mat[2][3] = -0.5 * (1.772);
-	if (!(revpxform = jas_cmpxform_createshapmat()))
+	if (!(revpxform = jas_cmpxform_createshapmat())) {
 		goto error;
+	}
 	revpxform->numinchans = 3;
 	revpxform->numoutchans = 3;
 	revshapmat = &revpxform->data.shapmat;
@@ -241,14 +253,16 @@ static jas_cmprof_t *jas_cmprof_createsycc()
 		unsigned j = SEQFWD(i);
 		if (prof->pxformseqs[j]) {
 			if (jas_cmpxformseq_insertpxform(prof->pxformseqs[j], 0,
-			  fwdpxform))
+			  fwdpxform)) {
 				goto error;
+			}
 		}
 		j = SEQREV(i);
 		if (prof->pxformseqs[j]) {
 			if (jas_cmpxformseq_insertpxform(prof->pxformseqs[j],
-			  -1, revpxform))
+			  -1, revpxform)) {
 				goto error;
+			}
 		}
 	}
 
@@ -256,10 +270,12 @@ static jas_cmprof_t *jas_cmprof_createsycc()
 	jas_cmpxform_destroy(revpxform);
 	return prof;
 error:
-	if (fwdpxform)
+	if (fwdpxform) {
 		jas_cmpxform_destroy(fwdpxform);
-	if (revpxform)
+	}
+	if (revpxform) {
 		jas_cmpxform_destroy(revpxform);
+	}
 	return 0;
 }
 
@@ -346,12 +362,14 @@ error:
 static jas_cmprof_t *jas_cmprof_create()
 {
 	jas_cmprof_t *prof;
-	if (!(prof = jas_malloc(sizeof(jas_cmprof_t))))
+	if (!(prof = jas_malloc(sizeof(jas_cmprof_t)))) {
 		return 0;
+	}
 	memset(prof, 0, sizeof(jas_cmprof_t));
 	prof->iccprof = 0;
-	for (unsigned i = 0; i < JAS_CMPROF_NUMPXFORMSEQS; ++i)
+	for (unsigned i = 0; i < JAS_CMPROF_NUMPXFORMSEQS; ++i) {
 		prof->pxformseqs[i] = 0;
+	}
 	return prof;
 }
 
@@ -363,8 +381,9 @@ void jas_cmprof_destroy(jas_cmprof_t *prof)
 			prof->pxformseqs[i] = 0;
 		}
 	}
-	if (prof->iccprof)
+	if (prof->iccprof) {
 		jas_iccprof_destroy(prof->iccprof);
+	}
 	jas_free(prof);
 }
 
@@ -372,8 +391,9 @@ jas_cmprof_t *jas_cmprof_copy(const jas_cmprof_t *prof)
 {
 	jas_cmprof_t *newprof;
 
-	if (!(newprof = jas_cmprof_create()))
+	if (!(newprof = jas_cmprof_create())) {
 		goto error;
+	}
 	newprof->clrspc = prof->clrspc;
 	newprof->numchans = prof->numchans;
 	newprof->refclrspc = prof->refclrspc;
@@ -387,8 +407,9 @@ jas_cmprof_t *jas_cmprof_copy(const jas_cmprof_t *prof)
 	}
 	return newprof;
 error:
-	if (newprof)
+	if (newprof) {
 		jas_cmprof_destroy(newprof);
+	}
 	return 0;
 }
 
@@ -406,39 +427,45 @@ jas_cmxform_t *jas_cmxform_create(const jas_cmprof_t *inprof, const jas_cmprof_t
 	jas_cmpxformseq_t *prfpxformseq;
 
 	/* Avoid compiler warnings about unused parameters. */
-	(void)optimize;
+	JAS_UNUSED(optimize);
 
 	const jas_cmxform_intent_t prfintent = intent;
 
-	if (!(xform = jas_malloc(sizeof(jas_cmxform_t))))
+	if (!(xform = jas_malloc(sizeof(jas_cmxform_t)))) {
 		goto error;
-	if (!(xform->pxformseq = jas_cmpxformseq_create()))
+	}
+	if (!(xform->pxformseq = jas_cmpxformseq_create())) {
 		goto error;
+	}
 
 	switch (op) {
 	case JAS_CMXFORM_OP_FWD:
 		inpxformseq = fwdpxformseq(inprof, intent);
 		outpxformseq = revpxformseq(outprof, intent);
-		if (!inpxformseq || !outpxformseq)
+		if (!inpxformseq || !outpxformseq) {
 			goto error;
+		}
 		if (jas_cmpxformseq_append(xform->pxformseq, inpxformseq) ||
 		  jas_cmpxformseq_appendcnvt(xform->pxformseq,
 		  inprof->refclrspc, outprof->refclrspc) ||
-		  jas_cmpxformseq_append(xform->pxformseq, outpxformseq))
+		  jas_cmpxformseq_append(xform->pxformseq, outpxformseq)) {
 			goto error;
+		}
 		xform->numinchans = jas_clrspc_numchans(inprof->clrspc);
 		xform->numoutchans = jas_clrspc_numchans(outprof->clrspc);
 		break;
 	case JAS_CMXFORM_OP_REV:
 		outpxformseq = fwdpxformseq(outprof, intent);
 		inpxformseq = revpxformseq(inprof, intent);
-		if (!outpxformseq || !inpxformseq)
+		if (!outpxformseq || !inpxformseq) {
 			goto error;
+		}
 		if (jas_cmpxformseq_append(xform->pxformseq, outpxformseq) ||
 		  jas_cmpxformseq_appendcnvt(xform->pxformseq,
 		  outprof->refclrspc, inprof->refclrspc) ||
-		  jas_cmpxformseq_append(xform->pxformseq, inpxformseq))
+		  jas_cmpxformseq_append(xform->pxformseq, inpxformseq)) {
 			goto error;
+		}
 		xform->numinchans = jas_clrspc_numchans(outprof->clrspc);
 		xform->numoutchans = jas_clrspc_numchans(inprof->clrspc);
 		break;
@@ -446,53 +473,62 @@ jas_cmxform_t *jas_cmxform_create(const jas_cmprof_t *inprof, const jas_cmprof_t
 		assert(prfprof);
 		inpxformseq = fwdpxformseq(inprof, intent);
 		prfpxformseq = fwdpxformseq(prfprof, prfintent);
-		if (!inpxformseq || !prfpxformseq)
+		if (!inpxformseq || !prfpxformseq) {
 			goto error;
+		}
 		outpxformseq = simpxformseq(outprof, intent);
 		altoutpxformseq = 0;
 		if (!outpxformseq) {
 			outpxformseq = revpxformseq(outprof, intent);
 			altoutpxformseq = fwdpxformseq(outprof, intent);
-			if (!outpxformseq || !altoutpxformseq)
+			if (!outpxformseq || !altoutpxformseq) {
 				goto error;
+			}
 		}
 		if (jas_cmpxformseq_append(xform->pxformseq, inpxformseq) ||
 		  jas_cmpxformseq_appendcnvt(xform->pxformseq,
-		  inprof->refclrspc, outprof->refclrspc))
+		  inprof->refclrspc, outprof->refclrspc)) {
 			goto error;
+		}
 		if (altoutpxformseq) {
 			if (jas_cmpxformseq_append(xform->pxformseq, outpxformseq) ||
-			  jas_cmpxformseq_append(xform->pxformseq, altoutpxformseq))
+			  jas_cmpxformseq_append(xform->pxformseq, altoutpxformseq)) {
 				goto error;
+			}
 		} else {
-			if (jas_cmpxformseq_append(xform->pxformseq, outpxformseq))
+			if (jas_cmpxformseq_append(xform->pxformseq, outpxformseq)) {
 				goto error;
+			}
 		}
 		if (jas_cmpxformseq_appendcnvt(xform->pxformseq,
 		  outprof->refclrspc, inprof->refclrspc) ||
-		  jas_cmpxformseq_append(xform->pxformseq, prfpxformseq))
+		  jas_cmpxformseq_append(xform->pxformseq, prfpxformseq)) {
 			goto error;
+		}
 		xform->numinchans = jas_clrspc_numchans(inprof->clrspc);
 		xform->numoutchans = jas_clrspc_numchans(prfprof->clrspc);
 		break;
 	case JAS_CMXFORM_OP_GAMUT:
 		inpxformseq = fwdpxformseq(inprof, intent);
 		outpxformseq = gampxformseq(outprof);
-		if (!inpxformseq || !outpxformseq)
+		if (!inpxformseq || !outpxformseq) {
 			goto error;
+		}
 		if (jas_cmpxformseq_append(xform->pxformseq, inpxformseq) ||
 		  jas_cmpxformseq_appendcnvt(xform->pxformseq,
 		  inprof->refclrspc, outprof->refclrspc) ||
-		  jas_cmpxformseq_append(xform->pxformseq, outpxformseq))
+		  jas_cmpxformseq_append(xform->pxformseq, outpxformseq)) {
 			goto error;
+		}
 		xform->numinchans = jas_clrspc_numchans(inprof->clrspc);
 		xform->numoutchans = 1;
 		break;
 	}
 	return xform;
 error:
-	if (xform)
+	if (xform) {
 		jas_cmxform_destroy(xform);
+	}
 	return 0;
 }
 
@@ -505,8 +541,10 @@ int jas_cmxform_apply(const jas_cmxform_t *xform, const jas_cmpixmap_t *in, jas_
 	jas_cmreal_t scale;
 	long v;
 
-	if (xform->numinchans > in->numcmpts || xform->numoutchans > out->numcmpts)
+	if (xform->numinchans > in->numcmpts ||
+	  xform->numoutchans > out->numcmpts) {
 		goto error;
+	}
 
 	const jas_cmcmptfmt_t *fmt = &in->cmptfmts[0];
 	const unsigned width = fmt->width;
@@ -536,9 +574,10 @@ int jas_cmxform_apply(const jas_cmxform_t *xform, const jas_cmpixmap_t *in, jas_
 		}
 	}
 
-	if (maxchans == 0)
+	if (maxchans == 0) {
 		/* avoid division by zero */
 		goto error;
+	}
 
 	const unsigned bufmax = APPLYBUFSIZ / maxchans;
 	assert(bufmax > 0);
@@ -557,8 +596,9 @@ int jas_cmxform_apply(const jas_cmxform_t *xform, const jas_cmpixmap_t *in, jas_
 			const long *dataptr = &fmt->buf[n];
 			jas_cmreal_t *bufptr = &inbuf[i];
 			for (unsigned j = 0; j < m; ++j) {
-				if (jas_cmgetint(&dataptr, fmt->sgnd, fmt->prec, &v))
+				if (jas_cmgetint(&dataptr, fmt->sgnd, fmt->prec, &v)) {
 					goto error;
+				}
 				*bufptr = (jas_cmreal_t)(v - bias) / scale;
 				bufptr += xform->numinchans;
 			}
@@ -573,8 +613,9 @@ int jas_cmxform_apply(const jas_cmxform_t *xform, const jas_cmpixmap_t *in, jas_
 			} else {
 				outbuf = inbuf;
 			}
-			if ((*pxform->ops->apply)(pxform, inbuf, outbuf, m))
+			if ((*pxform->ops->apply)(pxform, inbuf, outbuf, m)) {
 				goto error;
+			}
 			inbuf = outbuf;
 		}
 
@@ -587,8 +628,9 @@ int jas_cmxform_apply(const jas_cmxform_t *xform, const jas_cmpixmap_t *in, jas_
 			for (unsigned j = 0; j < m; ++j) {
 				v = (long)((*bufptr) * scale + bias);
 				bufptr += xform->numoutchans;
-				if (jas_cmputint(&dataptr, fmt->sgnd, fmt->prec, v))
+				if (jas_cmputint(&dataptr, fmt->sgnd, fmt->prec, v)) {
 					goto error;
+				}
 			}
 		}
 	
@@ -602,8 +644,9 @@ error:
 
 void jas_cmxform_destroy(jas_cmxform_t *xform)
 {
-	if (xform->pxformseq)
+	if (xform->pxformseq) {
 		jas_cmpxformseq_destroy(xform->pxformseq);
+	}
 	jas_free(xform);
 }
 
@@ -615,17 +658,20 @@ static jas_cmpxformseq_t *jas_cmpxformseq_create()
 {
 	jas_cmpxformseq_t *pxformseq;
 	pxformseq = 0;
-	if (!(pxformseq = jas_malloc(sizeof(jas_cmpxformseq_t))))
+	if (!(pxformseq = jas_malloc(sizeof(jas_cmpxformseq_t)))) {
 		goto error;
+	}
 	pxformseq->pxforms = 0;
 	pxformseq->numpxforms = 0;
 	pxformseq->maxpxforms = 0;
-	if (jas_cmpxformseq_resize(pxformseq, 16))
+	if (jas_cmpxformseq_resize(pxformseq, 16)) {
 		goto error;
+	}
 	return pxformseq;
 error:
-	if (pxformseq)
+	if (pxformseq) {
 		jas_cmpxformseq_destroy(pxformseq);
+	}
 	return 0;
 }
 
@@ -633,23 +679,28 @@ static jas_cmpxformseq_t *jas_cmpxformseq_copy(jas_cmpxformseq_t *pxformseq)
 {
 	jas_cmpxformseq_t *newpxformseq;
 
-	if (!(newpxformseq = jas_cmpxformseq_create()))
+	if (!(newpxformseq = jas_cmpxformseq_create())) {
 		goto error;
-	if (jas_cmpxformseq_append(newpxformseq, pxformseq))
+	}
+	if (jas_cmpxformseq_append(newpxformseq, pxformseq)) {
 		goto error;
+	}
 	return newpxformseq;
 error:
-	if (newpxformseq)
+	if (newpxformseq) {
 		jas_cmpxformseq_destroy(newpxformseq);
+	}
 	return 0;
 }
 
 static void jas_cmpxformseq_destroy(jas_cmpxformseq_t *pxformseq)
 {
-	while (pxformseq->numpxforms > 0)
+	while (pxformseq->numpxforms > 0) {
 		jas_cmpxformseq_delete(pxformseq, pxformseq->numpxforms - 1);
-	if (pxformseq->pxforms)
+	}
+	if (pxformseq->pxforms) {
 		jas_free(pxformseq->pxforms);
+	}
 	jas_free(pxformseq);
 }
 
@@ -666,11 +717,12 @@ static int jas_cmpxformseq_delete(jas_cmpxformseq_t *pxformseq, unsigned i)
 static int jas_cmpxformseq_appendcnvt(jas_cmpxformseq_t *pxformseq,
   unsigned dstclrspc, unsigned srcclrspc)
 {
-	if (dstclrspc == srcclrspc)
+	if (dstclrspc == srcclrspc) {
 		return 0;
+	}
 	abort();
 	/* Avoid compiler warnings about unused parameters. */
-	(void)pxformseq;
+	JAS_UNUSED(pxformseq);
 	return -1;
 }
 
@@ -681,13 +733,14 @@ static int jas_cmpxformseq_insertpxform(jas_cmpxformseq_t *pxformseq,
 	const unsigned i = _i >= 0 ? (unsigned)_i : pxformseq->numpxforms;
 	assert(i <= pxformseq->numpxforms);
 	if (pxformseq->numpxforms >= pxformseq->maxpxforms) {
-		if (jas_cmpxformseq_resize(pxformseq, pxformseq->numpxforms +
-		  16))
+		if (jas_cmpxformseq_resize(pxformseq, pxformseq->numpxforms + 16)) {
 			goto error;
+		}
 	}
 	assert(pxformseq->numpxforms < pxformseq->maxpxforms);
-	if (!(tmppxform = jas_cmpxform_copy(pxform)))
+	if (!(tmppxform = jas_cmpxform_copy(pxform))) {
 		goto error;
+	}
 	const unsigned n = pxformseq->numpxforms - i;
 	if (n > 0) {
 		memmove(&pxformseq->pxforms[i + 1], &pxformseq->pxforms[i],
@@ -707,13 +760,15 @@ static int jas_cmpxformseq_append(jas_cmpxformseq_t *pxformseq,
 	jas_cmpxform_t *othpxform;
 	const unsigned n = pxformseq->numpxforms + othpxformseq->numpxforms;
 	if (n > pxformseq->maxpxforms) {
-		if (jas_cmpxformseq_resize(pxformseq, n))
+		if (jas_cmpxformseq_resize(pxformseq, n)) {
 			goto error;
+		}
 	}
 	for (unsigned i = 0; i < othpxformseq->numpxforms; ++i) {
 		othpxform = othpxformseq->pxforms[i];
-		if (!(pxform = jas_cmpxform_copy(othpxform)))
+		if (!(pxform = jas_cmpxform_copy(othpxform))) {
 			goto error;
+		}
 		pxformseq->pxforms[pxformseq->numpxforms] = pxform;
 		++pxformseq->numpxforms;
 	}
@@ -743,8 +798,9 @@ static int jas_cmpxformseq_resize(jas_cmpxformseq_t *pxformseq, unsigned n)
 static jas_cmpxform_t *jas_cmpxform_create0()
 {
 	jas_cmpxform_t *pxform;
-	if (!(pxform = jas_malloc(sizeof(jas_cmpxform_t))))
+	if (!(pxform = jas_malloc(sizeof(jas_cmpxform_t)))) {
 		return 0;
+	}
 	memset(pxform, 0, sizeof(jas_cmpxform_t));
 	pxform->refcnt = 0;
 	pxform->ops = 0;
@@ -786,8 +842,9 @@ static jas_cmpxform_t *jas_cmpxform_createshapmat()
 		jas_cmshapmatlut_init(&shapmat->luts[i]);
 	}
 	for (unsigned i = 0; i < 3; ++i) {
-		for (unsigned j = 0; j < 4; ++j)
+		for (unsigned j = 0; j < 4; ++j) {
 			shapmat->mat[i][j] = 0.0;
+		}
 	}
 	++pxform->refcnt;
 	return pxform;
@@ -854,8 +911,9 @@ static int jas_cmshapmat_apply(const jas_cmpxform_t *pxform, const jas_cmreal_t 
 		if (!shapmat->order) {
 			while (cnt-- > 0) {
 				a0 = *src++;
-				if (shapmat->useluts)
+				if (shapmat->useluts) {
 					a0 = jas_cmshapmatlut_lookup(&shapmat->luts[0], a0);
+				}
 				a2 = a0 * shapmat->mat[2][0];
 				a1 = a0 * shapmat->mat[1][0];
 				a0 = a0 * shapmat->mat[0][0];
@@ -870,8 +928,9 @@ assert(0);
 				src++;
 				src++;
 				a0 = a0 * shapmat->mat[0][0];
-				if (shapmat->useluts)
+				if (shapmat->useluts) {
 					a0 = jas_cmshapmatlut_lookup(&shapmat->luts[0], a0);
+				}
 				*dst++ = a0;
 			}
 		}
@@ -897,8 +956,9 @@ static void jas_cmshapmatlut_cleanup(jas_cmshapmatlut_t *lut)
 
 static double gammafn(double x, double gamma)
 {
-	if (x == 0.0)
+	if (x == 0.0) {
 		return 0.0;
+	}
 	return pow(x, gamma);
 }
 
@@ -943,11 +1003,13 @@ static jas_cmreal_t jas_cmshapmatlut_lookup(const jas_cmshapmatlut_t *lut, jas_c
 	jas_cmreal_t t;
 	t = x * (lut->size - 1);
 	const int lo = (int)floor(t);
-	if (lo < 0)
+	if (lo < 0) {
 		return lut->data[0];
+	}
 	const unsigned hi = (unsigned)ceil(t);
-	if (hi >= lut->size)
+	if (hi >= lut->size) {
 		return lut->data[lut->size - 1];
+	}
 	return lut->data[lo] + (t - lo) * (lut->data[hi] - lut->data[lo]);
 }
 
@@ -972,8 +1034,9 @@ static int jas_cmshapmatlut_invert(jas_cmshapmatlut_t *invlut,
 			return -1;
 		}
 	}
-	if (!(invlut->data = jas_alloc2(n, sizeof(jas_cmreal_t))))
+	if (!(invlut->data = jas_alloc2(n, sizeof(jas_cmreal_t)))) {
 		return -1;
+	}
 	invlut->size = n;
 	for (unsigned i = 0; i < invlut->size; ++i) {
 		sy = ((double) i) / (invlut->size - 1);
@@ -984,11 +1047,9 @@ static int jas_cmshapmatlut_invert(jas_cmshapmatlut_t *invlut,
 				unsigned k;
 				for (k = j + 1; k < lut->size; ++k) {
 					by = lut->data[k];
-					if (by != sy)
+					if (by != sy) {
 						break;
-#if 0
-assert(0);
-#endif
+					}
 				}
 				if (k < lut->size) {
 					--k;
@@ -1147,12 +1208,15 @@ static int mono(const jas_iccprof_t *iccprof, int op, jas_cmpxformseq_t **retpxf
 	return 0;
 error:
 	jas_cmshapmatlut_cleanup(&lut);
-	if (graytrc)
+	if (graytrc) {
 		jas_iccattrval_destroy(graytrc);
-	if (pxform)
+	}
+	if (pxform) {
 		jas_cmpxform_destroy(pxform);
-	if (pxformseq)
+	}
+	if (pxformseq) {
 		jas_cmpxformseq_destroy(pxformseq);
+	}
 	return -1;
 }
 
@@ -1287,11 +1351,13 @@ static int jas_cmgetint(const long **bufptr, int sgnd, unsigned prec, long *val)
 	v = **bufptr;
 	if (sgnd) {
 		m = (1 << (prec - 1));
-		if (v < -m || v >= m)
+		if (v < -m || v >= m) {
 			return -1;
+		}
 	} else {
-		if (v < 0 || v >= (1 << prec))
+		if (v < 0 || v >= (1 << prec)) {
 			return -1;
+		}
 	}
 	++(*bufptr);
 	*val = v;
@@ -1303,11 +1369,13 @@ static int jas_cmputint(long **bufptr, int sgnd, unsigned prec, long val)
 	int m;
 	if (sgnd) {
 		m = (1 << (prec - 1));
-		if (val < -m || val >= m)
+		if (val < -m || val >= m) {
 			return -1;
+		}
 	} else {
-		if (val < 0 || val >= (1 << prec))
+		if (val < 0 || val >= (1 << prec)) {
 			return -1;
+		}
 	}
 	**bufptr = val;
 	++(*bufptr);

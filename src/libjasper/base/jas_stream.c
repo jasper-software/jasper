@@ -72,7 +72,8 @@
 \******************************************************************************/
 
 #include "jasper/jas_config.h"
-/* This must come before any direct/indirect inclusion of stdlib.h. */
+
+/* The following must come before any direct/indirect inclusion of stdlib.h. */
 #if defined(JAS_HAVE_MKOSTEMP)
 #define _GNU_SOURCE
 #endif
@@ -109,10 +110,12 @@
 #include <windows.h> // for GetTempPathA()
 #endif
 
-/* O_CLOEXEC is a Linux-specific flag which helps avoid leaking file
-   descriptors to child processes created by another thread; for
-   simplicity, we always specify it, and this definition is a fallback
-   for systems where this feature is not available */
+/*
+O_CLOEXEC is a Linux-specific flag which helps avoid leaking file descriptors
+to child processes created by another thread; for simplicity, we always
+specify it, and this definition is a fallback for systems where this feature
+is not available
+*/
 #ifndef O_CLOEXEC
 #define O_CLOEXEC 0
 #endif
@@ -347,7 +350,7 @@ jas_stream_t *jas_stream_freopen(const char *path, const char *mode, FILE *fp)
 	JAS_LOGDEBUGF(100, "jas_stream_freopen(\"%s\", \"%s\", %p)\n", path, mode, fp);
 
 	/* Eliminate compiler warning about unused variable. */
-	(void)path;
+	JAS_UNUSED(path);
 
 	/* Allocate a stream object. */
 	if (!(stream = jas_stream_create())) {
@@ -380,12 +383,14 @@ jas_stream_t *jas_stream_freopen(const char *path, const char *mode, FILE *fp)
 static size_t get_temp_directory(char *buffer, size_t size)
 {
 	const char *tmpdir = getenv("TMPDIR");
-	if (tmpdir == NULL)
+	if (tmpdir == NULL) {
 		tmpdir = "/tmp";
+	}
 
 	size_t length = strlen(tmpdir);
-	if (length + 1 > size)
+	if (length + 1 > size) {
 		return 0;
+	}
 
 	memcpy(buffer, tmpdir, length);
 	buffer[length++] = '/';
@@ -403,20 +408,18 @@ static int make_mkstemp_template(char *buffer, size_t size)
 {
 #ifdef _WIN32
 	char temp_directory[MAX_PATH];
-	if (GetTempPathA(sizeof(temp_directory), temp_directory) == 0)
+	if (GetTempPathA(sizeof(temp_directory), temp_directory) == 0) {
 		return -1;
-
-	(void)size;
-
+	}
+	JAS_UNUSED(size);
 	return GetTempFileNameA(temp_directory, "jasper", 0, buffer) > 0
 		? 0 : -1;
 #else
 	static const char base[] = "jasper.XXXXXX";
-
 	size_t length = get_temp_directory(buffer, size);
-	if (length == 0 || length + sizeof(base) >= size)
+	if (length == 0 || length + sizeof(base) >= size) {
 		return -1;
-
+	}
 	memcpy(buffer + length, base, sizeof(base));
 	return 0;
 #endif
@@ -435,23 +438,24 @@ static int easy_mkstemp(char *buffer, size_t size)
 	   create a temporary file without a name, not linked to any
 	   directory; this is even more secure than mkstemp() */
 	const char *tmpdir = getenv("TMPDIR");
-	if (tmpdir == NULL)
+	if (tmpdir == NULL) {
 		tmpdir = "/tmp";
-
-	int fd = open(tmpdir, O_TMPFILE|O_RDWR, JAS_STREAM_PERMS);
+	}
+	int fd = open(tmpdir, O_TMPFILE | O_RDWR, JAS_STREAM_PERMS);
 	if (fd >= 0) {
 		*buffer = 0;
 		return fd;
 	}
 #endif
 
-	if (make_mkstemp_template(buffer, size))
+	if (make_mkstemp_template(buffer, size)) {
 		return -1;
+	}
 
 #ifdef _WIN32
 	return open(buffer,
-		    O_CREAT | O_EXCL | O_RDWR | O_TRUNC | O_BINARY | O_CLOEXEC,
-		    JAS_STREAM_PERMS);
+	  O_CREAT | O_EXCL | O_RDWR | O_TRUNC | O_BINARY | O_CLOEXEC,
+	  JAS_STREAM_PERMS);
 #else
 #ifdef JAS_HAVE_MKOSTEMP
 	return mkostemp(buffer, O_CLOEXEC);
@@ -647,8 +651,9 @@ size_t jas_stream_read(jas_stream_t *stream, void *buf, size_t cnt)
 
 	JAS_LOGDEBUGF(100, "jas_stream_read(%p, %p, %zu)\n", stream, buf, cnt);
 
-	if (cnt == 0)
+	if (cnt == 0) {
 		return 0;
+	}
 
 	bufptr = buf;
 
@@ -656,11 +661,13 @@ size_t jas_stream_read(jas_stream_t *stream, void *buf, size_t cnt)
 	    jas_stream_is_input_buffer_empty(stream)) {
 		/* fast path for unbuffered streams */
 
-		if ((stream->flags_ & JAS_STREAM_ERRMASK) != 0)
+		if ((stream->flags_ & JAS_STREAM_ERRMASK) != 0) {
 			return 0;
+		}
 
-		if ((stream->openmode_ & JAS_STREAM_READ) == 0)
+		if ((stream->openmode_ & JAS_STREAM_READ) == 0) {
 			return 0;
+		}
 
 		assert((stream->bufmode_ & JAS_STREAM_WRBUF) == 0);
 
@@ -697,9 +704,11 @@ unsigned jas_stream_peek(jas_stream_t *stream, void *buf, size_t cnt)
 	const unsigned n = jas_stream_read(stream, bufptr, cnt);
 
 	/* Put the characters read back onto the stream. */
-	for (unsigned i = n; i-- > 0;)
-		if (jas_stream_ungetc(stream, bufptr[i]) == EOF)
+	for (unsigned i = n; i-- > 0;) {
+		if (jas_stream_ungetc(stream, bufptr[i]) == EOF) {
 			return 0;
+		}
+	}
 
 	return n;
 }
@@ -710,8 +719,9 @@ size_t jas_stream_write(jas_stream_t *stream, const void *buf, size_t cnt)
 
 	JAS_LOGDEBUGF(100, "jas_stream_write(%p, %p, %zu)\n", stream, buf, cnt);
 
-	if (cnt == 0)
+	if (cnt == 0) {
 		return 0;
+	}
 
 	bufptr = buf;
 
@@ -720,8 +730,9 @@ size_t jas_stream_write(jas_stream_t *stream, const void *buf, size_t cnt)
 
 		/* need to flush the output buffer before we do a raw
 		   write */
-		if (jas_stream_flushbuf(stream, EOF))
+		if (jas_stream_flushbuf(stream, EOF)) {
 			return 0;
+		}
 
 		stream->bufmode_ |= JAS_STREAM_WRBUF;
 
@@ -830,8 +841,9 @@ int jas_stream_pad(jas_stream_t *stream, int n, int c)
 	}
 	m = n;
 	for (m = n; m > 0; --m) {
-		if (jas_stream_putc(stream, c) == EOF)
+		if (jas_stream_putc(stream, c) == EOF) {
 			return n - m;
+		}
 	}
 	return n;
 }

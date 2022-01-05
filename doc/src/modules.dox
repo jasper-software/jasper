@@ -34,4 +34,13 @@ For more detail on I/O streams, please refer to
 @defgroup timers Timers
 @brief Timers
 
+@defgroup getopt Command-Line Interface (CLI) Option Processing
+@brief Command-Line Interface (CLI) Option Processing
+
+@defgroup tvp Tag-Value Pair (TVP) Parsing
+@brief Tag-Value Pair (TVP) Parsing
+
+@defgroup string String Processing
+@brief String Processing
+
  */
