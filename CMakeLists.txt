@@ -394,6 +394,10 @@ if(JAS_ENABLE_MULTITHREADING_SUPPORT)
 		endif()
 	endif()
 
+if(MACOS)
+	set(JAS_PREFER_PTHREAD FALSE)
+endif()
+
 	# Apply preferences to select one particular threading library.
 	if(JAS_HAVE_PTHREAD_THREADS AND JAS_PREFER_PTHREAD)
 		set(JAS_THREADS_PTHREAD TRUE)

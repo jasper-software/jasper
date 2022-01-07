@@ -218,6 +218,10 @@ while [ $# -gt 0 ]; do
 		shift 1
 		use_pthread=1
 		;;
+	--no-prefer-pthread)
+		shift 1
+		use_pthread=0
+		;;
 	--print-only)
 		shift 1
 		enable=0

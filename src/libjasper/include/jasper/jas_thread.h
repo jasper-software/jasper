@@ -112,13 +112,119 @@ extern "C" {
 
 #if defined(JAS_THREADS)
 
+/******************************************************************************\
+* Types
+\******************************************************************************/
+
 #if defined(JAS_THREADS_C11)
 #	define JAS_THREADS_IMPL "C11"
+#	define JAS_USE_SPINLOCK
 #elif defined(JAS_THREADS_PTHREAD)
 #	define JAS_THREADS_IMPL "PTHREAD"
+#	undef JAS_USE_SPINLOCK
 #elif defined(JAS_THREADS_WIN32)
 #	define JAS_THREADS_IMPL "WIN32"
+#	define JAS_USE_SPINLOCK
 #endif
+
+/**************************************\
+* Spinlock
+\**************************************/
+
+/*! Spinlock type. */
+#if defined(JAS_THREADS_C11)
+#	define JAS_USE_SPINLOCK
+typedef struct {
+	atomic_flag flag;
+} jas_spinlock_t;
+#elif defined(JAS_THREADS_PTHREAD)
+/* There is no pthread_spinlock_t type on MacOS. */
+#	undef JAS_USE_SPINLOCK
+#elif defined(JAS_THREADS_WIN32)
+#	define JAS_USE_SPINLOCK
+typedef struct {
+	LONG flag;
+} jas_spinlock_t;
+#endif
+
+/*!  Spinlock initializer. */
+#if defined(JAS_THREADS_C11)
+#define JAS_SPINLOCK_INITIALIZER {ATOMIC_FLAG_INIT}
+#elif defined(JAS_THREADS_PTHREAD)
+/* There is no pthread_spinlock_t type on MacOS. */
+#elif defined(JAS_THREADS_WIN32)
+#define JAS_SPINLOCK_INITIALIZER {0}
+#endif
+
+/**************************************\
+* Basic Mutex
+\**************************************/
+
+/*!  Mutex type. */
+#if defined(JAS_THREADS_C11)
+typedef mtx_t jas_basicmutex_t;
+#elif defined(JAS_THREADS_PTHREAD)
+typedef pthread_mutex_t jas_basicmutex_t;
+#elif defined(JAS_THREADS_WIN32)
+typedef CRITICAL_SECTION jas_basicmutex_t;
+#endif
+
+/*!  Mutex initializer. */
+#if defined(JAS_THREADS_C11)
+#undef JAS_BASICMUTEX_INITIALIZER
+#elif defined(JAS_THREADS_PTHREAD)
+#define JAS_BASICMUTEX_INITIALIZER PTHREAD_MUTEX_INITIALIZER
+#elif defined(JAS_THREADS_WIN32)
+#define JAS_BASICMUTEX_INITIALIZER
+#endif
+
+/**************************************\
+* Mutex (Allowing Static Initialization)
+\**************************************/
+
+#if defined(JAS_USE_SPINLOCK)
+#	define jas_mutex_t jas_spinlock_t
+#	define JAS_MUTEX_INITIALIZER JAS_SPINLOCK_INITIALIZER
+#	define jas_mutex_init jas_spinlock_init
+#	define jas_mutex_cleanup jas_spinlock_cleanup
+#	define jas_mutex_lock jas_spinlock_lock
+#	define jas_mutex_unlock jas_spinlock_unlock
+#else
+#	define jas_mutex_t jas_basicmutex_t
+#	define JAS_MUTEX_INITIALIZER JAS_BASICMUTEX_INITIALIZER
+#	define jas_mutex_init jas_basicmutex_init
+#	define jas_mutex_cleanup jas_basicmutex_cleanup
+#	define jas_mutex_lock jas_basicmutex_lock
+#	define jas_mutex_unlock jas_basicmutex_unlock
+#endif
+
+/**************************************\
+* Once Flag
+\**************************************/
+
+/*!  Once-flag type. */
+#if defined(JAS_THREADS_C11)
+typedef once_flag jas_once_flag_t;
+#elif defined(JAS_THREADS_PTHREAD)
+typedef pthread_once_t jas_once_flag_t;
+#elif defined(JAS_THREADS_WIN32)
+typedef struct {
+	volatile LONG status;
+} jas_once_flag_t;
+#endif
+
+/*!  Once-flag initializer. */
+#if defined(JAS_THREADS_C11)
+#	define JAS_ONCE_FLAG_INIT ONCE_FLAG_INIT
+#elif defined(JAS_THREADS_PTHREAD)
+#	define JAS_ONCE_FLAG_INIT PTHREAD_ONCE_INIT
+#elif defined(JAS_THREADS_WIN32)
+#	define JAS_ONCE_FLAG_INIT {0}
+#endif
+
+/**************************************\
+* Threads
+\**************************************/
 
 /*!  Thread ID type. */
 #if defined(JAS_THREADS_C11)
@@ -147,48 +253,9 @@ typedef struct {
 } jas_thread_t;
 #endif
 
-/*! Spinlock type. */
-#if defined(JAS_THREADS_C11)
-typedef struct {
-	atomic_flag flag;
-} jas_spinlock_t;
-#elif defined(JAS_THREADS_PTHREAD)
-typedef struct {
-	pthread_spinlock_t lock;
-} jas_spinlock_t;
-#elif defined(JAS_THREADS_WIN32)
-typdef struct {
-	LONG flag;
-} jas_spinlock_t;
-#endif
-
-/*!  Mutex type. */
-#if defined(JAS_THREADS_C11)
-typedef jas_spinlock_t jas_mutex_t;
-#elif defined(JAS_THREADS_PTHREAD)
-typedef pthread_mutex_t jas_mutex_t;
-#elif defined(JAS_THREADS_WIN32)
-//typedef CRITICAL_SECTION jas_mutex_t;
-typedef jas_spinlock_t jas_mutex_t;
-#endif
-
-/*!  Spinlock initializer. */
-#if defined(JAS_THREADS_C11)
-#define JAS_SPINLOCK_INITIALIZER {ATOMIC_FLAG_INIT}
-#elif defined(JAS_THREADS_PTHREAD)
-#undef JAS_SPINLOCK_INITIALIZER
-#elif defined(JAS_THREADS_WIN32)
-#define JAS_SPINLOCK_INITIALIZER {0}
-#endif
-
-/*!  Mutex initializer. */
-#if defined(JAS_THREADS_C11)
-#define JAS_MUTEX_INITIALIZER JAS_SPINLOCK_INITIALIZER
-#elif defined(JAS_THREADS_PTHREAD)
-#define JAS_MUTEX_INITIALIZER PTHREAD_MUTEX_INITIALIZER
-#elif defined(JAS_THREADS_WIN32)
-#define JAS_MUTEX_INITIALIZER JAS_SPINLOCK_INITIALIZER
-#endif
+/**************************************\
+* Thread-Specific Storage (TSS)
+\**************************************/
 
 /*!  Thread-specific storage type. */
 #if defined(JAS_THREADS_C11)
@@ -199,25 +266,253 @@ typedef pthread_key_t jas_tss_t;
 typedef DWORD jas_tss_t;
 #endif
 
-/*!  Once-flag type. */
+/******************************************************************************\
+* Spinlock
+\******************************************************************************/
+
+#if defined(JAS_USE_SPINLOCK)
+
+static inline int jas_spinlock_init(jas_spinlock_t *mtx)
+{
+	assert(mtx);
 #if defined(JAS_THREADS_C11)
-typedef once_flag jas_once_flag_t;
+	atomic_flag_clear(&mtx->flag);
+	return 0;
 #elif defined(JAS_THREADS_PTHREAD)
-typedef pthread_once_t jas_once_flag_t;
+	JAS_UNUSED(mtx);
+	abort();
+	return -1;
 #elif defined(JAS_THREADS_WIN32)
-typedef struct {
-	volatile LONG status;
-} jas_once_flag_t;
+	InterlockedExchange(&mtx->flag, 0);
+	return 0;
+#endif
+}
+
+static inline int jas_spinlock_cleanup(jas_spinlock_t *mtx)
+{
+	assert(mtx);
+#if defined(JAS_THREADS_C11)
+	JAS_UNUSED(mtx);
+	return 0;
+#elif defined(JAS_THREADS_PTHREAD)
+	JAS_UNUSED(mtx);
+	abort();
+	return -1;
+#elif defined(JAS_THREADS_WIN32)
+	JAS_UNUSED(mtx);
+	return 0;
+#endif
+}
+
+static inline int jas_spinlock_lock(jas_spinlock_t *mtx)
+{
+	assert(mtx);
+#if defined(JAS_THREADS_C11)
+	while (atomic_flag_test_and_set(&mtx->flag)) {}
+	return 0;
+#elif defined(JAS_THREADS_PTHREAD)
+	JAS_UNUSED(mtx);
+	abort();
+	return -1;
+#elif defined(JAS_THREADS_WIN32)
+	while (InterlockedCompareExchange(&mtx->flag, 1, 0)) {}
+	return 0;
+#endif
+}
+
+static inline int jas_spinlock_unlock(jas_spinlock_t *mtx)
+{
+	assert(mtx);
+#if defined(JAS_THREADS_C11)
+	atomic_flag_clear(&mtx->flag);
+	return 0;
+#elif defined(JAS_THREADS_PTHREAD)
+	JAS_UNUSED(mtx);
+	abort();
+	return -1;
+#elif defined(JAS_THREADS_WIN32)
+	InterlockedExchange(&mtx->flag, 0);
+	return 0;
+#endif
+}
+
 #endif
 
-/*!  Once-flag initializer. */
+/******************************************************************************\
+* Basic Mutex
+\******************************************************************************/
+
+/*!
+@brief Initialize a mutex.
+*/
+static inline int jas_basicmutex_init(jas_basicmutex_t *mtx)
+{
+	assert(mtx);
 #if defined(JAS_THREADS_C11)
-#	define JAS_ONCE_FLAG_INIT ONCE_FLAG_INIT
+	return mtx_init(mtx, mtx_plain) == thrd_success ? 0 : -1;
 #elif defined(JAS_THREADS_PTHREAD)
-#	define JAS_ONCE_FLAG_INIT PTHREAD_ONCE_INIT
+	return pthread_mutex_init(mtx, 0);
 #elif defined(JAS_THREADS_WIN32)
-#	define JAS_ONCE_FLAG_INIT {0}
+	InitializeCriticalSection(mtx);
+	return 0;
 #endif
+}
+
+/*!
+@brief Cleanup a mutex.
+*/
+static inline int jas_basicmutex_cleanup(jas_basicmutex_t *mtx)
+{
+	assert(mtx);
+#if defined(JAS_THREADS_C11)
+	mtx_destroy(mtx);
+	return 0;
+#elif defined(JAS_THREADS_PTHREAD)
+	return pthread_mutex_destroy(mtx);
+#elif defined(JAS_THREADS_WIN32)
+	DeleteCriticalSection(mtx);
+	return 0;
+#endif
+}
+
+/*!
+@brief Acquire a mutex.
+*/
+static inline int jas_basicmutex_lock(jas_basicmutex_t *mtx)
+{
+	assert(mtx);
+#if defined(JAS_THREADS_C11)
+	return mtx_lock(mtx);
+#elif defined(JAS_THREADS_PTHREAD)
+	return pthread_mutex_lock(mtx);
+#elif defined(JAS_THREADS_WIN32)
+	EnterCriticalSection(mtx);
+	return 0;
+#endif
+}
+
+/*!
+@brief Release a mutex.
+*/
+static inline int jas_basicmutex_unlock(jas_basicmutex_t *mtx)
+{
+	assert(mtx);
+#if defined(JAS_THREADS_C11)
+	return mtx_unlock(mtx);
+#elif defined(JAS_THREADS_PTHREAD)
+	return pthread_mutex_unlock(mtx);
+#elif defined(JAS_THREADS_WIN32)
+	LeaveCriticalSection(mtx);
+	return 0;
+#endif
+}
+
+/******************************************************************************\
+* Thread-Specific Storage (TSS)
+\******************************************************************************/
+
+/*!
+@brief Create thread-specific storage.
+*/
+static inline
+int jas_tss_create(jas_tss_t *tss, void (*destructor)(void *))
+{
+	assert(tss);
+#if defined(JAS_THREADS_C11)
+	return tss_create(tss, destructor) == thrd_success ? 0 : -1;
+#elif defined(JAS_THREADS_PTHREAD)
+	return pthread_key_create(tss, destructor);
+#elif defined(JAS_THREADS_WIN32)
+	if (destructor) {
+		return -1;
+	}
+	DWORD id;
+	if ((id = TlsAlloc()) == TLS_OUT_OF_INDEXES) {
+		return -2;
+	}
+	*tss = id;
+	return 0;
+#endif
+}
+
+/*!
+@brief Delete thread-specific storage.
+*/
+static inline
+void jas_tss_delete(jas_tss_t tss)
+{
+#if defined(JAS_THREADS_C11)
+	tss_delete(tss);
+#elif defined(JAS_THREADS_PTHREAD)
+	pthread_key_delete(tss);
+#elif defined(JAS_THREADS_WIN32)
+	TlsFree(tss);
+#endif
+}
+
+/*!
+@brief Get the thread-specific storage instance for the calling thread.
+*/
+static inline
+void *jas_tss_get(jas_tss_t tss)
+{
+#if defined(JAS_THREADS_C11)
+	return tss_get(tss);
+#elif defined(JAS_THREADS_PTHREAD)
+	return pthread_getspecific(tss);
+#elif defined(JAS_THREADS_WIN32)
+	return TlsGetValue(tss);
+#endif
+}
+
+/*!
+@brief Set the thread-specific storage instance for the calling thread.
+*/
+static inline
+int jas_tss_set(jas_tss_t tss, void *value)
+{
+#if defined(JAS_THREADS_C11)
+	return tss_set(tss, value) == thrd_success ? 0 : -1;
+#elif defined(JAS_THREADS_PTHREAD)
+	return pthread_setspecific(tss, value);
+#elif defined(JAS_THREADS_WIN32)
+	return TlsSetValue(tss, value) ? 0 : -1;
+#endif
+}
+
+/******************************************************************************\
+* Once Flag
+\******************************************************************************/
+
+/*!
+@brief Register to call a function once.
+*/
+static inline int jas_call_once(jas_once_flag_t *flag, void (*func)(void))
+{
+	assert(flag);
+	assert(func);
+#if defined(JAS_THREADS_C11)
+	call_once(flag, func);
+	return 0;
+#elif defined(JAS_THREADS_PTHREAD)
+	return pthread_once(flag, func);
+#elif defined(JAS_THREADS_WIN32)
+	if (InterlockedCompareExchange(&flag->status, 1, 0) == 0) {
+		(func)();
+		InterlockedExchange(&flag->status, 2);
+	} else {
+		while (flag->status == 1) {
+			/* Perform a busy wait.  This is ugly. */
+			jas_thread_yield();
+		}
+	}
+	return 0;
+#endif
+}
+
+/******************************************************************************\
+* Threads
+\******************************************************************************/
 
 #if defined(JAS_THREADS_PTHREAD)
 static void *thread_func_wrapper(void *thread_ptr)
@@ -328,6 +623,10 @@ static inline void jas_thread_yield(void)
 #endif
 }
 
+/******************************************************************************\
+*
+\******************************************************************************/
+
 #if 0
 /* This functionality is not available for all threading support libraries. */
 static inline
@@ -362,250 +661,6 @@ jas_thread_id_t jas_thread_current(void)
 #endif
 }
 #endif
-
-static inline int jas_spinlock_init(jas_spinlock_t *mtx)
-{
-#if defined(JAS_THREADS_C11)
-	atomic_flag_clear(&mtx->flag);
-	return 0;
-#elif defined(JAS_THREADS_PTHREAD)
-	JAS_UNUSED(mtx);
-	abort();
-	return -1;
-#elif defined(JAS_THREADS_WIN32)
-	InterlockedExchange(&mtx->flag, 0);
-	return 0;
-#endif
-}
-
-static inline int jas_spinlock_cleanup(jas_spinlock_t *mtx)
-{
-#if defined(JAS_THREADS_C11)
-	JAS_UNUSED(mtx);
-	return 0;
-#elif defined(JAS_THREADS_PTHREAD)
-	JAS_UNUSED(mtx);
-	abort();
-	return -1;
-#elif defined(JAS_THREADS_WIN32)
-	JAS_UNUSED(mtx);
-	return 0;
-#endif
-}
-
-static inline int jas_spinlock_lock(jas_spinlock_t *mtx)
-{
-#if defined(JAS_THREADS_C11)
-	while (atomic_flag_test_and_set(&mtx->flag)) {}
-	return 0;
-#elif defined(JAS_THREADS_PTHREAD)
-	JAS_UNUSED(mtx);
-	abort();
-	return -1;
-#elif defined(JAS_THREADS_WIN32)
-	while (InterlockedCompareExchange(&mtx->flag, 1, 0)) {}
-	return 0;
-#endif
-}
-
-static inline int jas_spinlock_unlock(jas_spinlock_t *mtx)
-{
-#if defined(JAS_THREADS_C11)
-	atomic_flag_clear(&mtx->flag);
-	return 0;
-#elif defined(JAS_THREADS_PTHREAD)
-	JAS_UNUSED(mtx);
-	abort();
-	return -1;
-#elif defined(JAS_THREADS_WIN32)
-	InterlockedExchange(&mtx->flag, 0);
-	return 0;
-#endif
-}
-
-/*!
-@brief Initialize a mutex.
-*/
-static inline int jas_mutex_init(jas_mutex_t *mtx)
-{
-	assert(mtx);
-#if defined(JAS_THREADS_C11)
-/*
-	return mtx_init(mtx, mtx_plain) == thrd_success ? 0 : -1;
-*/
-	return jas_spinlock_init(mtx);
-#elif defined(JAS_THREADS_PTHREAD)
-	return pthread_mutex_init(mtx, 0);
-#elif defined(JAS_THREADS_WIN32)
-	/*
-	InitializeCriticalSection(mtx);
-	return 0;
-	*/
-	return jas_spinlock_init(mtx);
-#endif
-}
-
-/*!
-@brief Cleanup a mutex.
-*/
-static inline int jas_mutex_cleanup(jas_mutex_t *mtx)
-{
-	assert(mtx);
-#if defined(JAS_THREADS_C11)
-/*
-	mtx_destroy(mtx);
-	return 0;
-*/
-	return jas_spinlock_cleanup(mtx);
-#elif defined(JAS_THREADS_PTHREAD)
-	return pthread_mutex_destroy(mtx);
-#elif defined(JAS_THREADS_WIN32)
-	/*
-	DeleteCriticalSection(mtx);
-	return 0;
-	*/
-	return jas_spinlock_cleanup(mtx);
-#endif
-}
-
-/*!
-@brief Acquire a mutex.
-*/
-static inline int jas_mutex_lock(jas_mutex_t *mtx)
-{
-	assert(mtx);
-#if defined(JAS_THREADS_C11)
-/*
-	return mtx_lock(mtx);
-*/
-	return jas_spinlock_lock(mtx);
-#elif defined(JAS_THREADS_PTHREAD)
-	return pthread_mutex_lock(mtx);
-#elif defined(JAS_THREADS_WIN32)
-	/*
-	EnterCriticalSection(mtx);
-	return 0;
-	*/
-	return jas_spinlock_lock(mtx);
-#endif
-}
-
-/*!
-@brief Release a mutex.
-*/
-static inline int jas_mutex_unlock(jas_mutex_t *mtx)
-{
-	assert(mtx);
-#if defined(JAS_THREADS_C11)
-/*
-	return mtx_unlock(mtx);
-*/
-	return jas_spinlock_unlock(mtx);
-#elif defined(JAS_THREADS_PTHREAD)
-	return pthread_mutex_unlock(mtx);
-#elif defined(JAS_THREADS_WIN32)
-	/*
-	LeaveCriticalSection(mtx);
-	return 0;
-	*/
-	return jas_spinlock_unlock(mtx);
-#endif
-}
-
-/*!
-@brief Create thread-specific storage.
-*/
-static inline
-int jas_tss_create(jas_tss_t *tss, void (*destructor)(void *))
-{
-	assert(tss);
-#if defined(JAS_THREADS_C11)
-	return tss_create(tss, destructor) == thrd_success ? 0 : -1;
-#elif defined(JAS_THREADS_PTHREAD)
-	return pthread_key_create(tss, destructor);
-#elif defined(JAS_THREADS_WIN32)
-	if (destructor) {
-		return -1;
-	}
-	DWORD id;
-	if ((id = TlsAlloc()) == TLS_OUT_OF_INDEXES) {
-		return -2;
-	}
-	*tss = id;
-	return 0;
-#endif
-}
-
-/*!
-@brief Delete thread-specific storage.
-*/
-static inline
-void jas_tss_delete(jas_tss_t tss)
-{
-#if defined(JAS_THREADS_C11)
-	tss_delete(tss);
-#elif defined(JAS_THREADS_PTHREAD)
-	pthread_key_delete(tss);
-#elif defined(JAS_THREADS_WIN32)
-	TlsFree(tss);
-#endif
-}
-
-/*!
-@brief Get the thread-specific storage instance for the calling thread.
-*/
-static inline
-void *jas_tss_get(jas_tss_t tss)
-{
-#if defined(JAS_THREADS_C11)
-	return tss_get(tss);
-#elif defined(JAS_THREADS_PTHREAD)
-	return pthread_getspecific(tss);
-#elif defined(JAS_THREADS_WIN32)
-	return TlsGetValue(tss);
-#endif
-}
-
-/*!
-@brief Set the thread-specific storage instance for the calling thread.
-*/
-static inline
-int jas_tss_set(jas_tss_t tss, void *value)
-{
-#if defined(JAS_THREADS_C11)
-	return tss_set(tss, value) == thrd_success ? 0 : -1;
-#elif defined(JAS_THREADS_PTHREAD)
-	return pthread_setspecific(tss, value);
-#elif defined(JAS_THREADS_WIN32)
-	return TlsSetValue(tss, value) ? 0 : -1;
-#endif
-}
-
-/*!
-@brief Register to call a function once.
-*/
-static inline int jas_call_once(jas_once_flag_t *flag, void (*func)(void))
-{
-	assert(flag);
-	assert(func);
-#if defined(JAS_THREADS_C11)
-	call_once(flag, func);
-	return 0;
-#elif defined(JAS_THREADS_PTHREAD)
-	return pthread_once(flag, func);
-#elif defined(JAS_THREADS_WIN32)
-	if (InterlockedCompareExchange(&flag->status, 1, 0) == 0) {
-		(func)();
-		InterlockedExchange(&flag->status, 2);
-	} else {
-		while (flag->status == 1) {
-			/* Perform a busy wait.  This is ugly. */
-			jas_thread_yield();
-		}
-	}
-	return 0;
-#endif
-}
 
 #else
 
