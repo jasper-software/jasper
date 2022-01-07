@@ -272,26 +272,17 @@ void jas_get_image_format_table(const jas_image_fmt_t **formats,
 JAS_EXPORT
 void jas_conf_clear()
 {
-#if 0
-	/* NOTE: The following two lines of code require that configuration,
-	  initialization, and cleanup of the library be performed on the
-	  same thread. */
-	assert(!jas_conf.initialized);
-#endif
-
-	//memset(&jas_conf, 0, sizeof(jas_conf_t));
-	//jas_conf.configured = 1;
 	jas_conf.multithread = 0;
 	jas_conf.allocator = 0;
 	jas_conf.enable_allocator_wrapper = 1;
-	jas_conf.max_mem = JAS_DEFAULT_MAX_MEM_USAGE;
+	jas_conf.max_mem = 0;
+	jas_conf.num_image_formats = sizeof(jas_image_fmts) /
+	  sizeof(jas_image_fmt_t);
+	jas_conf.image_formats = jas_image_fmts;
 	jas_conf.dec_default_max_samples = JAS_DEC_DEFAULT_MAX_SAMPLES;
 	jas_conf.debug_level = 0;
 	jas_conf.vlogmsgf = jas_vlogmsgf_stderr;
 	//jas_conf.vlogmsgf = jas_vlogmsgf_discard;
-	jas_conf.num_image_formats = sizeof(jas_image_fmts) /
-	  sizeof(jas_image_fmt_t);
-	jas_conf.image_formats = jas_image_fmts;
 	jas_conf.initialized = 1;
 }
 
@@ -307,11 +298,13 @@ void jas_conf_set_allocator(jas_allocator_t *allocator)
 	jas_conf.allocator = allocator;
 }
 
+#ifdef JAS_COMMENT
 JAS_EXPORT
 void jas_conf_set_allocator_wrapper(int enable)
 {
 	jas_conf.enable_allocator_wrapper = enable;
 }
+#endif
 
 JAS_EXPORT
 void jas_conf_set_debug_level(int debug_level)
@@ -353,16 +346,18 @@ void jas_conf_set_image_format_table(const jas_image_fmt_t *formats,
 JAS_EXPORT
 int jas_init_library()
 {
-	bool has_lock = false;
 	int ret = 0;
 	int status;
+#if defined(JAS_THREADS)
+	bool has_lock = false;
+#endif
 
 	JAS_UNUSED(status);
 
 #if defined(JAS_THREADS)
 	jas_mutex_lock(&jas_global.lock);
-#endif
 	has_lock = true;
+#endif
 
 	/*
 	The following check requires that library configuration be performed on
@@ -371,12 +366,21 @@ int jas_init_library()
 	assert(jas_conf.initialized);
 	assert(!jas_global.initialized);
 
-	// do not memset. this will trash mutex
-	//memset(&jas_global, 0, sizeof(jas_global_t));
 	jas_global.conf = jas_conf;
+	assert(jas_global.conf.initialized);
+
+	size_t max_mem = jas_global.conf.max_mem;
+	if (!max_mem) {
+		max_mem = jas_get_total_mem_size() / 2;
+		if (!max_mem) {
+			max_mem = JAS_DEFAULT_MAX_MEM_USAGE;
+		}
+		assert(max_mem);
+		jas_global.conf.max_mem = max_mem;
+	}
 
 #if !defined(JAS_THREADS)
-	if (jas_conf.multithread) {
+	if (jas_global.conf.multithread) {
 		jas_eprintf("library not built with multithreading support\n");
 		ret = -1;
 		goto done;
@@ -412,7 +416,7 @@ int jas_init_library()
 			jas_std_allocator_init(&jas_std_allocator);
 			jas_allocator = &jas_std_allocator.base;
 		} else {
-			jas_allocator = jas_conf.allocator;
+			jas_allocator = jas_global.conf.allocator;
 		}
 	}
 
@@ -429,27 +433,28 @@ int jas_init_library()
 	}
 #endif
 
-	jas_global.ctx->dec_default_max_samples = jas_conf.dec_default_max_samples;
-	jas_global.ctx->debug_level = jas_conf.debug_level;
-	//jas_setdbglevel(jas_global.conf.debug_level);
+	jas_global.ctx->dec_default_max_samples =
+	  jas_global.conf.dec_default_max_samples;
+	jas_global.ctx->debug_level = jas_global.conf.debug_level;
 	jas_global.ctx->image_numfmts = 0;
 
 	jas_global.initialized = 1;
 
 #if defined(JAS_THREADS)
 	jas_mutex_unlock(&jas_global.lock);
-#endif
 	has_lock = false;
+#endif
 
-	JAS_LOGDEBUGF(1, "memory size: %zu\n", jas_get_total_mem_size());
-	assert(jas_global.conf.initialized);
+	JAS_LOGDEBUGF(1, "library initialization complete\n");
+	JAS_LOGDEBUGF(1, "total memory size: %zu\n", jas_get_total_mem_size());
+	JAS_LOGDEBUGF(1, "library memory limit: %zu\n", max_mem);
 
 done:
-	if (has_lock) {
 #if defined(JAS_THREADS)
+	if (has_lock) {
 		jas_mutex_unlock(&jas_global.lock);
-#endif
 	}
+#endif
 
 	return ret;
 }

@@ -101,7 +101,7 @@ clean_tmp_dir=0
 debug_level=0
 os=
 use_jas_init=0
-enable_strict=0
+enable_strict=1
 cmake_generator=
 enable_32bit=0
 
@@ -161,6 +161,10 @@ while [ $# -gt 0 ]; do
 	--test)
 		shift 1
 		enable_test=1
+		;;
+	--no-test)
+		shift 1
+		enable_test=0
 		;;
 	--documentation)
 		shift 1

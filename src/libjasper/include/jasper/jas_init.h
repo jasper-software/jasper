@@ -98,6 +98,10 @@ typedef struct {
 	*/
 	bool initialized;
 
+	/*
+	A boolean flag indicating if the library is potentially going to be
+	used by more than one thread.
+	*/
 	bool multithread;
 
 	/*
@@ -116,12 +120,6 @@ typedef struct {
 	allocator wrapper is used.
 	*/
 	size_t max_mem;
-
-	/*
-	The jas_cleanup function should be invoked via atexit.
-	It is not recommended that this be used, as it can cause many problems.
-	*/
-	bool enable_atexit_cleanup;
 
 	/*
 	The image format information to be used to populate the image format
@@ -227,22 +225,6 @@ responsibility of the caller.
 */
 JAS_EXPORT
 void jas_conf_set_allocator(jas_allocator_t *allocator);
-
-/*!
-@brief Set the memory allocator wrapper enabled flag.
-
-@details
-This function sets the value of the allocator wrapper enabled flag.
-Setting this flag to true shall invoke the wrath of all of the world's
-most-evil hackers.
-It is strongly recommended that the allocator wrapper not be disabled
-unless the memory allocator being used imposes an upper bound on memory
-usage.
-Not placing a bound on the amount of memory used by the JasPer library
-would have many severe negative security implications.
-*/
-JAS_EXPORT
-void jas_conf_set_allocator_wrapper(int enable);
 
 /*!
 @brief Set the initial debug level for the library.

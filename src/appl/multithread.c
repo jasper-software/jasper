@@ -294,12 +294,17 @@ int main(int argc, char **argv)
 #else
 
 	jas_conf_clear();
+#ifdef JAS_COMMENT
 	if (use_wrapper) {
 		jas_conf_set_allocator_wrapper(true);
 		jas_conf_set_max_mem(max_mem);
 	} else {
 		jas_conf_set_allocator_wrapper(false);
 	}
+#else
+	JAS_UNUSED(use_wrapper);
+	jas_conf_set_max_mem(max_mem);
+#endif
 	static jas_std_allocator_t allocator;
 	jas_std_allocator_init(&allocator);
 	jas_conf_set_allocator(&allocator.base);
