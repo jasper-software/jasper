@@ -253,6 +253,8 @@ typedef struct {
 } jas_thread_t;
 #endif
 
+static inline void jas_thread_yield(void);
+
 /**************************************\
 * Thread-Specific Storage (TSS)
 \**************************************/
@@ -265,6 +267,7 @@ typedef pthread_key_t jas_tss_t;
 #elif defined(JAS_THREADS_WIN32)
 typedef DWORD jas_tss_t;
 #endif
+
 
 /******************************************************************************\
 * Spinlock
