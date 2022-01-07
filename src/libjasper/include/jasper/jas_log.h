@@ -109,6 +109,8 @@ extern "C" {
 */
 typedef unsigned int jas_logtype_t;
 
+typedef int (jas_vlogmsgf_t)(jas_logtype_t, const char *, va_list);
+
 /*!
 @brief Create an instance of a logtype.
 */

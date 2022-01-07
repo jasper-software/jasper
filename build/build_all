@@ -134,7 +134,7 @@ for multithread in 0 1; do
 	(Multithread $multithread)
 	================================================================================
 	EOF
-	base_dir="$build_dir/test_static_debug-$multithread"
+	base_dir="$build_dir/test_static_debug-ji-$multithread"
 	command=("$build_program")
 	command+=("${global_options[@]}")
 	command+=(--build-dir "$base_dir/build")

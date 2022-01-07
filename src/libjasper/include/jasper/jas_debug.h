@@ -110,7 +110,7 @@ Get the library debug level.
 static inline
 int jas_getdbglevel(void)
 {
-	return jas_context_get_debug_level(jas_get_context());
+	return jas_get_debug_level();
 }
 
 /*!

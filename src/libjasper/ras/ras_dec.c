@@ -124,9 +124,8 @@ static const jas_taginfo_t ras_decopts[] = {
 static int ras_dec_parseopts(const char *optstr, ras_dec_importopts_t *opts)
 {
 	jas_tvparser_t *tvp;
-	jas_context_t context = jas_get_context();
 
-	opts->max_samples = jas_context_get_dec_default_max_samples(context);
+	opts->max_samples = jas_get_dec_default_max_samples();
 	opts->allow_trunc = 0;
 
 	if (!(tvp = jas_tvparser_create(optstr ? optstr : ""))) {

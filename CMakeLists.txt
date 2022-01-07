@@ -92,7 +92,7 @@ option(JAS_ENABLE_DOC "Enable building of the documentation" ON)
 option(JAS_ENABLE_PROGRAMS "Enable building of the programs" ON)
 option(JAS_ENABLE_MULTITHREADING_SUPPORT "Enable multithreading support" ON)
 option(JAS_PREFER_PTHREAD
-  "Prefer POSIX Threading Library (over C11) for threading support" OFF)
+  "Prefer POSIX Threading Library (over C11) for threading support" ON)
 option(JAS_STRICT "Treat compiler warnings as errors" OFF)
 
 option(JAS_INCLUDE_BMP_CODEC "Include (native) BMP codec support" ON)
@@ -422,6 +422,13 @@ if(JAS_ENABLE_MULTITHREADING_SUPPORT)
 	message("Threading library: ${THREAD_LIBRARY}")
 else()
 	message("Threading support has been disabled.")
+endif()
+
+if(JAS_THREADS_C11 AND JAS_ENABLE_TSAN)
+	message(FATAL_ERROR
+	  "TSAN does not have interceptors for C11 concurrency primitives.  "
+	  "Using C11 threads and TSan will likely not end well.  "
+	  "See https://github.com/google/sanitizers/issues/1195")
 endif()
 
 ################################################################################

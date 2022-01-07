@@ -78,20 +78,11 @@
 \******************************************************************************/
 
 /* Set the library debug level. */
-int jas_setdbglevel(int dbglevel)
+int jas_setdbglevel(int level)
 {
-	int olddbglevel;
-
-	jas_ctx_t *ctx = jas_get_ctx();
-
-	/* Save the old debug level. */
-	olddbglevel = ctx->debug_level;
-
-	/* Change the debug level. */
-	ctx->debug_level = dbglevel;
-
-	/* Return the old debug level. */
-	return olddbglevel;
+	int old_level = jas_get_debug_level();
+	jas_set_debug_level(level);
+	return old_level;
 }
 
 /******************************************************************************\
@@ -177,8 +168,8 @@ JAS_EXPORT
 int jas_vlogmsgf(jas_logtype_t type, const char *fmt, va_list ap)
 {
 	int ret;
-	jas_ctx_t *ctx = jas_get_ctx();
-	ret = (ctx->vlogmsgf)(type, fmt, ap);
+	jas_vlogmsgf_t *func = jas_get_vlogmsgf();
+	ret = func(type, fmt, ap);
 	return ret;
 }
 

@@ -924,12 +924,13 @@ const jas_image_fmtinfo_t *jas_image_lookupfmtbyid(int id)
 
 const jas_image_fmtinfo_t *jas_image_lookupfmtbyname(const char *name)
 {
-	jas_ctx_t *ctx = jas_get_ctx();
+	const jas_image_fmtinfo_t *image_fmtinfos;
+	size_t image_numfmts;
+	jas_get_image_fmtinfo_table(&image_fmtinfos, &image_numfmts);
+
 	unsigned i;
 	const jas_image_fmtinfo_t *fmtinfo;
-
-	for (i = 0, fmtinfo = ctx->image_fmtinfos; i < ctx->image_numfmts;
-	  ++i, ++fmtinfo) {
+	for (i = 0, fmtinfo = image_fmtinfos; i < image_numfmts; ++i, ++fmtinfo) {
 		if (!strcmp(fmtinfo->name, name)) {
 			return fmtinfo;
 		}

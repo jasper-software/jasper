@@ -96,15 +96,9 @@ typedef struct {
 	A boolean flag indicating if the library has been configured
 	by invoking the jas_conf_clear function.
 	*/
-	bool configured;
-
-	/*
-	A boolean flag indicating that the library has been initialized
-	by invoking the jas_init or jas_initialize function.
-	*/
 	bool initialized;
 
-	bool atexitused;
+	bool multithread;
 
 	/*
 	The allocator to be used by the library.
@@ -196,64 +190,8 @@ An opaque handle type used to represent a JasPer library context.
 typedef void *jas_context_t;
 
 /******************************************************************************\
-* Functions.
+* Library Run-Time Configuration.
 \******************************************************************************/
-
-/*!
-@brief Initialize the JasPer library with the current configuration settings.
-
-@details
-The library must be configured by invoking the jas_conf_clear() function
-prior to calling jas_initialize().
-
-@returns
-If the initialization of the library is successful, zero is returned;
-otherwise, a nonzero value is returned.
-
-@warning
-Configuration, initialization, and cleanup of the library must be performed
-on the same thread.
-*/
-JAS_EXPORT
-int jas_initialize(void);
-
-/*!
-@brief Configure and initialize the JasPer library using the default
-configuration settings.
-
-@details
-The jas_init() function initializes the JasPer library.
-The library must be initialized before most code in the library can be used.
-
-The jas_init() function exists only for reasons of backward compatibility
-with earlier versions of the library.
-It is recommended that this function not be used.
-Instead, the jas_conf_clear() and jas_initialize() functions should be used
-to configure and initialize the library.
-
-@returns
-If the library is successfully initialized, zero is returned;
-otherwise, a nonzero value is returned.
-
-@warning
-Configuration, initialization, and cleanup of the library must be performed
-on the same thread.
-*/
-JAS_EXPORT
-int jas_init(void);
-
-/*!
-@brief Perform any clean up for the JasPer library.
-
-@details
-This function performs any clean up for the JasPer library.
-
-@warning
-Configuration, initialization, and cleanup of the library must be performed
-on the same thread.
-*/
-JAS_EXPORT
-void jas_cleanup(void);
 
 /*!
 @brief Configure the JasPer library with the default configuration settings.
@@ -262,7 +200,7 @@ void jas_cleanup(void);
 This function configures the JasPer library with the default configuration
 settings.
 These settings may be change via the @c jas_conf_* family of function
-prior to invoking jas_initialize().
+prior to invoking jas_init_library().
 
 @warning
 Configuration, initialization, and cleanup of the library must be performed
@@ -270,6 +208,13 @@ on the same thread.
 */
 JAS_EXPORT
 void jas_conf_clear(void);
+
+/*!
+@brief Set the multithreading flag for the library.
+@details
+*/
+JAS_EXPORT
+void jas_conf_set_multithread(int multithread);
 
 /*!
 @brief Set the memory allocator to be used by the library.
@@ -297,7 +242,7 @@ Not placing a bound on the amount of memory used by the JasPer library
 would have many severe negative security implications.
 */
 JAS_EXPORT
-void jas_conf_set_allocator_wrapper(bool enable);
+void jas_conf_set_allocator_wrapper(int enable);
 
 /*!
 @brief Set the initial debug level for the library.
@@ -346,6 +291,106 @@ JAS_EXPORT
 void jas_conf_set_image_format_table(const jas_image_fmt_t *,
   size_t num_formats);
 
+/******************************************************************************\
+* Library Initialization and Cleanup.
+\******************************************************************************/
+
+/*!
+@brief Initialize the JasPer library with the current configuration settings.
+
+@details
+The library must be configured by invoking the jas_conf_clear() function
+prior to calling jas_init_library().
+
+@returns
+If the initialization of the library is successful, zero is returned;
+otherwise, a nonzero value is returned.
+
+@warning
+The jas_init_library() function does NOT synchronize with the
+jas_conf_clear() function.
+Configuration, initialization, and cleanup of the library must be
+performed on the same thread.
+*/
+JAS_EXPORT
+int jas_init_library(void);
+
+JAS_EXPORT
+int jas_cleanup_library(void);
+
+/******************************************************************************\
+* Thread Initialization and Cleanup.
+\******************************************************************************/
+
+/*!
+@brief Perform per-thread initialization for the JasPer library.
+
+@details
+The library must be initialized by invoking the jas_init_library() function
+prior to calling jas_init_thread().
+
+@warning
+The jas_init_thread() function can only be invoked in a single thread
+unless the run-time configuration has enabled multithreading via
+jas_set_multithread().
+*/
+JAS_EXPORT
+int jas_init_thread(void);
+
+/*!
+@brief
+@details
+*/
+JAS_EXPORT
+int jas_cleanup_thread(void);
+
+/******************************************************************************\
+* Legacy Initialization and Cleanup Functions.
+\******************************************************************************/
+
+/*!
+@brief Configure and initialize the JasPer library using the default
+configuration settings.
+
+@details
+The jas_init() function initializes the JasPer library.
+The library must be initialized before most code in the library can be used.
+
+The jas_init() function exists only for reasons of backward compatibility
+with earlier versions of the library.
+It is recommended that this function not be used.
+Instead, the jas_conf_clear() and jas_init_library() functions should be used
+to configure and initialize the library.
+
+@returns
+If the library is successfully initialized, zero is returned;
+otherwise, a nonzero value is returned.
+
+@warning
+Configuration, initialization, and cleanup of the library must be performed
+on the same thread.
+*/
+JAS_EXPORT
+int jas_init(void);
+
+/*!
+@brief
+Perform any clean up for the JasPer library.
+
+@details
+This function performs any clean up for the JasPer library.
+
+@warning
+Configuration, initialization, and cleanup of the library must be performed
+on the same thread.
+*/
+JAS_EXPORT
+void jas_cleanup(void);
+
+/******************************************************************************\
+* Context Management
+\******************************************************************************/
+
 /*!
 @brief
 @details
@@ -354,10 +399,20 @@ JAS_EXPORT
 jas_context_t jas_context_create(void);
 
 /*!
+@brief
+@details
 The context being destroyed must not be the current context.
 */
 JAS_EXPORT
 void jas_context_destroy(jas_context_t context);
+
+/*!
+@brief
+Get the current context for the calling thread.
+@details
+*/
+JAS_EXPORT
+jas_context_t jas_get_default_context(void);
 
 /*!
 @brief
@@ -375,13 +430,20 @@ Set the current context for the calling thread.
 JAS_EXPORT
 void jas_set_context(jas_context_t context);
 
-#if defined(JAS_INTERNAL_USE_ONLY)
+/******************************************************************************\
+* Getting/Setting Context Properties
+\******************************************************************************/
+
+//#if defined(JAS_INTERNAL_USE_ONLY)
+JAS_EXPORT
+jas_ctx_t *jas_get_ctx_impl(void);
+
 /* This function is only for internal use by the library. */
 static inline jas_ctx_t *jas_get_ctx(void)
 {
-	return JAS_CAST(jas_ctx_t *, jas_get_context());
+	return JAS_CAST(jas_ctx_t *, jas_get_ctx_impl());
 }
-#endif
+//#endif
 
 /*!
 @brief
@@ -389,16 +451,16 @@ Set the debug level for a particular context.
 @details
 */
 JAS_EXPORT
-int jas_context_set_debug_level(jas_context_t context, int debug_level);
+int jas_set_debug_level(int debug_level);
 
 /*!
 @brief
 Get the debug level for a particular context.
 @details
 */
-static inline int jas_context_get_debug_level(jas_context_t context)
+static inline int jas_get_debug_level(void)
 {
-	jas_ctx_t *ctx = JAS_CAST(jas_ctx_t *, context);
+	jas_ctx_t *ctx = jas_get_ctx();
 	return ctx->debug_level;
 }
 
@@ -410,18 +472,16 @@ process.
 @details
 */
 JAS_EXPORT
-void jas_context_set_dec_default_max_samples(jas_context_t context,
-  size_t max_samples);
+void jas_set_dec_default_max_samples(size_t max_samples);
 
 /*!
 @brief
 Get the default maximum number of samples that a decoder is permitted to
 process.
 */
-static inline size_t jas_context_get_dec_default_max_samples(
-  jas_context_t context)
+static inline size_t jas_get_dec_default_max_samples(void)
 {
-	jas_ctx_t *ctx = JAS_CAST(jas_ctx_t *, context);
+	jas_ctx_t *ctx = jas_get_ctx();
 	return ctx->dec_default_max_samples;
 }
 
@@ -431,8 +491,8 @@ Set the function to be used for log messages.
 @details
 */
 JAS_EXPORT
-void jas_context_set_vlogmsgf(jas_context_t context,
-  int (*func)(jas_logtype_t, const char *, va_list));
+//void jas_set_vlogmsgf(int (*func)(jas_logtype_t, const char *, va_list));
+void jas_set_vlogmsgf(jas_vlogmsgf_t *func);
 
 /*!
 @brief
@@ -440,12 +500,15 @@ Get the function to be used for log messages.
 @details
 */
 static inline
-int (*jas_context_get_vlogmsgf(jas_context_t context))(jas_logtype_t,
-  const char *, va_list)
+jas_vlogmsgf_t *jas_get_vlogmsgf(void)
 {
-	jas_ctx_t *ctx = JAS_CAST(jas_ctx_t *, context);
+	jas_ctx_t *ctx = jas_get_ctx();
 	return ctx->vlogmsgf;
 }
+
+JAS_EXPORT
+void jas_get_image_fmtinfo_table(const jas_image_fmtinfo_t **fmtinfos,
+ size_t *numfmts);
 
 /*!
  * @}

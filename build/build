@@ -178,9 +178,17 @@ while [ $# -gt 0 ]; do
 		shift 1
 		enable_asan=1
 		;;
+	--no-asan)
+		shift 1
+		enable_asan=0
+		;;
 	--lsan)
 		shift 1
 		enable_lsan=1
+		;;
+	--no-lsan)
+		shift 1
+		enable_lsan=0
 		;;
 	--msan)
 		shift 1

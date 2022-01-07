@@ -124,14 +124,12 @@ int process_job(void *job_handle)
 
 	int result = 0;
 
-	jas_context_t context = 0;
-	if (!(context = jas_context_create())) {
-		fprintf(stderr, "cannot create context\n");
-		exit(EXIT_FAILURE);
+	if (jas_init_thread()) {
+		fprintf(stderr, "cannot initialize thread\n");
+		return -1;
 	}
-	jas_context_set_debug_level(context, job->debug_level);
-	jas_context_set_vlogmsgf(context, jas_vlogmsgf_stderr);
-	jas_set_context(context);
+	jas_set_debug_level(job->debug_level);
+	jas_set_vlogmsgf(jas_vlogmsgf_stderr);
 
 	for (int iter_no = 0; iter_no < JAS_CAST(int, job->num_iters); ++iter_no) {
 
@@ -182,11 +180,7 @@ int process_job(void *job_handle)
 
 done:
 
-	if (context) {
-		jas_set_context(0);
-		jas_context_destroy(context);
-		context = 0;
-	}
+	jas_cleanup_thread();
 
 	return result;
 }
@@ -294,9 +288,7 @@ int main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	}
 	jas_set_max_mem_usage(max_mem);
-	jas_context_t context = jas_get_context();
-	assert(context);
-	jas_context_set_debug_level(context, 0);
+	jas_set_debug_level(0);
 	atexit(jas_cleanup);
 
 #else
@@ -312,9 +304,14 @@ int main(int argc, char **argv)
 	jas_std_allocator_init(&allocator);
 	jas_conf_set_allocator(&allocator.base);
 	jas_conf_set_debug_level(0);
+	jas_conf_set_multithread(1);
 
-	if (jas_initialize()) {
+	if (jas_init_library()) {
 		fprintf(stderr, "cannot initialize JasPer library\n");
+		exit(EXIT_FAILURE);
+	}
+	if (jas_init_thread()) {
+		fprintf(stderr, "cannot initialize thread\n");
 		exit(EXIT_FAILURE);
 	}
 	atexit(jas_cleanup);
@@ -343,9 +340,6 @@ int main(int argc, char **argv)
 			++error_count;
 		}
 	}
-
-	jas_set_context(0);
-	//jas_cleanup();
 
 	if (error_count) {
 		fprintf(stderr, "ERRORS WERE DETECTED!\n");

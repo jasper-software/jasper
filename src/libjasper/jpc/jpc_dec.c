@@ -332,12 +332,10 @@ static jpc_dec_importopts_t *jpc_dec_opts_create(const char *optstr)
 		goto error;
 	}
 
-	jas_context_t context = jas_get_context();
-
 	opts->debug = 0;
 	opts->maxlyrs = JPC_MAXLYRS;
 	opts->maxpkts = -1;
-	opts->max_samples = jas_context_get_dec_default_max_samples(context);
+	opts->max_samples = jas_get_dec_default_max_samples();
 
 	if (!(tvp = jas_tvparser_create(optstr ? optstr : ""))) {
 		goto error;

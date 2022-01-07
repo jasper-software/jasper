@@ -70,6 +70,7 @@
 #include "jasper/jas_malloc.h"
 #include "jasper/jas_debug.h"
 #include "jasper/jas_string.h"
+#include "jasper/jas_thread.h"
 
 #include <stdlib.h>
 #include <stdbool.h>
@@ -77,19 +78,38 @@
 #include <stdarg.h>
 
 /******************************************************************************\
+* Types.
+\******************************************************************************/
+
+typedef struct {
+	jas_conf_t conf;
+	bool initialized;
+	size_t num_active_threads;
+	jas_ctx_t *ctx;
+	jas_ctx_t ctx_buf;
+#if defined(JAS_THREADS)
+	jas_mutex_t lock;
+	jas_tss_t cur_ctx_tss;
+	jas_tss_t default_ctx_tss;
+#endif
+} jas_global_t;
+
+/******************************************************************************\
 * Function prototypes.
 \******************************************************************************/
 
-void jas_context_init(jas_ctx_t *ctx);
-
+void jas_ctx_init(jas_ctx_t *ctx);
 static int jas_init_codecs(jas_ctx_t *ctx);
-
-static int jas_init_helper(void);
-
-void jas_context_cleanup(jas_ctx_t *ctx);
+void jas_ctx_cleanup(jas_ctx_t *ctx);
+void jas_set_ctx(jas_ctx_t *ctx);
+void jas_set_default_ctx(jas_ctx_t *ctx);
+jas_ctx_t *jas_ctx_create(void);
+void jas_ctx_destroy(jas_ctx_t *ctx);
+jas_ctx_t *jas_get_ctx_impl(void);
+jas_ctx_t *jas_get_default_ctx(void);
 
 /******************************************************************************\
-* Data.
+* Codec Table.
 \******************************************************************************/
 
 static const jas_image_fmt_t jas_image_fmts[] = {
@@ -213,61 +233,72 @@ static const jas_image_fmt_t jas_image_fmts[] = {
 
 };
 
+/******************************************************************************\
+* Configuration and Library Data.
+\******************************************************************************/
+
 /* MUTABLE_SHARED_STATE_TAG: This is mutable shared state. */
 /*
 Various user-configurable settings.
 */
 jas_conf_t jas_conf = {
-	.configured = 0,
 	.initialized = 0,
-	.atexitused = 0,
 };
 
+/* MUTABLE_SHARED_STATE_TAG: This is mutable shared state. */
+jas_global_t jas_global = {
+	.initialized = 0,
 #if defined(JAS_THREADS)
-/* MUTABLE_SHARED_STATE_TAG: This is mutable shared state. */
-static jas_tss_t jas_tss;
+	.lock = JAS_MUTEX_INITIALIZER,
 #endif
-
-/* MUTABLE_SHARED_STATE_TAG: This is mutable shared state. */
-static jas_ctx_t *jas_global_ctx = 0;
-
-/* MUTABLE_SHARED_STATE_TAG: This is mutable shared state. */
-static jas_ctx_t jas_global_ctx_buf;
+};
 
 /******************************************************************************\
-* Code.
+* Codec Table Code.
 \******************************************************************************/
 
 JAS_EXPORT
-void jas_get_image_format_table(const jas_image_fmt_t** formats,
+void jas_get_image_format_table(const jas_image_fmt_t **formats,
   size_t *num_formats)
 {
 	*formats = jas_image_fmts;
 	*num_formats = sizeof(jas_image_fmts) / sizeof(jas_image_fmt_t);
 }
 
+/******************************************************************************\
+* Library Configuration.
+\******************************************************************************/
+
 JAS_EXPORT
 void jas_conf_clear()
 {
+#if 0
 	/* NOTE: The following two lines of code require that configuration,
 	  initialization, and cleanup of the library be performed on the
 	  same thread. */
 	assert(!jas_conf.initialized);
-	assert(!jas_conf.atexitused);
+#endif
 
-	memset(&jas_conf, 0, sizeof(jas_conf_t));
-	jas_conf.configured = 1;
+	//memset(&jas_conf, 0, sizeof(jas_conf_t));
+	//jas_conf.configured = 1;
+	jas_conf.multithread = 0;
 	jas_conf.allocator = 0;
 	jas_conf.enable_allocator_wrapper = 1;
 	jas_conf.max_mem = JAS_DEFAULT_MAX_MEM_USAGE;
 	jas_conf.dec_default_max_samples = JAS_DEC_DEFAULT_MAX_SAMPLES;
 	jas_conf.debug_level = 0;
-	jas_conf.enable_atexit_cleanup = 0;
 	jas_conf.vlogmsgf = jas_vlogmsgf_stderr;
 	//jas_conf.vlogmsgf = jas_vlogmsgf_discard;
 	jas_conf.num_image_formats = sizeof(jas_image_fmts) /
 	  sizeof(jas_image_fmt_t);
 	jas_conf.image_formats = jas_image_fmts;
+	jas_conf.initialized = 1;
+}
+
+JAS_EXPORT
+void jas_conf_set_multithread(int multithread)
+{
+	jas_conf.multithread = multithread;
 }
 
 JAS_EXPORT
@@ -277,7 +308,7 @@ void jas_conf_set_allocator(jas_allocator_t *allocator)
 }
 
 JAS_EXPORT
-void jas_conf_set_allocator_wrapper(bool enable)
+void jas_conf_set_allocator_wrapper(int enable)
 {
 	jas_conf.enable_allocator_wrapper = enable;
 }
@@ -315,44 +346,46 @@ void jas_conf_set_image_format_table(const jas_image_fmt_t *formats,
 	jas_conf.num_image_formats = num_formats;
 }
 
-JAS_EXPORT
-int jas_init()
-{
-	/* NOTE: The following three lines of code require that configuration,
-	  initialization, and cleanup of the library be performed on the
-	  same thread. */
-	assert(!jas_conf.configured);
-	assert(!jas_conf.initialized);
-	assert(!jas_conf.atexitused);
-
-	jas_conf_clear();
-
-	/* Note: By commenting out the following line, the behavior of the
-	  jas_init function has been changed from past releases.  Now, the
-	  library user is responsible for invoking jas_cleanup through some
-	  appropriate means. */
-	/* jas_conf.enable_atexit_cleanup = 1; */
-
-	return jas_init_helper();
-}
+/******************************************************************************\
+* Library Initialization and Cleanup.
+\******************************************************************************/
 
 JAS_EXPORT
-int jas_initialize()
+int jas_init_library()
 {
-	/* NOTE: The following three lines of code require that configuration,
-	  initialization, and cleanup of the library be performed on the
-	  same thread. */
-	assert(jas_conf.configured);
-	assert(!jas_conf.initialized);
-	assert(!jas_conf.atexitused);
+	bool has_lock = false;
+	int ret = 0;
+	int status;
 
-	return jas_init_helper();
-}
+	JAS_UNUSED(status);
 
-static int jas_init_helper()
-{
 #if defined(JAS_THREADS)
-	memset(&jas_tss, 0, sizeof(jas_tss_t));
+	jas_mutex_lock(&jas_global.lock);
+#endif
+	has_lock = true;
+
+	/*
+	The following check requires that library configuration be performed on
+	the same thread as library initialization.
+	*/
+	assert(jas_conf.initialized);
+	assert(!jas_global.initialized);
+
+	// do not memset. this will trash mutex
+	//memset(&jas_global, 0, sizeof(jas_global_t));
+	jas_global.conf = jas_conf;
+
+#if !defined(JAS_THREADS)
+	if (jas_conf.multithread) {
+		jas_eprintf("library not built with multithreading support\n");
+		ret = -1;
+		goto done;
+	}
+#endif
+
+#if defined(JAS_THREADS)
+	memset(&jas_global.cur_ctx_tss, 0, sizeof(jas_tss_t));
+	memset(&jas_global.default_ctx_tss, 0, sizeof(jas_tss_t));
 #endif
 
 	/*
@@ -360,22 +393,22 @@ static int jas_init_helper()
 	The memory allocator uses information from the context in order to
 	handle log messages.
 	*/
-	jas_context_init(&jas_global_ctx_buf);
-	jas_global_ctx = &jas_global_ctx_buf;
+	jas_ctx_init(&jas_global.ctx_buf);
+	jas_global.ctx = &jas_global.ctx_buf;
 
-	if (jas_conf.enable_allocator_wrapper) {
+	if (jas_global.conf.enable_allocator_wrapper) {
 		jas_allocator_t *delegate;
-		if (!jas_conf.allocator) {
+		if (!jas_global.conf.allocator) {
 			jas_std_allocator_init(&jas_std_allocator);
 			delegate = &jas_std_allocator.base;
 		} else {
-			delegate = jas_conf.allocator;
+			delegate = jas_global.conf.allocator;
 		}
 		jas_basic_allocator_init(&jas_basic_allocator, delegate,
-		  jas_conf.max_mem);
+		  jas_global.conf.max_mem);
 		jas_allocator = &jas_basic_allocator.base;
 	} else {
-		if (!jas_conf.allocator) {
+		if (!jas_global.conf.allocator) {
 			jas_std_allocator_init(&jas_std_allocator);
 			jas_allocator = &jas_std_allocator.base;
 		} else {
@@ -384,46 +417,218 @@ static int jas_init_helper()
 	}
 
 #if defined(JAS_THREADS)
-	int ret;
-	if ((ret = jas_tss_create(&jas_tss, 0))) {
-		jas_eprintf("cannot create thread-specific storage %d\n", ret);
-		return -1;
+	if ((status = jas_tss_create(&jas_global.cur_ctx_tss, 0))) {
+		jas_eprintf("cannot create thread-specific storage %d\n", status);
+		ret = -1;
+		goto done;
+	}
+	if ((status = jas_tss_create(&jas_global.default_ctx_tss, 0))) {
+		jas_eprintf("cannot create thread-specific storage %d\n", status);
+		ret = -1;
+		goto done;
 	}
 #endif
 
-	jas_global_ctx->dec_default_max_samples = jas_conf.dec_default_max_samples;
-	jas_global_ctx->debug_level = jas_conf.debug_level;
-	//jas_setdbglevel(jas_conf.debug_level);
+	jas_global.ctx->dec_default_max_samples = jas_conf.dec_default_max_samples;
+	jas_global.ctx->debug_level = jas_conf.debug_level;
+	//jas_setdbglevel(jas_global.conf.debug_level);
+	jas_global.ctx->image_numfmts = 0;
+
+	jas_global.initialized = 1;
+
+#if defined(JAS_THREADS)
+	jas_mutex_unlock(&jas_global.lock);
+#endif
+	has_lock = false;
 
 	JAS_LOGDEBUGF(1, "memory size: %zu\n", jas_get_total_mem_size());
+	assert(jas_global.conf.initialized);
 
-	if (jas_init_codecs(jas_global_ctx)) {
-		jas_eprintf("cannot initialize codecs\n");
-		return -1;
+done:
+	if (has_lock) {
+#if defined(JAS_THREADS)
+		jas_mutex_unlock(&jas_global.lock);
+#endif
 	}
 
-	if (jas_conf.enable_atexit_cleanup) {
-		/*
-		Note:
-		We must not register the JasPer library exit handler until after
-		at least one memory allocation is performed.  This is desirable
-		as it ensures that the JasPer exit handler is called before the
-		debug memory allocator exit handler.
-		*/
-		atexit(jas_cleanup);
-		/* NOTE: The following two lines of code require that configuration,
-		  initialization, and cleanup of the library be performed on the
-		  same thread. */
-		jas_conf.atexitused = 1;
-	}
+	return ret;
+}
 
-	/* NOTE: The following line of code requires that configuration,
+JAS_EXPORT
+int jas_cleanup_library()
+{
+	jas_ctx_t *ctx;
+	bool has_lock = false;
+
+#if defined(JAS_THREADS)
+	jas_mutex_lock(&jas_global.lock);
+#endif
+	has_lock = true;
+
+	assert(jas_global.initialized);
+	assert(!jas_global.num_active_threads);
+
+	JAS_LOGDEBUGF(10, "jas_cleanup_library invoked\n");
+
+	ctx = &jas_global.ctx_buf;
+	jas_ctx_cleanup(ctx);
+	//jas_context_set_debug_level(ctx, 0);
+
+	assert(jas_allocator);
+	jas_allocator_cleanup(jas_allocator);
+	jas_allocator = 0;
+
+	JAS_LOGDEBUGF(10, "jas_cleanup_library returning\n");
+
+#if defined(JAS_THREADS)
+	jas_tss_delete(jas_global.cur_ctx_tss);
+	jas_tss_delete(jas_global.default_ctx_tss);
+#endif
+
+	/* NOTE: The following two lines of code require that configuration,
 	  initialization, and cleanup of the library be performed on the
 	  same thread. */
-	jas_conf.initialized = 1;
+	//jas_conf.configured = 0;
+	//jas_conf.initialized = 0;
+
+	if (has_lock) {
+#if defined(JAS_THREADS)
+		jas_mutex_unlock(&jas_global.lock);
+#endif
+	}
 
 	return 0;
 }
+
+/******************************************************************************\
+* Thread Initialization and Cleanup.
+\******************************************************************************/
+
+JAS_EXPORT
+int jas_init_thread()
+{
+	int ret = 0;
+	jas_ctx_t *ctx = 0;
+	bool has_lock = false;
+
+	/*
+	The default context must be established as soon as possible.
+	Prior to the default context being initialized the global state in
+	jas_global.conf is used for some settings (e.g., debug level
+	and logging function).
+	Due to the use of this global state, we must hold the lock on
+	this state until the default context is initialized.	
+	*/
+#if defined(JAS_THREADS)
+	jas_mutex_lock(&jas_global.lock);
+#endif
+	has_lock = true;
+
+	assert(jas_global.initialized);
+#if !defined(JAS_THREADS)
+	assert(jas_global.num_active_threads == 0);
+#endif
+
+	if (!(ctx = jas_ctx_create())) {
+		ret = -1;
+		goto done;
+	}
+	jas_set_ctx(ctx);
+	/* As of this point, shared use of jas_global.conf is no longer needed. */
+	jas_set_default_ctx(ctx);
+	++jas_global.num_active_threads;
+
+#if defined(JAS_THREADS)
+	jas_mutex_unlock(&jas_global.lock);
+#endif
+	has_lock = false;
+
+done:
+	if (has_lock) {
+#if defined(JAS_THREADS)
+		jas_mutex_unlock(&jas_global.lock);
+#endif
+	}
+	if (ret && ctx) {
+		jas_ctx_cleanup(ctx);
+	}
+	return ret;
+}
+
+JAS_EXPORT
+int jas_cleanup_thread()
+{
+	bool has_lock = false;
+	jas_ctx_t *ctx;
+
+#if defined(JAS_THREADS)
+	jas_mutex_lock(&jas_global.lock);
+#endif
+	has_lock = true;
+
+	/* Ensure that the library user is not doing something insane. */
+	assert(jas_get_ctx() == jas_get_default_ctx());
+
+	ctx = jas_get_default_ctx();
+	jas_set_default_ctx(0);
+	jas_set_ctx(0);
+	/*
+	As soon as we clear the current context, the global shared state
+	jas_conf.conf is used for various settings (e.g., debug level and
+	logging function).
+	*/
+
+	jas_ctx_destroy(ctx);
+	--jas_global.num_active_threads;
+
+	if (has_lock) {
+#if defined(JAS_THREADS)
+		jas_mutex_unlock(&jas_global.lock);
+#endif
+	}
+
+	return 0;
+}
+
+/******************************************************************************\
+* Legacy Library Initialization and Cleanup.
+\******************************************************************************/
+
+JAS_EXPORT
+int jas_init()
+{
+	/* NOTE: The following three lines of code require that configuration,
+	  initialization, and cleanup of the library be performed on the
+	  same thread. */
+	assert(!jas_conf.initialized);
+	assert(!jas_global.initialized);
+
+	jas_conf_clear();
+
+	if (jas_init_library()) {
+		return -1;
+	}
+	if (jas_init_thread()) {
+		jas_cleanup_library();
+		return -1;
+	}
+	return 0;
+}
+
+JAS_EXPORT
+void jas_cleanup()
+{
+	if (jas_cleanup_thread()) {
+		jas_eprintf("jas_cleanup_thread failed\n");
+	}
+	if (jas_cleanup_library()) {
+		jas_eprintf("jas_cleanup_library failed\n");
+	}
+}
+
+/******************************************************************************\
+* Code.
+\******************************************************************************/
 
 /* Initialize the image format table. */
 static int jas_init_codecs(jas_ctx_t *ctx)
@@ -434,8 +639,8 @@ static int jas_init_codecs(jas_ctx_t *ctx)
 	const jas_image_fmt_t *fmt;
 	size_t i;
 	fmtid = 0;
-	for (fmt = jas_conf.image_formats, i = 0; i < jas_conf.num_image_formats;
-	  ++fmt, ++i) {
+	for (fmt = jas_global.conf.image_formats, i = 0;
+	  i < jas_global.conf.num_image_formats; ++fmt, ++i) {
 		char *buf;
 		if (!(buf = jas_strdup(fmt->exts))) {
 			return -1;
@@ -458,32 +663,6 @@ static int jas_init_codecs(jas_ctx_t *ctx)
 	return 0;
 }
 
-JAS_EXPORT
-void jas_cleanup()
-{
-	JAS_LOGDEBUGF(10, "jas_cleanup invoked\n");
-
-	jas_global_ctx = &jas_global_ctx_buf;
-	jas_context_cleanup(&jas_global_ctx_buf);
-	jas_context_set_debug_level(&jas_global_ctx_buf, 0);
-
-	assert(jas_allocator);
-	jas_allocator_cleanup(jas_allocator);
-	jas_allocator = 0;
-
-	JAS_LOGDEBUGF(10, "jas_cleanup returning\n");
-
-#if defined(JAS_THREADS)
-	jas_tss_delete(jas_tss);
-#endif
-
-	/* NOTE: The following two lines of code require that configuration,
-	  initialization, and cleanup of the library be performed on the
-	  same thread. */
-	jas_conf.configured = 0;
-	jas_conf.initialized = 0;
-}
-
 /******************************************************************************\
 \******************************************************************************/
 
@@ -493,7 +672,7 @@ jas_conf_t *jas_get_conf_ptr()
 	return &jas_conf;
 }
 
-void jas_context_init(jas_ctx_t *ctx)
+void jas_ctx_init(jas_ctx_t *ctx)
 {
 	memset(ctx, 0, sizeof(jas_ctx_t));
 	ctx->dec_default_max_samples = jas_conf.dec_default_max_samples;
@@ -502,79 +681,144 @@ void jas_context_init(jas_ctx_t *ctx)
 	ctx->image_numfmts = 0;
 }
 
-JAS_EXPORT
-jas_context_t jas_context_create()
+jas_ctx_t *jas_ctx_create()
 {
 	jas_ctx_t *ctx;
 	if (!(ctx = jas_malloc(sizeof(jas_ctx_t)))) {
 		return 0;
 	}
-	jas_context_init(ctx);
+	jas_ctx_init(ctx);
 	jas_init_codecs(ctx);
-	return JAS_CAST(jas_context_t, ctx);
+	return ctx;
 }
 
-void jas_context_cleanup(jas_ctx_t *ctx)
+JAS_EXPORT
+jas_context_t jas_context_create()
+{
+	return JAS_CAST(jas_context_t, jas_ctx_create());
+}
+
+void jas_ctx_cleanup(jas_ctx_t *ctx)
 {
 	jas_image_clearfmts_internal(ctx->image_fmtinfos, &ctx->image_numfmts);
+}
+
+void jas_ctx_destroy(jas_ctx_t *ctx)
+{
+	jas_ctx_cleanup(ctx);
+	jas_free(ctx);
 }
 
 JAS_EXPORT
 void jas_context_destroy(jas_context_t context)
 {
-	jas_context_cleanup(JAS_CAST(jas_ctx_t *, context));
-	jas_free(context);
+	jas_ctx_destroy(JAS_CAST(jas_ctx_t *, context));
+}
+
+jas_ctx_t *jas_get_ctx_impl()
+{
+#if defined(JAS_THREADS)
+	jas_ctx_t *ctx = JAS_CAST(jas_ctx_t *, jas_tss_get(jas_global.cur_ctx_tss));
+	if (!ctx) {
+		ctx = jas_global.ctx;
+	}
+	return ctx;
+#else
+	return (jas_global.ctx) ? jas_global.ctx : &jas_global.ctx_buf;
+#endif
 }
 
 JAS_EXPORT
 jas_context_t jas_get_context()
 {
-#if defined(JAS_THREADS)
-	jas_ctx_t *ctx = JAS_CAST(jas_context_t, jas_tss_get(jas_tss));
-	if (!ctx) {
-		ctx = jas_global_ctx;
-	}
-	return JAS_CAST(jas_context_t, ctx);
-#else
-	return JAS_CAST(jas_context_t, (jas_global_ctx) ? jas_global_ctx :
-	  &jas_global_ctx_buf);
-#endif
+	return JAS_CAST(jas_context_t, jas_get_ctx());
+}
+
+JAS_EXPORT
+jas_context_t jas_get_default_context()
+{
+	return JAS_CAST(jas_context_t, jas_get_default_ctx());
 }
 
 JAS_EXPORT
 void jas_set_context(jas_context_t context)
 {
 #if defined(JAS_THREADS)
-	if (jas_tss_set(jas_tss, JAS_CAST(void *, context))) {
+	if (jas_tss_set(jas_global.cur_ctx_tss, JAS_CAST(void *, context))) {
 		assert(0);
 		abort();
 	}
 #else
-	jas_global_ctx = JAS_CAST(jas_ctx_t *, context);
+	jas_global.ctx = JAS_CAST(jas_ctx_t *, context);
+#endif
+}
+
+void jas_set_ctx(jas_ctx_t *ctx)
+{
+#if defined(JAS_THREADS)
+	if (jas_tss_set(jas_global.cur_ctx_tss, ctx)) {
+		assert(0);
+		abort();
+	}
+#else
+	jas_global.ctx = JAS_CAST(jas_ctx_t *, ctx);
+#endif
+}
+
+jas_ctx_t *jas_get_default_ctx()
+{
+#if defined(JAS_THREADS)
+	jas_ctx_t *ctx = JAS_CAST(jas_ctx_t *, jas_tss_get(jas_global.default_ctx_tss));
+	if (!ctx) {
+		ctx = jas_global.ctx;
+	}
+	return ctx;
+#else
+	return (jas_global.ctx) ? jas_global.ctx : &jas_global.ctx_buf;
+#endif
+}
+
+void jas_set_default_ctx(jas_ctx_t *ctx)
+{
+#if defined(JAS_THREADS)
+	if (jas_tss_set(jas_global.default_ctx_tss, ctx)) {
+		assert(0);
+		abort();
+	}
+#else
+	jas_global.ctx = JAS_CAST(jas_ctx_t *, ctx);
 #endif
 }
 
 JAS_EXPORT
-int jas_context_set_debug_level(jas_context_t context, int debug_level)
+int jas_set_debug_level(int debug_level)
 {
-	jas_ctx_t *ctx = JAS_CAST(jas_ctx_t *, context);
+	jas_ctx_t *ctx = jas_get_ctx();
 	int old = ctx->debug_level;
 	ctx->debug_level = debug_level;
 	return old;
 }
 
 JAS_EXPORT
-void jas_context_set_dec_default_max_samples(jas_context_t context,
-  size_t max_samples)
+void jas_set_dec_default_max_samples(size_t max_samples)
 {
-	jas_ctx_t *ctx = JAS_CAST(jas_ctx_t *, context);
+	jas_ctx_t *ctx = jas_get_ctx();
 	ctx->dec_default_max_samples = max_samples;
 }
 
 JAS_EXPORT
-void jas_context_set_vlogmsgf(jas_context_t context,
-  int (*func)(jas_logtype_t, const char *, va_list))
+void jas_set_vlogmsgf(int (*func)(jas_logtype_t, const char *,
+  va_list))
 {
-	jas_ctx_t *ctx = JAS_CAST(jas_ctx_t *, context);
+	jas_ctx_t *ctx = jas_get_ctx();
 	ctx->vlogmsgf = func;
+}
+
+JAS_EXPORT
+void jas_get_image_fmtinfo_table(const jas_image_fmtinfo_t **fmtinfos,
+  size_t *numfmts)
+{
+	jas_ctx_t *ctx = jas_get_ctx();
+	*fmtinfos = ctx->image_fmtinfos;
+	*numfmts = ctx->image_numfmts;
 }

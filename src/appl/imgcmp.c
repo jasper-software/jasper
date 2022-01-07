@@ -253,17 +253,14 @@ int main(int argc, char **argv)
 	jas_conf_set_allocator(&allocator.base);
 	jas_conf_set_max_mem(max_mem);
 	//jas_conf_set_debug_level(debug);
-	if (jas_initialize()) {
+	if (jas_init_library()) {
 		fprintf(stderr, "cannot initialize JasPer library\n");
 		exit(EXIT_ERROR);
 	}
-
-	jas_context_t context;
-	if (!(context = jas_context_create())) {
-		fprintf(stderr, "cannot create context\n");
+	if (jas_init_thread()) {
+		fprintf(stderr, "cannot initialize thread\n");
 		exit(EXIT_ERROR);
 	}
-	jas_set_context(context);
 
 	atexit(jas_cleanup);
 #endif
@@ -417,15 +414,6 @@ int main(int argc, char **argv)
 	It is only here for testing backward compatibility.
 	*/
 	jas_image_clearfmts();
-
-#if !defined(JAS_USE_JAS_INIT)
-	/*
-	Stop using the context that is about to be destroyed.
-	Then, destroy the context.
-	*/
-	jas_set_context(0);
-	jas_context_destroy(context);
-#endif
 
 	return EXIT_OK;
 }

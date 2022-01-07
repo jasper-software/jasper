@@ -207,16 +207,14 @@ int main(int argc, char **argv)
 	jas_conf_set_allocator(&allocator.base);
 	jas_conf_set_debug_level(cmdopts->debug);
 	jas_conf_set_max_mem(cmdopts->max_mem);
-	if (jas_initialize()) {
+	if (jas_init_library()) {
 		fprintf(stderr, "cannot initialize JasPer library\n");
 		exit(EXIT_FAILURE);
 	}
-	jas_context_t context;
-	if (!(context = jas_context_create())) {
-		fprintf(stderr, "cannot create context\n");
+	if (jas_init_thread()) {
+		fprintf(stderr, "cannot initialize thread\n");
 		exit(EXIT_FAILURE);
 	}
-	jas_set_context(context);
 	atexit(jas_cleanup);
 #endif
 
@@ -358,15 +356,6 @@ int main(int argc, char **argv)
 	cmdopts_destroy(cmdopts);
 	jas_image_destroy(image);
 	//jas_image_clearfmts();
-
-#if !defined(JAS_USE_JAS_INIT)
-	/*
-	Stop using the context that is about to be destroyed.
-	Then, destroy the context.
-	*/
-	jas_set_context(0);
-	jas_context_destroy(context);
-#endif
 
 	/* Success at last! :-) */
 	return EXIT_SUCCESS;

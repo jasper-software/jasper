@@ -86,6 +86,7 @@
 
 #if defined(JAS_THREADS_C11)
 #include <threads.h>
+#include <stdatomic.h>
 #elif defined(JAS_THREADS_PTHREAD)
 #include <pthread.h>
 #include <sched.h>
@@ -146,13 +147,47 @@ typedef struct {
 } jas_thread_t;
 #endif
 
+/*! Spinlock type. */
+#if defined(JAS_THREADS_C11)
+typedef struct {
+	atomic_flag flag;
+} jas_spinlock_t;
+#elif defined(JAS_THREADS_PTHREAD)
+typedef struct {
+	pthread_spinlock_t lock;
+} jas_spinlock_t;
+#elif defined(JAS_THREADS_WIN32)
+typdef struct {
+	LONG flag;
+} jas_spinlock_t;
+#endif
+
 /*!  Mutex type. */
 #if defined(JAS_THREADS_C11)
-typedef mtx_t jas_mutex_t;
+typedef jas_spinlock_t jas_mutex_t;
 #elif defined(JAS_THREADS_PTHREAD)
 typedef pthread_mutex_t jas_mutex_t;
 #elif defined(JAS_THREADS_WIN32)
-typedef CRITICAL_SECTION jas_mutex_t;
+//typedef CRITICAL_SECTION jas_mutex_t;
+typedef jas_spinlock_t jas_mutex_t;
+#endif
+
+/*!  Spinlock initializer. */
+#if defined(JAS_THREADS_C11)
+#define JAS_SPINLOCK_INITIALIZER {ATOMIC_FLAG_INIT}
+#elif defined(JAS_THREADS_PTHREAD)
+#undef JAS_SPINLOCK_INITIALIZER
+#elif defined(JAS_THREADS_WIN32)
+#define JAS_SPINLOCK_INITIALIZER {0}
+#endif
+
+/*!  Mutex initializer. */
+#if defined(JAS_THREADS_C11)
+#define JAS_MUTEX_INITIALIZER JAS_SPINLOCK_INITIALIZER
+#elif defined(JAS_THREADS_PTHREAD)
+#define JAS_MUTEX_INITIALIZER PTHREAD_MUTEX_INITIALIZER
+#elif defined(JAS_THREADS_WIN32)
+#define JAS_MUTEX_INITIALIZER JAS_SPINLOCK_INITIALIZER
 #endif
 
 /*!  Thread-specific storage type. */
@@ -328,6 +363,66 @@ jas_thread_id_t jas_thread_current(void)
 }
 #endif
 
+static inline int jas_spinlock_init(jas_spinlock_t *mtx)
+{
+#if defined(JAS_THREADS_C11)
+	atomic_flag_clear(&mtx->flag);
+	return 0;
+#elif defined(JAS_THREADS_PTHREAD)
+	JAS_UNUSED(mtx);
+	abort();
+	return -1;
+#elif defined(JAS_THREADS_WIN32)
+	InterlockedExchange(&mtx->flag, 0);
+	return 0;
+#endif
+}
+
+static inline int jas_spinlock_cleanup(jas_spinlock_t *mtx)
+{
+#if defined(JAS_THREADS_C11)
+	JAS_UNUSED(mtx);
+	return 0;
+#elif defined(JAS_THREADS_PTHREAD)
+	JAS_UNUSED(mtx);
+	abort();
+	return -1;
+#elif defined(JAS_THREADS_WIN32)
+	JAS_UNUSED(mtx);
+	return 0;
+#endif
+}
+
+static inline int jas_spinlock_lock(jas_spinlock_t *mtx)
+{
+#if defined(JAS_THREADS_C11)
+	while (atomic_flag_test_and_set(&mtx->flag)) {}
+	return 0;
+#elif defined(JAS_THREADS_PTHREAD)
+	JAS_UNUSED(mtx);
+	abort();
+	return -1;
+#elif defined(JAS_THREADS_WIN32)
+	while (InterlockedCompareExchange(&mtx->flag, 1, 0)) {}
+	return 0;
+#endif
+}
+
+static inline int jas_spinlock_unlock(jas_spinlock_t *mtx)
+{
+#if defined(JAS_THREADS_C11)
+	atomic_flag_clear(&mtx->flag);
+	return 0;
+#elif defined(JAS_THREADS_PTHREAD)
+	JAS_UNUSED(mtx);
+	abort();
+	return -1;
+#elif defined(JAS_THREADS_WIN32)
+	InterlockedExchange(&mtx->flag, 0);
+	return 0;
+#endif
+}
+
 /*!
 @brief Initialize a mutex.
 */
@@ -335,12 +430,18 @@ static inline int jas_mutex_init(jas_mutex_t *mtx)
 {
 	assert(mtx);
 #if defined(JAS_THREADS_C11)
+/*
 	return mtx_init(mtx, mtx_plain) == thrd_success ? 0 : -1;
+*/
+	return jas_spinlock_init(mtx);
 #elif defined(JAS_THREADS_PTHREAD)
 	return pthread_mutex_init(mtx, 0);
 #elif defined(JAS_THREADS_WIN32)
+	/*
 	InitializeCriticalSection(mtx);
 	return 0;
+	*/
+	return jas_spinlock_init(mtx);
 #endif
 }
 
@@ -351,13 +452,19 @@ static inline int jas_mutex_cleanup(jas_mutex_t *mtx)
 {
 	assert(mtx);
 #if defined(JAS_THREADS_C11)
+/*
 	mtx_destroy(mtx);
 	return 0;
+*/
+	return jas_spinlock_cleanup(mtx);
 #elif defined(JAS_THREADS_PTHREAD)
 	return pthread_mutex_destroy(mtx);
 #elif defined(JAS_THREADS_WIN32)
+	/*
 	DeleteCriticalSection(mtx);
 	return 0;
+	*/
+	return jas_spinlock_cleanup(mtx);
 #endif
 }
 
@@ -368,12 +475,18 @@ static inline int jas_mutex_lock(jas_mutex_t *mtx)
 {
 	assert(mtx);
 #if defined(JAS_THREADS_C11)
+/*
 	return mtx_lock(mtx);
+*/
+	return jas_spinlock_lock(mtx);
 #elif defined(JAS_THREADS_PTHREAD)
 	return pthread_mutex_lock(mtx);
 #elif defined(JAS_THREADS_WIN32)
+	/*
 	EnterCriticalSection(mtx);
 	return 0;
+	*/
+	return jas_spinlock_lock(mtx);
 #endif
 }
 
@@ -384,12 +497,18 @@ static inline int jas_mutex_unlock(jas_mutex_t *mtx)
 {
 	assert(mtx);
 #if defined(JAS_THREADS_C11)
+/*
 	return mtx_unlock(mtx);
+*/
+	return jas_spinlock_unlock(mtx);
 #elif defined(JAS_THREADS_PTHREAD)
 	return pthread_mutex_unlock(mtx);
 #elif defined(JAS_THREADS_WIN32)
+	/*
 	LeaveCriticalSection(mtx);
 	return 0;
+	*/
+	return jas_spinlock_unlock(mtx);
 #endif
 }
 
