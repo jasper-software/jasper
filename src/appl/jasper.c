@@ -197,7 +197,9 @@ int main(int argc, char **argv)
 		fprintf(stderr, "cannot initialize JasPer library\n");
 		exit(EXIT_FAILURE);
 	}
-	jas_set_max_mem_usage(cmdopts->max_mem);
+	if (cmdopts->max_mem) {
+		jas_set_max_mem_usage(cmdopts->max_mem);
+	}
 	jas_setdbglevel(cmdopts->debug);
 	atexit(jas_cleanup);
 #else
@@ -206,7 +208,9 @@ int main(int argc, char **argv)
 	jas_std_allocator_init(&allocator);
 	jas_conf_set_allocator(&allocator.base);
 	jas_conf_set_debug_level(cmdopts->debug);
-	jas_conf_set_max_mem(cmdopts->max_mem);
+	if (cmdopts->max_mem) {
+		jas_conf_set_max_mem(cmdopts->max_mem);
+	}
 	if (jas_init_library()) {
 		fprintf(stderr, "cannot initialize JasPer library\n");
 		exit(EXIT_FAILURE);
@@ -431,9 +435,7 @@ cmdopts_t *cmdopts_parse(int argc, char **argv)
 	cmdopts->debug = 0;
 	cmdopts->srgb = 0;
 	cmdopts->list_codecs = 0;
-//#if defined(JAS_DEFAULT_MAX_MEM_USAGE)
-	cmdopts->max_mem = JAS_DEFAULT_MAX_MEM_USAGE;
-//#endif
+	cmdopts->max_mem = 0;
 
 	while ((c = jas_getopt(argc, argv, cmdoptions)) != EOF) {
 		switch (c) {

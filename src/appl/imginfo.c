@@ -152,7 +152,7 @@ int main(int argc, char **argv)
 	max_samples_valid = false;
 	infile = 0;
 	debug = 0;
-	size_t max_mem = JAS_DEFAULT_MAX_MEM_USAGE;
+	size_t max_mem = 0;
 	dec_opt_spec[0] = '\0';
 
 	/* Parse the command line options. */
@@ -205,7 +205,9 @@ int main(int argc, char **argv)
 		fprintf(stderr, "cannot initialize JasPer library\n");
 		return EXIT_FAILURE;
 	}
-	jas_set_max_mem_usage(max_mem);
+	if (max_mem) {
+		jas_set_max_mem_usage(max_mem);
+	}
 	jas_setdbglevel(debug);
 	atexit(jas_cleanup);
 #else
@@ -216,7 +218,9 @@ int main(int argc, char **argv)
 	static jas_std_allocator_t allocator;
 	jas_std_allocator_init(&allocator);
 	jas_conf_set_allocator(&allocator.base);
-	jas_conf_set_max_mem(max_mem);
+	if (max_mem) {
+		jas_conf_set_max_mem(max_mem);
+	}
 	jas_conf_set_debug_level(debug);
 	if (special) {
 		jas_conf_set_vlogmsgf(jas_vlogmsgf_discard);

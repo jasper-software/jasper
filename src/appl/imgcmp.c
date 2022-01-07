@@ -189,9 +189,7 @@ int main(int argc, char **argv)
 	diffpath = 0;
 	maxonly = 0;
 	minonly = 0;
-//#if defined(JAS_DEFAULT_MAX_MEM_USAGE)
-	size_t max_mem = JAS_DEFAULT_MAX_MEM_USAGE;
-//#endif
+	size_t max_mem = 0;
 
 	cmdname = argv[0];
 
@@ -224,9 +222,7 @@ int main(int argc, char **argv)
 			exit(EXIT_OK);
 			break;
 		case OPT_MAXMEM:
-//#if defined(JAS_DEFAULT_MAX_MEM_USAGE)
 			max_mem = strtoull(jas_optarg, 0, 10);
-//#endif
 			break;
 		case OPT_HELP:
 		default:
@@ -244,14 +240,18 @@ int main(int argc, char **argv)
 		fprintf(stderr, "cannot initialize JasPer library\n");
 		exit(EXIT_ERROR);
 	}
-	jas_set_max_mem_usage(max_mem);
+	if (max_mem) {
+		jas_set_max_mem_usage(max_mem);
+	}
 	atexit(jas_cleanup);
 #else
 	jas_conf_clear();
 	static jas_std_allocator_t allocator;
 	jas_std_allocator_init(&allocator);
 	jas_conf_set_allocator(&allocator.base);
-	jas_conf_set_max_mem(max_mem);
+	if (max_mem) {
+		jas_conf_set_max_mem(max_mem);
+	}
 	//jas_conf_set_debug_level(debug);
 	if (jas_init_library()) {
 		fprintf(stderr, "cannot initialize JasPer library\n");

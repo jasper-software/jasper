@@ -214,7 +214,7 @@ int main(int argc, char **argv)
 {
 	int verbose = 0;
 	int debug_level = 0;
-	size_t max_mem = 1024ull * 1024ull * 1024ull;
+	size_t max_mem = 0;
 	size_t num_iters = 10;
 	int repeat = 1;
 	const char *out_format = "jp2";
@@ -287,7 +287,9 @@ int main(int argc, char **argv)
 		fprintf(stderr, "cannot initialize JasPer library\n");
 		exit(EXIT_FAILURE);
 	}
-	jas_set_max_mem_usage(max_mem);
+	if (max_mem) {
+		jas_set_max_mem_usage(max_mem);
+	}
 	jas_set_debug_level(0);
 	atexit(jas_cleanup);
 
@@ -297,13 +299,17 @@ int main(int argc, char **argv)
 #ifdef JAS_COMMENT
 	if (use_wrapper) {
 		jas_conf_set_allocator_wrapper(true);
-		jas_conf_set_max_mem(max_mem);
+		if (max_mem) {
+			jas_conf_set_max_mem(max_mem);
+		}
 	} else {
 		jas_conf_set_allocator_wrapper(false);
 	}
 #else
 	JAS_UNUSED(use_wrapper);
-	jas_conf_set_max_mem(max_mem);
+	if (max_mem) {
+		jas_conf_set_max_mem(max_mem);
+	}
 #endif
 	static jas_std_allocator_t allocator;
 	jas_std_allocator_init(&allocator);
