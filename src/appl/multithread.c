@@ -452,7 +452,7 @@ int main(int argc, char **argv)
 		}
 	}
 
-	jas_free(worker_threads);
+	free(worker_threads);
 
 	if (error_count) {
 		fprintf(stderr, "ERRORS WERE DETECTED!\n");
