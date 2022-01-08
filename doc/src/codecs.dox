@@ -1,0 +1,334 @@
+/*!
+
+\page codecs Codecs
+
+The JasPer software provides implementations of several popular codecs.
+Likely, the ones of most interest are those associated with the JPEG-2000
+standard.
+The sections that follow describe the various codecs in more detail.
+
+\section codecs__bmp BMP Codec
+
+One of the most popular image formats on the Microsoft Windows platform
+is Microsoft's BMP format.  The BMP codec in JasPer was written without
+the benefit of the BMP format specification from Microsoft.  This means
+that the BMP support will inevitably not work correctly for all valid
+BMP files.
+
+\subsection codecs__bmp__enc_options Encoder Options
+
+The encoder does not support any special options.
+
+\subsection codecs__bmp__dec_options Decoder Options
+
+The decoder does not support any special options.
+
+\section codecs__jp2 JP2 Codec
+
+One of the two image formats specified in the JPEG-2000 Part-1 standard
+(i.e., ISO/IEC 15444-1 \cite iso15444p1) is the so called "JP2" format.
+
+\subsection codecs__jp2__enc_options Encoder Options
+
+The encoder supports all of the same options as the JPC encoder.
+
+\subsection codecs__jp2__dec_options Decoder Options
+
+The decoder supports all of the same options as the JPC decoder.
+
+\section codecs__jpc JPC Codec
+
+One of the two image formats specified in the JPEG-2000 Part-1 standard
+(i.e., ISO/IEC 15444-1 \cite iso15444p1) is the so called JPEG-2000 code
+stream format.
+The JPC codec in JasPer implements this format.
+
+The design of the JPEG-2000 codec implementation was driven
+by several key concerns: execution speed, memory usage, robustness,
+portability, modularity, maintainability, and extensibility.  In some
+cases, however, during the design process, modularity, portability, and
+understandability of the code were weighed more heavily than execution
+speed and memory usage.  Code understandability and portability
+were critical considerations since this software was intended to be
+used as a reference implementation of the JPEG-2000 Part-1 codec
+in the JPEG-2000 Part-5 standard \cite iso15444p5.
+
+Since the JPEG-2000 standard does not specify any means for encoding
+color space information in a JPEG-2000 code stream, the decoder must
+make certain assumptions about the color space of an image.  If accurate
+color representation is important, the JPEG-2000 code stream format should
+not be employed.  The JPEG-2000 JP2 format should be used instead.
+
+\subsection codecs__jpc__enc_options Encoder Options
+
+The following options are supported by the encoder:
+\begin{description}
+
+	\item
+	\url{imgareatlx=}{\it x}\newline
+	Set the x-coordinate of the top-left corner of the image area to {\it x}.
+
+	\item
+	\url{imgareatly=}{\it y}\newline
+	Set the y-coordinate of the top-left corner of the image area to {\it y}.
+
+	\item
+	\url{tilegrdtlx=}{\it x}\newline
+	Set the x-coordinate of the top-left corner of the tiling grid to {\it x}.
+
+	\item
+	\url{tilegrdtly=}{\it y}\newline
+	Set the y-coordinate of the top-left corner of the tiling grid to {\it y}.
+
+	\item
+	\url{tilewidth=}{\it w}\newline
+	Set the nominal tile width to {\it w}.
+
+	\item
+	\url{tileheight=}{\it h}\newline
+	Set the nominal tile height to {\it h}.
+
+	\item
+	\url{prcwidth=}{\it w}\newline
+	Set the precinct width to {\it w}.  The argument {\it w} must be an
+	integer power of two.  The default value is 32768.
+
+	\item
+	\url{prcheight=}{\it h}\newline
+	Set the precinct height to {\it h}.
+	The argument {\it h} must be an integer power of two.
+	The default value is 32768.
+
+	\item
+	\url{cblkwidth=}{\it w}\newline
+	Set the nominal code block width to {\it w}.  The argument
+	{\it w} must be an integer power of two.  The default value is 64.
+
+	\item
+	\url{cblkheight=}{\it h}\newline
+	Set the nominal code block height to {\it h}.  The argument
+	{\it h} must be an integer power of two.  The default value is 64.
+
+	\item
+	\url{mode=}{\it m}\newline
+	Set the coding mode to {\it m}.  The argument {\it m} must have
+	one of the following values:
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+Value & Description \\
+\hline
+int  & integer mode \\
+real & real mode \\
+\hline
+\end{tabular}
+\end{center}
+
+	If lossless coding is desired, the integer mode must be used.
+	By default, the integer mode is employed.
+	The choice of mode also determines which multicomponent and wavelet
+	transforms (if any) are employed.
+
+	\item
+	\url{rate=}{\it r}\newline
+	Specify the target rate.  The argument {\it r} is a positive
+	real number.  Since a rate of one corresponds to no compression,
+	one should never need to explicitly specify a rate greater
+	than one.  By default, the target rate is considered to be infinite.
+
+	\item
+	\url{ilyrrates}={\it $r_0$[,$r_1$,\ldots,$r_{N-1}$]}
+	\newline
+	Specify the rates for any intermediate layers.  The argument to
+	this option is a comma separated list of {\it N} rates.
+	Each rate is a positive real number.
+	The rates must increase monotonically.
+	The last rate in the list should be less than or equal to the
+	overall rate (as specified with the \url{rate} option).
+
+	\item
+	\url{prg=}{\it p}\newline
+	Set the progression order to {\it p}.  The argument {\it p}
+	must have one of the following values:
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+Value & Description \\
+\hline
+lrcp & layer-resolution-component-position (LRCP) progressive
+       (i.e., rate scalable) \\
+rlcp & resolution-layer-component-position (RLCP) progressive
+       (i.e., resolution scalable) \\
+rpcl & resolution-position-component-layer (RPCL) progressive \\
+pcrl & position-component-resolution-layer (PCRL) progressive \\
+cprl & component-position-resolution-layer (CPRL) progressive \\
+\hline
+\end{tabular}
+\end{center}
+
+	By default, LRCP progressive ordering is employed.
+	Note that the RPCL and PCRL progressions are not valid for all possible
+	image geometries.  (See \cite iso15444p1 for more details.)
+
+	\item
+	\url{nomct}\newline
+	Disallow the use of any multicomponent transform.
+
+	\item
+	\url{numrlvls=}{\it n}\newline
+	Set the number of resolution levels to {\it n}.
+	The argument {\it n} must be an integer that is greater
+	than or equal to one.  The default value is 6.
+
+	\item
+	\url{sop}\newline
+	Generate SOP marker segments.
+
+	\item
+	\url{eph}\newline
+	Generate EPH marker segments.
+
+	\item
+	\url{lazy}\newline
+	Enable lazy coding mode (a.k.a. arithmetic coding bypass).
+
+	\item
+	\url{termall}\newline
+	Terminate all coding passes.
+
+	\item
+	\url{segsym}\newline
+	Use segmentation symbols.
+
+	\item
+	\url{vcausal}\newline
+	Use vertically stripe causal contexts.
+
+	\item
+	\url{pterm}\newline
+	Use predictable termination.
+
+	\item
+	\url{resetprob}\newline
+	Reset the probability models after each coding pass.
+
+	\item
+	\url{numgbits=}{\it n}\newline
+	Set the number of guard bits to {\it n}.
+
+\end{description}
+
+\subsection codecs__jpc__dec_options Decoder Options
+
+The decoder does not support any special options.
+
+\subsection codecs__jpc__rate_specification Rate Specification
+
+All rates are specified in terms of compression factors (i.e.,
+as reciprocals of compression ratio) and not as actual bit rates!
+Although image coding folks frequently use the number of bits per pixel
+to specify rate, this quantity is often inconvenient to use when dealing
+with images that have differing sample precisions.  Furthermore, the
+number of bits per pixel is not well defined for multicomponent images
+with distinct subsampling factors.  The compression factor, however, is
+independent of sample precision and well defined for all types of images.
+For these reasons, JasPer uses the compression factor and not the
+number of bits per pixel to specify rates.
+
+\section codecs__jpg JPG Codec
+
+For lossy coding, one of the most popular image formats is specified in
+the JPEG standard (i.e., ISO/IEC 10918-1 \cite iso10918p1).  In JasPer,
+the JPG codec implements this format.
+
+The JPEG support in JasPer requires the JPEG library from the Independent
+JPEG Group (IJG).  For legal reasons, the IJG JPEG library source code
+is not included with JasPer.  The source code for this library can be
+downloaded from the IJG web site (i.e., http://www.ijg.org).
+
+\subsection codecs__jpg__enc_options Encoder Options
+
+The following options are supported by the encoder:
+\begin{description}
+
+	\item
+	\url{quality=}{\it q}\newline
+	Set the quality factor to {\it q}.  This is used in order to indirectly
+	control the bit rate for lossy coding.
+
+\end{description}
+
+\subsection codecs__jpg_dec_options Decoder Options
+
+The decoder does not support any special options.
+
+\section codecs__pgx PGX Codec
+
+The JPEG-2000 Verification Model software employs a non-standard
+format called PGX.  In JasPer, this format is handled by the PGX codec.
+The PGX format can only handle single components images, and consequently,
+is of limited use.
+
+\subsection codecs__pgx__enc_options Encoder Options
+
+The encoder does not support any special options.
+
+\subsection codecs__pgx__dec_options Decoder Options
+
+The decoder does not support any special options.
+
+\section codecs__mif MIF Codec
+
+The MIF format is not a standard format.  This format
+was invented solely for the purpose of testing the JasPer software.
+The support for the MIF format is experimental.
+It is intended to be used for advanced testing of the JasPer JPEG-2000
+codec implementation.
+
+\subsection codecs__mif__enc_options Encoder Options
+
+The encoder does not support any special options.
+
+\subsection codecs__mif__dec_options Decoder Options
+
+The decoder does not support any special options.
+
+\subsection codecs__pnm PNM Codec
+
+On UNIX platforms, the Portable Pixmap/Graymap/Bitmap (PNM)
+format is quite popular for coding image data.  The PNM codec in JasPer
+supports this format.
+In JasPer, the support for the PNM/PGM/PPM format is complete.  Therefore,
+the use of this format is favored over the BMP format.  A (nonstandard)
+extension has also been added to the support for the PNM format so that
+it can handle images with signed sample values.
+
+\subsection codecs__pnm__enc_options Encoder Options
+
+The following options are provided by the PNM encoder:
+\begin{description}
+
+	\item
+	\url{text}\newline
+	Use a non-raw (i.e., non-binary) flavor of PNM format.
+
+\end{description}
+
+\subsection codecs__pnm__dec_options Decoder Options
+
+The decoder does not support any special options.
+
+\subsection codecs__ras RAS Codec
+
+One popular image format on Sun workstations is the Sun Rasterfile format.
+The RAS codec in JasPer implements this format.
+
+\subsection codecs__ras__enc__options Encoder Options
+
+The encoder does not support any special options.
+
+\subsection codecs__ras__dec_options Decoder Options
+
+The decoder does not support any special options.
+
+*/

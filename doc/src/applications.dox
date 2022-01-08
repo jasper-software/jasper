@@ -1,0 +1,288 @@
+/*!
+
+\page app Application Programs
+
+\section app_intro Introduction
+
+In order to demonstrate how the JasPer library can be used, several sample
+application programs are provided in the JasPer software distribution.
+These programs include: \c jasper, \c jiv, \c imgcmp, and \c imginfo.  The
+\c jasper program is an image transcoder (i.e.,
+it converts image data from one format to another).  The \c jiv
+program is a simple image viewer (based on OpenGL).  The \c imgcmp
+program is an image comparison utility.  It measures the difference
+between two images using one of numerous distortion metrics (such as
+peak signal-to-noise ratio, mean squared error, root mean squared error,
+peak absolute error, and mean absolute error).  The \c imginfo
+program provides basic information about an image, such as its geometry
+(i.e., number of components, width and height of components, and
+so on).  Although the above-mentioned programs are intended mainly for
+demonstration purposes, they have also proven quite useful in their own
+right, especially the \c jasper and \c jiv programs.
+In the sections that follow, each of the above-mentioned programs is
+described in more detail.
+
+\section app__jasper The jasper Program
+
+\subsection app__jasper__synopsis Synopsis
+
+\c jasper [options]
+
+\subsection app__jasper__desc Description
+
+The jasper command converts image data from one format to another.
+In other words, this command functions as a general-purpose transcoder.
+Since the JPEG-2000 format is supported by this software,
+it can be used as a JPEG-2000 encoder and/or decoder.
+
+\subsection app__jasper__options Options
+
+The jasper program accepts the following options:
+\begin{description}
+
+	\item
+	\url{--help}\newline
+	Print usage information and exit.
+
+	\item
+	\url{--version}\newline
+	Print the version and exit.
+
+	\item
+	\url{--input} {\it file}\newline
+	\url{-f} {\it file}\newline
+	Read the input image from the file named {\it file}.
+	By default, the input image is read from standard input.
+
+	\item
+	\url{--input-format} {\it format}\newline
+	\url{-t} {\it format}\newline
+	Specify the format of the input image as {\it format}.
+	In most circumstances, this option should not be needed, as the format
+	is normally autodetected by examining the image data directly
+	or deduced from the input file name extension if an input file is
+	specified (via the \url{--input} option).
+
+	\item
+	\url{--input-option} {\it option}\newline
+	\url{-o} {\it option}\newline
+	Provide the option {\it option} to the decoder.
+	The valid values for the argument {\it option} are determined
+	by the input image format.  See below for more details.
+
+	\item
+	\url{--output} {\it file}\newline
+	\url{-F} {\it file}\newline
+	Write the encoded image to the file named {\it file}.
+	By default, the encoded image is written to standard output.
+
+	\item
+	\url{--output-format} {\it format}\newline
+	\url{-T} {\it format}\newline
+	Produce the output image in the format indicated by {\it format}.
+	The output format must be specified if an output file is not given
+	(via the "--output" option).  If an output file is given and no
+	output format is specified, an attempt will be made to deduce the
+	correct format from the output file name extension.
+
+	\item
+	\url{--output-option} {\it option}\newline
+	\url{-O} {\it option}\newline
+	Provide the option {\it option} to the encoder.
+	The valid values for the argument {\it option} are determined by
+	the output format.  See below for more details.
+
+	\item
+	\url{--verbose}\newline
+	Enable verbose mode.
+
+	\item
+	\url{--force-srgb}\newline
+	Force the image to be converted to the sRGB color space before
+	encoding.  As a side effect, the image will also be homogenously
+	sampled (i.e., all components are sampled at the same points
+	on the reference grid).
+
+\end{description}
+%
+The argument {\it format} must have one of the following values:
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+Value & Description \\
+\hline
+bmp & Windows BMP \\
+jp2 & JPEG-2000 JP2 \\
+jpc & JPEG-2000 Code Stream \\
+jpg & JPEG \\
+pgx & PGX \\
+pnm & PNM/PGM/PPM \\
+mif & My Image Format \\
+ras & Sun Rasterfile \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection app__jasper__examples Examples
+
+\begin{enumerate}
+
+\item
+Suppose that we have an image stored in the PNM/PPM format in a file called
+\url{lena.ppm}.  To encode this image (losslessly) in the JPEG-2000 JP2
+format, and store the result in a file called \url{lena.jp2}, type:
+\sil{\tt jasper --input lena.ppm --output lena.jp2
+--output-format jp2}
+Or, alternately (using short option names), type:
+\sil{\tt jasper -f lena.ppm -F lena.jp2 -T jp2}
+
+\item
+Suppose that we have a RGB color image stored in the JPEG-2000 JP2
+format in a file called \url{lena.jp2}.  To encode this image in the PNM/PPM
+format, and store the result in a file called \url{lena.ppm}, type:
+\sil{\tt jasper --input lena.jp2 --output lena.ppm
+--output-format pnm}
+Or, alternately (using short option names), type:
+\sil{\tt jasper -f lena.jp2 -F lena.ppm -T pnm}
+
+\item
+Suppose that we have an image stored in the BMP format in a file called
+\url{lena.bmp}.  To encode this image in a lossy manner at 100:1 compression
+in the JPEG-2000 (code stream) format, and store the result in a file
+called \url{lena_lossy.jpc}, type:
+\sil{\tt jasper -f lena.bmp -F \url{lena_lossy.jpc} -T jpc -O rate=0.01}
+
+\item
+Suppose that we have an image stored in a file called
+\url{sachie.pnm} in the PNM/PPM format, and we want to encode the image in
+the JPEG-2000 (code stream) format and store the result in a file
+named \url{sachie_new.jpc}.  Further, suppose that we want the JPEG-2000
+format to employ the following parameters:
+\begin{itemize}
+	\item
+	code blocks are 64 samples in width and 32 samples in height
+	\item
+	no multicomponent transform is to be employed
+	\item
+	4 resolution levels should be employed for each component
+	\item
+	the compression is lossy at 64:1
+\end{itemize}
+%
+In order to accomplish the above, type:
+\sil{\tt jasper -f sachie.pnm -F \url{sachie_new.jpc} -T jpc -O cblkwidth=64
+-O cblkheight=32 -O nomct -O numrlvls=4 -O rate=0.015625}
+
+\end{enumerate}
+
+\section app__imgcmp The imgcmp Program
+
+\subsection app__imgcmp__synpopsis Synopsis
+
+\c imgcmp [options]
+
+\subsection app__imgcmp__desc Description
+
+The imgcmp command compares two images.  The two images being compared
+must have the same geometry (i.e., the same width, height, number of
+components, component subsampling factors, etc.).
+
+\subsection app__imgcmp__options Options
+
+The following options are supported:
+\begin{description}
+
+	\item
+	\url{-f} {\it file}\newline
+	Read the primary (i.e., reference) image (for comparison purposes)
+	from the file named {\it file}.
+
+	\item
+	\url{-F} {\it file}\newline
+	Read the secondary image (for comparison purposes) from the file named
+	{\it file}.
+
+	\item
+	\url{-m} {\it metric}\newline
+	Use the difference metric specified by {\it metric}.
+	The {\it metric} argument may assume one of the following values:
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+Value & Description \\
+\hline
+psnr  & peak signal to noise ratio (PSNR) \\
+mse   & mean squared error (MSE) \\
+rmse  & root mean squared error (RMSE) \\
+pae   & peak absolute error (PAE) \\
+mae   & mean absolute error (MAE) \\
+equal & equality \\
+\hline
+\end{tabular}
+\end{center}
+
+\end{description}
+%
+The \url{-f} and \url{-F} options must always be specified.
+There is currently no way to explicitly specify the format of the images.
+If the format of either image cannot be autodetected, the command will
+exit with an error.
+
+\subsection app__imgcmp__examples Examples
+
+\begin{enumerate}
+
+\item
+Suppose that we have two slightly different versions of an image
+stored in files \url{original.pgm} and \url{reconstructed.pgm}.
+In order to
+calculate the difference between these images using the PSNR metric, type:
+\sil{\tt imgcmp -f original.pgm -F reconstructed.pgm -m psnr}
+
+\end{enumerate}
+
+\section app__imginfo The imginfo Program
+
+\subsection app__imginfo__synopsis Synopsis
+
+\c imginfo [options]
+
+\subsection app__imginfo__desc Description
+
+The imginfo command displays information about an image.
+This command is really only intended to be used from shell scripts for
+testing purposes.
+
+\section app__jiv The jiv Program
+
+\subsection app__jiv__synopsis Synopsis
+
+\c jiv [options] [file1 file2 $\ldots$]
+
+\subsection app__jiv__desc Description
+
+The jiv command displays an image.  Basic pan and zoom functionality
+is provided.  Components of an image may be viewed individually.  Color
+components may also be viewed together as a composite image.  At present,
+the jiv image viewer has only trivial support for color.  It recognizes
+RGB and YCbCr color spaces, but does not use tone reproduction curves
+and the like in order to accurately reproduce color.  For basic testing
+purposes, however, the color reproduction should suffice.
+
+\subsection app__jiv__options Options
+
+The following options are supported:
+\begin{description}
+
+	\item
+	\url{--help}\newline
+	Print help information and exit.
+
+	\item
+	\url{--wait} {\it n}\newline
+	Automatically step from one image to the next,
+	pausing for $n$ seconds in between.
+
+\end{description}
+
+*/

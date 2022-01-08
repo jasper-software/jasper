@@ -1,0 +1,401 @@
+/*!
+
+\page software JasPer Software
+
+\section software__version_identification Version Identification
+
+As the JasPer software continues to evolve over time, it is important
+to be able to identify particular releases of the software.  Every
+release of the JasPer software is named by a version identifier.
+A version identifier is comprised of three integers separated by dots.
+In order, the three integers correspond to the major, minor, and micro
+version numbers for the software.  For example, the version identifier
+"1.500.0" corresponds to a major version of 1, a minor version of 500,
+and a micro version of 0.  In instances where the micro version is zero,
+the version identifier may be truncated after the minor version number.
+For example, the version identifier "1.500" is completely valid and
+simply an abbreviation for "1.500.0".
+
+Given two different releases of the JasPer software, one can easily
+determine which one is more recent by comparing the version identifiers,
+as follows:
+
+  1. if the major version numbers differ, the release with the higher major
+  version number is newer;
+
+  2. if the major version numbers are equal and the minor version numbers
+  differ, the release with the higher minor version number is newer; or
+
+  3. if the major version numbers are equal and the minor version numbers are
+  equal, the release with the higher micro version is newer.
+
+*/
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Obtaining the Software}
+\label{sect::obtaining_software}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The latest version of the JasPer software can be downloaded
+from the following locations:
+\begin{itemize}
+
+	\item
+	JasPer Project Home Page
+	(i.e., \url{http://www.ece.uvic.ca/~mdadams/jasper})
+
+	\item
+	JPEG Web Site Software Page
+	(i.e., \url{http://www.jpeg.org/software})
+
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Extracting the Software}
+\label{sect::extract}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The JasPer software is distributed in the form of a Zip file.
+Therefore, in order to extract the contents of this
+file, a program capable of handling Zip archives is required.
+Such software is readily available for many different computing
+platforms, and can be obtained from:
+\begin{itemize}
+
+	\item
+	Info-Zip Web Site (i.e., \url{http://www.info-zip.org}).
+	Unzip software for many different computing platforms
+	(e.g., UNIX, DOS, MacOS, etc.).
+
+	\item
+	WinZip Web Site (i.e., \url{http://www.winzip.com}).
+	Zip/Unzip software for Microsoft Windows.
+
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Building the Software}
+\label{sect::build}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Obviously, before the software can be built, the contents of the
+archive file containing the JasPer distribution must be extracted.
+
+The JasPer code should compile and run on any platform with a C
+language implementation conforming to ISO/IEC 9899:1999~\cite iso9899
+(i.e., the ISO C language standard) and supporting a subset of ISO/IEC
+9945-1 \cite iso9945p1 (i.e., the POSIX C API).  Only limited POSIX
+support is required (i.e., the open, close, read, write, and lseek
+functions must be supported).
+
+Portability was a major consideration during the design of the JasPer
+software.  For this reason, the software makes minimal assumptions about
+the runtime environment.  The code uses very little floating-point
+arithmetic, most of which can be attributed to floating-point conversions in
+printf's.  This minimal use of floating-point arithmetic should make
+the code much easier to port to platforms lacking hardware support for
+floating-point arithmetic.
+
+The specific procedure required to build the JasPer software depends on the
+type of system involved.  Only two different build methods are supported.
+The first method is based on the well known make utility and should work
+on most UNIX (or UNIX-like) systems.  The second method is specifically
+tailored to the needs of Microsoft Visual C under Microsoft Windows.
+In passing, we note that by using free software such as
+Cygwin (\url{http://www.cygwin.com}), one
+can also create a UNIX-like environment under Microsoft Windows in which
+to build JasPer using the first method.
+
+If you are unfortunate enough to have a compiler that is not compliant
+with ISO/IEC 9899:1999, you may need
+to make some changes to the code.  Unfortunately, even some of the
+most popular C language implementations do not strictly comply with
+the standard.  One such example is Microsoft Visual C 6.0.  Due to the
+popularity of Visual C, however, several workarounds have been added to
+the JasPer code to ensure that it will compile successfully with Visual C.
+
+The current version of the JasPer software is known to compile in the
+following environments:
+\begin{itemize}
+
+	\item
+	% Standard Red Hat 7.3 Distribution
+	Red Hat Linux 7.3,
+	GNU C 2.96,
+	GNU Make 3.79.1
+
+	\item
+	% jericho
+	SunOS/SPARC 5.7,
+	GNU C 2.95,
+	SunOS make
+
+	\item
+	Windows 2000 Professional, Microsoft Visual C 6.0
+
+\end{itemize}
+%
+Of course, the software should compile successfully in many other
+environments as well.
+For example, past versions of JasPer have been reported to build
+successfully in the following environments:
+\begin{itemize}
+
+	\item
+	Apple Macintosh PPC G3,
+	Rhapsody 5.6,
+	GNU C 2.7.2.1
+
+	\item
+	Power Macintosh,
+	GNU/Linux 2.2.15pre9,
+	GNU C 2.95.2
+
+	\item
+	Sun SPARC,
+	Solaris 2.7,
+	GNU C 2.95.2
+
+	\item
+	Compaq/DEC Alpha,
+	OSF/1 4.0F,
+	GNU C 2.95.2
+
+	\item
+	IBM PowerPC,
+	AIX 4.2,
+	GNU C 2.95.2
+
+	\item
+	HP 9000/712,
+	HP-UX 10.20,
+	GNU C 2.95.2
+
+	\item
+	SGI Origin 200,
+	IRIX 6.5,
+	GNU C 2.95.2
+
+	\item
+	OpenVMS Alpha 7.2-1 with Compaq C compiler V6.2-008
+	(after creating custom makefiles)
+
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Build Process for UNIX (or UNIX-Like) Systems}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The JasPer software is intended to be built using the standard UNIX
+make utility (in conjunction with a configure script).
+
+If you need a C compiler that is reasonably compliant with the ISO/IEC
+9899:1999 standard, you can obtain GNU C from the GNU Project web site
+(i.e., \url{http://www.gnu.org}).  If you need an implementation of
+the make utility, you can also obtain GNU Make from the the GNU Project
+web site.  All GNU software is free software.
+
+In what follows, \url{$TOPDIR} denotes the top level directory of
+the JasPer software distribution (i.e., the directory containing the
+file named \url{configure}).  To build the software, the following
+steps are required (in order):
+%
+\begin{enumerate}
+
+	\item
+	{\em Set the current working directory to the top level directory of
+	the JasPer software distribution.}
+
+	To set the current working directory as required, type:
+	\sil{\tt cd \url{$TOPDIR}}
+	(where \url{$TOPDIR} is defined as described earlier in this section).
+
+	\item
+	{\em Perform the initial configuration of the software.}
+
+	This is accomplished by running the configure script.
+	This process allows important information about the system
+	configuration to be determined.  The configure script also
+	generates makefiles from makefile templates.  In theory, it should
+	not be necessary to manually edit any of the makefile templates
+	(i.e., the Makefile.in files) used by the configure program.
+	To invoke the configure program, type:
+	\sil{\url{./configure}}
+
+	The configure script accepts a number of options.  These options
+	can be listed by invoking the configure command with the
+	\url{--help} option.  Unless you know what you are doing (or have
+	problems with the default build settings), it
+	is {\em strongly} recommended that you not override the default
+	settings for configure.
+
+	In some cases, it may be necessary to explicitly disable the use
+	of the IJG JPEG library (i.e., libjpeg).  This is accomplished
+	by supplying the \url{--disable-libjpeg} option to configure.
+	For example, such action may be required if the version of the
+	JPEG library installed on your system is not compatible with the
+	version of JasPer being built.	Also, when building under the
+	Cygwin environment, it may be neccessary to explicitly disable
+	the use of the JPEG library.
+
+	In some situations, it may be necessary to explicitly disable the use
+	of the OpenGL libraries.  This is accomplished by supplying the
+	\url{--disable-opengl} option to configure.
+
+	\item
+	{\em Compile and link the software.}
+
+	This is accomplished via the make command.
+	To run the make program, type:
+	\sil{\url{make}}
+
+	\item
+	{\em Install the software.}
+
+	This step may require special (e.g., superuser/administrator) privileges
+	depending on the target directory for installation.
+	(The default installation directories are normally under
+	\url{/usr/local}.)
+	To install the executables, libraries,
+	include files, and other auxiliary data, type:
+	\sil{\tt make install}
+
+\end{enumerate}
+%
+Presuming that the build was successful, the executables for
+the JasPer application programs can be found in the directory
+\url{$TOPDIR/src/appl}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Build Process for Microsoft Visual C Studio
+under Microsoft Windows}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+With Microsoft Visual C, the entire build process is driven from
+workspace and project files.  For the sake of convenience, all of the
+workspace and project files necessary to build the JasPer software are
+provided.
+
+In what follows, \url{$TOPDIR} denotes the top level directory of the
+JasPer software distribution (i.e., the directory containing the file named
+\url{configure}).  To build the software, the following steps are required
+(in order):
+\begin{enumerate}
+
+	\item
+	{\em If necessary, install the OpenGL and GLUT libraries on your
+	system.}
+
+	These libraries are required in order to build the jiv application
+	program which is included in the JasPer software.  The JasPer
+	library itself and the other application programs included
+	with JasPer can be built without the OpenGL and GLUT libraries,
+	however.
+
+	\item
+	{\em Run Microsoft Visual C.}
+
+	\item
+	{\em Open the JasPer workspace file.}
+
+	The JasPer workspace file is called \url{jasper.dsw}
+	and can be found in the directory \url{$TOPDIR/src/msvc}.
+	The workspace file can be opened using the ``File'' menu.
+
+	\item
+	{\em Build the code.}
+
+	From the ``Build Menu'', select the ``Batch Build'' item.
+	Choose the projects/configurations that are to be built, and then,
+	click on the ``Build'' button.	If you do not have the OpenGL
+	and GLUT libraries (and their associated header files) installed on
+	your system, you should not attempt to build the jiv application.
+
+\end{enumerate}
+%
+Presuming that the build was successful, the release and debug versions
+of the executables for the JasPer software can be found in the directories
+\url{$TOPDIR/src/msvc/Win32_Release} and
+\url{$TOPDIR/src/msvc/Win32_Debug}, respectively.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Dependencies on Other Software}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In order to have access to the full functionality of the JasPer sofware,
+you may need to install some additional software on your system.
+This software must be installed before you attempt to build JasPer.
+
+In order to compile the JasPer software with JPEG support, you will need
+to download and install the free IJG JPEG library which is available
+from the IJG web site (i.e., \url{http://www.ijg.org}).
+If you are not using a configure-based build for JasPer, then you will need to
+manually change the build process to use the code in the files
+\url{jpg_enc.c} and \url{jpg_dec.c} instead of \url{jpg_dummy.c}.
+(Note: These three files are contained in the JasPer distribution,
+not the IJG library.)
+
+In order to build the jiv application, you will need the OpenGL
+and GLUT libraries installed on your system.  It would appear that
+Windows 2000 and Windows XP ship with the OpenGL library from Microsoft.
+Most recent versions of UNIX ship with OpenGL support included.
+The GLUT library is less common and, therefore, may not be installed
+on your system.
+To obtain the GLUT library, one can visit:
+\url{http://www.opengl.org/developers/documentation/glut}.
+For more information on the OpenGL library, see:
+\url{http://www.opengl.org}.
+
+At the time of this writing, a binary distribution of the GLUT library
+for Windows is available from the OpenGL web site:
+\begin{itemize}\item[]
+\url{http://www.opengl.org/developers/documentation/glut/glutdlls37beta.zip}
+\end{itemize}
+This archive file contains three files of interest:
+1)~\url{glut.h}, 2)~\url{glut32.lib}, and 3)~\url{glut32.dll}.
+The file \url{glut.h} file should be installed in a directory
+in which the C compiler searches for header files (e.g.,
+\url{$TOPDIR/src/include/jasper}).  The \url{glut32.lib} file should be
+installed in a directory in which the C compiler searches for libraries.
+The \url{glut32.dll} file should be installed in a directory in
+which the system looks for dynamically-linked libraries.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Reporting Bugs}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If you are unfortunate enough to encounter any
+problems with the JasPer software, please submit a bug report.
+In order to ensure that your bug report can be properly processed,
+always be sure to include {\it all} of the following information:
+\begin{itemize}
+
+	\item
+	The version of JasPer in which the problem was found.
+
+	\item
+	The details of the run-time system (i.e., operating system,
+	version number).
+
+	\item
+	The compiler that you are using (i.e., vendor, version number).
+
+	\item
+	The exact command line options used when the problem was observed.
+
+	\item
+	Indicate whether or not the problem is reproducible.  If the
+	problem is reproducible, indicate the exact steps required to
+	reproduce the problem.
+
+	\item
+	A detailed description of the problem that you are experiencing.
+
+\end{itemize}
+%
+{\bf
+It is essential that you include all of the above information.
+}
+Failure to do so may result in the bug report not being processed.
+Your complete bug report should be sent to \url{mdadams@ieee.org}.
