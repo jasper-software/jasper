@@ -452,6 +452,8 @@ int main(int argc, char **argv)
 		}
 	}
 
+	jas_free(worker_threads);
+
 	if (error_count) {
 		fprintf(stderr, "ERRORS WERE DETECTED!\n");
 		fprintf(stderr, "error count: %d\n", error_count);
