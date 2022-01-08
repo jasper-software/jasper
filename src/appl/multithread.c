@@ -78,6 +78,10 @@
 
 #include <jasper/jasper.h>
 
+#if defined(JAS_HAVE_NANOSLEEP)
+#include <time.h>
+#endif
+
 /******************************************************************************\
 *
 \******************************************************************************/
@@ -115,6 +119,54 @@ void usage()
 {
 	fprintf(stderr, "bad usage\n");
 	exit(1);
+}
+
+typedef struct {
+	size_t num_iters;
+	int debug_level;
+	long delay;
+} worker_info_t;
+
+int worker_1(void *args);
+
+int worker_1(void *args)
+{
+	worker_info_t *info = JAS_CAST(worker_info_t *, args);
+
+	fprintf(stderr, "worker: %zu %ld %d\n", info->num_iters, info->delay,
+	  info->debug_level);
+	for (size_t iter_no = 0; iter_no < info->num_iters; ++iter_no) {
+
+		if (jas_init_thread()) {
+			fprintf(stderr, "cannot initialize thread\n");
+			return -1;
+		}
+		jas_set_debug_level(info->debug_level);
+		jas_set_vlogmsgf(jas_vlogmsgf_stderr);
+
+		void* p;
+		p = jas_malloc(1);
+		if (p) {
+			jas_free(p);
+		}
+
+#if defined(JAS_HAVE_NANOSLEEP)
+		struct timespec t;
+		t.tv_sec = 0;
+		t.tv_nsec = info->delay * 100000L;
+		if (nanosleep(&t, &t)) {
+			fprintf(stderr, "nanosleep failed\n");
+		}
+#endif
+
+		if (jas_cleanup_thread()) {
+			fprintf(stderr, "cannot cleanup thread\n");
+			return -1;
+		}
+
+	}
+
+	return 0;
 }
 
 int process_job(void *job_handle)
@@ -194,7 +246,10 @@ typedef enum {
 	CLI_OPT_SPECIAL,
 	CLI_OPT_REPEAT,
 	CLI_OPT_NUM_ITERS,
-	CLI_OPT_DEBUG_LEVEL,
+	CLI_OPT_JOB_DEBUG_LEVEL,
+	CLI_OPT_WORKER_DEBUG_LEVEL,
+	CLI_OPT_NUM_WORKERS,
+	CLI_OPT_NUM_WORKER_ITERS,
 } cli_opt_id;
 
 static const jas_opt_t cli_opts[] = {
@@ -206,19 +261,25 @@ static const jas_opt_t cli_opts[] = {
     {CLI_OPT_SPECIAL, "X", 0},
     {CLI_OPT_REPEAT, "r", JAS_OPT_HASARG},
     {CLI_OPT_NUM_ITERS, "n", JAS_OPT_HASARG},
-    {CLI_OPT_DEBUG_LEVEL, "l", JAS_OPT_HASARG},
+    {CLI_OPT_JOB_DEBUG_LEVEL, "job-debug-level", JAS_OPT_HASARG},
+    {CLI_OPT_WORKER_DEBUG_LEVEL, "worker-debug-level", JAS_OPT_HASARG},
+    {CLI_OPT_NUM_WORKERS, "num-workers", JAS_OPT_HASARG},
+    {CLI_OPT_NUM_WORKER_ITERS, "num-worker-iters", JAS_OPT_HASARG},
 	{-1, 0, 0},
 };
 
 int main(int argc, char **argv)
 {
 	int verbose = 0;
-	int debug_level = 0;
+	int job_debug_level = 0;
 	size_t max_mem = 0;
 	size_t num_iters = 10;
 	int repeat = 1;
 	const char *out_format = "jp2";
 	bool use_wrapper = true;
+	size_t num_workers = 0;
+	size_t num_worker_iters = 10000;
+	int worker_debug_level = 0;
 
 	int c;
 	while ((c = jas_getopt(argc, argv, cli_opts)) != EOF) {
@@ -242,8 +303,17 @@ int main(int argc, char **argv)
 		case CLI_OPT_NUM_ITERS:
 			num_iters = atoi(jas_optarg);
 			break;
-		case CLI_OPT_DEBUG_LEVEL:
-			debug_level = atoi(jas_optarg);
+		case CLI_OPT_JOB_DEBUG_LEVEL:
+			job_debug_level = atoi(jas_optarg);
+			break;
+		case CLI_OPT_WORKER_DEBUG_LEVEL:
+			worker_debug_level = atoi(jas_optarg);
+			break;
+		case CLI_OPT_NUM_WORKERS:
+			num_workers = atol(jas_optarg);
+			break;
+		case CLI_OPT_NUM_WORKER_ITERS:
+			num_worker_iters = atol(jas_optarg);
 			break;
 		default:
 			usage();
@@ -266,9 +336,9 @@ int main(int argc, char **argv)
 			job->out_format_str = out_format;
 			job->num_iters = num_iters;
 			job->id = num_jobs;
-			job->debug_level = (num_jobs == 0) ? debug_level : 0;
+			job->debug_level = (num_jobs == 0) ? job_debug_level : 0;
 			if (job->verbose >= 2) {
-				job->debug_level = debug_level;
+				job->debug_level = job_debug_level;
 			}
 			job->verbose = verbose;
 			++job;
@@ -279,6 +349,8 @@ int main(int argc, char **argv)
 
 	fprintf(stderr, "number of jobs: %d\n", num_jobs);
 	fprintf(stderr, "number of iterations: %zu\n", num_iters);
+	fprintf(stderr, "number of workers: %zu\n", num_workers);
+	fprintf(stderr, "number of worker iterations: %zu\n", num_worker_iters);
 
 #if defined(JAS_USE_JAS_INIT)
 
@@ -338,11 +410,39 @@ int main(int argc, char **argv)
 		}
 	}
 
+	worker_info_t worker_info;
+	worker_info.num_iters = num_worker_iters;
+	worker_info.delay = 1;
+	worker_info.debug_level = worker_debug_level;
+	jas_thread_t *worker_threads;
+	if (!(worker_threads = malloc(num_workers * sizeof(jas_thread_t)))) {
+		abort();
+	}
+	for (size_t i = 0; i < num_workers; ++i) {
+		if (jas_thread_create(&worker_threads[i], worker_1,
+		  &worker_info)) {
+			fprintf(stderr, "cannot create thread\n");
+			abort();
+		}
+	}
+
 	int error_count = 0;
 	for (int i = 0; i < num_jobs; ++i) {
 		job_t *job = &jobs[i];
 		int result;
 		if (jas_thread_join(&job->thread, &result)) {
+			fprintf(stderr, "cannot join thread\n");
+			abort();
+		}
+		if (result) {
+			fprintf(stderr, "job %d failed\n", i);
+			++error_count;
+		}
+	}
+
+	for (int i = 0; i < num_workers; ++i) {
+		int result;
+		if (jas_thread_join(&worker_threads[i], &result)) {
 			fprintf(stderr, "cannot join thread\n");
 			abort();
 		}

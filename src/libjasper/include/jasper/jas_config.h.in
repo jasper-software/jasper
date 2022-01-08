@@ -25,6 +25,7 @@
 #cmakedefine JAS_HAVE_MKOSTEMP
 #cmakedefine JAS_HAVE_GETTIMEOFDAY
 #cmakedefine JAS_HAVE_GETRUSAGE
+#cmakedefine JAS_HAVE_NANOSLEEP
 
 #cmakedefine JAS_HAVE_GL_GLUT_H
 #cmakedefine JAS_HAVE_GLUT_GLUT_H

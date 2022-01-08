@@ -64,8 +64,11 @@ out_formats+=(jp2)
 for out_format in "${out_formats[@]}"; do
 	command=("$test_program")
 	command+=(-f "$out_format")
-	command+=(-l 0)
+	command+=(--job-debug-level 0)
 	command+=(-r 1)
+	command+=(--num-workers 4)
+	command+=(--num-worker-iters 10000)
+	command+=(--worker-debug-level 0)
 	for in_format in "${in_formats[@]}"; do
 		for file in "$data_dir"/images/*.$in_format; do
 			if [ -e "$file" ]; then

@@ -463,12 +463,14 @@ JAS_EXPORT
 int jas_cleanup_library()
 {
 	jas_ctx_t *ctx;
+#if defined(JAS_THREADS)
 	bool has_lock = false;
+#endif
 
 #if defined(JAS_THREADS)
 	jas_mutex_lock(&jas_global.lock);
-#endif
 	has_lock = true;
+#endif
 
 	assert(jas_global.initialized);
 	assert(!jas_global.num_active_threads);
@@ -479,28 +481,25 @@ int jas_cleanup_library()
 	jas_ctx_cleanup(ctx);
 	//jas_context_set_debug_level(ctx, 0);
 
+#if defined(JAS_THREADS)
+	jas_tss_delete(jas_global.cur_ctx_tss);
+	jas_tss_delete(jas_global.default_ctx_tss);
+#endif
+
 	assert(jas_allocator);
 	jas_allocator_cleanup(jas_allocator);
 	jas_allocator = 0;
 
 	JAS_LOGDEBUGF(10, "jas_cleanup_library returning\n");
 
+	jas_global.initialized = 0;
+	jas_conf.initialized = 0;
+
 #if defined(JAS_THREADS)
-	jas_tss_delete(jas_global.cur_ctx_tss);
-	jas_tss_delete(jas_global.default_ctx_tss);
-#endif
-
-	/* NOTE: The following two lines of code require that configuration,
-	  initialization, and cleanup of the library be performed on the
-	  same thread. */
-	//jas_conf.configured = 0;
-	//jas_conf.initialized = 0;
-
 	if (has_lock) {
-#if defined(JAS_THREADS)
 		jas_mutex_unlock(&jas_global.lock);
-#endif
 	}
+#endif
 
 	return 0;
 }
@@ -514,7 +513,9 @@ int jas_init_thread()
 {
 	int ret = 0;
 	jas_ctx_t *ctx = 0;
+#if defined(JAS_THREADS)
 	bool has_lock = false;
+#endif
 
 	/*
 	The default context must be established as soon as possible.
@@ -526,8 +527,8 @@ int jas_init_thread()
 	*/
 #if defined(JAS_THREADS)
 	jas_mutex_lock(&jas_global.lock);
-#endif
 	has_lock = true;
+#endif
 
 	assert(jas_global.initialized);
 #if !defined(JAS_THREADS)
@@ -545,15 +546,15 @@ int jas_init_thread()
 
 #if defined(JAS_THREADS)
 	jas_mutex_unlock(&jas_global.lock);
-#endif
 	has_lock = false;
+#endif
 
 done:
-	if (has_lock) {
 #if defined(JAS_THREADS)
+	if (has_lock) {
 		jas_mutex_unlock(&jas_global.lock);
-#endif
 	}
+#endif
 	if (ret && ctx) {
 		jas_ctx_cleanup(ctx);
 	}
@@ -563,13 +564,15 @@ done:
 JAS_EXPORT
 int jas_cleanup_thread()
 {
-	bool has_lock = false;
 	jas_ctx_t *ctx;
+#if defined(JAS_THREADS)
+	bool has_lock = false;
+#endif
 
 #if defined(JAS_THREADS)
 	jas_mutex_lock(&jas_global.lock);
-#endif
 	has_lock = true;
+#endif
 
 	/* Ensure that the library user is not doing something insane. */
 	assert(jas_get_ctx() == jas_get_default_ctx());
@@ -586,11 +589,11 @@ int jas_cleanup_thread()
 	jas_ctx_destroy(ctx);
 	--jas_global.num_active_threads;
 
-	if (has_lock) {
 #if defined(JAS_THREADS)
+	if (has_lock) {
 		jas_mutex_unlock(&jas_global.lock);
-#endif
 	}
+#endif
 
 	return 0;
 }
@@ -602,14 +605,7 @@ int jas_cleanup_thread()
 JAS_EXPORT
 int jas_init()
 {
-	/* NOTE: The following three lines of code require that configuration,
-	  initialization, and cleanup of the library be performed on the
-	  same thread. */
-	assert(!jas_conf.initialized);
-	assert(!jas_global.initialized);
-
 	jas_conf_clear();
-
 	if (jas_init_library()) {
 		return -1;
 	}
