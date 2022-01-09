@@ -71,7 +71,7 @@ impact backward compatibility):
 
 @section license License
 
-@verbinclude @CMAKE_SOURCE_DIR@/LICENSE
+@verbinclude @CMAKE_SOURCE_DIR@/LICENSE.txt
 
 @section bugs Reporting Bugs
 
