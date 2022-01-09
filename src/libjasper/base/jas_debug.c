@@ -260,16 +260,17 @@ int jas_logmemdump(const void *data, size_t len)
 * Code.
 \******************************************************************************/
 
-void jas_deprecated(const char *s)
+void jas_deprecated(const char *fmt, ...)
 {
 	static const char message[] =
-	"WARNING!!! WARNING!!! WARNING!!! WARNING!!! WARNING!!! WARNING!!!\n"
-	"WARNING!!! WARNING!!! WARNING!!! WARNING!!! WARNING!!! WARNING!!!\n"
-	"WARNING!!! WARNING!!! WARNING!!! WARNING!!! WARNING!!! WARNING!!!\n"
-	"YOUR CODE IS RELYING ON DEPRECATED FUNCTIONALITY IN THE JASPER LIBRARY.\n"
-	"THIS FUNCTIONALITY WILL BE REMOVED IN THE NEAR FUTURE.\n"
-	"PLEASE FIX THIS PROBLEM BEFORE YOUR CODE STOPS WORKING!\n"
+	"WARNING: YOUR CODE IS RELYING ON DEPRECATED FUNCTIONALITY IN THE JASPER\n"
+	"LIBRARY.  THIS FUNCTIONALITY WILL BE REMOVED IN THE NEAR FUTURE. PLEASE\n"
+	"FIX THIS PROBLEM BEFORE YOUR CODE STOPS WORKING.\n"
 	;
-	jas_eprintf("%s", message);
-	jas_eprintf("The specific problem is as follows:\n%s\n", s);
+	fprintf(stderr, "%s", message);
+	fprintf(stderr, "deprecation warning: ");
+	va_list ap;
+	va_start(ap, fmt);
+	vfprintf(stderr, fmt, ap);
+	va_end(ap);
 }

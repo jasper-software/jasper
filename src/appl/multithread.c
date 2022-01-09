@@ -144,10 +144,15 @@ int worker_1(void *args)
 		jas_set_debug_level(info->debug_level);
 		jas_set_vlogmsgf(jas_vlogmsgf_stderr);
 
-		void* p;
-		p = jas_malloc(1);
-		if (p) {
-			jas_free(p);
+		assert(jas_get_context() == jas_get_default_context());
+		jas_context_t context;
+		context = jas_context_create();
+		if (context) {
+			jas_set_context(context);
+			assert(jas_get_context() == context);
+			jas_set_context(jas_get_default_context());
+			assert(jas_get_context() == jas_get_default_context());
+			jas_context_destroy(context);
 		}
 
 #if defined(JAS_HAVE_NANOSLEEP)

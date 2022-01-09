@@ -176,7 +176,7 @@ int jas_memdump(FILE *out, const void *data, size_t len);
 Warn about the use of deprecated functionality.
 */
 JAS_EXPORT
-void jas_deprecated(const char *s);
+void jas_deprecated(const char *fmt, ...);
 
 /*!
 @brief

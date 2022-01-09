@@ -82,16 +82,41 @@
 \******************************************************************************/
 
 typedef struct {
+
+	/* A copy of the run-time library configuration settings. */
 	jas_conf_t conf;
+
+	/* A flag indicating if the library is initialized.*/
 	bool initialized;
+
+	/* The number of threads currently using the library. */
 	size_t num_active_threads;
+
+	/*
+	If JAS_THREADS is not defined, this pointer is used for both the
+	global context and default context.
+	Otherwise, this pointer is only used for the global context.
+	*/
 	jas_ctx_t *ctx;
+
+	/*
+	The storage for the global context.
+	*/
 	jas_ctx_t ctx_buf;
+
 #if defined(JAS_THREADS)
+
+	/* A mutex to protect this data structure. */
 	jas_mutex_t lock;
+
+	/* The TSS for the current context pointer. */
 	jas_tss_t cur_ctx_tss;
+
+	/* The TSS for the default context pointer. */
 	jas_tss_t default_ctx_tss;
+
 #endif
+
 } jas_global_t;
 
 /******************************************************************************\
@@ -343,6 +368,12 @@ void jas_conf_set_image_format_table(const jas_image_fmt_t *formats,
 * Library Initialization and Cleanup.
 \******************************************************************************/
 
+/*
+Note: I think that it should actually be okay for jas_init_library and
+jas_cleanup_library to be called from different threads, since:
+the mutex ensures synchronization and also guarantees that only one
+thread can use the global context at once.
+*/
 JAS_EXPORT
 int jas_init_library()
 {
@@ -370,13 +401,29 @@ int jas_init_library()
 	assert(jas_global.conf.initialized);
 
 	size_t max_mem = jas_global.conf.max_mem;
+	size_t total_mem_size = jas_get_total_mem_size();
 	if (!max_mem) {
-		max_mem = jas_get_total_mem_size() / 2;
+		max_mem = total_mem_size / 2;
 		if (!max_mem) {
 			max_mem = JAS_DEFAULT_MAX_MEM_USAGE;
 		}
 		assert(max_mem);
 		jas_global.conf.max_mem = max_mem;
+		jas_eprintf(
+		  "warning: application program did not set JasPer memory limit\n");
+		jas_eprintf("warning: JasPer memory limit being defaulted to value "
+		  "that may be inappropriate; if default is too small, some "
+		  "reasonable encoding/decoding operations will fail; if default is "
+		  "too large, security vulnerabilities may result "
+		  "(e.g., decoding large image could exhaust all physical and "
+		  "virtual memory and crash your system\n");
+		jas_eprintf("warning: setting JasPer memory limit to %zu bytes\n",
+		  max_mem);
+	}
+	if (max_mem > total_mem_size) {
+		jas_eprintf("WARNING: JasPer memory limit set to EXCESSIVELY "
+		  "LARGE value (i.e., limit exceeds system memory size (%zu > %zu)\n",
+		  max_mem, total_mem_size);
 	}
 
 #if !defined(JAS_THREADS)
@@ -534,6 +581,9 @@ int jas_init_thread()
 #if !defined(JAS_THREADS)
 	assert(jas_global.num_active_threads == 0);
 #endif
+	assert(jas_get_ctx() == jas_global.ctx);
+	assert(!jas_get_default_ctx() || jas_get_default_ctx() ==
+	  &jas_global.ctx_buf);
 
 	if (!(ctx = jas_ctx_create())) {
 		ret = -1;
@@ -574,6 +624,9 @@ int jas_cleanup_thread()
 	has_lock = true;
 #endif
 
+	assert(jas_get_default_ctx());
+	assert(jas_get_ctx());
+
 	/* Ensure that the library user is not doing something insane. */
 	assert(jas_get_ctx() == jas_get_default_ctx());
 
@@ -605,6 +658,7 @@ int jas_cleanup_thread()
 JAS_EXPORT
 int jas_init()
 {
+	jas_deprecated("use of jas_init is deprecated\n");
 	jas_conf_clear();
 	if (jas_init_library()) {
 		return -1;
@@ -619,6 +673,7 @@ int jas_init()
 JAS_EXPORT
 void jas_cleanup()
 {
+	jas_deprecated("use of jas_cleanup is deprecated\n");
 	if (jas_cleanup_thread()) {
 		jas_eprintf("jas_cleanup_thread failed\n");
 	}
@@ -675,11 +730,11 @@ jas_conf_t *jas_get_conf_ptr()
 
 void jas_ctx_init(jas_ctx_t *ctx)
 {
-	memset(ctx, 0, sizeof(jas_ctx_t));
 	ctx->dec_default_max_samples = jas_conf.dec_default_max_samples;
 	ctx->debug_level = jas_conf.debug_level;
 	ctx->vlogmsgf = jas_conf.vlogmsgf;
 	ctx->image_numfmts = 0;
+	memset(ctx->image_fmtinfos, 0, sizeof(ctx->image_fmtinfos));
 }
 
 jas_ctx_t *jas_ctx_create()
@@ -769,7 +824,8 @@ void jas_set_ctx(jas_ctx_t *ctx)
 jas_ctx_t *jas_get_default_ctx()
 {
 #if defined(JAS_THREADS)
-	jas_ctx_t *ctx = JAS_CAST(jas_ctx_t *, jas_tss_get(jas_global.default_ctx_tss));
+	jas_ctx_t *ctx =
+	  JAS_CAST(jas_ctx_t *, jas_tss_get(jas_global.default_ctx_tss));
 	if (!ctx) {
 		ctx = jas_global.ctx;
 	}

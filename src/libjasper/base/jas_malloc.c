@@ -99,9 +99,11 @@
 * Data.
 \******************************************************************************/
 
+/* MUTABLE_SHARED_STATE_TAG: This is mutable shared state. */
 /* The memory allocator object to be used for all memory allocation. */
 jas_allocator_t *jas_allocator = 0;
 
+/* MUTABLE_SHARED_STATE_TAG: This is mutable shared state. */
 jas_std_allocator_t jas_std_allocator = {
 	.base = {
 		.cleanup = 0,
@@ -111,6 +113,7 @@ jas_std_allocator_t jas_std_allocator = {
 	},
 };
 
+/* MUTABLE_SHARED_STATE_TAG: This is mutable shared state. */
 jas_basic_allocator_t jas_basic_allocator = {
 	.base = {
 		.cleanup = 0,
