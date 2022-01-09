@@ -43,7 +43,7 @@ The manual is provided in two formats:
 
 The old reference manual (which is still useful) can be found in:
 
-    - doc/jasper.pdf
+  - doc/jasper.pdf
 
 The version of the reference manual corresponding to the most recent commit
 on the master branch of the JasPer Git repository can be found at:
