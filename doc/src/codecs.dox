@@ -3,9 +3,29 @@
 \page codecs Codecs
 
 The JasPer software provides implementations of several popular codecs.
-Likely, the ones of most interest are those associated with the JPEG-2000
-standard.
 The sections that follow describe the various codecs in more detail.
+
+\section codecs__common Common Codec Functionality
+
+Some encoder and decoder options are common to most/all codecs.
+Typically, encoders and decoders tend to ignore unrecognized options
+(although a warning might be issued for such options).
+So, it is not normally problematic to specify an option that is not
+supported to an encoder or decoder.
+
+\subsection codecs__common__enc_options Common Encoder Options
+
+There are no common options supported by all encoders.
+
+\subsection codecs__common__dec_options Common Decoder Options
+
+Except where explictly noted otherwise, all decoders support the
+following options:
+
+  - `max_samples=$n`.
+    Set the maximum number of samples that are permitted
+    in an image to be decoded to `$n`.
+    (An 100\f$\times\f$100 RGB-color image has 30000 samples.)
 
 \section codecs__bmp BMP Codec
 
@@ -21,7 +41,23 @@ The encoder does not support any special options.
 
 \subsection codecs__bmp__dec_options Decoder Options
 
-The decoder does not support any special options.
+The decoder does not support any options beyond the common ones.
+
+\section codecs__heic HEIC Codec
+
+The HEIC format is quite popular on Apple platforms.
+The support is experimental and likely has numerous bugs.
+
+\subsection codecs__heic__enc_options Encoder Options
+
+Encoding is not currently supported.
+
+\subsection codecs__heic__dec_options Decoder Options
+
+In addition to the common decoder options, the decoder supports the
+following options:
+
+  - `version`
 
 \section codecs__jp2 JP2 Codec
 
@@ -61,162 +97,124 @@ not be employed.  The JPEG-2000 JP2 format should be used instead.
 
 \subsection codecs__jpc__enc_options Encoder Options
 
-The following options are supported by the encoder:
-\begin{description}
+In addition to the common encoder options, the JPC encoder supports
+the following options:
 
-	\item
-	\url{imgareatlx=}{\it x}\newline
-	Set the x-coordinate of the top-left corner of the image area to {\it x}.
+  - `imgareatlx=$x`.
+    Set the x-coordinate of the top-left corner of the image area to `$x`.
 
-	\item
-	\url{imgareatly=}{\it y}\newline
-	Set the y-coordinate of the top-left corner of the image area to {\it y}.
+  - `imgareatly=$y`.
+    Set the y-coordinate of the top-left corner of the image area to `$y`.
 
-	\item
-	\url{tilegrdtlx=}{\it x}\newline
-	Set the x-coordinate of the top-left corner of the tiling grid to {\it x}.
+  - `tilegrdtlx=$x`.
+    Set the x-coordinate of the top-left corner of the tiling grid to `$x`.
 
-	\item
-	\url{tilegrdtly=}{\it y}\newline
-	Set the y-coordinate of the top-left corner of the tiling grid to {\it y}.
+  - `tilegrdtly=$y`.
+    Set the y-coordinate of the top-left corner of the tiling grid to `$y`.
 
-	\item
-	\url{tilewidth=}{\it w}\newline
-	Set the nominal tile width to {\it w}.
+  - `tilewidth=$w`.
+    Set the nominal tile width to `$w`.
 
-	\item
-	\url{tileheight=}{\it h}\newline
-	Set the nominal tile height to {\it h}.
+  - `tileheight=$h`.
+    Set the nominal tile height to `$h`.
 
-	\item
-	\url{prcwidth=}{\it w}\newline
-	Set the precinct width to {\it w}.  The argument {\it w} must be an
-	integer power of two.  The default value is 32768.
+  - `prcwidth=$w`.
+    Set the precinct width to `$w`.
+    The argument `$w` must be an integer power of two.
+    The default value is 32768.
 
-	\item
-	\url{prcheight=}{\it h}\newline
-	Set the precinct height to {\it h}.
-	The argument {\it h} must be an integer power of two.
-	The default value is 32768.
+  - `prcheight=$h`.
+    Set the precinct height to `$h`.
+    The argument `$h` must be an integer power of two.
+    The default value is 32768.
 
-	\item
-	\url{cblkwidth=}{\it w}\newline
-	Set the nominal code block width to {\it w}.  The argument
-	{\it w} must be an integer power of two.  The default value is 64.
+  - `cblkwidth=$w`.
+    Set the nominal code block width to `$w`.
+    The argument `$w` must be an integer power of two.
+    The default value is 64.
 
-	\item
-	\url{cblkheight=}{\it h}\newline
-	Set the nominal code block height to {\it h}.  The argument
-	{\it h} must be an integer power of two.  The default value is 64.
+  - `cblkheight=$h`.
+    Set the nominal code block height to `$h`.
+    The argument `$h` must be an integer power of two.
+    The default value is 64.
 
-	\item
-	\url{mode=}{\it m}\newline
-	Set the coding mode to {\it m}.  The argument {\it m} must have
-	one of the following values:
-\begin{center}
-\begin{tabular}{|l|l|}
-\hline
-Value & Description \\
-\hline
-int  & integer mode \\
-real & real mode \\
-\hline
-\end{tabular}
-\end{center}
+  - `mode=$m`.
+    Set the coding mode to `$m`.
+    The argument `$m` must have one of the following values:
 
-	If lossless coding is desired, the integer mode must be used.
-	By default, the integer mode is employed.
-	The choice of mode also determines which multicomponent and wavelet
-	transforms (if any) are employed.
+      - `int`. integer mode
+      - `real`. real mode
 
-	\item
-	\url{rate=}{\it r}\newline
-	Specify the target rate.  The argument {\it r} is a positive
-	real number.  Since a rate of one corresponds to no compression,
-	one should never need to explicitly specify a rate greater
-	than one.  By default, the target rate is considered to be infinite.
+    If lossless coding is desired, the integer mode must be used.
+    By default, the integer mode is employed.
+    The choice of mode also determines which multicomponent and wavelet
+    transforms (if any) are employed.
 
-	\item
-	\url{ilyrrates}={\it $r_0$[,$r_1$,\ldots,$r_{N-1}$]}
-	\newline
-	Specify the rates for any intermediate layers.  The argument to
-	this option is a comma separated list of {\it N} rates.
-	Each rate is a positive real number.
-	The rates must increase monotonically.
-	The last rate in the list should be less than or equal to the
-	overall rate (as specified with the \url{rate} option).
+  - `rate=$r`.
+    Specify the target rate.
+    The argument `$r` is a positive real number.
+    Since a rate of one corresponds to no compression, one should never need
+    to explicitly specify a rate greater than one.
+    By default, the target rate is considered to be infinite.
 
-	\item
-	\url{prg=}{\it p}\newline
-	Set the progression order to {\it p}.  The argument {\it p}
-	must have one of the following values:
-\begin{center}
-\begin{tabular}{|l|l|}
-\hline
-Value & Description \\
-\hline
-lrcp & layer-resolution-component-position (LRCP) progressive
-       (i.e., rate scalable) \\
-rlcp & resolution-layer-component-position (RLCP) progressive
-       (i.e., resolution scalable) \\
-rpcl & resolution-position-component-layer (RPCL) progressive \\
-pcrl & position-component-resolution-layer (PCRL) progressive \\
-cprl & component-position-resolution-layer (CPRL) progressive \\
-\hline
-\end{tabular}
-\end{center}
+  - `ilyrrates=`\f$r_0\f$[,\f$r_1\f$,\f$\ldots\f$,\f$r_{N-1}\f$].
+    Specify the rates for any intermediate layers.
+    The argument to this option is a comma separated list of \f$N\f$ rates.
+    Each rate is a positive real number.
+    The rates must increase monotonically.
+    The last rate in the list should be less than or equal to the
+    overall rate (as specified with the `rate` option).
 
-	By default, LRCP progressive ordering is employed.
-	Note that the RPCL and PCRL progressions are not valid for all possible
-	image geometries.  (See \cite iso15444p1 for more details.)
+  - `prg=$p`.
+    Set the progression order to `$p`.
+    The argument `$p` must have one of the following values:
 
-	\item
-	\url{nomct}\newline
-	Disallow the use of any multicomponent transform.
+      - `lrcp`. layer-resolution-component-position (LRCP) progressive
+        (i.e., rate scalable)
+      - `rlcp`. resolution-layer-component-position (RLCP) progressive
+       (i.e., resolution scalable)
+      - `rpcl`. resolution-position-component-layer (RPCL) progressive
+      - `pcrl`. position-component-resolution-layer (PCRL) progressive
+      - `cprl`. component-position-resolution-layer (CPRL) progressive
 
-	\item
-	\url{numrlvls=}{\it n}\newline
-	Set the number of resolution levels to {\it n}.
-	The argument {\it n} must be an integer that is greater
-	than or equal to one.  The default value is 6.
+    By default, LRCP progressive ordering is employed.
+    Note that the RPCL and PCRL progressions are not valid for all possible
+    image geometries.  (See \cite iso15444p1 for more details.)
 
-	\item
-	\url{sop}\newline
-	Generate SOP marker segments.
+  - `nomct`.
+    Disallow the use of any multicomponent transform.
 
-	\item
-	\url{eph}\newline
-	Generate EPH marker segments.
+  - `numrlvls=$n`.
+    Set the number of resolution levels to `$n`.
+    The argument `$n` must be an integer that is greater than or equal to one.
+    The default value is 6.
 
-	\item
-	\url{lazy}\newline
-	Enable lazy coding mode (a.k.a. arithmetic coding bypass).
+  - `sop`.
+    Generate SOP marker segments.
 
-	\item
-	\url{termall}\newline
-	Terminate all coding passes.
+  - `eph`.
+    Generate EPH marker segments.
 
-	\item
-	\url{segsym}\newline
-	Use segmentation symbols.
+  - `lazy`.
+    Enable lazy coding mode (a.k.a. arithmetic coding bypass).
 
-	\item
-	\url{vcausal}\newline
-	Use vertically stripe causal contexts.
+  - `termall`.
+    Terminate all coding passes.
 
-	\item
-	\url{pterm}\newline
-	Use predictable termination.
+  - `segsym`.
+    Use segmentation symbols.
 
-	\item
-	\url{resetprob}\newline
-	Reset the probability models after each coding pass.
+  - `vcausal`.
+    Use vertically stripe causal contexts.
 
-	\item
-	\url{numgbits=}{\it n}\newline
-	Set the number of guard bits to {\it n}.
+  - `pterm`.
+    Use predictable termination.
 
-\end{description}
+  - `resetprob`.
+    Reset the probability models after each coding pass.
+
+  - `numgbits=$n`.
+    Set the number of guard bits to `$n`.
 
 \subsection codecs__jpc__dec_options Decoder Options
 
@@ -249,14 +247,10 @@ downloaded from the IJG web site (i.e., http://www.ijg.org).
 \subsection codecs__jpg__enc_options Encoder Options
 
 The following options are supported by the encoder:
-\begin{description}
 
-	\item
-	\url{quality=}{\it q}\newline
-	Set the quality factor to {\it q}.  This is used in order to indirectly
-	control the bit rate for lossy coding.
-
-\end{description}
+  - `quality=$q`.
+    Set the quality factor to `$q`.
+    This is used in order to indirectly control the bit rate for lossy coding.
 
 \subsection codecs__jpg_dec_options Decoder Options
 
@@ -264,8 +258,8 @@ The decoder does not support any special options.
 
 \section codecs__pgx PGX Codec
 
-The JPEG-2000 Verification Model software employs a non-standard
-format called PGX.  In JasPer, this format is handled by the PGX codec.
+The JPEG-2000 Verification Model software employs a non-standard format
+called PGX.  In JasPer, this format is handled by the PGX codec.
 The PGX format can only handle single components images, and consequently,
 is of limited use.
 
@@ -293,7 +287,7 @@ The encoder does not support any special options.
 
 The decoder does not support any special options.
 
-\subsection codecs__pnm PNM Codec
+\section codecs__pnm PNM Codec
 
 On UNIX platforms, the Portable Pixmap/Graymap/Bitmap (PNM)
 format is quite popular for coding image data.  The PNM codec in JasPer
@@ -306,19 +300,15 @@ it can handle images with signed sample values.
 \subsection codecs__pnm__enc_options Encoder Options
 
 The following options are provided by the PNM encoder:
-\begin{description}
 
-	\item
-	\url{text}\newline
-	Use a non-raw (i.e., non-binary) flavor of PNM format.
-
-\end{description}
+  - `text`.
+    Use a non-raw (i.e., non-binary) flavor of PNM format.
 
 \subsection codecs__pnm__dec_options Decoder Options
 
 The decoder does not support any special options.
 
-\subsection codecs__ras RAS Codec
+\section codecs__ras RAS Codec
 
 One popular image format on Sun workstations is the Sun Rasterfile format.
 The RAS codec in JasPer implements this format.
