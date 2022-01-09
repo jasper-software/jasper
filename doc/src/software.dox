@@ -264,7 +264,7 @@ steps are required (in order):
 %
 Presuming that the build was successful, the executables for
 the JasPer application programs can be found in the directory
-\url{$TOPDIR/src/appl}.
+\url{$TOPDIR/src/app}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Build Process for Microsoft Visual C Studio

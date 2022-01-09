@@ -51,10 +51,10 @@ fi
 
 jpdec="$cmd_dir/jpdec"
 dec=jasper
-imgcmp="$abs_top_builddir/src/appl/imgcmp"
-imginfo="$abs_top_builddir/src/appl/imginfo"
+imgcmp="$abs_top_builddir/src/app/imgcmp"
+imginfo="$abs_top_builddir/src/app/imginfo"
 export IMGINFO_COMMAND="$imginfo"
-jasper="$abs_top_builddir/src/appl/jasper"
+jasper="$abs_top_builddir/src/app/jasper"
 
 
 testcase_file="$cmd_dir/decoder_tests"

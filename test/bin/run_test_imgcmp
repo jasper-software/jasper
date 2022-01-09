@@ -15,7 +15,7 @@ fi
 
 set_source_and_build_dirs || panic "cannot set source and build directories"
 
-imgcmp="$abs_top_builddir/src/appl/imgcmp"
+imgcmp="$abs_top_builddir/src/app/imgcmp"
 
 data_dir="$abs_top_srcdir/data"
 

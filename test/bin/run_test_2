@@ -33,10 +33,10 @@ tmp_file=$tmp_dir/data
 top_dir="$cmd_dir/../.."
 data_dir="$top_dir/data"
 
-export IMGINFO_COMMAND="$abs_top_builddir/src/appl/imginfo"
-jasper="$abs_top_builddir/src/appl/jasper"
-imgcmp="$abs_top_builddir/src/appl/imgcmp"
-jiv="$abs_top_builddir/src/appl/jiv"
+export IMGINFO_COMMAND="$abs_top_builddir/src/app/imginfo"
+jasper="$abs_top_builddir/src/app/jasper"
+imgcmp="$abs_top_builddir/src/app/imgcmp"
+jiv="$abs_top_builddir/src/app/jiv"
 
 internal_testing_mode="${JAS_INTERNAL_TESTING_MODE:-0}"
 

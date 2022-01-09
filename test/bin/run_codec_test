@@ -15,8 +15,8 @@ tmp_dir=$(make_tmp_dir)
 
 init
 
-export IMGINFO_COMMAND="$abs_top_builddir/src/appl/imginfo"
-IMGCMP="$abs_top_builddir/src/appl/imgcmp"
+export IMGINFO_COMMAND="$abs_top_builddir/src/app/imginfo"
+IMGCMP="$abs_top_builddir/src/app/imgcmp"
 
 MKDATA=1
 DATADIR="$tmp_dir"

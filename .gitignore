@@ -15,12 +15,12 @@ Makefile.in
 /build/jasper.spec
 /build/jasper.pc
 
-# src/appl directory
-/src/appl/imgcmp
-/src/appl/imginfo
-/src/appl/jasper
-/src/appl/jiv
-/src/appl/tmrdemo
+# src/app directory
+/src/app/imgcmp
+/src/app/imginfo
+/src/app/jasper
+/src/app/jiv
+/src/app/tmrdemo
 
 # src/libjasper/include/jasper directory
 /src/libjasper/include/jasper/jas_config.h

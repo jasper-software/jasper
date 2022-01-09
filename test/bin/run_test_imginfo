@@ -17,8 +17,8 @@ fi
 
 set_source_and_build_dirs || panic "cannot set source and build directories"
 
-imginfo="$abs_top_builddir/src/appl/imginfo"
-jasper="$abs_top_builddir/src/appl/jasper"
+imginfo="$abs_top_builddir/src/app/imginfo"
+jasper="$abs_top_builddir/src/app/jasper"
 
 data_dir="$abs_top_srcdir/data"
 

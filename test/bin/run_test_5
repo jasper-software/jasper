@@ -20,8 +20,8 @@ top_dir="$cmd_dir/../.."
 
 data_dir="$abs_top_srcdir/data"
 
-test_program="$abs_top_builddir/src/appl/multithread"
-jasper_program="$abs_top_builddir/src/appl/jasper"
+test_program="$abs_top_builddir/src/app/multithread"
+jasper_program="$abs_top_builddir/src/app/jasper"
 
 ################################################################################
 

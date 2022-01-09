@@ -35,15 +35,15 @@ init()
 	SHOWIMG="display -geometry 256x256> -geometry +0+0"
 
 	#IMGDIR=$JASPERTOPDIR/data/images
-	#JASPER=$JASPERTOPDIR/src/appl/jasper$EXEEXT
-	#JIV=$JASPERTOPDIR/src/appl/jiv$EXEEXT
-	#IMGCMP=$JASPERTOPDIR/src/appl/imgcmp$EXEEXT
-	#IMGINFO=$JASPERTOPDIR/src/appl/imginfo$EXEEXT
+	#JASPER=$JASPERTOPDIR/src/app/jasper$EXEEXT
+	#JIV=$JASPERTOPDIR/src/app/jiv$EXEEXT
+	#IMGCMP=$JASPERTOPDIR/src/app/imgcmp$EXEEXT
+	#IMGINFO=$JASPERTOPDIR/src/app/imginfo$EXEEXT
 	IMGDIR=`parsepathname $JASPERTOPDIR/data/images`
-	JASPER=`parsepathname $JASPERTOPDIR/src/appl/jasper$EXEEXT`
-	JIV=`parsepathname $JASPERTOPDIR/src/appl/jiv$EXEEXT`
-	IMGCMP=`parsepathname $JASPERTOPDIR/src/appl/imgcmp$EXEEXT`
-	IMGINFO=`parsepathname $JASPERTOPDIR/src/appl/imginfo$EXEEXT`
+	JASPER=`parsepathname $JASPERTOPDIR/src/app/jasper$EXEEXT`
+	JIV=`parsepathname $JASPERTOPDIR/src/app/jiv$EXEEXT`
+	IMGCMP=`parsepathname $JASPERTOPDIR/src/app/imgcmp$EXEEXT`
+	IMGINFO=`parsepathname $JASPERTOPDIR/src/app/imginfo$EXEEXT`
 	KAKADUENC=$KAKADUTOPDIR/kdu_compress$EXEEXT
 	KAKADUDEC=$KAKADUTOPDIR/kdu_expand$EXEEXT
 	VMENC=$VMTOPDIR/bin/vm9_compress_32$EXEEXT

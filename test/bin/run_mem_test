@@ -18,7 +18,7 @@ start=0
 step=64
 end=4294967296
 
-imginfo_program="$program_dir/../../tmp_cmake/build/src/appl/imginfo"
+imginfo_program="$program_dir/../../tmp_cmake/build/src/app/imginfo"
 image_file=
 
 while getopts s:e:d:p:i: opt; do

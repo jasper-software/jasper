@@ -572,7 +572,7 @@ endif()
 
 add_subdirectory(src/libjasper)
 if(JAS_ENABLE_PROGRAMS)
-    add_subdirectory(src/appl)
+    add_subdirectory(src/app)
 endif()
 if(JAS_ENABLE_DOC)
 	add_subdirectory(doc)

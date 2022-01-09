@@ -15,8 +15,8 @@ set_source_and_build_dirs || panic "cannot set source and build directories"
 init
 VERBOSE=0
 
-export IMGINFO_COMMAND="$abs_top_builddir/src/appl/imginfo"
-JASPER="$abs_top_builddir/src/appl/jasper"
+export IMGINFO_COMMAND="$abs_top_builddir/src/app/imginfo"
+JASPER="$abs_top_builddir/src/app/jasper"
 
 ################################################################################
 #

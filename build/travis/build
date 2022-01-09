@@ -146,7 +146,7 @@ else
 			echo "Running cmake ${cmake_opts[@]}"
 			(cmake "${cmake_opts[@]}") || panic "build of $target failed"
 			if [ "$verbose" -ge 1 ]; then
-				for dir in src/appl src/libjasper test/bin; do
+				for dir in src/app src/libjasper test/bin; do
 					echo "Listing directory $build_dir/$dir"
 					(cd "$build_dir" && ls -alR "$dir")
 				done
@@ -169,7 +169,7 @@ else
 		echo "########################################"
 
 		mkdir -p "$test_dir" || panic "cannot make directory $test_dir"
-		for file in build/travis/CMakeLists.txt src/appl/jasper.c; do
+		for file in build/travis/CMakeLists.txt src/app/jasper.c; do
 			cp "$source_dir/$file" "$test_dir" || \
 			  panic "cannot copy $file"
 		done
