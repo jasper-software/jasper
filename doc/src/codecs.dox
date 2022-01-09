@@ -2,30 +2,40 @@
 
 \page codecs Codecs
 
-The JasPer software provides implementations of several popular codecs.
-The sections that follow describe the various codecs in more detail.
+The JasPer software supports several popular codecs.
+In some cases, the support is native (i.e., built-in to the JasPer
+library itself).  In other cases, the support is provided indirectly
+through external software dependencies.
+The sections that follow describe the various codecs supported
+by JasPer in more detail.
 
 \section codecs__common Common Codec Functionality
 
-Some encoder and decoder options are common to most/all codecs.
+Some encoder and decoder options are generic in the sense that they are
+essentially independent of the codec.
 Typically, encoders and decoders tend to ignore unrecognized options
 (although a warning might be issued for such options).
-So, it is not normally problematic to specify an option that is not
-supported to an encoder or decoder.
+So, it is not usually problematic to specify an unsupported option
+to an encoder or a decoder.
 
-\subsection codecs__common__enc_options Common Encoder Options
+\subsection codecs__common__enc_options Generic Encoder Options
 
-There are no common options supported by all encoders.
+The following generic options are supported by some encoders:
 
-\subsection codecs__common__dec_options Common Decoder Options
+  - `debug=$level`.
+    Set the debug level to `$level`.
 
-Except where explictly noted otherwise, all decoders support the
-following options:
+\subsection codecs__common__dec_options Generic Decoder Options
+
+The following generic options are supported by some decoders:
+
+  - `debug=$level`.
+    Set the debug level to `$level`.
 
   - `max_samples=$n`.
     Set the maximum number of samples that are permitted
     in an image to be decoded to `$n`.
-    (An 100\f$\times\f$100 RGB-color image has 30000 samples.)
+    (An 100 \f$\times\f$ 100 RGB-color image has 30000 samples.)
 
 \section codecs__bmp BMP Codec
 
@@ -37,11 +47,15 @@ BMP files.
 
 \subsection codecs__bmp__enc_options Encoder Options
 
-The encoder does not support any special options.
+The BMP encoder does not support any special options.
 
 \subsection codecs__bmp__dec_options Decoder Options
 
-The decoder does not support any options beyond the common ones.
+The BMP decoder supports the following generic options:
+
+  - `max_samples`
+
+The BMP decoder does not support any options beyond generic ones.
 
 \section codecs__heic HEIC Codec
 
@@ -50,14 +64,17 @@ The support is experimental and likely has numerous bugs.
 
 \subsection codecs__heic__enc_options Encoder Options
 
-Encoding is not currently supported.
+HEIC encoding is not currently supported.
 
 \subsection codecs__heic__dec_options Decoder Options
 
-In addition to the common decoder options, the decoder supports the
-following options:
+The HEIC decoder supports the following special options:
 
-  - `version`
+  - `version`.
+    Print the version of the Libheif library being used without performing
+    any decoding.
+
+The HEIC decoder does not support any generic options.
 
 \section codecs__jp2 JP2 Codec
 
@@ -66,11 +83,11 @@ One of the two image formats specified in the JPEG-2000 Part-1 standard
 
 \subsection codecs__jp2__enc_options Encoder Options
 
-The encoder supports all of the same options as the JPC encoder.
+The JP2 encoder supports all of the same options as the JPC encoder.
 
 \subsection codecs__jp2__dec_options Decoder Options
 
-The decoder supports all of the same options as the JPC decoder.
+The JP2 decoder supports all of the same options as the JPC decoder.
 
 \section codecs__jpc JPC Codec
 
@@ -97,8 +114,10 @@ not be employed.  The JPEG-2000 JP2 format should be used instead.
 
 \subsection codecs__jpc__enc_options Encoder Options
 
-In addition to the common encoder options, the JPC encoder supports
-the following options:
+The JPC encoder supports the following special options:
+
+  - `debug=$level`.
+    Set the debug level to `$level`.
 
   - `imgareatlx=$x`.
     Set the x-coordinate of the top-left corner of the image area to `$x`.
@@ -216,9 +235,26 @@ the following options:
   - `numgbits=$n`.
     Set the number of guard bits to `$n`.
 
+  - `_jp2overhead=$n`.
+    This is for internal use only.
+    It allows the rate to compensate for the overhead of a container
+    format in which the JPEG-2000 code stream is embedded.
+
 \subsection codecs__jpc__dec_options Decoder Options
 
-The decoder does not support any special options.
+The JPC decoder supports the following special options:
+
+  - `maxlyrs=$n`.
+    Set the maximum number of layers to decode to `$n`.
+
+  - `maxpkts=$n`.
+    Set the maximum number of packets to decode to `$n`.
+
+The following generic options are supported:
+
+  - `debug`
+
+  - `max_samples`
 
 \subsection codecs__jpc__rate_specification Rate Specification
 
@@ -246,15 +282,25 @@ downloaded from the IJG web site (i.e., http://www.ijg.org).
 
 \subsection codecs__jpg__enc_options Encoder Options
 
-The following options are supported by the encoder:
+The JPG encoder supports the following special options:
 
   - `quality=$q`.
     Set the quality factor to `$q`.
     This is used in order to indirectly control the bit rate for lossy coding.
 
+The JPG encoder does not support any generic options.
+
 \subsection codecs__jpg_dec_options Decoder Options
 
-The decoder does not support any special options.
+The JPG decoder supports the following special options:
+
+  - `version`.
+    Indicate that the decoder should only print the version of the
+    IJG JPEG library in use.  (No decoding is performed.)
+
+The JPG decoder supports the following generic options:
+
+  - `max_samples`
 
 \section codecs__pgx PGX Codec
 
@@ -265,11 +311,19 @@ is of limited use.
 
 \subsection codecs__pgx__enc_options Encoder Options
 
-The encoder does not support any special options.
+The PGX encoder does not support any generic or special options.
 
 \subsection codecs__pgx__dec_options Decoder Options
 
-The decoder does not support any special options.
+The PGX decoder supports the following special options:
+
+  - `allow_trunc`.
+    Allow decoding of truncated bitstreams (i.e., reaching EOF
+    during decoding is not deemed to be an error).
+
+The PGX decoder supports the following generic options:
+
+  - `max_samples`
 
 \section codecs__mif MIF Codec
 
@@ -278,14 +332,17 @@ was invented solely for the purpose of testing the JasPer software.
 The support for the MIF format is experimental.
 It is intended to be used for advanced testing of the JasPer JPEG-2000
 codec implementation.
+__It is strongly recommended that this codec not be enabled/used
+in code running in environments where security is a concern.__
 
 \subsection codecs__mif__enc_options Encoder Options
 
-The encoder does not support any special options.
+The MIF encoder does not support any generic or special options.
 
 \subsection codecs__mif__dec_options Decoder Options
 
-The decoder does not support any special options.
+The MIF decoder does not support any generic or special options.
+
 
 \section codecs__pnm PNM Codec
 
@@ -299,14 +356,22 @@ it can handle images with signed sample values.
 
 \subsection codecs__pnm__enc_options Encoder Options
 
-The following options are provided by the PNM encoder:
+The PNM encoder supports the following special options:
 
   - `text`.
     Use a non-raw (i.e., non-binary) flavor of PNM format.
 
 \subsection codecs__pnm__dec_options Decoder Options
 
-The decoder does not support any special options.
+The PNM decoder supports the following special options:
+
+  - `allow_trunc`.
+    Allow decoding of truncated bitstreams (i.e., reaching EOF
+    during decoding is not deemed to be an error).
+
+The PNM decoder supports the following generic options:
+
+  - `max_samples`
 
 \section codecs__ras RAS Codec
 
@@ -319,6 +384,14 @@ The encoder does not support any special options.
 
 \subsection codecs__ras__dec_options Decoder Options
 
-The decoder does not support any special options.
+The RAS decoder supports the following special options:
+
+  - `allow_trunc`.
+    Allow decoding of truncated bitstreams (i.e., reaching EOF
+    during decoding is not deemed to be an error).
+
+The RAS decoder supports the following generic options:
+
+  - `max_samples`
 
 */
