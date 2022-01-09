@@ -120,6 +120,7 @@ typedef struct {
 	allocator wrapper is used.
 	*/
 	size_t max_mem;
+	bool max_mem_valid;
 
 	/*
 	The image format information to be used to populate the image format
@@ -238,6 +239,12 @@ void jas_conf_set_debug_level(int debug_level);
 (assuming the allocator wrapper is not disabled).
 
 @details
+
+@warning
+It is strongly recommended that the memory usage limit not be set to an
+excessively large value, as this poses security risks (e.g., decoding a
+malicious image file could exhaust all virtual memory and effectively
+crash the system).
 */
 JAS_EXPORT
 void jas_conf_set_max_mem(size_t max_mem);

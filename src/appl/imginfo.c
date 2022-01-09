@@ -92,6 +92,7 @@ typedef enum {
 	OPT_MAXMEM,
 	OPT_DECOPT,
 	OPT_SPECIAL,
+	OPT_DEFAULT_MAX_MEM,
 } optid_t;
 
 /******************************************************************************\
@@ -100,6 +101,7 @@ typedef enum {
 
 static void usage(void);
 static void cmdinfo(void);
+size_t get_default_max_mem_usage(void);
 
 /******************************************************************************\
 *
@@ -116,6 +118,7 @@ static const jas_opt_t opts[] = {
 	{OPT_DECOPT, "decoder-option", JAS_OPT_HASARG},
 	{OPT_DECOPT, "o", JAS_OPT_HASARG},
 	{OPT_SPECIAL, "X", 0},
+	{OPT_DEFAULT_MAX_MEM, "default-memory-limit", 0},
 	{-1, 0, 0}
 };
 
@@ -152,8 +155,9 @@ int main(int argc, char **argv)
 	max_samples_valid = false;
 	infile = 0;
 	debug = 0;
-	size_t max_mem = 0;
+	size_t max_mem = get_default_max_mem_usage();
 	dec_opt_spec[0] = '\0';
+	bool default_mem_limit = false;
 
 	/* Parse the command line options. */
 	while ((id = jas_getopt(argc, argv, opts)) >= 0) {
@@ -189,6 +193,9 @@ int main(int argc, char **argv)
 		case OPT_SPECIAL:
 			special = 1;
 			break;
+		case OPT_DEFAULT_MAX_MEM:
+			default_mem_limit = true;
+			break;
 		case OPT_HELP:
 		default:
 			usage();
@@ -205,7 +212,7 @@ int main(int argc, char **argv)
 		fprintf(stderr, "cannot initialize JasPer library\n");
 		return EXIT_FAILURE;
 	}
-	if (max_mem) {
+	if (!default_mem_limit) {
 		jas_set_max_mem_usage(max_mem);
 	}
 	jas_setdbglevel(debug);
@@ -218,7 +225,7 @@ int main(int argc, char **argv)
 	static jas_std_allocator_t allocator;
 	jas_std_allocator_init(&allocator);
 	jas_conf_set_allocator(&allocator.base);
-	if (max_mem) {
+	if (!default_mem_limit) {
 		jas_conf_set_max_mem(max_mem);
 	}
 	jas_conf_set_debug_level(debug);
@@ -345,4 +352,16 @@ static void usage()
 	fprintf(stderr, "[-f image_file]\n");
 	fputs(help, stderr);
 	exit(EXIT_FAILURE);
+}
+
+size_t get_default_max_mem_usage(void)
+{
+	size_t total_mem_size = jas_get_total_mem_size();
+	size_t max_mem;
+	if (total_mem_size) {
+		max_mem = 0.90 * total_mem_size;
+	} else {
+		max_mem = JAS_DEFAULT_MAX_MEM_USAGE;
+	}
+	return max_mem;
 }

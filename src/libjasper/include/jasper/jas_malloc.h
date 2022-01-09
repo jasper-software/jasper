@@ -331,6 +331,21 @@ void jas_basic_allocator_init(jas_basic_allocator_t *allocator,
 
 #endif
 
+/*!
+@brief
+Get the total amount of memory available on the system.
+
+@details
+This function may be called prior to the library being initialized.
+In fact, this function may be useful for determining a reasonable value
+for the memory limit setting to be used during (run-time) library
+configuration.
+
+@returns
+The total amount of memory available (in bytes) is returned, if this can
+be determined.
+Otherwise, zero is returned.
+*/
 JAS_EXPORT
 size_t jas_get_total_mem_size(void);
 

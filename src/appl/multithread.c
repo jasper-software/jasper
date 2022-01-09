@@ -114,6 +114,7 @@ job_t jobs[max_jobs];
 
 void usage(void);
 int process_job(void *job_handle);
+size_t get_default_max_mem_usage(void);
 
 void usage()
 {
@@ -277,7 +278,7 @@ int main(int argc, char **argv)
 {
 	int verbose = 0;
 	int job_debug_level = 0;
-	size_t max_mem = 0;
+	size_t max_mem = get_default_max_mem_usage();
 	size_t num_iters = 10;
 	int repeat = 1;
 	const char *out_format = "jp2";
@@ -466,4 +467,16 @@ int main(int argc, char **argv)
 	}
 
 	return EXIT_SUCCESS;
+}
+
+size_t get_default_max_mem_usage(void)
+{
+	size_t total_mem_size = jas_get_total_mem_size();
+	size_t max_mem;
+	if (total_mem_size) {
+		max_mem = 0.90 * total_mem_size;
+	} else {
+		max_mem = JAS_DEFAULT_MAX_MEM_USAGE;
+	}
+	return max_mem;
 }

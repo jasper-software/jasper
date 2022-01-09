@@ -119,6 +119,7 @@ double psnr(jas_matrix_t *x, jas_matrix_t *y, int depth);
 jas_image_t *makediffimage(jas_matrix_t *origdata, jas_matrix_t *recondata);
 void usage(void);
 void cmdinfo(void);
+size_t get_default_max_mem_usage(void);
 
 /******************************************************************************\
 *
@@ -189,7 +190,7 @@ int main(int argc, char **argv)
 	diffpath = 0;
 	maxonly = 0;
 	minonly = 0;
-	size_t max_mem = 0;
+	size_t max_mem = get_default_max_mem_usage();
 
 	cmdname = argv[0];
 
@@ -240,18 +241,14 @@ int main(int argc, char **argv)
 		fprintf(stderr, "cannot initialize JasPer library\n");
 		exit(EXIT_ERROR);
 	}
-	if (max_mem) {
-		jas_set_max_mem_usage(max_mem);
-	}
+	jas_set_max_mem_usage(max_mem);
 	atexit(jas_cleanup);
 #else
 	jas_conf_clear();
 	static jas_std_allocator_t allocator;
 	jas_std_allocator_init(&allocator);
 	jas_conf_set_allocator(&allocator.base);
-	if (max_mem) {
-		jas_conf_set_max_mem(max_mem);
-	}
+	jas_conf_set_max_mem(max_mem);
 	//jas_conf_set_debug_level(debug);
 	if (jas_init_library()) {
 		fprintf(stderr, "cannot initialize JasPer library\n");
@@ -614,4 +611,16 @@ void usage()
 	  "    equal ... equality (boolean)\n"
 	  );
 	exit(EXIT_USAGE);
+}
+
+size_t get_default_max_mem_usage(void)
+{
+	size_t total_mem_size = jas_get_total_mem_size();
+	size_t max_mem;
+	if (total_mem_size) {
+		max_mem = 0.90 * total_mem_size;
+	} else {
+		max_mem = JAS_DEFAULT_MAX_MEM_USAGE;
+	}
+	return max_mem;
 }

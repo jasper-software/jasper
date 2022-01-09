@@ -301,6 +301,7 @@ void jas_conf_clear()
 	jas_conf.allocator = 0;
 	jas_conf.enable_allocator_wrapper = 1;
 	jas_conf.max_mem = 0;
+	jas_conf.max_mem_valid = 0;
 	jas_conf.num_image_formats = sizeof(jas_image_fmts) /
 	  sizeof(jas_image_fmt_t);
 	jas_conf.image_formats = jas_image_fmts;
@@ -341,6 +342,7 @@ JAS_EXPORT
 void jas_conf_set_max_mem(size_t max_mem)
 {
 	jas_conf.max_mem = max_mem;
+	jas_conf.max_mem_valid = 1;
 }
 
 JAS_EXPORT
@@ -400,9 +402,9 @@ int jas_init_library()
 	jas_global.conf = jas_conf;
 	assert(jas_global.conf.initialized);
 
-	size_t max_mem = jas_global.conf.max_mem;
+	size_t max_mem;
 	size_t total_mem_size = jas_get_total_mem_size();
-	if (!max_mem) {
+	if (!jas_global.conf.max_mem_valid) {
 		max_mem = total_mem_size / 2;
 		if (!max_mem) {
 			max_mem = JAS_DEFAULT_MAX_MEM_USAGE;
@@ -410,15 +412,21 @@ int jas_init_library()
 		assert(max_mem);
 		jas_global.conf.max_mem = max_mem;
 		jas_eprintf(
-		  "warning: application program did not set JasPer memory limit\n");
-		jas_eprintf("warning: JasPer memory limit being defaulted to value "
-		  "that may be inappropriate; if default is too small, some "
-		  "reasonable encoding/decoding operations will fail; if default is "
-		  "too large, security vulnerabilities may result "
-		  "(e.g., decoding large image could exhaust all physical and "
-		  "virtual memory and crash your system\n");
+		  "warning: The application program did not set the memory limit "
+		  "for the JasPer library.\n"
+		  );
+		jas_eprintf(
+		  "warning: The JasPer memory limit is being defaulted to a "
+		  "value that may be inappropriate for the system.  If the default "
+		  "is too small, some reasonable encoding/decoding operations will "
+		  "fail.  If the default is too large, security vulnerabilities "
+		  "will result (e.g., decoding a malicious image could exhaust all "
+		  "memory and crash the system.\n"
+		  );
 		jas_eprintf("warning: setting JasPer memory limit to %zu bytes\n",
 		  max_mem);
+	} else {
+		max_mem = jas_global.conf.max_mem;
 	}
 	if (max_mem > total_mem_size) {
 		jas_eprintf("WARNING: JasPer memory limit set to EXCESSIVELY "

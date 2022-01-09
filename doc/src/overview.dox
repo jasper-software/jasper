@@ -46,6 +46,7 @@ configured (via `jas_conf_clear()`):
 
   - `jas_std_allocator_init()`
   - `jas_get_image_format_table()`
+  - `jas_get_total_mem_size()`
 
 The following functions may be called after the JasPer library is
 configured (via `jas_conf_clear()`) but before it is initialized

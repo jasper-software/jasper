@@ -189,6 +189,8 @@ static void pan(float dx, float dy);
 static void panzoom(float dx, float dy, float sx, float sy);
 static void render(void);
 
+size_t get_default_max_mem_usage(void);
+
 /******************************************************************************\
 *
 \******************************************************************************/
@@ -242,7 +244,7 @@ int main(int argc, char **argv)
 	cmdopts.tmout = 0;
 	cmdopts.loop = 0;
 	cmdopts.verbose = 0;
-	cmdopts.max_mem = 0;
+	cmdopts.max_mem = get_default_max_mem_usage();
 
 	while ((c = jas_getopt(argc, argv, opts)) != EOF) {
 		switch (c) {
@@ -1119,4 +1121,16 @@ static void init()
 	gs.vp.data = 0;
 	gs.viewportwidth = -1;
 	gs.viewportheight = -1;
+}
+
+size_t get_default_max_mem_usage(void)
+{
+	size_t total_mem_size = jas_get_total_mem_size();
+	size_t max_mem;
+	if (total_mem_size) {
+		max_mem = 0.90 * total_mem_size;
+	} else {
+		max_mem = JAS_DEFAULT_MAX_MEM_USAGE;
+	}
+	return max_mem;
 }
