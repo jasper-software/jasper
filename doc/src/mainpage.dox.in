@@ -67,7 +67,7 @@ impact backward compatibility):
       - jas_stream_copy()
   - the jas_stream_memopen2() function has been deprecated
 
-@verbinclude @CMAKE_SOURCE_DIR@/NEWS
+@verbinclude @CMAKE_SOURCE_DIR@/NEWS.txt
 
 @section license License
 
