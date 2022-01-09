@@ -247,7 +247,7 @@ malicious image file could exhaust all virtual memory and effectively
 crash the system).
 */
 JAS_EXPORT
-void jas_conf_set_max_mem(size_t max_mem);
+void jas_conf_set_max_mem_usage(size_t max_mem);
 
 /*!
 @brief Set the default value for the maximum number of samples that is
@@ -328,6 +328,8 @@ int jas_init_thread(void);
 
 /*!
 @brief
+Perform per-thread cleanup for the JasPer library.
+
 @details
 */
 JAS_EXPORT

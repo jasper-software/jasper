@@ -226,7 +226,7 @@ int main(int argc, char **argv)
 	jas_std_allocator_init(&allocator);
 	jas_conf_set_allocator(&allocator.base);
 	if (!default_mem_limit) {
-		jas_conf_set_max_mem(max_mem);
+		jas_conf_set_max_mem_usage(max_mem);
 	}
 	jas_conf_set_debug_level(debug);
 	if (special) {

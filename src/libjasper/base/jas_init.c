@@ -339,7 +339,7 @@ void jas_conf_set_debug_level(int debug_level)
 }
 
 JAS_EXPORT
-void jas_conf_set_max_mem(size_t max_mem)
+void jas_conf_set_max_mem_usage(size_t max_mem)
 {
 	jas_conf.max_mem = max_mem;
 	jas_conf.max_mem_valid = 1;

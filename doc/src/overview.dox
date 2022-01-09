@@ -6,62 +6,91 @@
 
 \section init_overview Configuration, Initialization, and Shutdown
 
-There are two stages in the setup of the JasPer library at run time:
+There are three stages in the setup of the JasPer library at run time:
 
-  1. configuration; and
-  2. initialization.
+  1. configuration;
+  2. global (i.e., library-wide) initialization; and
+  3. per-thread initialization.
 
-The configuration stage initializes the current configuration settings
-for the library.
-The configuration settings are initialized to their default values
+These stages of setup are performed in the order listed.
+Aside from the exceptions noted in this section, code in the JasPer library
+must not be invoked by a thread prior to per-thread initialization being
+performed.
+Only the following functions may be called prior to the configuration of
+the JasPer library (via `jas_conf_clear()`):
+
+  - `jas_get_total_mem_size()`
+  - `jas_get_image_format_table()`
+
+The configuration stage initializes the current (run-time)
+configuration settings for the library.
+First, the configuration settings are initialized to their default values
 using the `jas_conf_clear()` function
 (where these default values are fixed at the time that the library is built).
-The initialization stage initializes the library using the current
-configuration settings.
-The `jas_initialize()` function performs initialization (not configuration).
-The library must be both configured and initialized (in that order)
-before most code in the library can be used.
-For backward compatibility with older versions of the
-library, the `jas_init()` function performs both configuration and initialization
-of the library.
-(The `jas_init()` function internally calls `jas_conf_clear()` to initialize the
-configuration settings with their default values before proceeding to
-initialize the library.)
+Then, configuration settings may be changed from their defaults (prior
+to global initialization), if so desired.
+The following functions may be called after the JasPer library is
+configured (via `jas_conf_clear()`) but before global initialization
+is performed (via `jas_init_library()`):
+
+  - the \c jas_conf_* family of functions, including functions such as:
+
+    - `jas_conf_clear()`
+    - `jas_conf_set_allocator()`
+    - `jas_conf_set_debug_level()`
+    - `jas_conf_set_max_mem_usage()`
+    - `jas_conf_set_dec_default_max_samples()`
+    - `jas_conf_set_vlogmsgf()`
+    - `jas_conf_set_image_format_table()`
+
+  - `jas_std_allocator_init()`
+
+The global initialization stage initializes the library itself using the
+current configuration settings.
+The `jas_init_library()` function performs global initialization
+(but not configuration).
+After global initialization is performed, per-thread initialization
+can then be performed.
+
+The per-thread initialization stage performs any initialization necessary
+in order to allow a thread to use the library.
+The `jas_init_thread()` function performs per-thread initialization.
+Per-thread initialization cannot be performed until after global initialization.
+After a thread performs per-thread initialization, it is free to use the full
+API of the library.
+Aside from the exceptions noted in this section, no function in the library
+may be invoked by a thread prior to it performing per-thread initialization
+via `jas_init_thread()`.
+
+The shutdown of the library roughly mirrors the process for library setup
+and consists of the following two stages:
+
+  1. per-thread cleanup
+  2. library cleanup
+
 The library is cleaned up (i.e., shutdown) by invoking the `jas_cleanup()`
 function.
 The library cannot be re-initialized.
 That is, calling `jas_init()` or `jas_initialize()` without an intervening
 call to `jas_cleanup()` is not allowed.
 
-All configuration, initialization, and cleanup of the library must be
-performed on the same thread.  Otherwise, data races and other synchronization
-problems will result.
+Configuration, global initialization, and global cleanup should be
+performed on the same thread.
 
-No code in the library can be invoked prior to initialization of the
-library (via `jas_init()` or `jas_initialize()`), with the exception
-of the functions identified below.
-
-Only the following functions may be called before the JasPer library is
-configured (via `jas_conf_clear()`):
-
-  - `jas_std_allocator_init()`
-  - `jas_get_image_format_table()`
-  - `jas_get_total_mem_size()`
-
-The following functions may be called after the JasPer library is
-configured (via `jas_conf_clear()`) but before it is initialized
-(via `jas_init()` or `jas_initialize()`):
-
-- the \c jas_conf_* family of functions, including functions such as:
-
-  - `jas_conf_clear()`
-  - `jas_conf_set_allocator()`
-  - `jas_conf_set_allocator_wrapper()`
-  - `jas_conf_set_debug_level()`
-  - `jas_conf_set_max_mem()`
-  - `jas_conf_set_dec_default_max_samples()`
-  - `jas_conf_set_vlogmsgf()`
-  - `jas_conf_set_image_format_table()`
+For backward-compatibility with older versions of the library, the
+jas_init() and jas_cleanup() functions may also be used for library
+setup and shutdown.  These function have been marked as deprecated,
+and will be removed in a future version of the library.  Also, if these
+functions are used, JasPer cannot be employed in more than one thread and
+library configuration parameters cannot be changed from their defaults.
+The `jas_init()` function can be used (by legacy code) to perform
+configuration, global initialization, and per-thread initialization for the
+calling thread.
+The `jas_init()` function internally calls `jas_conf_clear()` to initialize
+the configuration settings with their default values, and then invokes
+`jas_init_library()` and `jas_init_thread()`.
+Similarly, `jas_cleanup()` can be used (by legacy code) to perform per-thread
+cleanup for the calling thread and global cleanup.
 
 \subsection init__state Library State
 
@@ -77,20 +106,11 @@ It is analogous to a null pointer.
 The JasPer library allows the current context to be set independently
 for each thread.
 That is, the current context is a per-thread setting.
-When the library is initialized, a single context is automatically
-created, which is referred to as the default context.
-If the current context for a thread is set to the special value of 0,
-the thread's current context becomes the default context.
-A given context cannot be shared by more than one thread, as this would
+When a thread is initialized, a single context is automatically
+created, which is referred to as the default context, and the current
+context for the thread is set to this default context.
+A context cannot be shared by more than one thread, as this would
 lead to data races and other synchronization problems.
-For this reason, of the threads that are using the JasPer library,
-at most one thread may use the default context.
-In an application that has multiple threads using the JasPer library,
-it is recommended that no thread use the default context
-(i.e., each thread should create and use its own context).
-If only one thread needs to use the JasPer library (such as in the case
-of a single-threaded application), that thread can simply use the
-default context, eliminating the need to create additional contexts.
 
 The JasPer library has two types of state:
 
@@ -106,6 +126,8 @@ The global state for the library includes:
 
   - the memory allocator to be used by the library
   - the maximum amount of memory that the library is permitted to use
+  - certain configuration settings that are used as default values
+    when creating/initializing contexts
 
 The per-context state includes:
 
@@ -132,17 +154,17 @@ following functions:
 The various per-context settings can be set/queried with the following
 functions:
 
-  - `jas_context_set_debug_level()`
-  - `jas_context_get_debug_level()`
-  - `jas_context_set_dec_default_max_samples()`
-  - `jas_context_get_dec_default_max_samples()`
-  - `jas_context_set_vlogmsgf()`
-  - `jas_context_get_vlogmsgf()`
+  - `jas_set_debug_level()`
+  - `jas_get_debug_level()`
+  - `jas_set_dec_default_max_samples()`
+  - `jas_get_dec_default_max_samples()`
+  - `jas_set_vlogmsgf()`
+  - `jas_get_vlogmsgf()`
 
-\subsection init_setup_example_1 Example of Code for Library Setup
+\subsection init_setup_example_1 Example of Code for Library Setup and Shutdown
 
-Setup of the library would typically be performed using code resembling
-the following:
+Setup and shutdown of the library would typically be performed in the
+main thread of the application using code resembling the following:
 
 ~~~~~~~~~~
 /*
@@ -159,75 +181,62 @@ An example of this type of code follows.
 static jas_std_allocator_t allocator;
 jas_std_allocator_init(&allocator);
 jas_conf_set_allocator(JAS_CAST(std_allocator_t *, &allocator));
-jas_conf_set_max_mem(10000000);
+jas_conf_set_max_mem_usage(10000000);
 
 /*
-Initialize the JasPer library.
+Perform global initialization for the JasPer library.
 */
-if (jas_initialize()) {
+if (jas_init_library()) {
 	/* Handle the initialization error. */
 }
 
 /*
-Use the library.
-In the case that the library is only used in a single thread, there
-is no need to explicitly create any contexts, as the default context can
-safely be used.
+Perform any per-thread initialization for the JasPer library.
+*/
+if (jas_init_thread()) {
+	/* Handle the initialization error. */
+}
+
+/*
+Use the JasPer library.
 */
 
-/* Clean up the library. */
+/* Perform any per-thread clean up for the JasPer library. */
+jas_cleanup_thread();
+
+/* Perform global cleanup for the JasPer library. */
 jas_cleanup();
 ~~~~~~~~~~
 
 In the case of an application in which the JasPer library is used in more than
-one thread, each thread would typically establish its own context before
-starting to use the library.
+one thread, each additional thread would need to perform per-thread
+initialization (via `jas_thread_init()`) before using the library.
+Also, each additional thread would need to perform per-thread cleanup
+(via `jas_cleanup_thread()`) when the use of the library is no longer needed.
 For each thread, the code for this might resemble something like the following:
 
 ~~~~~~~~~~
-/* Create a new context. */
-jas_context_t context;
-if (!(context = jas_create_context())) {
-	/* Handle the error. */
-}
-/* Set the context for the calling thread to this new context. */
-jas_set_context(context);
-~~~~~~~~~~
-
-The cleanup of the context might resemble like the following:
-
-~~~~~~~~~~
-/* Stop using the context before it is destroyed. */
-jas_set_context(0);
-/* Destroy the context. */
-jas_context_destroy(context);
-~~~~~~~~~~
-
-\subsection init_setup_example_2 Example of Code for Library Setup (jas_init)
-
-Alternatively, the setup of the library can be performed using code resembling
-the following, if the library configuration parameters do not need to be
-changed from their defaults:
-
-~~~~~~~~~~
-if (jas_init()) {
-	/* handle initialization error */
+/*
+Perform any per-thread initialization for the JasPer library.
+*/
+if (jas_init_thread()) {
+	/* Handle the initialization error. */
 }
 
-/* Use the library. */
+/*
+Use the JasPer library.
+*/
 
-/* Clean up the library. */
-jas_cleanup();
+/* Perform any per-thread clean up for the JasPer library. */
+jas_cleanup_thread();
 ~~~~~~~~~~
 
-Contexts can also be created and used when the library is initialized
-with `jas_init()` (just like in the case of `jas_initialize()`).
 
 \subsection init_setup_example_3 Additional Examples of Library Setup
 
-Some additional examples of using the `jas_conf_clear()`, `jas_initialize()`,
-and `jas_init()` functions can be found in the source code for the application
-programs `jasper`, `imginfo`, and `imgcmp`.
+Some additional examples of using the `jas_conf_clear()`, `jas_init_library()`,
+`jas_init_thread()` and `jas_init()` functions can be found in the source
+code for the application programs `jasper`, `imginfo`, and `imgcmp`.
 Moreover, the application program `multithread` is an example of a
 program that uses the JasPer library in multiple threads.
 

@@ -207,7 +207,7 @@ int main(int argc, char **argv)
 	jas_std_allocator_init(&allocator);
 	jas_conf_set_allocator(&allocator.base);
 	jas_conf_set_debug_level(cmdopts->debug);
-	jas_conf_set_max_mem(cmdopts->max_mem);
+	jas_conf_set_max_mem_usage(cmdopts->max_mem);
 	if (jas_init_library()) {
 		fprintf(stderr, "cannot initialize JasPer library\n");
 		exit(EXIT_FAILURE);
