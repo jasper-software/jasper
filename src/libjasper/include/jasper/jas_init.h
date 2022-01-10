@@ -193,7 +193,8 @@ typedef void *jas_context_t;
 \******************************************************************************/
 
 /*!
-@brief Configure the JasPer library with the default configuration settings.
+@brief
+Configure the JasPer library with the default configuration settings.
 
 @details
 This function configures the JasPer library with the default configuration
@@ -210,6 +211,7 @@ void jas_conf_clear(void);
 
 /*!
 @brief Set the multithreading flag for the library.
+
 @details
 */
 JAS_EXPORT
@@ -229,13 +231,15 @@ void jas_conf_set_allocator(jas_allocator_t *allocator);
 
 /*!
 @brief Set the initial debug level for the library.
+
 @details
 */
 JAS_EXPORT
 void jas_conf_set_debug_level(int debug_level);
 
 /*!
-@brief Set the maximum amount of memory that can be used by the library
+@brief
+Set the maximum amount of memory that can be used by the library
 (assuming the allocator wrapper is not disabled).
 
 @details
@@ -250,7 +254,8 @@ JAS_EXPORT
 void jas_conf_set_max_mem_usage(size_t max_mem);
 
 /*!
-@brief Set the default value for the maximum number of samples that is
+@brief
+Set the default value for the maximum number of samples that is
 allowed in an image to be decoded.
 
 @details
@@ -259,7 +264,8 @@ JAS_EXPORT
 void jas_conf_set_dec_default_max_samples(size_t max_samples);
 
 /*!
-@brief Set the function used by the library to output error, warning, and
+@brief
+Set the function used by the library to output error, warning, and
 informational messages.
 
 @details
@@ -269,7 +275,8 @@ void jas_conf_set_vlogmsgf(int (*func)(jas_logtype_t, const char *,
   va_list));
 
 /*!
-@brief Set the image-format table to be used to initialize the library.
+@brief
+Set the image-format table to be used to initialize the library.
 
 @details
 The entries for the image-format table that reside in the array pointed to
@@ -285,7 +292,8 @@ void jas_conf_set_image_format_table(const jas_image_fmt_t *,
 \******************************************************************************/
 
 /*!
-@brief Initialize the JasPer library with the current configuration settings.
+@brief
+Initialize the JasPer library with the current configuration settings.
 
 @details
 The library must be configured by invoking the jas_conf_clear() function
@@ -312,7 +320,8 @@ int jas_cleanup_library(void);
 \******************************************************************************/
 
 /*!
-@brief Perform per-thread initialization for the JasPer library.
+@brief
+Perform per-thread initialization for the JasPer library.
 
 @details
 The library must be initialized by invoking the jas_init_library() function
@@ -340,7 +349,8 @@ int jas_cleanup_thread(void);
 \******************************************************************************/
 
 /*!
-@brief Configure and initialize the JasPer library using the default
+@brief
+Configure and initialize the JasPer library using the default
 configuration settings.
 
 @details
@@ -384,6 +394,8 @@ void jas_cleanup(void);
 
 /*!
 @brief
+Create a context.
+
 @details
 */
 JAS_EXPORT
@@ -391,6 +403,8 @@ jas_context_t jas_context_create(void);
 
 /*!
 @brief
+Destroy a context.
+
 @details
 The context being destroyed must not be the current context.
 */
@@ -400,6 +414,7 @@ void jas_context_destroy(jas_context_t context);
 /*!
 @brief
 Get the current context for the calling thread.
+
 @details
 */
 JAS_EXPORT
@@ -408,6 +423,7 @@ jas_context_t jas_get_default_context(void);
 /*!
 @brief
 Get the current context for the calling thread.
+
 @details
 */
 JAS_EXPORT
@@ -416,6 +432,7 @@ jas_context_t jas_get_context(void);
 /*!
 @brief
 Set the current context for the calling thread.
+
 @details
 */
 JAS_EXPORT
@@ -439,6 +456,7 @@ static inline jas_ctx_t *jas_get_ctx(void)
 /*!
 @brief
 Set the debug level for a particular context.
+
 @details
 */
 JAS_EXPORT
@@ -447,6 +465,7 @@ int jas_set_debug_level(int debug_level);
 /*!
 @brief
 Get the debug level for a particular context.
+
 @details
 */
 static inline int jas_get_debug_level(void)
@@ -469,6 +488,8 @@ void jas_set_dec_default_max_samples(size_t max_samples);
 @brief
 Get the default maximum number of samples that a decoder is permitted to
 process.
+
+@details
 */
 static inline size_t jas_get_dec_default_max_samples(void)
 {
@@ -479,6 +500,7 @@ static inline size_t jas_get_dec_default_max_samples(void)
 /*!
 @brief
 Set the function to be used for log messages.
+
 @details
 */
 JAS_EXPORT
@@ -488,6 +510,7 @@ void jas_set_vlogmsgf(jas_vlogmsgf_t *func);
 /*!
 @brief
 Get the function to be used for log messages.
+
 @details
 */
 static inline
