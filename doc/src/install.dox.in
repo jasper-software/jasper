@@ -1,0 +1,7 @@
+/*!
+
+\page install Installation
+
+\verbinclude @CMAKE_SOURCE_DIR@/INSTALL.txt
+
+*/

@@ -1,7 +1,8 @@
 /*!
-@mainpage @JAS_PROJECT_NAME@ Reference Manual (Version @JAS_VERSION@)
 
-@section intro Introduction
+\mainpage Overview
+
+\section intro Introduction
 
 JasPer is a collection
 of software (i.e., a library and application programs) for the
@@ -13,7 +14,7 @@ This software was developed by
 from the Department of Electrical and Computer Engineering at the 
 University of Victoria, Victoria, BC, Canada.
 
-@section features Features
+\section features Features
 
 Some of the features of the JasPer library are as follows:
 
@@ -45,7 +46,7 @@ Several application programs are also provided:
     such as PAE, MAE, and PSNR
   - an image viewer
 
-@section news News
+\section news News
 
 In release 3 of JasPer, the following notable changes were made to the API
 and/or behavior of the library relative to earlier releases (and therefore
@@ -67,25 +68,10 @@ impact backward compatibility):
       - jas_stream_copy()
   - the jas_stream_memopen2() function has been deprecated
 
-@verbinclude @CMAKE_SOURCE_DIR@/NEWS.txt
+\verbinclude @CMAKE_SOURCE_DIR@/NEWS.txt
 
-@section license License
-
-@verbinclude @CMAKE_SOURCE_DIR@/LICENSE.txt
-
-@section bugs Reporting Bugs
-
-All bug reports should be submitted via the issue-tracking system
-provided by GitHub.  To submit a bug report, go the the following
-URL and click on the "New issue" button:
-
-    https://github.com/jasper-software/jasper/issues
-
-Please do not submit bug reports directly to the author of JasPer
-via email, as bug reports that are not submitted via the above
-issue-tracking system on GitHub are easy to be lost.
 */
 
-//@mainpage notitle
+// backslash mainpage notitle
 
 

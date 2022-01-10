@@ -1,0 +1,118 @@
+/*!
+
+\page lib_images Images and Color Management
+
+\section overview_images Images
+
+An image is represented by the type `jas_image_t`.
+An image component is represented by the type `jas_image_cmpt_t`.
+
+image creation/destruction:
+
+  - `jas_image_create()`
+  - `jas_image_create0()`
+  - `jas_image_copy()`
+  - `jas_image_destroy()`
+
+image encoding/decoding:
+
+  - `jas_image_decode()`
+  - `jas_image_encode()`
+
+other
+  - `jas_image_rawsize()`
+
+  - `jas_image_ishomosamp()`
+  - `jas_image_cmprof()`
+  - `jas_image_sampcmpt()`
+  - `jas_image_writecmpt2()`
+  - `jas_image_readcmpt2()`
+  - `jas_image_chclrspc()`
+  - `jas_image_dump()`
+
+Image Component
+
+  - `jas_image_cmptwidth()`
+  - `jas_image_cmptheight()`
+  - `jas_image_cmptsgnd()`
+  - `jas_image_cmptprec()`
+  - `jas_image_cmpthstep()`
+  - `jas_image_cmptvstep()`
+  - `jas_image_cmpttlx()`
+  - `jas_image_cmpttly()`
+  - `jas_image_cmptbrx()`
+  - `jas_image_cmptbry()`
+
+  - `jas_image_cmpt_domains_same()`
+
+  - `jas_image_readcmpt()`
+  - `jas_image_writecmpt()`
+  - `jas_image_delcmpt()`
+  - `jas_image_addcmpt()`
+  - `jas_image_copycmpt()`
+
+  - `JAS_IMAGE_CDT_GETSGND()`
+  - `JAS_IMAGE_CDT_SETSGND()`
+  - `JAS_IMAGE_CDT_GETPREC()`
+  - `JAS_IMAGE_CDT_SETPREC()`
+  - `jas_image_cmptdtype()`
+  - `jas_image_depalettize()`
+  - `jas_image_readcmptsample()`
+  - `jas_image_writecmptsample()`
+  - `jas_image_getcmptbytype()`
+
+image format table
+  - `jas_image_clearfmts()`
+  - `jas_image_addfmt()`
+  - `jas_image_lookupfmtbyid()`
+  - `jas_image_lookupfmtbyname()`
+  - `jas_image_fmtfromname()`
+  - `jas_image_getfmt()`
+  - `jas_image_strtofmt()`
+  - `jas_image_fmttostr()`
+
+\section overview_cm Color Management
+
+color management profile
+
+  - `jas_cmxform_create()`
+  - `jas_cmxform_destroy()`
+  - `jas_cmxform_apply()`
+  - `jas_cmprof_createfromclrspc()`
+  - `jas_cmprof_destroy()`
+  - `jas_clrspc_numchans()`
+  - `jas_cmprof_clrspc()`
+  - `jas_cmprof_copy()`
+
+color space
+
+  - `jas_clrspc_create()`
+  - `jas_clrspc_fam()`
+  - `jas_clrspc_mbr()`
+  - `jas_clrspc_isgeneric()`
+  - `jas_clrspc_isunknown()`
+
+\section overview_icc ICC Profiles
+
+  - `jas_iccprof_load()`
+  - `jas_iccprof_save()`
+  - `jas_iccprof_destroy()`
+  - `jas_iccprof_getattr()`
+  - `jas_iccprof_setattr()`
+  - `jas_iccprof_dump()`
+  - `jas_iccprof_copy()`
+  - `jas_iccprof_gethdr()`
+  - `jas_iccprof_sethdr()`
+
+  - `jas_iccattrval_destroy()`
+  - `jas_iccattrval_dump()`
+  - `jas_iccattrval_allowmodify()`
+  - `jas_iccattrval_clone()`
+  - `jas_iccattrval_create()`
+
+  - `jas_iccattrtab_dump()`
+
+  - `jas_iccprof_createfrombuf()`
+  - `jas_iccprof_createfromclrspc()`
+
+*/

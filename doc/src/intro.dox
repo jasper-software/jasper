@@ -1,6 +1,6 @@
 /*!
 
-\page __introduction Introduction
+\page intro Introduction
 
 \section __motivation Motivation Behind JasPer
 
@@ -53,33 +53,18 @@ programming language as well.
 \section intro__software_license Software License
 
 JasPer software development is based on an open-source model.
-A copy of the software license can be found in Appendix~\ref{ch::license}.
+A copy of the software license can be found in \ref license.
 
 \section intro__other_jasper_references Other Sources of Information on JasPer
 
 For more information about the JasPer software, please visit the following
 web pages:
-\begin{itemize}
 
-	\item
-	JasPer Project Home Page
-	(i.e., \url{http://www.ece.uvic.ca/~mdadams/jasper})
+  - https://jasper-software.github.io/jasper
+  - https://github.com/jasper-software/jasper
+  - https://jasper-software.github.io/jasper-manual
+  - https://www.ece.uvic.ca/~mdadams/jasper
 
-	\item
-	JasPer Software Announcements Group
-	(i.e., \url{http://groups.yahoo.com/group/jasper-announce})
-
-	By joining this group, one can easily obtain up-to-date
-	information about the JasPer Project in a timely fashion.
-	The associated mailing list is used to announce new releases
-	of the software and disseminate other important information
-	about JasPer.
-
-	\item
-	JasPer Software Discussion Group
-	(i.e., \url{http://groups.yahoo.com/group/jasper-discussion}).
-
-\end{itemize}
 For more information about the JasPer software and JPEG-2000 standard, the
 reader is referred to \cite Adams2000c \cite wg1n2412.
 

@@ -1,0 +1,17 @@
+/*!
+
+\page apps_imginfo The imginfo Program
+
+\section app__imginfo The imginfo Program
+
+\subsection app__imginfo__synopsis Synopsis
+
+\c imginfo [options]
+
+\subsection app__imginfo__desc Description
+
+The imginfo command displays information about an image.
+This command is really only intended to be used from shell scripts for
+testing purposes.
+
+*/

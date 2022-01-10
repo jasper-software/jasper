@@ -15,10 +15,14 @@ message("LATEX_FOUND ${LATEX_FOUND}")
 if(DOXYGEN_FOUND)
 	configure_file("${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in"
 	  "${CMAKE_CURRENT_BINARY_DIR}/Doxyfile" @ONLY)
-	configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/mainpage.dox.in"
-	  "${CMAKE_CURRENT_BINARY_DIR}/src/mainpage.dox" @ONLY)
-	configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/getting_started.dox.in"
-	  "${CMAKE_CURRENT_BINARY_DIR}/src/getting_started.dox" @ONLY)
+	configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/overview.dox.in"
+	  "${CMAKE_CURRENT_BINARY_DIR}/src/overview.dox" @ONLY)
+	configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/install.dox.in"
+	  "${CMAKE_CURRENT_BINARY_DIR}/src/install.dox" @ONLY)
+	configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/license.dox.in"
+	  "${CMAKE_CURRENT_BINARY_DIR}/src/license.dox" @ONLY)
+#	configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/getting_started.dox.in"
+#	  "${CMAKE_CURRENT_BINARY_DIR}/src/getting_started.dox" @ONLY)
 
 	file(GLOB_RECURSE DOXYGEN_DEPENDS "${CMAKE_SOURCE_DIR}/*.[ch]")
 	add_custom_command(OUTPUT "html/index.html" "latex/index.tex"
