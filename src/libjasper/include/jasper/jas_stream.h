@@ -891,12 +891,12 @@ destination stream @c destination.
 Upon success, 0 is returned; otherwise, -1 is returned.
 
 @todo
-TODO/FIXME: should return type be JAS_SSIZE_T and the return value be
+TODO/FIXME: should return type be jas_ssize_t and the return value be
 the count of the characters copied?
 */
 JAS_EXPORT
-int jas_stream_copy(jas_stream_t *destination, jas_stream_t *source,
-  JAS_SSIZE_T count);
+jas_ssize_t jas_stream_copy(jas_stream_t *destination, jas_stream_t *source,
+  jas_ssize_t count);
 
 /*!
 @brief Print a hex dump of data read from a stream.
@@ -943,7 +943,7 @@ To distinguish EOF from an I/O error, jas_stream_eof() and jas_stream_error()
 can be used.
 
 @warning
-TODO/FIXME: count be size_t and return type should be JAS_SSIZE_T
+TODO/FIXME: count be size_t and return type should be jas_ssize_t
 */
 JAS_EXPORT int jas_stream_gobble(jas_stream_t *stream, int count);
 
@@ -988,7 +988,7 @@ Upon success, the size of the stream is returned.
 If an error occurs, a negative value is returned.
 
 @warning
-TODO/FIXME: the return type should be JAS_SSIZE_T?
+TODO/FIXME: the return type should be jas_ssize_t?
 */
 JAS_ATTRIBUTE_PURE JAS_EXPORT
 long jas_stream_length(jas_stream_t *stream);
