@@ -17,55 +17,38 @@ components, component subsampling factors, etc.).
 \subsection app__imgcmp__options Options
 
 The following options are supported:
-\begin{description}
 
-	\item
-	\url{-f} {\it file}\newline
-	Read the primary (i.e., reference) image (for comparison purposes)
-	from the file named {\it file}.
+  - `-f $file`
+    - Read the primary (i.e., reference) image (for comparison purposes)
+      from the file named `$file`.
 
-	\item
-	\url{-F} {\it file}\newline
-	Read the secondary image (for comparison purposes) from the file named
-	{\it file}.
+  - `-F $file`
+    - Read the secondary image (for comparison purposes) from the file named
+      `$file`.
 
-	\item
-	\url{-m} {\it metric}\newline
-	Use the difference metric specified by {\it metric}.
-	The {\it metric} argument may assume one of the following values:
-\begin{center}
-\begin{tabular}{|l|l|}
-\hline
-Value & Description \\
-\hline
-psnr  & peak signal to noise ratio (PSNR) \\
-mse   & mean squared error (MSE) \\
-rmse  & root mean squared error (RMSE) \\
-pae   & peak absolute error (PAE) \\
-mae   & mean absolute error (MAE) \\
-equal & equality \\
-\hline
-\end{tabular}
-\end{center}
+  - `-m $metric`
+    - Use the difference metric specified by `$metric`.
+      The `$metric` argument may assume one of the following values:
 
-\end{description}
-%
-The \url{-f} and \url{-F} options must always be specified.
+        - `psnr`: peak signal to noise ratio (PSNR)
+        - `mse`: mean squared error (MSE)
+        - `rmse`: root mean squared error (RMSE)
+        - `pae`: peak absolute error (PAE)
+        - `mae`: mean absolute error (MAE)
+        - `equal`: equality
+
+The `-f` and `-F` options must always be specified.
 There is currently no way to explicitly specify the format of the images.
 If the format of either image cannot be autodetected, the command will
 exit with an error.
 
 \subsection app__imgcmp__examples Examples
 
-\begin{enumerate}
-
-\item
 Suppose that we have two slightly different versions of an image
-stored in files \url{original.pgm} and \url{reconstructed.pgm}.
-In order to
-calculate the difference between these images using the PSNR metric, type:
-\sil{\tt imgcmp -f original.pgm -F reconstructed.pgm -m psnr}
+stored in files `original.pgm` and `reconstructed.pgm`.
+In order to calculate the difference between these images using the PSNR
+metric, use the command:
 
-\end{enumerate}
+    imgcmp -f original.pgm -F reconstructed.pgm -m psnr
 
 */

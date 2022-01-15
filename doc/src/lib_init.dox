@@ -2,6 +2,10 @@
 
 \page lib_init Library Configuration, Initialization, and Shutdown
 
+\section lib_init__api API References
+
+- \ref module_init
+
 \section init_overview Configuration, Initialization, and Shutdown
 
 There are three stages in the setup of the JasPer library at run time:

@@ -648,7 +648,7 @@ INPUT                  = \
 	@CMAKE_SOURCE_DIR@/doc/src/lib.dox \
 	@CMAKE_SOURCE_DIR@/doc/src/lib_init.dox \
 	@CMAKE_SOURCE_DIR@/doc/src/lib_images.dox \
-	@CMAKE_SOURCE_DIR@/doc/src/lib_streams.dox \
+	@CMAKE_SOURCE_DIR@/doc/src/lib_iostreams.dox \
 	@CMAKE_SOURCE_DIR@/doc/src/lib_log.dox \
 	@CMAKE_SOURCE_DIR@/doc/src/lib_misc.dox \
 	@CMAKE_SOURCE_DIR@/doc/src/apps.dox \

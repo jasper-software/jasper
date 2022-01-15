@@ -3,7 +3,7 @@
 
   - \subpage lib_init
   - \subpage lib_images
-  - \subpage lib_streams
+  - \subpage lib_iostreams
   - \subpage lib_log
   - \subpage lib_misc
 

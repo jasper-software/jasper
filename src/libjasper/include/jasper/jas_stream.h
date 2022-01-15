@@ -87,7 +87,7 @@ extern "C" {
 #endif
 
 /*!
- * @addtogroup iostreams
+ * @addtogroup module_iostreams
  * @{
  */
 

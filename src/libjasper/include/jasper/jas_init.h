@@ -81,7 +81,7 @@ extern "C" {
 #endif
 
 /*!
- * @addtogroup init
+ * @addtogroup module_init
  * @{
  */
 

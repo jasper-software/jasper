@@ -86,7 +86,7 @@ extern "C" {
 #endif
 
 /*!
- * @addtogroup seq
+ * @addtogroup module_seq
  * @{
  */
 

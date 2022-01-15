@@ -2,6 +2,10 @@
 
 @page lib_log Logging
 
+\section lib_log__api API References
+
+- \ref module_logging
+
 \section logging Logging
 
 The library provides an interface for generating log messages.

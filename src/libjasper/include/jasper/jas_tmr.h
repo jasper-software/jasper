@@ -81,7 +81,7 @@ extern "C" {
 #endif
 
 /*!
- * @addtogroup timers
+ * @addtogroup module_timers
  * @{
  */
 

@@ -83,7 +83,7 @@ extern "C" {
 #endif
 
 /*!
- * @addtogroup fixed
+ * @addtogroup module_fixed
  * @{
  */
 

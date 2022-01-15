@@ -77,7 +77,7 @@ extern "C" {
 #include <jasper/jas_config.h>
 
 /*!
- * @addtogroup getopt
+ * @addtogroup module_getopt
  * @{
  */
 

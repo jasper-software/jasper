@@ -87,7 +87,7 @@ extern "C" {
 #endif
 
 /*!
- * @addtogroup malloc
+ * @addtogroup module_alloc
  * @{
  */
 

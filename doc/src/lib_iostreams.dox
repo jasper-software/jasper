@@ -1,6 +1,10 @@
 /*!
 
-\page lib_streams I/O Streams
+\page lib_iostreams I/O Streams
+
+\section lib_iostream__api API References
+
+- \ref module_iostreams
 
 \section overview_streams I/O Streams
 

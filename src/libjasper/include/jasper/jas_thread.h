@@ -106,7 +106,7 @@ extern "C" {
 #endif
 
 /*!
- * @addtogroup threads
+ * @addtogroup module_threads
  * @{
  */
 

@@ -2,6 +2,11 @@
 
 \page lib_images Images and Color Management
 
+\section lib_images__api API References
+
+- \ref module_images
+- \ref module_cm
+
 \section overview_images Images
 
 An image is represented by the type `jas_image_t`.

@@ -79,7 +79,7 @@ extern "C" {
 #endif
 
 /*!
- * @addtogroup tvp
+ * @addtogroup module_tvp
  * @{
  */
 

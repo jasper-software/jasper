@@ -80,7 +80,7 @@ extern "C" {
 #endif
 
 /*!
- * @addtogroup color_management
+ * @addtogroup module_cm
  * @{
  */
 

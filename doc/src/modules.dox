@@ -1,46 +1,62 @@
 /*!
 
-@defgroup init Configuration, Initialization, and Shutdown
+@defgroup module_init Configuration, Initialization, and Shutdown
 @brief Configuration, Initialization, and Shutdown
 
-@defgroup malloc Memory Allocation
+@details
+General information can be found
+\ref lib_init "here".
+
+@defgroup module_alloc Memory Allocation
 @brief Memory Allocation
 
-@defgroup iostreams I/O Streams
+@details
+General information can be found
+\ref lib_alloc "here".
+
+@defgroup module_iostreams I/O Streams
 @brief I/O streams
 
 @details
-For more detail on I/O streams, please refer to
-<a href="iostreams__page.html">here</a>.
+General information can be found
+\ref lib_iostreams "here".
 
-@defgroup image Image Representation
+@defgroup module_images Image Representation
 @brief Image Representation
 
-@defgroup color_management Color Management
+@details
+General information can be found
+\ref lib_image "here".
+
+@defgroup module_cm Color Management
 @brief Color Management
 
-@defgroup fixed Fixed-Point Arithmetic
+@details
+General information can be found
+\ref lib_image "here".
+
+@defgroup module_fixed Fixed-Point Arithmetic
 @brief Fixed-Point Arithmetic
 
-@defgroup logging Logging
+@defgroup module_logging Logging
 @brief Logging
 
-@defgroup seq One- and Two-Dimensional Sequences
+@defgroup module_seq One- and Two-Dimensional Sequences
 @brief One- and Two-Dimensional Sequences
 
-@defgroup threads Threads
+@defgroup module_threads Threads
 @brief Threads
 
-@defgroup timers Timers
+@defgroup module_timers Timers
 @brief Timers
 
-@defgroup getopt Command-Line Interface (CLI) Option Processing
+@defgroup module_getopt Command-Line Interface (CLI) Option Processing
 @brief Command-Line Interface (CLI) Option Processing
 
-@defgroup tvp Tag-Value Pair (TVP) Parsing
+@defgroup module_tvp Tag-Value Pair (TVP) Parsing
 @brief Tag-Value Pair (TVP) Parsing
 
-@defgroup string String Processing
+@defgroup module_string String Processing
 @brief String Processing
 
  */
