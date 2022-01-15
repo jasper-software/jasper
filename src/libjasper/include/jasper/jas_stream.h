@@ -781,7 +781,8 @@ If the underlying file object supports seek operations, a (strictly)
 positive value is returned.
 Otherwise, 0 is returned.
 */
-JAS_ATTRIBUTE_PURE JAS_EXPORT
+JAS_EXPORT
+JAS_ATTRIBUTE_PURE
 int jas_stream_isseekable(jas_stream_t *stream);
 
 /*!
@@ -820,7 +821,7 @@ The current position of the stream is returned.
 Upon success, the current stream position is returned.
 If an error is encountered, a negative value is returned.
 */
-JAS_ATTRIBUTE_PURE JAS_EXPORT
+JAS_EXPORT
 long jas_stream_tell(jas_stream_t *stream);
 
 /*!
@@ -945,7 +946,8 @@ can be used.
 @warning
 TODO/FIXME: count be size_t and return type should be jas_ssize_t
 */
-JAS_EXPORT int jas_stream_gobble(jas_stream_t *stream, int count);
+JAS_EXPORT
+jas_ssize_t jas_stream_gobble(jas_stream_t *stream, size_t count);
 
 /*!
 @brief Write a fill character multiple times to a stream.
@@ -967,11 +969,9 @@ The number of times the fill character was written to the stream is
 returned.
 If this value is less than the specified count, an error must have
 occurred.
-
-@todo
-TODO: should the count be size_t; return type maybe size_t?
 */
-JAS_EXPORT int jas_stream_pad(jas_stream_t *stream, int count, int value);
+JAS_EXPORT
+jas_ssize_t jas_stream_pad(jas_stream_t *stream, size_t count, int value);
 
 /*!
 @brief Get the size of the file associated with the specified stream.
@@ -987,10 +987,11 @@ The specified stream must be seekable.
 Upon success, the size of the stream is returned.
 If an error occurs, a negative value is returned.
 
-@warning
-TODO/FIXME: the return type should be jas_ssize_t?
+@todo
+Should the return type be long or ssize_t?  long is consistent with the
+type used for seek offsets.
 */
-JAS_ATTRIBUTE_PURE JAS_EXPORT
+JAS_EXPORT
 long jas_stream_length(jas_stream_t *stream);
 
 /******************************************************************************\

@@ -814,17 +814,10 @@ char *jas_stream_gets(jas_stream_t *stream, char *buf, int bufsize)
 	return buf;
 }
 
-/* FIXME integral type */
-int jas_stream_gobble(jas_stream_t *stream, int n)
+jas_ssize_t jas_stream_gobble(jas_stream_t *stream, size_t n)
 {
-	int m;
-
-	JAS_LOGDEBUGF(100, "jas_stream_gobble(%p, %d)\n", stream, n);
-
-	if (n < 0) {
-		jas_deprecated("negative count for jas_stream_gobble");
-	}
-	m = n;
+	size_t m;
+	JAS_LOGDEBUGF(100, "jas_stream_gobble(%p, %zu)\n", stream, n);
 	for (m = n; m > 0; --m) {
 		if (jas_stream_getc(stream) == EOF) {
 			return n - m;
@@ -833,17 +826,10 @@ int jas_stream_gobble(jas_stream_t *stream, int n)
 	return n;
 }
 
-/* FIXME integral type */
-int jas_stream_pad(jas_stream_t *stream, int n, int c)
+jas_ssize_t jas_stream_pad(jas_stream_t *stream, size_t n, int c)
 {
-	int m;
-
-	JAS_LOGDEBUGF(100, "jas_stream_pad(%p, %d, %d)\n", stream, n, c);
-
-	if (n < 0) {
-		jas_deprecated("negative count for jas_stream_pad");
-	}
-	m = n;
+	size_t m;
+	JAS_LOGDEBUGF(100, "jas_stream_pad(%p, %zu, %d)\n", stream, n, c);
 	for (m = n; m > 0; --m) {
 		if (jas_stream_putc(stream, c) == EOF) {
 			return n - m;
