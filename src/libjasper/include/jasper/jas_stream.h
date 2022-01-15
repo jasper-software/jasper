@@ -179,10 +179,10 @@ typedef void jas_stream_obj_t;
 typedef struct {
 
 	/* Read characters from a file object. */
-	int (*read_)(jas_stream_obj_t *obj, char *buf, unsigned cnt);
+	ssize_t (*read_)(jas_stream_obj_t *obj, char *buf, size_t cnt);
 
 	/* Write characters to a file object. */
-	int (*write_)(jas_stream_obj_t *obj, const char *buf, unsigned cnt);
+	ssize_t (*write_)(jas_stream_obj_t *obj, const char *buf, size_t cnt);
 
 	/* Set the position for a file object. */
 	long (*seek_)(jas_stream_obj_t *obj, long offset, int origin);
@@ -272,10 +272,10 @@ typedef struct {
 	size_t bufsize_;
 
 	/* The length of the file. */
-	uint_fast32_t len_;
+	size_t len_;
 
 	/* The seek position. */
-	uint_fast32_t pos_;
+	size_t pos_;
 
 	/* Is the buffer growable? */
 	int growable_;
@@ -562,6 +562,9 @@ stream @c stream into the buffer starting at @c buffer.
 The number of characters read can be less than @c count, due to
 end-of-file (EOF) or an I/O error.
 
+(This function is analogous to fread with the two read-count
+parameters combined into a single size.)
+
 @return
 The number of characters read is returned.
 In the case that the number of characters read is less than @c count,
@@ -602,7 +605,9 @@ Returns the number of bytes copied to the given buffer, or 0 on error
 or EOF.
 
 @warning
-TODO/FIXME: peeking at EOF should be distinguishable from an I/O error
+TODO/FIXME: peeking at EOF should be distinguishable from an I/O error;
+also should return type be changed to size_t?
+
 */
 JAS_EXPORT
 unsigned jas_stream_peek(jas_stream_t *stream, void *buffer, size_t count);
@@ -622,6 +627,9 @@ Otherwise, the function will attempt to write @c count characters
 from the buffer starting at @c buffer to the stream @c stream.
 The number of characters written can be less than @c count due to
 an I/O error or the read/write limit being exceeded.
+
+(This function is analogous to fwrite with the two write-count
+parameters combined into a single size.)
 
 @return
 Upon success, the number of characters successfully written is returned.
@@ -672,6 +680,8 @@ A pointer to a null-terminated string for output.
 @details
 The null character is not output.
 
+(This function is analogous to fputs for C standard library streams.)
+
 @return
 Upon success, a nonnegative value is returned.
 Upon failure, a negative value is returned.
@@ -693,6 +703,8 @@ The function reads a line of input from a stream into a buffer.
 If a newline character is read, it is placed in the buffer.
 Since the buffer may be too small to hold the input,
 this operation can fail due to attempted buffer overrun.
+
+(This function is analogous to fgets for C standard library streams.)
 
 @return
 If the operation fails (e.g., due to an I/O error or attempted buffer overrun),
@@ -802,6 +814,8 @@ A pointer to the stream whose current position is to be queried.
 @details
 The current position of the stream is returned.
 
+(This function is analogous to ftell for C standard library streams.)
+
 @return
 Upon success, the current stream position is returned.
 If an error is encountered, a negative value is returned.
@@ -811,12 +825,17 @@ long jas_stream_tell(jas_stream_t *stream);
 
 /*!
 @brief Seek to the beginning of a stream.
+
 @param stream
 A pointer to the stream whose position is to be set.
+
 @details
 The stream position is set to the start of the stream.
 This function is equivalent to returning the value
 of jas_stream_seek(stream, 0, SEEK_SET).
+
+(This function is analogous to frewind for C standard library streams.)
+
 @return
 Upon success, the new stream position is returned.
 Otherwise, a negative value is returned.
@@ -829,10 +848,15 @@ JAS_EXPORT int jas_stream_rewind(jas_stream_t *stream);
 
 /*!
 @brief Flush any pending output to a stream.
+
 @param stream
 A pointer to the stream for which output should be flushed.
+
 @details
 The function flushes any buffered output to the underlying file object.
+
+(This function is analogous to fflush for C standard library streams.)
+
 @return
 Upon success, zero is returned.
 Otherwise, a negative value is returned.
@@ -861,7 +885,7 @@ copied from the source stream @c source to the destination stream
 @c destination.
 Otherwise (i.e., if @c count is negative), the entire source
 stream @c source (i.e., until EOF is reached) is copied to the
-destination stream @destination.
+destination stream @c destination.
 
 @return
 Upon success, 0 is returned; otherwise, -1 is returned.
