@@ -179,10 +179,10 @@ typedef void jas_stream_obj_t;
 typedef struct {
 
 	/* Read characters from a file object. */
-	ssize_t (*read_)(jas_stream_obj_t *obj, char *buf, size_t cnt);
+	jas_ssize_t (*read_)(jas_stream_obj_t *obj, char *buf, size_t cnt);
 
 	/* Write characters to a file object. */
-	ssize_t (*write_)(jas_stream_obj_t *obj, const char *buf, size_t cnt);
+	jas_ssize_t (*write_)(jas_stream_obj_t *obj, const char *buf, size_t cnt);
 
 	/* Set the position for a file object. */
 	long (*seek_)(jas_stream_obj_t *obj, long offset, int origin);

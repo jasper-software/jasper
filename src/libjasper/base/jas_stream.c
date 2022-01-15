@@ -130,18 +130,21 @@ static jas_stream_t *jas_stream_create(void);
 static void jas_stream_initbuf(jas_stream_t *stream, int bufmode, char *buf,
   int bufsize);
 
-static ssize_t mem_read(jas_stream_obj_t *obj, char *buf, size_t cnt);
-static ssize_t mem_write(jas_stream_obj_t *obj, const char *buf, size_t cnt);
+static jas_ssize_t mem_read(jas_stream_obj_t *obj, char *buf, size_t cnt);
+static jas_ssize_t mem_write(jas_stream_obj_t *obj, const char *buf,
+  size_t cnt);
 static long mem_seek(jas_stream_obj_t *obj, long offset, int origin);
 static int mem_close(jas_stream_obj_t *obj);
 
-static ssize_t sfile_read(jas_stream_obj_t *obj, char *buf, size_t cnt);
-static ssize_t sfile_write(jas_stream_obj_t *obj, const char *buf, size_t cnt);
+static jas_ssize_t sfile_read(jas_stream_obj_t *obj, char *buf, size_t cnt);
+static jas_ssize_t sfile_write(jas_stream_obj_t *obj, const char *buf,
+  size_t cnt);
 static long sfile_seek(jas_stream_obj_t *obj, long offset, int origin);
 static int sfile_close(jas_stream_obj_t *obj);
 
-static ssize_t file_read(jas_stream_obj_t *obj, char *buf, size_t cnt);
-static ssize_t file_write(jas_stream_obj_t *obj, const char *buf, size_t cnt);
+static jas_ssize_t file_read(jas_stream_obj_t *obj, char *buf, size_t cnt);
+static jas_ssize_t file_write(jas_stream_obj_t *obj, const char *buf,
+  size_t cnt);
 static long file_seek(jas_stream_obj_t *obj, long offset, int origin);
 static int file_close(jas_stream_obj_t *obj);
 
@@ -1228,7 +1231,7 @@ long jas_stream_length(jas_stream_t *stream)
 * Memory stream object.
 \******************************************************************************/
 
-static ssize_t mem_read(jas_stream_obj_t *obj, char *buf, size_t cnt)
+static jas_ssize_t mem_read(jas_stream_obj_t *obj, char *buf, size_t cnt)
 {
 	jas_stream_memobj_t *m;
 	assert(buf);
@@ -1265,7 +1268,8 @@ static int mem_resize(jas_stream_memobj_t *m, size_t bufsize)
 	return 0;
 }
 
-static ssize_t mem_write(jas_stream_obj_t *obj, const char *buf, size_t cnt)
+static jas_ssize_t mem_write(jas_stream_obj_t *obj, const char *buf,
+  size_t cnt)
 {
 	size_t n;
 	jas_stream_memobj_t *m = (jas_stream_memobj_t *)obj;
@@ -1366,7 +1370,7 @@ static int mem_close(jas_stream_obj_t *obj)
 * File stream object.
 \******************************************************************************/
 
-static ssize_t file_read(jas_stream_obj_t *obj, char *buf, size_t cnt)
+static jas_ssize_t file_read(jas_stream_obj_t *obj, char *buf, size_t cnt)
 {
 	jas_stream_fileobj_t *fileobj;
 	JAS_LOGDEBUGF(100, "file_read(%p, %p, %zu)\n", obj, buf, cnt);
@@ -1374,7 +1378,8 @@ static ssize_t file_read(jas_stream_obj_t *obj, char *buf, size_t cnt)
 	return read(fileobj->fd, buf, cnt);
 }
 
-static ssize_t file_write(jas_stream_obj_t *obj, const char *buf, size_t cnt)
+static jas_ssize_t file_write(jas_stream_obj_t *obj, const char *buf,
+  size_t cnt)
 {
 	jas_stream_fileobj_t *fileobj;
 	JAS_LOGDEBUGF(100, "file_write(%p, %p, %zu)\n", obj, buf, cnt);
@@ -1411,7 +1416,7 @@ static int file_close(jas_stream_obj_t *obj)
 * Stdio file stream object.
 \******************************************************************************/
 
-static ssize_t sfile_read(jas_stream_obj_t *obj, char *buf, size_t cnt)
+static jas_ssize_t sfile_read(jas_stream_obj_t *obj, char *buf, size_t cnt)
 {
 	FILE *fp;
 	size_t n;
@@ -1427,7 +1432,8 @@ static ssize_t sfile_read(jas_stream_obj_t *obj, char *buf, size_t cnt)
 	return result;
 }
 
-static ssize_t sfile_write(jas_stream_obj_t *obj, const char *buf, size_t cnt)
+static jas_ssize_t sfile_write(jas_stream_obj_t *obj, const char *buf,
+  size_t cnt)
 {
 	FILE *fp;
 	size_t n;
