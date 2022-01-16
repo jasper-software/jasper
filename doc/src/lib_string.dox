@@ -1,0 +1,30 @@
+/*!
+
+\page lib_string String Processing
+
+\section lib_string__api API References
+
+- \ref module_getopt
+- \ref module_tvp
+- \ref module_string
+
+\section lib_string__getopt Command-Line Interface (CLI) Option Processing
+
+  - jas_getopt()
+
+\section lib_string_tvp Tag-Value Pair (TVP) Processing
+
+  - jas_taginfos_lookup()
+  - jas_taginfo_nonull()
+  - jas_tvparser_create()
+  - jas_tvparser_destroy()
+  - jas_tvparser_next()
+  - jas_tvparser_gettag()
+  - jas_tvparser_getval()
+
+\section lib_string__string String Processing
+
+  - jas_strdup()
+  - jas_strtok()
+
+*/

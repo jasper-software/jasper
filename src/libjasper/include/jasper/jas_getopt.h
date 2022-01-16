@@ -98,6 +98,7 @@ extern "C" {
 \******************************************************************************/
 
 /*!
+@brief
 Command line option type.
 */
 typedef struct {
@@ -118,19 +119,25 @@ typedef struct {
 \******************************************************************************/
 
 /*!
+@brief
 The current option index.
 */
-JAS_EXPORT extern int jas_optind;
+JAS_EXPORT
+extern int jas_optind;
 
 /*!
+@brief
 The current option argument.
 */
-JAS_EXPORT extern const char *jas_optarg;
+JAS_EXPORT
+extern const char *jas_optarg;
 
 /*!
+@brief
 The debug level.
 */
-JAS_EXPORT extern int jas_opterr;
+JAS_EXPORT
+extern int jas_opterr;
 
 /******************************************************************************\
 * Prototypes.
@@ -147,7 +154,8 @@ Gets the next CLI option.
 This function is not thread safe, due to its use of @c jas_optind,
 @c jas_optarg, and @c jas_opterr.
 */
-JAS_EXPORT int jas_getopt(int argc, char **argv, const jas_opt_t *opts);
+JAS_EXPORT
+int jas_getopt(int argc, char **argv, const jas_opt_t *opts);
 
 /*!
  * @}

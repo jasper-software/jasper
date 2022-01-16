@@ -58,16 +58,36 @@ General information can be found
 @defgroup module_threads Threads
 @brief Threads
 
+@details
+General information can be found
+\ref lib_threads "here".
+
 @defgroup module_timers Timers
 @brief Timers
+
+@details
+General information can be found
+\ref lib_timers "here".
 
 @defgroup module_getopt Command-Line Interface (CLI) Option Processing
 @brief Command-Line Interface (CLI) Option Processing
 
+@details
+General information can be found
+\ref lib_string "here".
+
 @defgroup module_tvp Tag-Value Pair (TVP) Parsing
 @brief Tag-Value Pair (TVP) Parsing
 
+@details
+General information can be found
+\ref lib_string "here".
+
 @defgroup module_string String Processing
 @brief String Processing
+
+@details
+General information can be found
+\ref lib_string "here".
 
  */

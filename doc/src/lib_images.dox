@@ -1,11 +1,12 @@
 /*!
 
-\page lib_images Images and Color Management
+\page lib_images Images, Sequences, and Color Management
 
 \section lib_images__api API References
 
 - \ref module_images
 - \ref module_cm
+- \ref module_seq
 
 \section overview_images Images
 
@@ -119,5 +120,7 @@ color space
 
   - `jas_iccprof_createfrombuf()`
   - `jas_iccprof_createfromclrspc()`
+
+\section images_seq Sequences
 
 */
