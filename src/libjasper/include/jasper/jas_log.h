@@ -82,7 +82,7 @@ extern "C" {
 #endif
 
 /*!
- * @addtogroup module_logging
+ * @addtogroup module_log
  * @{
  */
 

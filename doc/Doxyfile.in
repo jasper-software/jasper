@@ -650,6 +650,7 @@ INPUT                  = \
 	@CMAKE_SOURCE_DIR@/doc/src/lib_images.dox \
 	@CMAKE_SOURCE_DIR@/doc/src/lib_iostreams.dox \
 	@CMAKE_SOURCE_DIR@/doc/src/lib_log.dox \
+	@CMAKE_SOURCE_DIR@/doc/src/lib_threads.dox \
 	@CMAKE_SOURCE_DIR@/doc/src/lib_misc.dox \
 	@CMAKE_SOURCE_DIR@/doc/src/apps.dox \
 	@CMAKE_SOURCE_DIR@/doc/src/apps_jasper.dox \

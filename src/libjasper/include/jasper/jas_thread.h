@@ -275,6 +275,17 @@ typedef DWORD jas_tss_t;
 
 #if defined(JAS_USE_SPINLOCK)
 
+/*!
+@brief
+Initialize a spinlock.
+
+@param mtx
+A pointer to a spinlock.
+
+@returns
+If the spinlock is successfully initialized, zero is returned.
+Otherwise, a nonzero value is returned.
+*/
 static inline int jas_spinlock_init(jas_spinlock_t *mtx)
 {
 	assert(mtx);
@@ -291,6 +302,17 @@ static inline int jas_spinlock_init(jas_spinlock_t *mtx)
 #endif
 }
 
+/*!
+@brief
+Clean up a spinlock mutex.
+
+@param mtx
+A pointer to the splinlock.
+
+@returns
+If the spinlock is successfully cleaned up, zero is returned.
+Otherwise, a nonzero value is returned.
+*/
 static inline int jas_spinlock_cleanup(jas_spinlock_t *mtx)
 {
 	assert(mtx);
@@ -307,6 +329,17 @@ static inline int jas_spinlock_cleanup(jas_spinlock_t *mtx)
 #endif
 }
 
+/*!
+@brief
+Acquire a spinlock.
+
+@param mtx
+A pointer to the spinlock.
+
+@returns
+If successful, zero is returned.
+Otherwise, a nonzero value is returned.
+*/
 static inline int jas_spinlock_lock(jas_spinlock_t *mtx)
 {
 	assert(mtx);
@@ -323,6 +356,17 @@ static inline int jas_spinlock_lock(jas_spinlock_t *mtx)
 #endif
 }
 
+/*!
+@brief
+Release a spinlock.
+
+@param mtx
+A pointer to the spinlock.
+
+@returns
+If the operation is successful, zero is returned.
+Otherwise, a nonzero value is returned.
+*/
 static inline int jas_spinlock_unlock(jas_spinlock_t *mtx)
 {
 	assert(mtx);
@@ -345,9 +389,7 @@ static inline int jas_spinlock_unlock(jas_spinlock_t *mtx)
 * Basic Mutex
 \******************************************************************************/
 
-/*!
-@brief Initialize a mutex.
-*/
+/* For internal use only. */
 static inline int jas_basicmutex_init(jas_basicmutex_t *mtx)
 {
 	assert(mtx);
@@ -361,9 +403,7 @@ static inline int jas_basicmutex_init(jas_basicmutex_t *mtx)
 #endif
 }
 
-/*!
-@brief Cleanup a mutex.
-*/
+/* For internal use only. */
 static inline int jas_basicmutex_cleanup(jas_basicmutex_t *mtx)
 {
 	assert(mtx);
@@ -378,9 +418,7 @@ static inline int jas_basicmutex_cleanup(jas_basicmutex_t *mtx)
 #endif
 }
 
-/*!
-@brief Acquire a mutex.
-*/
+/* For internal use only. */
 static inline int jas_basicmutex_lock(jas_basicmutex_t *mtx)
 {
 	assert(mtx);
@@ -394,9 +432,7 @@ static inline int jas_basicmutex_lock(jas_basicmutex_t *mtx)
 #endif
 }
 
-/*!
-@brief Release a mutex.
-*/
+/* For internal use only. */
 static inline int jas_basicmutex_unlock(jas_basicmutex_t *mtx)
 {
 	assert(mtx);
@@ -415,7 +451,17 @@ static inline int jas_basicmutex_unlock(jas_basicmutex_t *mtx)
 \******************************************************************************/
 
 /*!
-@brief Create thread-specific storage.
+@brief
+Create thread-specific storage.
+
+@param tss
+A pointer to the TSS object to be initialized.
+@param destructor
+A function to be called when the TSS is deallocated when the thread exits.
+
+@returns
+If the operation is successful, zero is returned.
+Otherwise, a nonzero value is returned.
 */
 static inline
 int jas_tss_create(jas_tss_t *tss, void (*destructor)(void *))
@@ -440,6 +486,13 @@ int jas_tss_create(jas_tss_t *tss, void (*destructor)(void *))
 
 /*!
 @brief Delete thread-specific storage.
+
+@param tss
+The TSS to be destroyed.
+
+@returns
+If the operation is successful, zero is returned.
+Otherwise, a nonzero value is returned.
 */
 static inline
 void jas_tss_delete(jas_tss_t tss)
@@ -455,6 +508,12 @@ void jas_tss_delete(jas_tss_t tss)
 
 /*!
 @brief Get the thread-specific storage instance for the calling thread.
+
+@param tss
+The TSS to be queried.
+
+@returns
+A pointer to the TSS is returned.
 */
 static inline
 void *jas_tss_get(jas_tss_t tss)
@@ -470,6 +529,13 @@ void *jas_tss_get(jas_tss_t tss)
 
 /*!
 @brief Set the thread-specific storage instance for the calling thread.
+
+@param tss
+The TSS object.
+
+@returns
+If the operation is successful, zero is returned.
+Otherwise, a nonzero value is returned.
 */
 static inline
 int jas_tss_set(jas_tss_t tss, void *value)
@@ -489,6 +555,11 @@ int jas_tss_set(jas_tss_t tss, void *value)
 
 /*!
 @brief Register to call a function once.
+
+@param flag
+@param func
+
+@returns
 */
 static inline int jas_call_once(jas_once_flag_t *flag, void (*func)(void))
 {
@@ -536,6 +607,11 @@ static unsigned __stdcall thread_func_wrapper(void *thread_ptr)
 
 /*!
 @brief Compare two thread IDs.
+
+@warning
+This function is only for internal use by the JasPer software.
+This function may be changed/removed without any notice in future versions
+of JasPer.
 */
 static inline
 int jas_thread_compare(jas_thread_id_t x, jas_thread_id_t y)
@@ -551,6 +627,11 @@ int jas_thread_compare(jas_thread_id_t x, jas_thread_id_t y)
 
 /*!
 @brief Create a thread.
+
+@warning
+This function is only for internal use by the JasPer software.
+This function may be changed/removed without any notice in future versions
+of JasPer.
 */
 static inline
 int jas_thread_create(jas_thread_t *thread, int (*func)(void *), void *arg)
@@ -578,6 +659,11 @@ int jas_thread_create(jas_thread_t *thread, int (*func)(void *), void *arg)
 
 /*!
 @brief Join a thread.
+
+@warning
+This function is only for internal use by the JasPer software.
+This function may be changed/removed without any notice in future versions
+of JasPer.
 */
 static inline
 int jas_thread_join(jas_thread_t *thread, int *result)
@@ -614,6 +700,16 @@ int jas_thread_join(jas_thread_t *thread, int *result)
 	return 0;
 #endif
 }
+
+/*!
+@brief
+Yield the processor.
+
+@warning
+This function is only for internal use by the JasPer software.
+This function may be changed/removed without any notice in future versions
+of JasPer.
+*/
 
 static inline void jas_thread_yield(void)
 {

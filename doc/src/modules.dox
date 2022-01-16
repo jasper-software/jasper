@@ -26,7 +26,7 @@ General information can be found
 
 @details
 General information can be found
-\ref lib_image "here".
+\ref lib_images "here".
 
 @defgroup module_cm Color Management
 @brief Color Management
@@ -38,8 +38,19 @@ General information can be found
 @defgroup module_fixed Fixed-Point Arithmetic
 @brief Fixed-Point Arithmetic
 
-@defgroup module_logging Logging
+@defgroup module_log Logging
 @brief Logging
+
+@details
+General information can be found
+\ref lib_log "here".
+
+@defgroup module_threads Threading Support
+@brief Threading
+
+@details
+General information can be found
+\ref lib_threads "here".
 
 @defgroup module_seq One- and Two-Dimensional Sequences
 @brief One- and Two-Dimensional Sequences

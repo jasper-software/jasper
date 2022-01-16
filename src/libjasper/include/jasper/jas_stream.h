@@ -388,6 +388,15 @@ jas_stream_t *jas_stream_freopen(const char *path, const char *mode, FILE *fp);
 /*!
 @brief Open a temporary file as a stream.
 
+@param path
+A pointer to a null-terminated string containing the pathname of the file
+to be reopened.
+@param mode
+A pointer to a null-terminated string containing the mode to be used for
+reopening the file.
+@param fp
+The FILE to be reopened.
+
 @details
 A temporary file is created and opened as a stream.
 The temporary file is deleted when closed via jas_stream_close().
@@ -441,6 +450,7 @@ A nonzero value indicates that the stream has encountered EOF.
 
 /*!
 @brief Get the error indicator for a stream.
+
 @param stream
 The stream whose error indicator is to be queried.
 @return
@@ -454,6 +464,7 @@ Note that EOF is not an error.
 
 /*!
 @brief Clear the error indicator for a stream.
+
 @param stream
 The stream whose error indicator is to be cleared.
 
@@ -478,6 +489,7 @@ effectively infinite).
 
 /*!
 @brief Set the read/write limit for a stream.
+
 @param stream
 A pointer to the stream whose read/write limit is to be set.
 @param rwlimit
@@ -507,6 +519,7 @@ This operation cannot fail.
 
 /*!
 @brief Set the read/write count for a stream.
+
 @param stream
 A pointer to the stream whose read/write count is to be set.
 @param rw_count
@@ -528,6 +541,13 @@ JAS_EXPORT long jas_stream_setrwcount(jas_stream_t *stream, long rw_count);
 /*!
 @brief jas_stream_getc
 Read a character from a stream.
+
+@param stream
+A pointer to the stream from which to read a character.
+
+@returns
+If a character is succesfully read, the character is returned.
+Otherwise, EOF is returned.
 */
 #define	jas_stream_getc(stream)	jas_stream_getc_func(stream)
 #else
@@ -539,6 +559,16 @@ Read a character from a stream.
 /*!
 @brief jas_stream_putc
 Write a character to a stream.
+
+@param stream
+A pointer to the stream to which to write the character.
+@param c
+The character to be written.
+
+@returns
+If the character is successfully output, the value of the character is
+returned.
+Otherwise, EOF is returned.
 */
 #define jas_stream_putc(stream, c)	jas_stream_putc_func(stream, c)
 #else
@@ -575,11 +605,13 @@ to distinguish between:
 <li>a failure due to the read/write limit being exceeded
 <li>EOF.
 </ol>
-TODO/CHECK: can items 1 and 2 be distinguished currently?
+(The functions jas_stream_getrwcount() and jas_stream_getrwlimit()
+can be used to distinguish between failure due to an I/O error
+and failure due to the read/write limit being exceeed.)
 
-@warning
-TODO/FIXME/CHECK: jas_stream_error should be true if RWLIMIT exceeded?
-or need a jas_stream_rwlimit predicate?
+@todo
+TODO: should jas_stream_error be true if RWLIMIT exceeded?
+or maybe introduce a jas_stream_rwlimit predicate?
 */
 JAS_EXPORT
 size_t jas_stream_read(jas_stream_t *stream, void *buffer, size_t count);
@@ -809,6 +841,7 @@ long jas_stream_seek(jas_stream_t *stream, long offset, int origin);
 
 /*!
 @brief Get the current position within the stream.
+
 @param stream
 A pointer to the stream whose current position is to be queried.
 
@@ -942,9 +975,6 @@ If an error or EOF is encountered, the number of characters read
 will be less than count.
 To distinguish EOF from an I/O error, jas_stream_eof() and jas_stream_error()
 can be used.
-
-@warning
-TODO/FIXME: count be size_t and return type should be jas_ssize_t
 */
 JAS_EXPORT
 jas_ssize_t jas_stream_gobble(jas_stream_t *stream, size_t count);
@@ -977,6 +1007,7 @@ jas_ssize_t jas_stream_pad(jas_stream_t *stream, size_t count, int value);
 @brief Get the size of the file associated with the specified stream.
 
 @param stream
+A pointer to the stream.
 
 @details
 This function queries the size (i.e., length) of the underlying file object

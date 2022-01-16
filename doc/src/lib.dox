@@ -5,6 +5,7 @@
   - \subpage lib_images
   - \subpage lib_iostreams
   - \subpage lib_log
+  - \subpage lib_threads
   - \subpage lib_misc
 
 */

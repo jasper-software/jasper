@@ -87,7 +87,7 @@ extern "C" {
 #endif
 
 /*!
- * @addtogroup module_image
+ * @addtogroup module_images
  * @{
  */
 

@@ -73,7 +73,7 @@ Numerous other functions for streams are also provided, including:
   - `jas_stream_error()`
   - `jas_stream_clearerr()`
   - `jas_stream_setrwlimit()`
-  - `jas_stream_setwrcount()`
+  - `jas_stream_setrwcount()`
   - `jas_stream_getrwlimit()`
   - `jas_stream_getrwcount()`
 
