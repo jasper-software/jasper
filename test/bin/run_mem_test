@@ -11,18 +11,31 @@ program_dir=$(dirname "$0") || exit 1
 usage()
 {
 	echo "bad usage: $@"
+	cat <<- EOF
+	Options
+	=======
+
+	-s \$start
+	-e \$end
+	-d \$step
+	-i \$image_file
+	-p \$imginfo_program
+	EOF
 	exit 2
 }
 
 start=0
 step=64
 end=4294967296
+debug_level=0
 
 imginfo_program="$program_dir/../../tmp_cmake/build/src/app/imginfo"
 image_file=
 
-while getopts s:e:d:p:i: opt; do
+while getopts s:e:d:p:i:D: opt; do
 	case "$opt" in
+	D)
+		debug_level="$OPTARG";;
 	s)
 		start="$OPTARG";;
 	e)
@@ -44,7 +57,7 @@ fi
 i="$start"
 while [ $i -lt "$end" ]; do
 	echo "max mem $i"
-	command=(env ASAN_OPTIONS="exitcode=10" "$imginfo_program" --memory-limit "$i")
+	command=(env ASAN_OPTIONS="exitcode=10" "$imginfo_program" --debug-level "$debug_level" --memory-limit "$i")
 	echo "RUN ${command[@]} < $image_file"
 	${command[@]} < "$image_file" > /dev/null
 	status=$?

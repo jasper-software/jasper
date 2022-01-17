@@ -679,6 +679,43 @@ int jas_image_writecmpt(jas_image_t *image, unsigned cmptno,
 * File format operations.
 \******************************************************************************/
 
+void jas_image_fmtinfo_init(jas_image_fmtinfo_t *fmtinfo)
+{
+	fmtinfo->id = -1;
+	fmtinfo->name = 0;
+	fmtinfo->ext = 0;
+	fmtinfo->exts = 0;
+	fmtinfo->max_exts = 0;
+	fmtinfo->num_exts = 0;
+	fmtinfo->enabled = 0;
+	fmtinfo->desc = 0;
+	memset(&fmtinfo->ops, 0, sizeof(jas_image_fmtops_t));
+}
+
+void jas_image_fmtinfo_cleanup(jas_image_fmtinfo_t *fmtinfo)
+{
+	if (fmtinfo->name) {
+		jas_free(fmtinfo->name);
+		fmtinfo->name = 0;
+	}
+	if (fmtinfo->ext) {
+		jas_free(fmtinfo->ext);
+		fmtinfo->ext = 0;
+	}
+	if (fmtinfo->exts) {
+		assert(fmtinfo->max_exts > 0);
+		for (int i = 0; i < fmtinfo->num_exts; ++i) {
+			jas_free(fmtinfo->exts[i]);
+		}
+		jas_free(fmtinfo->exts);
+		fmtinfo->exts = 0;
+	}
+	if (fmtinfo->desc) {
+		jas_free(fmtinfo->desc);
+		fmtinfo->desc = 0;
+	}
+}
+
 JAS_EXPORT
 const jas_image_fmtinfo_t *jas_image_getfmtbyind(int index)
 {
@@ -708,26 +745,7 @@ void jas_image_clearfmts_internal(jas_image_fmtinfo_t *image_fmtinfos,
 	jas_image_fmtinfo_t *fmtinfo;
 	for (int fmtind = 0; fmtind < *image_numfmts; ++fmtind) {
 		fmtinfo = &image_fmtinfos[fmtind];
-		if (fmtinfo->name) {
-			jas_free(fmtinfo->name);
-			fmtinfo->name = 0;
-		}
-		if (fmtinfo->ext) {
-			jas_free(fmtinfo->ext);
-			fmtinfo->ext = 0;
-		}
-		if (fmtinfo->exts) {
-			assert(fmtinfo->max_exts > 0);
-			for (int i = 0; i < fmtinfo->num_exts; ++i) {
-				jas_free(fmtinfo->exts[i]);
-			}
-			jas_free(fmtinfo->exts);
-			fmtinfo->exts = 0;
-		}
-		if (fmtinfo->desc) {
-			jas_free(fmtinfo->desc);
-			fmtinfo->desc = 0;
-		}
+		jas_image_fmtinfo_cleanup(fmtinfo);
 	}
 	*image_numfmts = 0;
 }
@@ -743,43 +761,44 @@ int jas_image_addfmt_internal(jas_image_fmtinfo_t *image_fmtinfos,
   const char *desc, const jas_image_fmtops_t *ops)
 {
 	const char delim[] = " \t";
-	jas_image_fmtinfo_t *fmtinfo;
+	int ret = 0;
+	jas_image_fmtinfo_t *fmtinfo = 0;
+
 	assert(id >= 0 && name && ext && ops);
 	if (*image_numfmts >= JAS_IMAGE_MAXFMTS) {
-		return -1;
+		ret = -1;
+		goto done;
 	}
 	fmtinfo = &image_fmtinfos[*image_numfmts];
+	jas_image_fmtinfo_init(fmtinfo);
 	fmtinfo->id = id;
-#if 1
-	char **exts = 0;
-	size_t num_exts = 0;
-	size_t max_exts = 0;
-	if (jas_string_tokenize(ext, delim, &exts, &max_exts,
-	  &num_exts)) {
-		assert(!exts && !max_exts && !num_exts);
-		return -1;
+	if (jas_string_tokenize(ext, delim, &fmtinfo->exts, &fmtinfo->max_exts,
+	  &fmtinfo->num_exts)) {
+		assert(!fmtinfo->exts && !fmtinfo->max_exts && !fmtinfo->num_exts);
+		ret = -1;
+		goto done;
 	}
-	assert(num_exts > 0);
-	char *primary_ext = exts[0];
-#endif
+	assert(fmtinfo->num_exts > 0);
+	char *primary_ext = fmtinfo->exts[0];
 	if (!(fmtinfo->name = jas_strdup(name))) {
-		return -1;
+		ret = -1;
+		goto done;
 	}
 	if (!(fmtinfo->ext = jas_strdup(primary_ext))) {
-		jas_free(fmtinfo->name);
-		return -1;
+		ret = -1;
+		goto done;
 	}
 	if (!(fmtinfo->desc = jas_strdup(desc))) {
-		jas_free(fmtinfo->name);
-		jas_free(fmtinfo->ext);
-		return -1;
+		ret = -1;
+		goto done;
 	}
 	fmtinfo->ops = *ops;
-	fmtinfo->exts = exts;
-	fmtinfo->max_exts = max_exts;
-	fmtinfo->num_exts = num_exts;
 	++(*image_numfmts);
-	return 0;
+done:
+	if (ret && fmtinfo) {
+		jas_image_fmtinfo_cleanup(fmtinfo);
+	}
+	return ret;
 }
 
 int jas_image_addfmt(int id, const char *name, const char *ext,
