@@ -3,7 +3,10 @@ name: release
 on:
   push:
     tags:
-      - 'version-*.*.*'
+      - version-[0-9]+.[0-9]+.[0-9]+
+      - version-[0-9]+.[0-9]+.[0-9]+-rc[0-9]+
+      - version-[0-9]+.[0-9]+.[0-9]+-alpha[0-9]+
+      - version-[0-9]+.[0-9]+.[0-9]+-beta[0-9]+
 
 jobs:
   build:
