@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2003 Michael David Adams.
+ * Copyright (c) 2022 Michael David Adams.
  * All rights reserved.
  */
 

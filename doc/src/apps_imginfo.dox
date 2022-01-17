@@ -32,6 +32,9 @@ The following options are supported:
       If this option is not specified, the image is read from standard
       input.
 
+  - `--list-enabled-formats`
+    - Print the names of all of the enabled image formats to standard output.
+
   - `--memory-limit $n`
     - Set the memory limit to `$n` bytes.
 
@@ -46,6 +49,11 @@ The following options are supported:
 
 
 \subsection app__imginfo__example Examples
+
+To obtain information on how to use the `imginfo` program, use the
+command:
+
+    imginfo --help
 
 Suppose that we would like to print information about an image stored
 in the file name `image.jp2`.

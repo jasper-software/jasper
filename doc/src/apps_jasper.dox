@@ -28,6 +28,9 @@ The jasper program accepts the following options:
   - `--verbose`
     - Enable verbose mode.
 
+  - `--list-enabled-formats`
+    - Print the names of all of the enabled image formats to standard output.
+
   - `--memory-limit $n`
     - Set the memory limit to `$n` bytes.
 
@@ -99,6 +102,11 @@ The argument `$format` must have one of the following values:
   - `ras`: Sun Rasterfile
 
 \subsection app__jasper__examples Examples
+
+To obtain information on how to use the `jasper` program, use the
+command:
+
+    jasper --help
 
 Suppose that we have an image stored in the PNM/PPM format in a file called
 `lena.ppm`.
