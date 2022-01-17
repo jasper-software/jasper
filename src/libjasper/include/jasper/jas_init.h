@@ -85,78 +85,6 @@ extern "C" {
  * @{
  */
 
-#if defined(JAS_INTERNAL_USE_ONLY)
-/*
-User-configurable settings for library.
-This is for internal library use only.
-*/
-typedef struct {
-
-	/*
-	A boolean flag indicating if the library has been configured
-	by invoking the jas_conf_clear function.
-	*/
-	bool initialized;
-
-	/*
-	A boolean flag indicating if the library is potentially going to be
-	used by more than one thread.
-	*/
-	bool multithread;
-
-	/*
-	The allocator to be used by the library.
-	*/
-	jas_allocator_t *allocator;
-
-	/*
-	A boolean flag indicating if the allocator should be accessed through
-	a wrapper that allows memory usage to be tracked and limited.
-	*/
-	bool enable_allocator_wrapper;
-
-	/*
-	The maximum amount of memory to be used by the library if the
-	allocator wrapper is used.
-	*/
-	size_t max_mem;
-	bool max_mem_valid;
-
-	/*
-	The image format information to be used to populate the image format
-	table in newly created contexts.
-	*/
-	const jas_image_fmt_t *image_formats;
-	size_t num_image_formats;
-	
-	/*
-	The maximum number of samples allowable in an image to be decoded to be
-	used in newly created contexts.
-	*/
-	size_t dec_default_max_samples;
-
-	/*
-	The level of debugging checks/output enabled by the library for newly
-	created contexts.
-	A larger value corresponds to a greater level of debugging checks/output.
-	*/
-	int debug_level;
-
-	/*
-	The function used to output error/warning/informational messages
-	for newly created contexts.
-	*/
-	int (*vlogmsgf)(jas_logtype_t type, const char *format, va_list ap);
-
-} jas_conf_t;
-#endif
-
-#if defined(JAS_INTERNAL_USE_ONLY)
-/* This is for internal library use only. */
-jas_conf_t *jas_get_conf_ptr(void);
-extern jas_conf_t jas_conf;
-#endif
-
 typedef struct {
 
 	/* The maximum number of samples allowable in an image to be decoded. */
@@ -274,6 +202,7 @@ JAS_EXPORT
 void jas_conf_set_vlogmsgf(int (*func)(jas_logtype_t, const char *,
   va_list));
 
+#if 0
 /*!
 @brief
 Set the image-format table to be used to initialize the library.
@@ -286,6 +215,7 @@ JasPer library is cleaned up (via @c jas_cleanup).
 JAS_EXPORT
 void jas_conf_set_image_format_table(const jas_image_fmt_t *,
   size_t num_formats);
+#endif
 
 /******************************************************************************\
 * Library Initialization and Cleanup.
@@ -312,6 +242,18 @@ performed on the same thread.
 JAS_EXPORT
 int jas_init_library(void);
 
+/*!
+@brief
+Perform clean up for the JasPer library.
+
+@details
+At the point when this function is called, all threads that have called
+jas_init_thread() must have called jas_cleanup_thread().
+
+@returns
+If the operation is successful, zero is returned.
+Otherwise, a nonzero value is returned.
+*/
 JAS_EXPORT
 int jas_cleanup_library(void);
 
@@ -520,9 +462,13 @@ jas_vlogmsgf_t *jas_get_vlogmsgf(void)
 	return ctx->vlogmsgf;
 }
 
-JAS_EXPORT
+#if 0
+#if defined(JAS_INTERNAL_USE_ONLY)
+//JAS_EXPORT
 void jas_get_image_fmtinfo_table(const jas_image_fmtinfo_t **fmtinfos,
  size_t *numfmts);
+#endif
+#endif
 
 /*!
  * @}

@@ -1687,6 +1687,12 @@ int jpc_validate(jas_stream_t *in)
 {
 	unsigned char buf[2];
 
+	/*
+	Note: The validation operation does not require the initialization of the
+	JPC codec.  So, jpc_init is not called here.
+	jpc_init();
+	*/
+
 	assert(JAS_STREAM_MAXPUTBACK >= 2);
 
 	if (jas_stream_peek(in, buf, sizeof(buf)) != sizeof(buf))

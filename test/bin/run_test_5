@@ -34,7 +34,7 @@ tmp_dir=$(make_tmp_dir)
 
 log_file=$tmp_dir/log
 
-"$jasper_program" -l | grep -q jpg
+"$jasper_program" --list-enabled-formats | grep -q jpg
 if [ $? -eq 0 ]; then
 	has_jpg_codec=1
 else

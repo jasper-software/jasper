@@ -93,6 +93,9 @@ typedef enum {
 	OPT_DECOPT,
 	OPT_SPECIAL,
 	OPT_DEFAULT_MAX_MEM,
+	OPT_LIST_ENABLED_CODECS,
+	OPT_LIST_ALL_CODECS,
+	OPT_ENABLE_FORMAT,
 } optid_t;
 
 /******************************************************************************\
@@ -102,6 +105,7 @@ typedef enum {
 static void usage(void);
 static void cmdinfo(void);
 size_t get_default_max_mem_usage(void);
+void cleanup(void);
 
 /******************************************************************************\
 *
@@ -119,6 +123,9 @@ static const jas_opt_t opts[] = {
 	{OPT_DECOPT, "o", JAS_OPT_HASARG},
 	{OPT_SPECIAL, "X", 0},
 	{OPT_DEFAULT_MAX_MEM, "default-memory-limit", 0},
+	{OPT_LIST_ENABLED_CODECS, "list-enabled-formats", 0},
+	{OPT_LIST_ALL_CODECS, "list-all-formats", 0},
+	{OPT_ENABLE_FORMAT, "enable-format", JAS_OPT_HASARG},
 	{-1, 0, 0}
 };
 
@@ -147,6 +154,8 @@ int main(int argc, char **argv)
 	char dec_opt_spec[256];
 	int verbose;
 	int special = 0;
+	int list_codecs = 0;
+	int list_codecs_all = 0;
 
 	cmdname = argv[0];
 
@@ -158,6 +167,7 @@ int main(int argc, char **argv)
 	size_t max_mem = get_default_max_mem_usage();
 	dec_opt_spec[0] = '\0';
 	bool default_mem_limit = false;
+	const char *enable_format = 0;
 
 	/* Parse the command line options. */
 	while ((id = jas_getopt(argc, argv, opts)) >= 0) {
@@ -196,6 +206,17 @@ int main(int argc, char **argv)
 		case OPT_DEFAULT_MAX_MEM:
 			default_mem_limit = true;
 			break;
+		case OPT_LIST_ALL_CODECS:
+			list_codecs = 1;
+			list_codecs_all = 1;
+			break;
+		case OPT_LIST_ENABLED_CODECS:
+			list_codecs = 1;
+			list_codecs_all = 0;
+			break;
+		case OPT_ENABLE_FORMAT:
+			enable_format = jas_optarg;
+			break;
 		case OPT_HELP:
 		default:
 			usage();
@@ -216,7 +237,7 @@ int main(int argc, char **argv)
 		jas_set_max_mem_usage(max_mem);
 	}
 	jas_setdbglevel(debug);
-	atexit(jas_cleanup);
+	atexit(cleanup);
 #else
 	if (verbose >= 1) {
 		fprintf(stderr, "using jas_init_custom\n");
@@ -240,11 +261,29 @@ int main(int argc, char **argv)
 		fprintf(stderr, "cannot initialize thread\n");
 		return EXIT_FAILURE;
 	}
-	atexit(jas_cleanup);
+	atexit(cleanup);
 #endif
 
-//#if defined(JAS_DEFAULT_MAX_MEM_USAGE)
-//#endif
+	if (enable_format) {
+		for (int i = 0; i < jas_image_getnumfmts(); ++i) {
+			const jas_image_fmtinfo_t *fmtinfo = jas_image_getfmtbyind(i);
+			if (!strcmp(fmtinfo->name, enable_format)) {
+				jas_image_setfmtenable(i, 1);
+			}
+		}
+	}
+
+	if (list_codecs) {
+		size_t num_formats = jas_image_getnumfmts();
+		for (int i = 0; i < num_formats; ++i) {
+			const jas_image_fmtinfo_t *fmt;
+			fmt = jas_image_getfmtbyind(i);
+			if (list_codecs_all || fmt->enabled) {
+				printf("%s\n", fmt->name);
+			}
+		}
+		exit(EXIT_SUCCESS);
+	}
 
 	/* Open the image file. */
 	if (infile) {
@@ -307,7 +346,6 @@ int main(int argc, char **argv)
 	  JAS_CAST(long, jas_image_rawsize(image)));
 
 	jas_image_destroy(image);
-	//jas_image_clearfmts();
 
 	return EXIT_SUCCESS;
 }
@@ -364,4 +402,14 @@ size_t get_default_max_mem_usage(void)
 		max_mem = JAS_DEFAULT_MAX_MEM_USAGE;
 	}
 	return max_mem;
+}
+
+void cleanup()
+{
+#if defined(JAS_USE_JAS_INIT)
+	jas_cleanup();
+#else
+	jas_cleanup_thread();
+	jas_cleanup_library();
+#endif
 }

@@ -115,6 +115,7 @@ job_t jobs[max_jobs];
 void usage(void);
 int process_job(void *job_handle);
 size_t get_default_max_mem_usage(void);
+void cleanup(void);
 
 void usage()
 {
@@ -367,7 +368,7 @@ int main(int argc, char **argv)
 	}
 	jas_set_max_mem_usage(max_mem);
 	jas_set_debug_level(0);
-	atexit(jas_cleanup);
+	atexit(cleanup);
 
 #else
 
@@ -397,7 +398,7 @@ int main(int argc, char **argv)
 		fprintf(stderr, "cannot initialize thread\n");
 		exit(EXIT_FAILURE);
 	}
-	atexit(jas_cleanup);
+	atexit(cleanup);
 
 #endif
 
@@ -473,4 +474,14 @@ size_t get_default_max_mem_usage(void)
 		max_mem = JAS_DEFAULT_MAX_MEM_USAGE;
 	}
 	return max_mem;
+}
+
+void cleanup(void)
+{
+#if defined(JAS_USE_JAS_INIT)
+	jas_cleanup();
+#else
+	jas_cleanup_thread();
+	jas_cleanup_library();
+#endif
 }

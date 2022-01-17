@@ -1,7 +1,5 @@
 /*
- * Copyright (c) 1999-2000 Image Power, Inc. and the University of
- *   British Columbia.
- * Copyright (c) 2001-2002 Michael David Adams.
+ * Copyright (c) 2001-2003 Michael David Adams.
  * All rights reserved.
  */
 
@@ -61,88 +59,103 @@
  * __END_OF_JASPER_LICENSE__
  */
 
-/*!
- * @file jas_string.h
- * @brief String Library
- */
-
-#ifndef	JAS_STRING_H
-#define	JAS_STRING_H
-
 /******************************************************************************\
 * Includes.
 \******************************************************************************/
 
-/* The configuration header file should be included first. */
-#include <jasper/jas_config.h>
-#include <jasper/jas_types.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <math.h>
+#include <float.h>
+#include <assert.h>
+#include <stdint.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <jasper/jasper.h>
 
-/*!
- * @addtogroup module_string
- * @{
- */
+int alloc_test_main(int argc, char **argv);
+int string_test_main(int argc, char **argv);
 
 /******************************************************************************\
-* Functions.
+* Main program.
 \******************************************************************************/
 
-/*!
-@brief
-Create a copy of a null-terminated string.
+int main(int argc, char **argv)
+{
+	int ret = 0;
+	int debug = 0;
 
-@details
-This function has a behavior similar to the well-known strdup function.
-*/
-JAS_EXPORT char *jas_strdup(const char *);
+	jas_conf_clear();
+	static jas_std_allocator_t allocator;
+	jas_std_allocator_init(&allocator);
+	jas_conf_set_allocator(&allocator.base);
+	//jas_conf_set_max_mem_usage(max_mem);
+	jas_conf_set_debug_level(debug);
+	if (jas_init_library()) {
+		fprintf(stderr, "cannot initialize JasPer library\n");
+		return EXIT_FAILURE;
+	}
+	if (jas_init_thread()) {
+		fprintf(stderr, "cannot initialize thread\n");
+		return EXIT_FAILURE;
+	}
 
-/*!
-@brief
-Extract tokens from a string.
+	if (argc < 2) {
+		abort();
+	}
 
-@details
-This function has a similar behavior as @c strtok_r in the POSIX standard.
-*/
-JAS_EXPORT
-char *jas_strtok(char *str, const char *delim, char **saveptr);
+	if (!strcmp(argv[1], "alloc")) {
+		ret = alloc_test_main(argc - 1, &argv[1]);
+	} else if (!strcmp(argv[1], "string")) {
+		ret = string_test_main(argc - 1, &argv[1]);
+	} else {
+	}
 
-/*!
-@brief
-Split a string into tokens based on specified delimiters.
+	jas_cleanup_thread();
+	jas_cleanup_library();
 
-@param string
-A pointer to a null-terminated string to be split into tokens.
-@param delim
-A pointer to a null-terminated string contained characters used to delimit
-tokens.
-@param tokens_buf
-A pointer to the output token array.
-@param max_tokens_buf
-A pointer to the allocated size of the token array.
-@param num_tokens_buf
-A pointer to the number of elements in the token array.
-
-@details
-The memory to hold token information is allocated via jas_malloc()
-and friends.
-
-@returns
-If successful, zero is returned.
-Otherwise, a nonzero value is returned.
-*/
-JAS_EXPORT
-int jas_string_tokenize(const char *string, const char *delim,
-  char ***tokens_buf, size_t *max_tokens_buf, size_t *num_tokens_buf);
-
-/*!
- * @}
- */
-
-#ifdef __cplusplus
+	return ret ? EXIT_FAILURE : EXIT_SUCCESS;
 }
-#endif
 
-#endif
+int alloc_test_main(int argc, char **argv)
+{
+	JAS_UNUSED(argc);
+	JAS_UNUSED(argv);
+	char *buffer;
+	char *new_buffer;
+	buffer = jas_malloc(7);
+	assert(buffer);
+	strcpy(buffer, "Hello!");
+	printf("%s\n", buffer);
+	new_buffer = jas_realloc(buffer, 100);
+	assert(new_buffer);
+	buffer = new_buffer;
+	printf("%s\n", buffer);
+	assert(buffer);
+	jas_free(buffer);
+	
+	return 0;
+}
+
+int string_test_main(int argc, char **argv)
+{
+	JAS_UNUSED(argc);
+	JAS_UNUSED(argv);
+	char **tokens;
+	size_t max_tokens;
+	size_t num_tokens;
+	char delim[] = " ";
+	if (jas_string_tokenize("This is a test.", delim, &tokens, &max_tokens,
+	  &num_tokens)) {
+		return 1;
+	};
+	printf("tokens %p; max_tokens %zu; num_tokens %zu\n",
+	  JAS_CAST(void *, tokens), max_tokens, num_tokens);
+	if (tokens) {
+		for (int i = 0; i < num_tokens; ++i) {
+			printf("%s\n", tokens[i]);
+			jas_free(tokens[i]);
+		}
+		jas_free(tokens);
+	}
+	return 0;
+}

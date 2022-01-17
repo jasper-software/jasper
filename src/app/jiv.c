@@ -202,9 +202,7 @@ static const jas_opt_t opts[] = {
 	{'w', "wait", JAS_OPT_HASARG},
 	{'l', "loop", 0},
 	{'t', "title", JAS_OPT_HASARG},
-//#if defined(JAS_DEFAULT_MAX_MEM_USAGE)
 	{'m', "memory-limit", JAS_OPT_HASARG},
-//#endif
 	{-1, 0, 0}
 };
 
@@ -310,7 +308,7 @@ int main(int argc, char **argv)
 		fprintf(stderr, "cannot initialize thread\n");
 		exit(EXIT_FAILURE);
 	}
-	atexit(jas_cleanup);
+	//atexit(jas_cleanup);
 #endif
 
 	streamin = jas_stream_fdopen(0, "rb");
@@ -320,6 +318,11 @@ int main(int argc, char **argv)
 
 	/* Start the GLUT main event handler loop. */
 	glutMainLoop();
+
+#if !defined(JAS_USE_JAS_INIT)
+	jas_cleanup_thread();
+	jas_cleanup_library();
+#endif
 
 	return EXIT_SUCCESS;
 }

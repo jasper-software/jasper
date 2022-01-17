@@ -284,6 +284,10 @@ while [ $# -gt 0 ]; do
 	--help)
 		usage
 		;;
+	--)
+		shift 1
+		break
+		;;
 	--*|-*)
 		usage "invalid option $option"
 		;;
@@ -292,6 +296,8 @@ while [ $# -gt 0 ]; do
 		;;
 	esac
 done
+
+program_args=("$@")
 
 if [ "$debug_level" -ge 1 ]; then
 	set -xv
@@ -430,7 +436,7 @@ if [ "$use_pthread" -ne 0 ]; then
 	configure_opts+=("-DJAS_PREFER_PTHREAD=true")
 fi
 
-configure_opts+=("$@")
+configure_opts+=("${program_args[@]}")
 command=(cmake "${configure_opts[@]}")
 echo "============================================================"
 echo "RUNNING: ${command[@]}"

@@ -81,6 +81,70 @@
 * Types.
 \******************************************************************************/
 
+/*
+User-configurable settings for library.
+This is for internal library use only.
+*/
+typedef struct {
+
+	/*
+	A boolean flag indicating if the library has been configured
+	by invoking the jas_conf_clear function.
+	*/
+	bool initialized;
+
+	/*
+	A boolean flag indicating if the library is potentially going to be
+	used by more than one thread.
+	*/
+	bool multithread;
+
+	/*
+	The allocator to be used by the library.
+	*/
+	jas_allocator_t *allocator;
+
+	/*
+	A boolean flag indicating if the allocator should be accessed through
+	a wrapper that allows memory usage to be tracked and limited.
+	*/
+	bool enable_allocator_wrapper;
+
+	/*
+	The maximum amount of memory to be used by the library if the
+	allocator wrapper is used.
+	*/
+	size_t max_mem;
+	bool max_mem_valid;
+
+	/*
+	The image format information to be used to populate the image format
+	table in newly created contexts.
+	*/
+	const jas_image_fmt_t *image_formats;
+	size_t num_image_formats;
+
+	/*
+	The maximum number of samples allowable in an image to be decoded to be
+	used in newly created contexts.
+	*/
+	size_t dec_default_max_samples;
+
+	/*
+	The level of debugging checks/output enabled by the library for newly
+	created contexts.
+	A larger value corresponds to a greater level of debugging checks/output.
+	*/
+	int debug_level;
+
+	/*
+	The function used to output error/warning/informational messages
+	for newly created contexts.
+	*/
+	int (*vlogmsgf)(jas_logtype_t type, const char *format, va_list ap);
+
+} jas_conf_t;
+
 typedef struct {
 
 	/* A copy of the run-time library configuration settings. */
@@ -123,6 +187,7 @@ typedef struct {
 * Function prototypes.
 \******************************************************************************/
 
+static jas_conf_t *jas_get_conf_ptr(void);
 void jas_ctx_init(jas_ctx_t *ctx);
 static int jas_init_codecs(jas_ctx_t *ctx);
 void jas_ctx_cleanup(jas_ctx_t *ctx);
@@ -141,118 +206,127 @@ static const jas_image_fmt_t jas_image_fmts[] = {
 
 #if defined(JAS_INCLUDE_MIF_CODEC) && defined(JAS_ENABLE_MIF_CODEC)
 	{
-		"mif",
-		"My Image Format (MIF)",
-		"mif",
-		{
+		.name = "mif",
+		.desc = "My Image Format (MIF)",
+		.exts = "mif",
+		.ops = {
 			.decode = mif_decode,
 			.encode = mif_encode,
 			.validate = mif_validate
-		}
+		},
+		.enabled = JAS_ENABLE_MIF_CODEC,
 	},
 #endif
 
 #if defined(JAS_INCLUDE_PNM_CODEC)
 	{
-		"pnm",
-		"Portable Graymap/Pixmap (PNM)",
-		"pnm pbm pgm ppm",
-		{
+		.name = "pnm",
+		.desc = "Portable Graymap/Pixmap (PNM)",
+		.exts = "pnm pbm pgm ppm",
+		.ops = {
 			.decode = pnm_decode,
 			.encode = pnm_encode,
 			.validate = pnm_validate
-		}
+		},
+		.enabled = JAS_ENABLE_PNM_CODEC,
 	},
 #endif
 
 #if defined(JAS_INCLUDE_BMP_CODEC)
 	{
-		"bmp",
-		"Microsoft Bitmap (BMP)",
-		"bmp",
-		{
+		.name = "bmp",
+		.desc = "Microsoft Bitmap (BMP)",
+		.exts = "bmp",
+		.ops = {
 			.decode = bmp_decode,
 			.encode = bmp_encode,
 			.validate = bmp_validate
-		}
+		},
+		.enabled = JAS_ENABLE_BMP_CODEC,
 	},
 #endif
 
 #if defined(JAS_INCLUDE_RAS_CODEC)
 	{
-		"ras",
-		"Sun Rasterfile (RAS)",
-		"ras",
-		{
+		.name = "ras",
+		.desc = "Sun Rasterfile (RAS)",
+		.exts = "ras",
+		.ops = {
 			.decode = ras_decode,
 			.encode = ras_encode,
 			.validate = ras_validate
-		}
+		},
+		.enabled = JAS_ENABLE_RAS_CODEC,
 	},
 #endif
 
 #if defined(JAS_INCLUDE_JP2_CODEC)
 	{
-		"jp2",
-		"JPEG-2000 JP2 File Format Syntax (ISO/IEC 15444-1)",
-		"jp2",
-		{
+		.name = "jp2",
+		.desc = "JPEG-2000 JP2 File Format Syntax (ISO/IEC 15444-1)",
+		.exts = "jp2",
+		.ops = {
 			.decode = jp2_decode,
 			.encode = jp2_encode,
 			.validate = jp2_validate
-		}
+		},
+		.enabled = JAS_ENABLE_JP2_CODEC,
 	},
 #endif
 
 #if defined(JAS_INCLUDE_JPC_CODEC) || defined(JAS_INCLUDE_JP2_CODEC)
 	{
-		"jpc",
-		"JPEG-2000 Code Stream Syntax (ISO/IEC 15444-1)",
-		"jpc",
-		{
+		.name = "jpc",
+		.desc = "JPEG-2000 Code Stream Syntax (ISO/IEC 15444-1)",
+		.exts = "jpc",
+		.ops = {
 			.decode = jpc_decode,
 			.encode = jpc_encode,
 			.validate = jpc_validate
-		}
+		},
+		.enabled = JAS_ENABLE_JPC_CODEC,
 	},
 #endif
 
 #if defined(JAS_INCLUDE_JPG_CODEC)
 	{
-		"jpg",
-		"JPEG (ISO/IEC 10918-1)",
-		"jpg",
-		{
+		.name = "jpg",
+		.desc = "JPEG (ISO/IEC 10918-1)",
+		.exts = "jpg",
+		.ops = {
 			.decode = jpg_decode,
 			.encode = jpg_encode,
 			.validate = jpg_validate
-		}
+		},
+		.enabled = JAS_ENABLE_JPG_CODEC,
 	},
 #endif
 
 #if defined(JAS_INCLUDE_HEIC_CODEC)
 	{
-		"heic",
-		"HEIC (ISO/IEC 23008-12)",
-		"heic heif",
-		{
+		.name = "heic",
+		.desc = "HEIC (ISO/IEC 23008-12)",
+		.exts = "heic heif",
+		.ops = {
 			.decode = jas_heic_decode,
 			.encode = jas_heic_encode,
 			.validate = jas_heic_validate
-		}
+		},
+		.enabled = JAS_ENABLE_HEIC_CODEC,
 	},
 #endif
 
 #if defined(JAS_INCLUDE_PGX_CODEC)
 	{
-		"pgx",
-		"JPEG-2000 VM Format (PGX)",
-		"pgx",
-		{
+		.name = "pgx",
+		.desc = "JPEG-2000 VM Format (PGX)",
+		.exts = "pgx",
+		.ops = {
 			.decode = pgx_decode,
 			.encode = pgx_encode,
 			.validate = pgx_validate
-		}
+		},
+		.enabled = JAS_ENABLE_PGX_CODEC,
 	},
 #endif
 
@@ -282,6 +356,7 @@ jas_global_t jas_global = {
 * Codec Table Code.
 \******************************************************************************/
 
+#if 0
 JAS_EXPORT
 void jas_get_image_format_table(const jas_image_fmt_t **formats,
   size_t *num_formats)
@@ -289,6 +364,7 @@ void jas_get_image_format_table(const jas_image_fmt_t **formats,
 	*formats = jas_image_fmts;
 	*num_formats = sizeof(jas_image_fmts) / sizeof(jas_image_fmt_t);
 }
+#endif
 
 /******************************************************************************\
 * Library Configuration.
@@ -326,9 +402,9 @@ void jas_conf_set_allocator(jas_allocator_t *allocator)
 
 #ifdef JAS_COMMENT
 JAS_EXPORT
-void jas_conf_set_allocator_wrapper(int enable)
+void jas_conf_set_allocator_wrapper(int enabled)
 {
-	jas_conf.enable_allocator_wrapper = enable;
+	jas_conf.enable_allocator_wrapper = enabled;
 }
 #endif
 
@@ -358,6 +434,7 @@ void jas_conf_set_vlogmsgf(int (*func)(jas_logtype_t type, const char *,
 	jas_conf.vlogmsgf = func;
 }
 
+#if 0
 JAS_EXPORT
 void jas_conf_set_image_format_table(const jas_image_fmt_t *formats,
   size_t num_formats)
@@ -365,6 +442,7 @@ void jas_conf_set_image_format_table(const jas_image_fmt_t *formats,
 	jas_conf.image_formats = formats;
 	jas_conf.num_image_formats = num_formats;
 }
+#endif
 
 /******************************************************************************\
 * Library Initialization and Cleanup.
@@ -697,41 +775,25 @@ void jas_cleanup()
 /* Initialize the image format table. */
 static int jas_init_codecs(jas_ctx_t *ctx)
 {
-	int fmtid;
-	const char delim[] = " \t";
-
+	int ret = 0;
+	int i;
 	const jas_image_fmt_t *fmt;
-	size_t i;
-	fmtid = 0;
 	for (fmt = jas_global.conf.image_formats, i = 0;
 	  i < jas_global.conf.num_image_formats; ++fmt, ++i) {
-		char *buf;
-		if (!(buf = jas_strdup(fmt->exts))) {
-			return -1;
-		}
-		bool first = true;
-		for (;;) {
-			char *saveptr;
-			char *ext;
-			if (!(ext = jas_strtok(first ? buf : NULL, delim, &saveptr))) {
-				break;
-			}
-			JAS_LOGDEBUGF(10, "adding image format %s %s\n", fmt->name, ext);
-			jas_image_addfmt_internal(ctx->image_fmtinfos, &ctx->image_numfmts,
-			  fmtid, fmt->name, ext, fmt->desc, &fmt->ops);
-			++fmtid;
-			first = false;
-		}
-		jas_free(buf);
+		JAS_LOGDEBUGF(10, "adding image format %s %s\n", fmt->name, fmt->exts);
+		jas_image_addfmt_internal(ctx->image_fmtinfos, &ctx->image_numfmts,
+		  i, fmt->name, fmt->exts, fmt->desc, &fmt->ops);
+		assert(ctx->image_fmtinfos[i].id == i);
+		ctx->image_fmtinfos[i].enabled = fmt->enabled;
 	}
-	return 0;
+	return ret;
 }
 
 /******************************************************************************\
 \******************************************************************************/
 
 /* For internal library use only. */
-jas_conf_t *jas_get_conf_ptr()
+static jas_conf_t *jas_get_conf_ptr()
 {
 	return &jas_conf;
 }

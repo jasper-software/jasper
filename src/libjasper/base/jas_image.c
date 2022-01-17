@@ -679,12 +679,35 @@ int jas_image_writecmpt(jas_image_t *image, unsigned cmptno,
 * File format operations.
 \******************************************************************************/
 
+JAS_EXPORT
+const jas_image_fmtinfo_t *jas_image_getfmtbyind(int index)
+{
+	jas_ctx_t *ctx = jas_get_ctx();
+	assert(index >= 0 && index < ctx->image_numfmts);
+	return &ctx->image_fmtinfos[index];
+}
+
+JAS_EXPORT
+int jas_image_getnumfmts(void)
+{
+	jas_ctx_t *ctx = jas_get_ctx();
+	return ctx->image_numfmts;
+}
+
+JAS_EXPORT
+int jas_image_setfmtenable(int index, int enabled)
+{
+	jas_ctx_t *ctx = jas_get_ctx();
+	ctx->image_fmtinfos[index].enabled = enabled;
+	return 0;
+}
+
 void jas_image_clearfmts_internal(jas_image_fmtinfo_t *image_fmtinfos,
   size_t *image_numfmts)
 {
 	jas_image_fmtinfo_t *fmtinfo;
-	for (unsigned i = 0; i < *image_numfmts; ++i) {
-		fmtinfo = &image_fmtinfos[i];
+	for (int fmtind = 0; fmtind < *image_numfmts; ++fmtind) {
+		fmtinfo = &image_fmtinfos[fmtind];
 		if (fmtinfo->name) {
 			jas_free(fmtinfo->name);
 			fmtinfo->name = 0;
@@ -692,6 +715,14 @@ void jas_image_clearfmts_internal(jas_image_fmtinfo_t *image_fmtinfos,
 		if (fmtinfo->ext) {
 			jas_free(fmtinfo->ext);
 			fmtinfo->ext = 0;
+		}
+		if (fmtinfo->exts) {
+			assert(fmtinfo->max_exts > 0);
+			for (int i = 0; i < fmtinfo->num_exts; ++i) {
+				jas_free(fmtinfo->exts[i]);
+			}
+			jas_free(fmtinfo->exts);
+			fmtinfo->exts = 0;
 		}
 		if (fmtinfo->desc) {
 			jas_free(fmtinfo->desc);
@@ -711,6 +742,7 @@ int jas_image_addfmt_internal(jas_image_fmtinfo_t *image_fmtinfos,
   size_t *image_numfmts, int id, const char *name, const char *ext,
   const char *desc, const jas_image_fmtops_t *ops)
 {
+	const char delim[] = " \t";
 	jas_image_fmtinfo_t *fmtinfo;
 	assert(id >= 0 && name && ext && ops);
 	if (*image_numfmts >= JAS_IMAGE_MAXFMTS) {
@@ -718,10 +750,22 @@ int jas_image_addfmt_internal(jas_image_fmtinfo_t *image_fmtinfos,
 	}
 	fmtinfo = &image_fmtinfos[*image_numfmts];
 	fmtinfo->id = id;
+#if 1
+	char **exts = 0;
+	size_t num_exts = 0;
+	size_t max_exts = 0;
+	if (jas_string_tokenize(ext, delim, &exts, &max_exts,
+	  &num_exts)) {
+		assert(!exts && !max_exts && !num_exts);
+		return -1;
+	}
+	assert(num_exts > 0);
+	char *primary_ext = exts[0];
+#endif
 	if (!(fmtinfo->name = jas_strdup(name))) {
 		return -1;
 	}
-	if (!(fmtinfo->ext = jas_strdup(ext))) {
+	if (!(fmtinfo->ext = jas_strdup(primary_ext))) {
 		jas_free(fmtinfo->name);
 		return -1;
 	}
@@ -731,6 +775,9 @@ int jas_image_addfmt_internal(jas_image_fmtinfo_t *image_fmtinfos,
 		return -1;
 	}
 	fmtinfo->ops = *ops;
+	fmtinfo->exts = exts;
+	fmtinfo->max_exts = max_exts;
+	fmtinfo->num_exts = num_exts;
 	++(*image_numfmts);
 	return 0;
 }
@@ -791,7 +838,7 @@ int jas_image_getfmt(jas_stream_t *in)
 	unsigned i;
 	for (i = 0, fmtinfo = ctx->image_fmtinfos; i < ctx->image_numfmts; ++i,
 	  ++fmtinfo) {
-		if (fmtinfo->ops.validate) {
+		if (fmtinfo->enabled && fmtinfo->ops.validate) {
 			/* Is the input data valid for this format? */
 			JAS_LOGDEBUGF(20, "testing for format %s ... ", fmtinfo->name);
 			if (!(*fmtinfo->ops.validate)(in)) {
@@ -819,7 +866,7 @@ int jas_image_fmtfromname(const char *name)
 	for (i = 0, fmtinfo = ctx->image_fmtinfos; i < ctx->image_numfmts; ++i,
 	  ++fmtinfo) {
 		/* Do we have a match? */
-		if (!strcmp(ext, fmtinfo->ext)) {
+		if (fmtinfo->enabled && !strcmp(ext, fmtinfo->ext)) {
 			return fmtinfo->id;
 		}
 	}
@@ -924,6 +971,8 @@ const jas_image_fmtinfo_t *jas_image_lookupfmtbyid(int id)
 
 const jas_image_fmtinfo_t *jas_image_lookupfmtbyname(const char *name)
 {
+#if 0
+
 	const jas_image_fmtinfo_t *image_fmtinfos;
 	size_t image_numfmts;
 	jas_get_image_fmtinfo_table(&image_fmtinfos, &image_numfmts);
@@ -936,6 +985,21 @@ const jas_image_fmtinfo_t *jas_image_lookupfmtbyname(const char *name)
 		}
 	}
 	return 0;
+
+#else
+
+	jas_ctx_t *ctx = jas_get_ctx();
+	unsigned i;
+	const jas_image_fmtinfo_t *fmtinfo;
+	for (i = 0, fmtinfo = ctx->image_fmtinfos; i < ctx->image_numfmts;
+	  ++i, ++fmtinfo) {
+		if (!strcmp(fmtinfo->name, name)) {
+			return fmtinfo;
+		}
+	}
+	return 0;
+
+#endif
 }
 
 static uint_fast32_t inttobits(jas_seqent_t v, unsigned prec, bool sgnd)

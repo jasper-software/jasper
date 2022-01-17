@@ -14,7 +14,8 @@ set(JAS_VERSION_PATCH 0)
 
 # The shared library versioning information.
 # Guidelines on how to change this information can be found below.
-set(JAS_SO_VERSION 7)
+# The shared library version was set to 6.0.0 for JasPer version 3.0.0.
+set(JAS_SO_VERSION 6)
 set(JAS_SO_MINOR 0)
 set(JAS_SO_RELEASE 0)
 
@@ -95,6 +96,7 @@ option(JAS_PREFER_PTHREAD
   "Prefer POSIX Threading Library (over C11) for threading support" ON)
 option(JAS_STRICT "Treat compiler warnings as errors" OFF)
 
+# Options controlling which codec support is built into the JasPer library.
 option(JAS_INCLUDE_BMP_CODEC "Include (native) BMP codec support" ON)
 option(JAS_INCLUDE_JP2_CODEC "Include (native) JP2 codec support" ON)
 option(JAS_INCLUDE_JPC_CODEC "Include (native) JPC codec support" ON)
@@ -107,11 +109,22 @@ option(JAS_INCLUDE_PGX_CODEC "Include (native) PGX codec support" ON)
 option(JAS_INCLUDE_PNM_CODEC "Include (native) PNM codec support" ON)
 option(JAS_INCLUDE_RAS_CODEC "Include (native) RAS codec support" ON)
 
-set(JAS_DEFAULT_MAX_MEM_USAGE
-  "1073741824"
-  CACHE STRING
-  "Set memory usage limit in bytes"
-)
+# Options controlling which codec support that is built into the JasPer
+# library is enabled by default.
+option(JAS_ENABLE_BMP_CODEC "Enable (native) BMP codec support" ON)
+option(JAS_ENABLE_JP2_CODEC "Enable (native) JP2 codec support" ON)
+option(JAS_ENABLE_JPC_CODEC "Enable (native) JPC codec support" ON)
+option(JAS_ENABLE_JPG_CODEC
+  "Enable JPG codec support (via IJG JPEG Library)" ON)
+option(JAS_ENABLE_HEIC_CODEC
+	"Enable experimental HEIC codec support (via Libheif Library)" OFF)
+option(JAS_ENABLE_MIF_CODEC "Enable (native) MIF codec support" OFF)
+option(JAS_ENABLE_PGX_CODEC "Enable (native) PGX codec support" ON)
+option(JAS_ENABLE_PNM_CODEC "Enable (native) PNM codec support" ON)
+option(JAS_ENABLE_RAS_CODEC "Enable (native) RAS codec support" ON)
+
+set(JAS_DEFAULT_MAX_MEM_USAGE "1073741824" CACHE STRING
+  "Set memory usage limit in bytes")
 
 # The following options are for testing/debugging and should normally only
 # be changed by the developers of JasPer.
@@ -330,11 +343,21 @@ endif()
 # Check for invalid codec combinations.
 ################################################################################
 
+if(NOT JAS_ENABLE_DANGEROUS_INTERNAL_TESTING_MODE AND JAS_ENABLE_MIF_CODEC)
+	message(FATAL_ERROR
+	  "For reasons of security, it is not recommended that the MIF codec "
+	  "be enabled by default."
+	  )
+	set(JAS_ENABLE_MIF_CODEC OFF)
+endif()
+message("JAS_ENABLE_MIF_CODEC: ${JAS_ENABLE_MIF_CODEC}")
+
 if (JAS_INCLUDE_BMP_CODEC AND
   JAS_INCLUDE_JP2_CODEC AND
   JAS_INCLUDE_JPC_CODEC AND
   JAS_INCLUDE_PGX_CODEC AND
   JAS_INCLUDE_PNM_CODEC AND
+  JAS_INCLUDE_MIF_CODEC AND
   JAS_INCLUDE_RAS_CODEC)
 	message("Support for all native codecs has been included.")
 	set(JAS_HAVE_ALL_NATIVE_CODECS 1)

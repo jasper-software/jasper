@@ -76,6 +76,15 @@ int main(int argc, char **argv)
 
 	numiters = atoi(argv[1]);
 
+	if (jas_init_library()) {
+		fprintf(stderr, "cannot perform JasPer library initialization\n");
+		exit(1);
+	}
+	if (jas_init_thread()) {
+		fprintf(stderr, "cannot perform JasPer thread initialization\n");
+		exit(1);
+	}
+
 	jas_tmr_start(&tmr);
 	for (i = numiters; i > 0; --i) {
 		jas_tmr_start(&dummytmr);
@@ -108,6 +117,9 @@ int main(int argc, char **argv)
 	jas_tmr_stop(&tmr);
 	t = jas_tmr_get(&tmr);
 	printf("time delay %.8f s\n", t);
+
+	jas_cleanup_library();
+	jas_cleanup_thread();
 
 	exit(0);
 }

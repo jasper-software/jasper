@@ -35,11 +35,12 @@ is_supported_format()
 {
 	local format="$1"
 	local supported=0
-	"$jasper" -l | grep -q '^'"$format"'$' && supported=1
+	"$jasper" --list-enabled-formats | grep -q '^'"$format"'$' && supported=1
 	echo "$supported"
 }
 
-formats=($("$jasper" -l)) || panic "cannot get supported formats"
+formats=($("$jasper" --list-enabled-formats)) || \
+  panic "cannot get supported formats"
 if [ "$verbose" -ge 2 ]; then
 	echo "The following formats are supported:"
 	for format in "${formats[@]}"; do

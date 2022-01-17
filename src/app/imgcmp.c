@@ -120,6 +120,7 @@ jas_image_t *makediffimage(jas_matrix_t *origdata, jas_matrix_t *recondata);
 void usage(void);
 void cmdinfo(void);
 size_t get_default_max_mem_usage(void);
+void cleanup(void);
 
 /******************************************************************************\
 *
@@ -145,9 +146,7 @@ static const jas_opt_t opts[] = {
 	{OPT_MAXONLY, "max", 0},
 	{OPT_MINONLY, "min", 0},
 	{OPT_DIFFIMAGE, "d", JAS_OPT_HASARG},
-//#if defined(JAS_DEFAULT_MAX_MEM_USAGE)
 	{OPT_MAXMEM, "memory-limit", JAS_OPT_HASARG},
-//#endif
 	{-1, 0, 0}
 };
 
@@ -242,7 +241,7 @@ int main(int argc, char **argv)
 		exit(EXIT_ERROR);
 	}
 	jas_set_max_mem_usage(max_mem);
-	atexit(jas_cleanup);
+	atexit(cleanup);
 #else
 	jas_conf_clear();
 	static jas_std_allocator_t allocator;
@@ -259,7 +258,7 @@ int main(int argc, char **argv)
 		exit(EXIT_ERROR);
 	}
 
-	atexit(jas_cleanup);
+	atexit(cleanup);
 #endif
 
 	/* Ensure that files are given for both the original and reconstructed
@@ -623,4 +622,14 @@ size_t get_default_max_mem_usage(void)
 		max_mem = JAS_DEFAULT_MAX_MEM_USAGE;
 	}
 	return max_mem;
+}
+
+void cleanup(void)
+{
+#if defined(JAS_USE_JAS_INIT)
+	jas_cleanup();
+#else
+	jas_cleanup_thread();
+	jas_cleanup_library();
+#endif
 }

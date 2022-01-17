@@ -34,7 +34,7 @@ is_supported_format()
 {
 	local format="$1"
 	local supported=0
-	"$jasper" -l | grep -q '^'"$format"'$' && supported=1
+	"$jasper" --list-enabled-formats | grep -q '^'"$format"'$' && supported=1
 	echo "$supported"
 }
 

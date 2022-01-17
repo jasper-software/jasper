@@ -75,6 +75,7 @@
 
 #include "jasper/jas_string.h"
 #include "jasper/jas_malloc.h"
+#include "jasper/jas_debug.h"
 
 #include <string.h>
 
@@ -128,4 +129,90 @@ char *jas_strtok(char *s, const char *delim, char **save_ptr)
 #else
 	return strtok_r(str, delim, save_ptr);
 #endif
+}
+
+JAS_EXPORT
+int jas_string_tokenize(const char *string, const char *delim,
+  char ***tokens_buf, size_t *max_tokens_buf, size_t *num_tokens_buf)
+{
+	char **tokens = 0;
+	size_t max_tokens = 0;
+	size_t num_tokens = 0;
+	char **new_tokens;
+	size_t new_max_tokens;
+	char *buffer = 0;
+	int ret = 0;
+	char *token = 0;
+
+	if (!(buffer = jas_strdup(string))) {
+		ret = -1;
+		goto done;
+	}
+	//new_max_tokens = 1;
+	new_max_tokens = 0;
+	if (new_max_tokens > 0) {
+		if (!(tokens = jas_malloc(new_max_tokens * sizeof(char *)))) {
+			ret = -1;
+			goto done;
+		}
+		max_tokens = new_max_tokens;
+	}
+
+	bool first = true;
+	char *saveptr = 0;
+	for (;;) {
+		char *cp;
+		if (!(cp = jas_strtok(first ? buffer : 0, delim, &saveptr))) {
+			break;
+		}
+		first = false;
+		if (!(token = jas_strdup(cp))) {
+			ret = -1;
+			goto done;
+		}
+		if (num_tokens == max_tokens) {
+			new_max_tokens = max_tokens ? 2 * max_tokens : 1;
+			if (!(new_tokens = jas_realloc(tokens, new_max_tokens *
+			  sizeof(char *)))) {
+				ret = -1;
+				goto done;
+			}
+			tokens = new_tokens;
+			max_tokens = new_max_tokens;
+		}
+		assert(num_tokens < max_tokens);
+		tokens[num_tokens] = token;
+		token = 0;
+		++num_tokens;
+	}
+
+done:
+	if (buffer) {
+		jas_free(buffer);
+	}
+	if (ret && tokens) {
+		for (int i = 0; i < num_tokens; ++i) {
+			jas_free(tokens[i]);
+		}
+		jas_free(tokens);
+		tokens = 0;
+		max_tokens = 0;
+		num_tokens = 0;
+	}
+	if (token) {
+		jas_free(token);
+	}
+	if (!ret) {
+		*tokens_buf = tokens;
+		*max_tokens_buf = max_tokens;
+		*num_tokens_buf = num_tokens;
+	}
+	if (jas_getdbglevel() >= 100) {
+		jas_eprintf("tokens %p; max_tokens %zu; num_tokens %zu\n",
+		  JAS_CAST(void *, tokens), max_tokens, num_tokens);
+		for (int i = 0; i < num_tokens; ++i) {
+			jas_eprintf("[%d] = %s\n", i, tokens[i]);
+		}
+	}
+	return ret;
 }

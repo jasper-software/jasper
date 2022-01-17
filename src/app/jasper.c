@@ -119,12 +119,16 @@ typedef struct {
 	int version;
 
 	int list_codecs;
+	int list_codecs_all;
+	int help;
 
 	int_fast32_t cmptno;
 
 	int srgb;
 
 	size_t max_mem;
+
+	const char *enable_format;
 
 } cmdopts_t;
 
@@ -139,6 +143,7 @@ void badusage(void);
 void cmdinfo(void);
 int addopt(char *optstr, int maxlen, const char *s);
 size_t get_default_max_mem_usage(void);
+void cleanup(void);
 
 /******************************************************************************\
 * Global data.
@@ -182,17 +187,6 @@ int main(int argc, char **argv)
 		exit(EXIT_SUCCESS);
 	}
 
-	if (cmdopts->list_codecs) {
-		const jas_image_fmt_t *formats;
-		size_t num_formats;
-		jas_get_image_format_table(&formats, &num_formats);
-		const jas_image_fmt_t *fmt;
-		for (fmt = formats, i = 0; i < JAS_CAST(int, num_formats); ++fmt, ++i) {
-			printf("%s\n", fmt->name);
-		}
-		exit(EXIT_SUCCESS);
-	}
-
 #if defined(JAS_USE_JAS_INIT)
 	if (jas_init()) {
 		fprintf(stderr, "cannot initialize JasPer library\n");
@@ -200,7 +194,7 @@ int main(int argc, char **argv)
 	}
 	jas_set_max_mem_usage(cmdopts->max_mem);
 	jas_setdbglevel(cmdopts->debug);
-	atexit(jas_cleanup);
+	atexit(cleanup);
 #else
 	jas_conf_clear();
 	static jas_std_allocator_t allocator;
@@ -216,8 +210,33 @@ int main(int argc, char **argv)
 		fprintf(stderr, "cannot initialize thread\n");
 		exit(EXIT_FAILURE);
 	}
-	atexit(jas_cleanup);
+	atexit(cleanup);
 #endif
+
+	if (cmdopts->enable_format) {
+		for (i = 0; i < jas_image_getnumfmts(); ++i) {
+			const jas_image_fmtinfo_t *fmtinfo = jas_image_getfmtbyind(i);
+			if (!strcmp(fmtinfo->name, cmdopts->enable_format)) {
+				jas_image_setfmtenable(i, 1);
+			}
+		}
+	}
+
+	if (cmdopts->help) {
+		cmdusage();
+	}
+
+	if (cmdopts->list_codecs) {
+		size_t num_formats = jas_image_getnumfmts();
+		for (i = 0; i < num_formats; ++i) {
+			const jas_image_fmtinfo_t *fmt;
+			fmt = jas_image_getfmtbyind(i);
+			if (cmdopts->list_codecs_all || fmt->enabled) {
+				printf("%s\n", fmt->name);
+			}
+		}
+		exit(EXIT_SUCCESS);
+	}
 
 	if (cmdopts->infmt_str) {
 		if ((cmdopts->infmt = jas_image_strtofmt(cmdopts->infmt_str)) < 0) {
@@ -236,7 +255,8 @@ int main(int argc, char **argv)
 		}
 	} else {
 		if (cmdopts->outfmt < 0 && cmdopts->outfile) {
-			if ((cmdopts->outfmt = jas_image_fmtfromname(cmdopts->outfile)) < 0) {
+			if ((cmdopts->outfmt = jas_image_fmtfromname(cmdopts->outfile)) <
+			  0) {
 				cmdopts->outfmt = -1;
 			}
 		}
@@ -321,7 +341,8 @@ int main(int argc, char **argv)
 			fprintf(stderr, "cannot create sRGB profile\n");
 			exit(EXIT_FAILURE);
 		}
-		if (!(newimage = jas_image_chclrspc(image, outprof, JAS_CMXFORM_INTENT_PER))) {
+		if (!(newimage = jas_image_chclrspc(image, outprof,
+		  JAS_CMXFORM_INTENT_PER))) {
 			fprintf(stderr, "cannot convert to sRGB\n");
 			exit(EXIT_FAILURE);
 		}
@@ -356,7 +377,6 @@ int main(int argc, char **argv)
 
 	cmdopts_destroy(cmdopts);
 	jas_image_destroy(image);
-	//jas_image_clearfmts();
 
 	/* Success at last! :-) */
 	return EXIT_SUCCESS;
@@ -378,7 +398,9 @@ cmdopts_t *cmdopts_parse(int argc, char **argv)
 		CMDOPT_CMPTNO,
 		CMDOPT_SRGB,
 		CMDOPT_MAXMEM,
-		CMDOPT_LIST_CODECS,
+		CMDOPT_LIST_ENABLED_CODECS,
+		CMDOPT_LIST_ALL_CODECS,
+		CMDOPT_ENABLE_FORMAT,
 	};
 
 	static const jas_opt_t cmdoptions[] = {
@@ -401,10 +423,10 @@ cmdopts_t *cmdopts_parse(int argc, char **argv)
 		{CMDOPT_CMPTNO, "cmptno", JAS_OPT_HASARG},
 		{CMDOPT_SRGB, "force-srgb", 0},
 		{CMDOPT_SRGB, "S", 0},
-//#if defined(JAS_DEFAULT_MAX_MEM_USAGE)
 		{CMDOPT_MAXMEM, "memory-limit", JAS_OPT_HASARG},
-//#endif
-		{CMDOPT_LIST_CODECS, "l", 0},
+		{CMDOPT_LIST_ENABLED_CODECS, "list-enabled-formats", 0},
+		{CMDOPT_LIST_ALL_CODECS, "list-all-formats", 0},
+		{CMDOPT_ENABLE_FORMAT, "enable-format", JAS_OPT_HASARG},
 		{-1, 0, 0}
 	};
 
@@ -432,12 +454,15 @@ cmdopts_t *cmdopts_parse(int argc, char **argv)
 	cmdopts->debug = 0;
 	cmdopts->srgb = 0;
 	cmdopts->list_codecs = 0;
+	cmdopts->list_codecs_all = 0;
+	cmdopts->help = 0;
 	cmdopts->max_mem = get_default_max_mem_usage();
+	cmdopts->enable_format = 0;
 
 	while ((c = jas_getopt(argc, argv, cmdoptions)) != EOF) {
 		switch (c) {
 		case CMDOPT_HELP:
-			cmdusage();
+			cmdopts->help = 1;
 			break;
 		case CMDOPT_VERBOSE:
 			cmdopts->verbose = 1;
@@ -445,8 +470,13 @@ cmdopts_t *cmdopts_parse(int argc, char **argv)
 		case CMDOPT_VERSION:
 			cmdopts->version = 1;
 			break;
-		case CMDOPT_LIST_CODECS:
+		case CMDOPT_LIST_ENABLED_CODECS:
 			cmdopts->list_codecs = 1;
+			cmdopts->list_codecs_all = 0;
+			break;
+		case CMDOPT_LIST_ALL_CODECS:
+			cmdopts->list_codecs = 1;
+			cmdopts->list_codecs_all = 1;
 			break;
 		case CMDOPT_DEBUG:
 			cmdopts->debug = atoi(jas_optarg);
@@ -455,15 +485,7 @@ cmdopts_t *cmdopts_parse(int argc, char **argv)
 			cmdopts->infile = jas_optarg;
 			break;
 		case CMDOPT_INFMT:
-#if 0
-			if ((cmdopts->infmt = jas_image_strtofmt(jas_optarg)) < 0) {
-				fprintf(stderr, "warning: ignoring invalid input format %s\n",
-				  jas_optarg);
-				cmdopts->infmt = -1;
-			}
-#else
 			cmdopts->infmt_str= jas_optarg;
-#endif
 			break;
 		case CMDOPT_INOPT:
 			addopt(cmdopts->inoptsbuf, OPTSMAX, jas_optarg);
@@ -473,14 +495,7 @@ cmdopts_t *cmdopts_parse(int argc, char **argv)
 			cmdopts->outfile = jas_optarg;
 			break;
 		case CMDOPT_OUTFMT:
-#if 0
-			if ((cmdopts->outfmt = jas_image_strtofmt(jas_optarg)) < 0) {
-				fprintf(stderr, "error: invalid output format %s\n", jas_optarg);
-				badusage();
-			}
-#else
 			cmdopts->outfmt_str = jas_optarg;
-#endif
 			break;
 		case CMDOPT_OUTOPT:
 			addopt(cmdopts->outoptsbuf, OPTSMAX, jas_optarg);
@@ -495,6 +510,9 @@ cmdopts_t *cmdopts_parse(int argc, char **argv)
 		case CMDOPT_MAXMEM:
 			cmdopts->max_mem = strtoull(jas_optarg, 0, 10);
 			break;
+		case CMDOPT_ENABLE_FORMAT:
+			cmdopts->enable_format = jas_optarg;
+			break;
 		default:
 			badusage();
 			break;
@@ -508,30 +526,14 @@ cmdopts_t *cmdopts_parse(int argc, char **argv)
 		++jas_optind;
 	}
 
-	if (cmdopts->version || cmdopts->list_codecs) {
+	if (cmdopts->version || cmdopts->list_codecs || cmdopts->help) {
 		goto done;
 	}
 
-#if 0
-	if (cmdopts->outfmt < 0 && cmdopts->outfile) {
-		if ((cmdopts->outfmt = jas_image_fmtfromname(cmdopts->outfile)) < 0) {
-			fprintf(stderr,
-			  "error: cannot guess image format from output file name\n");
-		}
-	}
-#endif
-
-#if 0
-	if (cmdopts->outfmt < 0) {
-		fprintf(stderr, "error: no output format specified\n");
-		badusage();
-	}
-#else
 	if (!cmdopts->outfmt_str && !cmdopts->outfile) {
 		fprintf(stderr, "error: cannot determine output format\n");
 		badusage();
 	}
-#endif
 
 done:
 	return cmdopts;
@@ -599,26 +601,20 @@ void cmdusage()
 	for (i = 0, s = helpinfo[i]; s; ++i, s = helpinfo[i]) {
 		fprintf(stderr, "%s", s);
 	}
+
 	fprintf(stderr, "The following formats are supported:\n");
-#if 0
-	int fmtid;
+	int fmtind;
 	const jas_image_fmtinfo_t *fmtinfo;
-	for (fmtid = 0;; ++fmtid) {
-		if (!(fmtinfo = jas_image_lookupfmtbyid(fmtid))) {
+	int numfmts = jas_image_getnumfmts();
+	for (fmtind = 0; fmtind < numfmts; ++fmtind) {
+		if (!(fmtinfo = jas_image_getfmtbyind(fmtind))) {
 			break;
 		}
-		fprintf(stderr, "    %-5s    %s\n", fmtinfo->name,
+		fprintf(stderr, "    %s %-5s    %s\n",
+		  fmtinfo->enabled ? "[enabled] " : "[disabled]",
+		  fmtinfo->name,
 		  fmtinfo->desc);
 	}
-#else
-	const jas_image_fmt_t *formats;
-	size_t num_formats;
-	jas_get_image_format_table(&formats, &num_formats);
-	const jas_image_fmt_t *fmt;
-	for (fmt = formats, i = 0; i < JAS_CAST(int, num_formats); ++fmt, ++i) {
-		fprintf(stderr, "    %-5s    %s\n", fmt->name, fmt->desc);
-	}
-#endif
 	exit(EXIT_FAILURE);
 }
 
@@ -670,4 +666,14 @@ size_t get_default_max_mem_usage(void)
 		max_mem = JAS_DEFAULT_MAX_MEM_USAGE;
 	}
 	return max_mem;
+}
+
+void cleanup(void)
+{
+#if defined(JAS_USE_JAS_INIT)
+	jas_cleanup();
+#else
+	jas_cleanup_thread();
+	jas_cleanup_library();
+#endif
 }

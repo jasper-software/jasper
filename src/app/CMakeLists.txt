@@ -43,6 +43,11 @@ if(JAS_THREADS)
 	set(programs "${programs}" multithread)
 endif()
 
+add_executable(test_1 test_1.c)
+target_link_libraries(test_1 libjasper ${JAS_LIBJPEG_TARGET}
+  ${MATH_LIBRARY} ${THREAD_LIBRARY})
+set(programs "${programs}" test_1)
+
 if(JAS_ENABLE_FUZZER)
 	add_executable(fuzz fuzz.c)
 	target_link_libraries(fuzz libjasper ${JAS_LIBJPEG_TARGET}

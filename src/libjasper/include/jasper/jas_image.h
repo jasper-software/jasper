@@ -298,20 +298,29 @@ typedef struct {
 */
 typedef struct {
 
+	/*! The ID for this format. */
 	int id;
-	/* The ID for this format. */
 
+	/*! The name by which this format is identified. */
 	char *name;
-	/* The name by which this format is identified. */
 
+	/* The primary file name extension associated with this format. */
+	/* This member only exists for backward compatibility. */
 	char *ext;
-	/* The file name extension associated with this format. */
 
+	/*! The table of file name extensions associated with this format. */
+	char **exts;
+	size_t max_exts;
+	size_t num_exts;
+
+	/*! A boolean flag indicating if this format is enabled. */
+	int enabled;
+
+	/*! A brief description of the format. */
 	char *desc;
-	/* A brief description of the format. */
 
+	/*! The operations for this format. */
 	jas_image_fmtops_t ops;
-	/* The operations for this format. */
 
 } jas_image_fmtinfo_t;
 
@@ -340,13 +349,20 @@ typedef struct {
 	*/
 	const jas_image_fmtops_t ops;
 
+	/*!
+	A boolean flag indicating if the format is enabled.
+	*/
+	int enabled;
+
 } jas_image_fmt_t;
 
+#if 0
 /*!
 @brief Get the image format table (generated when the library was built).
 */
 JAS_EXPORT
 void jas_get_image_format_table(const jas_image_fmt_t**, size_t *);
+#endif
 
 /******************************************************************************\
 * Image operations.
@@ -640,6 +656,39 @@ void jas_image_clearfmts_internal(jas_image_fmtinfo_t *image_fmtinfos,
 #endif
 
 /*!
+@brief Get a image format entry by its table index.
+*/
+JAS_EXPORT
+const jas_image_fmtinfo_t *jas_image_getfmtbyind(int index);
+
+/*!
+@brief Get the number of image format table entries.
+*/
+JAS_EXPORT
+int jas_image_getnumfmts(void);
+
+#if 0
+JAS_EXPORT
+int jas_image_delfmtbyid(int id);
+#endif
+
+/*!
+@brief Get the number of image format table entries.
+
+@warning
+This function may be removed in future versions of the library.
+Do not rely on it.
+*/
+JAS_EXPORT
+int jas_image_setfmtenable(int index, int enabled);
+
+#if 0
+// TODO: should this be added?
+JAS_EXPORT
+int jas_image_getfmtindbyname(const char* name);
+#endif
+
+/*!
 @brief Add entry to table of image formats.
 */
 JAS_EXPORT
@@ -689,11 +738,13 @@ int jas_image_fmtfromname(const char *filename);
 
 /*!
 @brief Get the format of image data in a stream.
+
+@details
+Note that only enabled codecs are used in determining the image format.
 */
 JAS_ATTRIBUTE_PURE
 JAS_EXPORT
 int jas_image_getfmt(jas_stream_t *in);
-
 
 /*!
 @brief Get the color management profile of an image.

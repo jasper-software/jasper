@@ -545,7 +545,7 @@ void *jas_basic_realloc(jas_allocator_t *allocator, void *ptr, size_t size)
 	Skip performing any allocation if the currently-allocated block is
 	sufficiently large to accommodate the allocation request.
 	*/
-	if (size <= old_ext_size) {
+	if (ext_size <= old_ext_size) {
 		result = jas_mb_get_data(old_mb);
 		goto done;
 	}
@@ -558,8 +558,8 @@ void *jas_basic_realloc(jas_allocator_t *allocator, void *ptr, size_t size)
 		goto done;
 	}
 
-	JAS_LOGDEBUGF(100, "jas_basic_realloc: realloc(%p, %p, %zu)\n", a->delegate,
-	  old_mb, ext_size);
+	JAS_LOGDEBUGF(100, "jas_basic_realloc: realloc(%p, %p, %zu)\n",
+	  a->delegate, old_mb, ext_size);
 	jas_mb_destroy(old_mb);
 	if ((mb = (a->delegate->realloc)(a->delegate, old_mb, ext_size))) {
 		jas_mb_init(mb, ext_size);
