@@ -66,6 +66,12 @@ API of the library.
 Aside from the exceptions noted in this section, no function in the library
 may be invoked by a thread prior to it performing per-thread initialization
 via `jas_init_thread()`.
+Per-thread initialization (via `jas_init_thread()`) can be performed at any
+point during the lifetime of a thread (not necessarily at the start of the
+thread's lifetime), subject to the constraint that the thread
+must not use any macros/functions in the JasPer library that require
+per-thread initialization to have been performed prior to calling
+`jas_init_thread()`.
 
 The shutdown of the library roughly mirrors the process for library setup
 and consists of the following two stages:
@@ -83,9 +89,13 @@ function.
 The library cannot be re-initialized (without first being cleaned up).
 That is, calling `jas_init_library()` more than once without an intervening
 call to `jas_cleanup_library()` is not allowed.
+Note, however, that a program can call `jas_init_library()` more than once,
+provided that the program makes an intervening call to `jas_cleanup_library()`.
 Similarly, a thread cannot be re-initialized (without first being cleaned up).
 That is, calling `jas_init_thread()` more than once without an intervening
 call to `jas_cleanup_thread()` is not allowed.
+Note, however, that a thread can call `jas_init_thread()` more than once,
+provided that the thread makes an intervening call to `jas_cleanup_thread()`.
 
 Configuration, global initialization, and global clean-up should be
 performed on the same thread.
@@ -247,6 +257,46 @@ Use the JasPer library.
 
 /* Perform any per-thread clean-up for the JasPer library. */
 jas_cleanup_thread();
+~~~~~~~~~~
+
+When practical, it is probably preferable (for reasons of efficiency)
+to invoke `jas_init_thread()`
+and `jas_cleanup_thread()` only once in the lifetime of a thread.
+In some cases, this may be difficult to do, due to the
+structure of the application code.
+In such situations, one could simply wrap code using the JasPer
+library in calls to `jas_init_thread()` and `jas_cleanup_thread()`.
+As explained earlier, this is valid to do.
+For example, code like that shown in the example below is valid
+(assuming that the global initialization of the JasPer library
+has already been performed).
+
+~~~~~~~~~~
+/* Code that does not use the JasPer library. */
+
+/* Perform per-thread initialization of the JasPer library. */
+if (jas_init_thread()) {
+    /* Handle initialization error. */
+}
+
+/* Code that uses the JasPer library (e.g., performing encoding/decoding).
+
+/* Perform per-thread cleanup of the JasPer library. */
+jas_cleanup_thread();
+
+/* Code that does not use the JasPer library. */
+
+/* Perform per-thread initialization of the JasPer library. */
+if (jas_init_thread()) {
+    /* Handle initialization error. */
+}
+
+/* Code that uses the JasPer library (e.g., performing encoding/decoding).
+
+/* Perform per-thread cleanup of the JasPer library. */
+jas_cleanup_thread();
+
+/* Code that does not use the JasPer library. */
 ~~~~~~~~~~
 
 \section init_setup_example_3 Additional Examples of Library Setup
