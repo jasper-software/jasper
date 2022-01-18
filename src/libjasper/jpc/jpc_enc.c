@@ -878,6 +878,9 @@ void jpc_enc_destroy(jpc_enc_t *enc)
 	if (enc->tmpstream) {
 		jas_stream_close(enc->tmpstream);
 	}
+	if (enc->mrk) {
+		jpc_ms_destroy(enc->mrk);
+	}
 
 	jas_free(enc);
 }
@@ -892,8 +895,8 @@ static int jpc_enc_encodemainhdr(jpc_enc_t *enc)
 	jpc_cod_t *cod;
 	jpc_qcd_t *qcd;
 	int i;
-long startoff;
-long mainhdrlen;
+	long startoff;
+	long mainhdrlen;
 	jpc_enc_cp_t *cp;
 	jpc_qcc_t *qcc;
 	jpc_enc_tccp_t *tccp;
@@ -912,7 +915,7 @@ long mainhdrlen;
 
 	cp = enc->cp;
 
-startoff = jas_stream_getrwcount(enc->out);
+	startoff = jas_stream_getrwcount(enc->out);
 
 	/* Write SOC marker segment. */
 	if (!(enc->mrk = jpc_ms_create(JPC_MS_SOC))) {
@@ -1619,9 +1622,10 @@ void dump_layeringinfo(jpc_enc_t *enc)
 
 int rateallocate(jpc_enc_t *enc, unsigned numlyrs, uint_fast32_t *cumlens)
 {
+	int ret = 0;
 	jpc_flt_t lo;
 	jpc_flt_t hi;
-	jas_stream_t *out;
+	jas_stream_t *out = 0;
 	uint_fast32_t cumlen;
 	jpc_flt_t thresh;
 	jpc_flt_t goodthresh;
@@ -1656,7 +1660,8 @@ int rateallocate(jpc_enc_t *enc, unsigned numlyrs, uint_fast32_t *cumlens)
 	}
 
 	if (!(out = jas_stream_memopen(0, 0))) {
-		return -1;
+		ret = -1;
+		goto done;
 	}
 
 	/* Find minimum and maximum R-D slope values. */
@@ -1786,7 +1791,8 @@ int rateallocate(jpc_enc_t *enc, unsigned numlyrs, uint_fast32_t *cumlens)
 					for (prcno = 0; prcno < lvl->numprcs; ++prcno) {
 						if (jpc_enc_encpkt(enc, out, comp - tile->tcmpts,
 						  lvl - comp->rlvls, prcno, lyrno)) {
-							return -1;
+							ret = -1;
+							goto done;
 						}
 					}
 				}
@@ -1811,7 +1817,8 @@ int rateallocate(jpc_enc_t *enc, unsigned numlyrs, uint_fast32_t *cumlens)
 			/* Save the tier 2 coding state. */
 			jpc_restore_t2state(enc);
 			if (jas_stream_seek(out, oldpos, SEEK_SET) < 0) {
-				return -1;
+				ret = -1;
+				goto done;
 			}
 
 			JAS_LOGDEBUGF(10, "maxlen=%08ld actuallen=%08ld thresh=%f\n",
@@ -1883,7 +1890,8 @@ int rateallocate(jpc_enc_t *enc, unsigned numlyrs, uint_fast32_t *cumlens)
 				for (prcno = 0; prcno < lvl->numprcs; ++prcno) {
 					if (jpc_enc_encpkt(enc, out, comp - tile->tcmpts,
 					  lvl - comp->rlvls, prcno, lyrno)) {
-						return -1;
+						ret = -1;
+						goto done;
 					}
 				}
 			}
@@ -1895,10 +1903,17 @@ int rateallocate(jpc_enc_t *enc, unsigned numlyrs, uint_fast32_t *cumlens)
 	}
 
 	jas_stream_close(out);
+	out = 0;
+
+done:
+
+	if (out) {
+		jas_stream_close(out);
+	}
 
 	JAS_LOGDEBUGF(10, "finished rate allocation\n");
 
-	return 0;
+	return ret;
 }
 
 /******************************************************************************\

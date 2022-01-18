@@ -38,8 +38,13 @@ debug_level=0
 op=decode
 out_format=jp2
 
-imginfo_program="$program_dir/../../tmp_cmake/build/src/app/imginfo"
-jasper_program="$program_dir/../../tmp_cmake/build/src/app/jasper"
+if [ -n "$JAS_ABS_TOP_BUILDDIR" ]; then
+	imginfo_program="$JAS_ABS_TOP_BUILDDIR/src/app/imginfo"
+	jasper_program="$JAS_ABS_TOP_BUILDDIR/src/app/jasper"
+else
+	imginfo_program="$program_dir/../../tmp_cmake/build/src/app/imginfo"
+	jasper_program="$program_dir/../../tmp_cmake/build/src/app/jasper"
+fi
 image_file=
 
 while getopts s:e:d:p:i:D:m:T:h opt; do
