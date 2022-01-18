@@ -37,6 +37,7 @@ formats that it will use.
 In this way, an application can avoid the cost of increased memory
 consumption for codec drivers that are never to be employed.
 
+@todo Add figure.
 \begin{figure}
 \centerline{\includegraphics{figures/library/software.eps}}
 \caption{Software structure.}
@@ -76,7 +77,7 @@ the core code are prefixed with either `jas_` or `JAS_`.
 
 - Stream class (i.e., `jas_stream_t`).
   This class provides I/O streams similar to that of standard C
-  library \cite iso9899, but with additional functionality required by
+  library \cite iso9899-2011, but with additional functionality required by
   other code in the JasPer library.
   This extra functionality includes:
 
@@ -155,6 +156,7 @@ a per-component basis.
 All of the components are associated with same spatial extent in an image,
 but represent different types of information.
 
+@todo Add figure.
 \begin{figure}
 \begin{minipage}{0.70\columnwidth}%
 \centerline{\includegraphics{figures/library/srcimgmodel.eps}}
@@ -210,6 +212,7 @@ as $\text{HO}_k$, $\text{VO}_k$, $\text{HS}_k$, and $\text{VS}_k$,
 respectively.
 Suppose, for example, that these parameters have the following values:
 
+@todo Format table.
 \begin{center}%
 \begin{tabular}{|c|c|c|}\hline%
 $k$ & $(\text{HO}_k, \text{VO}_k)$ & $(\text{HS}_k, \text{VS}_k)$ \\ \hline
@@ -227,6 +230,7 @@ chosen in order to provide an enlightening example, and is not meant to
 represent a set of values that is likely to be used with great frequency
 by applications.
 
+@todo Add figure.
 \begin{figure}
 \centerline{\includegraphics{figures/library/refgridex.eps}}
 \caption{Alignment of components on the reference grid.}

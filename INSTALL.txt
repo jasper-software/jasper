@@ -6,45 +6,65 @@ The process required to install JasPer is described below.
 Installation on Systems Running Unix
 ------------------------------------
 
-In what follows, let $SOURCE_DIR denote the top-level directory of the
-JasPer software source tree (i.e., the directory containing the files
-named LICENSE and INSTALL) and let $INSTALL_DIR denote the target
-directory for installation.
+In what follows, let $SOURCE_DIR denote the top-level directory of the JasPer
+software source tree (i.e., the directory containing the files named LICENSE
+and INSTALL) and let $INSTALL_DIR denote the target directory for installation.
+To build the software, the following steps are required (in order):
 
-1) Select an empty directory to use for building the software.
-Let $BUILD_DIR denote this directory.
+  1. Select an empty directory to use for building the software.
+  Let $BUILD_DIR denote this directory.
 
-2) Generate the makefiles used for building the software.  To do this,
-invoke the command:
+  2. Configure the software using CMake.
+  To do this, invoke the command:
 
-    cmake -H$SOURCE_DIR -B$BUILD_DIR -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR \
-      $OPTIONS
+      cmake -H$SOURCE_DIR -B$BUILD_DIR -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR \
+        $OPTIONS
 
-where $OPTIONS corresponds to zero or more -D options as described below
-under the heading "Cmake Options".
+  where $OPTIONS corresponds to zero or more -D options as described below
+  under the heading "Cmake Options".
 
-3) Build the code using the make utility.  To do this, invoke the command:
+  This process allows important information about the system configuration
+  to be determined.  Unless you know what you are doing (or have problems
+  with the default build settings), it is STRONGLY RECOMMENDED that you
+  not override the default build settings.
 
-    cmake --build $BUILD_DIR
+  3. Build the software using CMake.
+  To do this, invoke the command:
 
-4) Run the test suite to ensure that the software seems to be working
-correctly.  To do this, invoke the commands:
+      cmake --build $BUILD_DIR
+
+  (Assuming that the build operation was successful, the executables
+  for the JasPer application programs should be located in the directory
+  $BUILD_DIR/src/app.)
+
+  4. Run the test suite to ensure that the software seems to be working
+  correctly.  To do this, invoke the commands:
 
     cd $BUILD_DIR
     ctest --output-on-failure
 
-5) Install the software.  To do this, invoke the command:
+  5. Install the software (i.e., the library, application programs,
+  header files, and other auxiliary data).
+  To do this, invoke the command:
 
-    cmake --build $BUILD_DIR --target install
+      cmake --build $BUILD_DIR --target install
+
+  This step may require special (e.g., administrator) privileges depending
+  on the target directory for installation.  (On Unix-based systems,
+  the default installation directory is typically under usr/local.)
+
+  Assuming that the software was installed successfully, the executables
+  for the JasPer application programs should be found somewhere under
+  the $CMAKE_INSTALL_PREFIX directory (e.g., $CMAKE_INSTALL_PREFIX/bin).
 
 Additional Remarks:
 
-When building the JasPer software under Mac OSX, only the use of the
-native framework for OpenGL is officially supported.  If the Freeglut
-library is installed on your system, you will need to ensure that the
-native GLUT library (as opposed to the Freeglut library) is used by the
-build process.  This can be accomplished by adding an extra option to
-the cmake command line that resembles the following:
+When building the JasPer software under Mac OSX, only the use of the native
+framework for OpenGL is officially supported.  If the Freeglut library
+is installed on your system, you will need to ensure that the native GLUT
+library (as opposed to the Freeglut library) is used by the build process.
+This can be accomplished by adding an extra option to the cmake command line
+that resembles the following:
 
     -DGLUT_glut_LIBRARY=/System/Library/Frameworks/GLUT.framework
 
@@ -73,7 +93,22 @@ above denotes line continuation.)
 
     msbuild %build_dir%\INSTALL.vcxproj
 
-Cmake Options
+Other Remarks
+-------------
+
+In some cases, it may be necessary to explicitly disable the use of the
+IJG JPEG library (i.e., libjpeg).  This is accomplished through a CMake
+configuration option.  (See the "CMake Options" section below.)  For example,
+such action may be required if the version of the JPEG library installed
+on your system is not compatible with the version of JasPer being built.
+Also, when building under the Cygwin environment, it may be necessary to
+explicitly disable the use of the JPEG library.
+
+In some situations, it may be necessary to explicitly disable the use of the
+OpenGL libraries.  This is accomplished through a CMake configuration option.
+(See the "CMake Options" section below.)
+
+CMake Options
 -------------
 
 The option OPTION can be set to the value VALUE with a command-line option
@@ -144,6 +179,17 @@ JAS_INCLUDE_PNM_CODEC
 JAS_INCLUDE_RAS_CODEC
     Include support for the specified codec in the library.
     (This support can still be disabled at run time.)
+    Valid values: true or false
+
+JAS_ENABLE_BMP_CODEC
+JAS_ENABLE_JP2_CODEC
+JAS_ENABLE_JPC_CODEC
+JAS_ENABLE_JPG_CODEC
+JAS_ENABLE_MIF_CODEC
+JAS_ENABLE_PGX_CODEC
+JAS_ENABLE_PNM_CODEC
+JAS_ENABLE_RAS_CODEC
+    Enable support for the specified codec by default at run time.
     Valid values: true or false
 
 JAS_ENABLE_ASAN

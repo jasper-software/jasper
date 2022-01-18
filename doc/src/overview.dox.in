@@ -28,6 +28,7 @@ Some of the features of the JasPer library are as follows:
       - JPEG-2000 VM Format (PGX)
   - non-native support for following image codecs:
       - JPEG (ISO/IEC 10918-1) via IJG JPEG Library
+      - HEIC via the libheif Library
   - can add new codecs (or disable codecs) at run time
   - can provide custom memory allocator to be used by library
   - can provide custom logging function to be used by library for
