@@ -90,9 +90,12 @@ The jasper program accepts the following options:
       (i.e., all components are sampled at the same points on the reference
       grid).
 
-The argument `$format` must have one of the following values:
+Assuming that JasPer is built with all codec support included (so that
+all codecs are available for use), the argument `$format` must have one of
+the following values:
 
   - `bmp`: Windows BMP
+  - `heic`: HEIC Format
   - `jp2`: JPEG-2000 JP2
   - `jpc`: JPEG-2000 Code Stream
   - `jpg`: JPEG
@@ -100,6 +103,9 @@ The argument `$format` must have one of the following values:
   - `pnm`: PNM/PGM/PPM
   - `mif`: My Image Format
   - `ras`: Sun Rasterfile
+
+A list of the available formats is included in the help information for
+the program (obtained via the `--help` option).
 
 \subsection app__jasper__examples Examples
 

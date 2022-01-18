@@ -29,13 +29,18 @@ Some of the features of the JasPer library are as follows:
   - non-native support for following image codecs:
       - JPEG (ISO/IEC 10918-1) via IJG JPEG Library
       - HEIC via the libheif Library
-  - can add new codecs (or disable codecs) at run time
+  - can add new codecs (or enable/disable codecs) at run time
   - can provide custom memory allocator to be used by library
   - can provide custom logging function to be used by library for
     error, warning, informational, and debugging messages
   - can place upper limit on total amount of memory used by library
+    (which is useful in protecting against malicious image streams
+    during decoding)
+  - can decode from a non-seekable source stream (which is useful for
+    filtering pipelines)
   - can manage ICC profiles
   - portable code known to work on many platforms
+    (e.g., Linux, Windows, MacOS, BSD, etc.)
   - can autodetect image format during decoding
 
 Several application programs are also provided:

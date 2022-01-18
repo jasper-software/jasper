@@ -20,6 +20,13 @@ usage()
 	-d \$step
 	-i \$image_file
 	-p \$imginfo_program
+
+	Examples
+	========
+
+	$0 -s 0 -e 1000000 -d 64 -i data/images/test.pnm
+
+	$0 -s 0 -e 1000000 -d 64 -i data/images/test.pnm -m encode -T jp2
 	EOF
 	exit 2
 }
@@ -28,12 +35,19 @@ start=0
 step=64
 end=4294967296
 debug_level=0
+op=decode
+out_format=jp2
 
 imginfo_program="$program_dir/../../tmp_cmake/build/src/app/imginfo"
+jasper_program="$program_dir/../../tmp_cmake/build/src/app/jasper"
 image_file=
 
-while getopts s:e:d:p:i:D: opt; do
+while getopts s:e:d:p:i:D:m:T:h opt; do
 	case "$opt" in
+	T)
+		out_format="$OPTARG";;
+	m)
+		op="$OPTARG";;
 	D)
 		debug_level="$OPTARG";;
 	s)
@@ -46,6 +60,8 @@ while getopts s:e:d:p:i:D: opt; do
 		image_file="$OPTARG";;
 	p)
 		imginfo_program="$OPTARG";;
+	-h|*)
+		usage;;
 	esac
 done
 shift $((OPTIND - 1))
@@ -57,10 +73,25 @@ fi
 i="$start"
 while [ $i -lt "$end" ]; do
 	echo "max mem $i"
-	command=(env ASAN_OPTIONS="exitcode=10" "$imginfo_program" --debug-level "$debug_level" --memory-limit "$i")
-	echo "RUN ${command[@]} < $image_file"
-	${command[@]} < "$image_file" > /dev/null
-	status=$?
+
+	case "$op" in
+	decode)
+		command=(env ASAN_OPTIONS="exitcode=10" \
+		  "$imginfo_program" --debug-level "$debug_level" --memory-limit "$i")
+		echo "RUN ${command[@]} < $image_file"
+		${command[@]} < "$image_file" > /dev/null
+		status=$?
+		;;
+	encode)
+		command=(env ASAN_OPTIONS="exitcode=10" \
+		  "$jasper_program" \
+		  --debug-level "$debug_level" --memory-limit "$i" -T "$out_format")
+		echo "RUN ${command[@]} < $image_file"
+		${command[@]} < "$image_file" > /dev/null
+		status=$?
+		;;
+	esac
+
 	if [ "$status" -eq 0 ]; then
 		echo "OK"
 		exit 0
