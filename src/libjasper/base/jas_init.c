@@ -204,20 +204,6 @@ jas_ctx_t *jas_get_default_ctx(void);
 
 static const jas_image_fmt_t jas_image_fmts[] = {
 
-#if defined(JAS_INCLUDE_MIF_CODEC) && defined(JAS_ENABLE_MIF_CODEC)
-	{
-		.name = "mif",
-		.desc = "My Image Format (MIF)",
-		.exts = "mif",
-		.ops = {
-			.decode = mif_decode,
-			.encode = mif_encode,
-			.validate = mif_validate
-		},
-		.enabled = JAS_ENABLE_MIF_CODEC,
-	},
-#endif
-
 #if defined(JAS_INCLUDE_PNM_CODEC)
 	{
 		.name = "pnm",
@@ -260,17 +246,17 @@ static const jas_image_fmt_t jas_image_fmts[] = {
 	},
 #endif
 
-#if defined(JAS_INCLUDE_JP2_CODEC)
+#if defined(JAS_INCLUDE_PGX_CODEC)
 	{
-		.name = "jp2",
-		.desc = "JPEG-2000 JP2 File Format Syntax (ISO/IEC 15444-1)",
-		.exts = "jp2",
+		.name = "pgx",
+		.desc = "JPEG-2000 VM Format (PGX)",
+		.exts = "pgx",
 		.ops = {
-			.decode = jp2_decode,
-			.encode = jp2_encode,
-			.validate = jp2_validate
+			.decode = pgx_decode,
+			.encode = pgx_encode,
+			.validate = pgx_validate
 		},
-		.enabled = JAS_ENABLE_JP2_CODEC,
+		.enabled = JAS_ENABLE_PGX_CODEC,
 	},
 #endif
 
@@ -285,6 +271,34 @@ static const jas_image_fmt_t jas_image_fmts[] = {
 			.validate = jpc_validate
 		},
 		.enabled = JAS_ENABLE_JPC_CODEC,
+	},
+#endif
+
+#if defined(JAS_INCLUDE_JP2_CODEC)
+	{
+		.name = "jp2",
+		.desc = "JPEG-2000 JP2 File Format Syntax (ISO/IEC 15444-1)",
+		.exts = "jp2",
+		.ops = {
+			.decode = jp2_decode,
+			.encode = jp2_encode,
+			.validate = jp2_validate
+		},
+		.enabled = JAS_ENABLE_JP2_CODEC,
+	},
+#endif
+
+#if defined(JAS_INCLUDE_MIF_CODEC) && defined(JAS_ENABLE_MIF_CODEC)
+	{
+		.name = "mif",
+		.desc = "My Image Format (MIF)",
+		.exts = "mif",
+		.ops = {
+			.decode = mif_decode,
+			.encode = mif_encode,
+			.validate = mif_validate
+		},
+		.enabled = JAS_ENABLE_MIF_CODEC,
 	},
 #endif
 
@@ -313,20 +327,6 @@ static const jas_image_fmt_t jas_image_fmts[] = {
 			.validate = jas_heic_validate
 		},
 		.enabled = JAS_ENABLE_HEIC_CODEC,
-	},
-#endif
-
-#if defined(JAS_INCLUDE_PGX_CODEC)
-	{
-		.name = "pgx",
-		.desc = "JPEG-2000 VM Format (PGX)",
-		.exts = "pgx",
-		.ops = {
-			.decode = pgx_decode,
-			.encode = pgx_encode,
-			.validate = pgx_validate
-		},
-		.enabled = JAS_ENABLE_PGX_CODEC,
 	},
 #endif
 

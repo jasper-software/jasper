@@ -226,6 +226,8 @@ typedef struct {
 * Threads
 \**************************************/
 
+#if defined(JAS_FOR_INTERNAL_USE_ONLY) || defined(JAS_FOR_JASPER_APP_USE_ONLY)
+
 /*!  Thread ID type. */
 #if defined(JAS_THREADS_C11)
 typedef thrd_t jas_thread_id_t;
@@ -255,6 +257,8 @@ typedef struct {
 
 static inline void jas_thread_yield(void);
 
+#endif
+
 /**************************************\
 * Thread-Specific Storage (TSS)
 \**************************************/
@@ -280,7 +284,7 @@ typedef DWORD jas_tss_t;
 Initialize a spinlock.
 
 @param mtx
-A pointer to a spinlock.
+A pointer to the spinlock to be initialized.
 
 @returns
 If the spinlock is successfully initialized, zero is returned.
@@ -307,7 +311,7 @@ static inline int jas_spinlock_init(jas_spinlock_t *mtx)
 Clean up a spinlock mutex.
 
 @param mtx
-A pointer to the splinlock.
+A pointer to the spinlock to be cleaned up.
 
 @returns
 If the spinlock is successfully cleaned up, zero is returned.
@@ -334,7 +338,7 @@ static inline int jas_spinlock_cleanup(jas_spinlock_t *mtx)
 Acquire a spinlock.
 
 @param mtx
-A pointer to the spinlock.
+A pointer to the spinlock to be acquired.
 
 @returns
 If successful, zero is returned.
@@ -361,7 +365,7 @@ static inline int jas_spinlock_lock(jas_spinlock_t *mtx)
 Release a spinlock.
 
 @param mtx
-A pointer to the spinlock.
+A pointer to the spinlock to be released.
 
 @returns
 If the operation is successful, zero is returned.
@@ -557,7 +561,9 @@ int jas_tss_set(jas_tss_t tss, void *value)
 @brief Register to call a function once.
 
 @param flag
+A pointer to a flag to track whether the function has been called yet.
 @param func
+A pointer to the function to be called.
 
 @returns
 */
@@ -587,6 +593,8 @@ static inline int jas_call_once(jas_once_flag_t *flag, void (*func)(void))
 /******************************************************************************\
 * Threads
 \******************************************************************************/
+
+#if defined(JAS_FOR_INTERNAL_USE_ONLY) || defined(JAS_FOR_JASPER_APP_USE_ONLY)
 
 #if defined(JAS_THREADS_PTHREAD)
 static void *thread_func_wrapper(void *thread_ptr)
@@ -722,9 +730,7 @@ static inline void jas_thread_yield(void)
 #endif
 }
 
-/******************************************************************************\
-*
-\******************************************************************************/
+#endif
 
 #if 0
 /* This functionality is not available for all threading support libraries. */
@@ -760,6 +766,10 @@ jas_thread_id_t jas_thread_current(void)
 #endif
 }
 #endif
+
+/******************************************************************************\
+*
+\******************************************************************************/
 
 #else
 

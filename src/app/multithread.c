@@ -71,6 +71,8 @@
 * Includes.
 \******************************************************************************/
 
+#define JAS_FOR_JASPER_APP_USE_ONLY
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>

@@ -13,21 +13,37 @@
 An image is represented by the type `jas_image_t`.
 An image component is represented by the type `jas_image_cmpt_t`.
 
-image creation/destruction:
+The image-format table contains an entry for each codec that is
+supported by the JasPer library.
+More specifically, an entry in the table will be present for each codec
+whose support was included in the JasPer library when the
+library was built.
+A codec may be either in an enabled or disabled state.
+The default value for the enable/disable setting is specified when the
+library is built.
+The enable/disable setting can also be changed (from the default)
+at run time.
+Most functions that query the image-format table ignore (or skip)
+entries that correspond to disabled codecs.
+The default build-time configuration settings for JasPer are such
+that codecs that are experimental or dangerous (due to posing
+security risks) are disabled by default.
+
+The following functions are provided for image creation/destruction:
 
   - `jas_image_create()`
   - `jas_image_create0()`
   - `jas_image_copy()`
   - `jas_image_destroy()`
 
-image encoding/decoding:
+The following functions are provided for image encoding/decoding:
 
   - `jas_image_decode()`
   - `jas_image_encode()`
 
 other
-  - `jas_image_rawsize()`
 
+  - `jas_image_rawsize()`
   - `jas_image_ishomosamp()`
   - `jas_image_cmprof()`
   - `jas_image_sampcmpt()`
