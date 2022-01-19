@@ -583,7 +583,8 @@ static inline int jas_call_once(jas_once_flag_t *flag, void (*func)(void))
 	} else {
 		while (flag->status == 1) {
 			/* Perform a busy wait.  This is ugly. */
-			jas_thread_yield();
+			/* Yield processor. */
+			SwitchToThread();
 		}
 	}
 	return 0;
@@ -730,8 +731,6 @@ static inline void jas_thread_yield(void)
 #endif
 }
 
-#endif
-
 #if 0
 /* This functionality is not available for all threading support libraries. */
 static inline
@@ -765,6 +764,8 @@ jas_thread_id_t jas_thread_current(void)
 	abort();
 #endif
 }
+#endif
+
 #endif
 
 /******************************************************************************\
