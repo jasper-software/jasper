@@ -233,7 +233,7 @@ Use the JasPer library.
 jas_cleanup_thread();
 
 /* Perform global cleanup for the JasPer library. */
-jas_cleanup();
+jas_cleanup_library();
 ~~~~~~~~~~
 
 In the case of an application where the JasPer library is used in more than
