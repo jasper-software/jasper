@@ -418,9 +418,10 @@ if(JAS_ENABLE_MULTITHREADING_SUPPORT)
 		endif()
 	endif()
 
-if(MACOS)
-	set(JAS_PREFER_PTHREAD FALSE)
-endif()
+	# TODO: Is this really needed?  Is this due to a TSan issue?
+	if(MACOS)
+		set(JAS_PREFER_PTHREAD FALSE)
+	endif()
 
 	# Apply preferences to select one particular threading library.
 	if(JAS_HAVE_PTHREAD_THREADS AND JAS_PREFER_PTHREAD)
@@ -450,6 +451,10 @@ endif()
 	message("Threading library: ${THREAD_LIBRARY}")
 else()
 	message("Threading support has been disabled.")
+endif()
+
+if(JAS_ENABLE_MULTITHREADING_SUPPORT AND NOT JAS_THREADS)
+	message(FATAL_ERROR "Threading support is not available.")
 endif()
 
 if(JAS_THREADS_C11 AND JAS_ENABLE_TSAN)
