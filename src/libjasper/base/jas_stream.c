@@ -353,7 +353,6 @@ jas_stream_t *jas_stream_freopen(const char *path, const char *mode, FILE *fp)
 
 	JAS_LOGDEBUGF(100, "jas_stream_freopen(\"%s\", \"%s\", %p)\n", path, mode, fp);
 
-	/* Eliminate compiler warning about unused variable. */
 	JAS_UNUSED(path);
 
 	/* Allocate a stream object. */

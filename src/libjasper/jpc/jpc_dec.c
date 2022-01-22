@@ -468,15 +468,14 @@ static int jpc_dec_process_crg(jpc_dec_t *dec, jpc_ms_t *ms)
 		cmpt->vsubstep = crg->comps[cmptno].voff;
 		*/
 		/* suppress -Wunused-but-set-variable */
-		(void)crg;
+		JAS_UNUSED(crg);
 	}
 	return 0;
 }
 
 static int jpc_dec_process_soc(jpc_dec_t *dec, jpc_ms_t *ms)
 {
-	/* Eliminate warnings about unused variables. */
-	(void)ms;
+	JAS_UNUSED(ms);
 
 	/* We should expect to encounter a SIZ marker segment next. */
 	dec->state = JPC_MHSIZ;
@@ -590,8 +589,7 @@ static int jpc_dec_process_sod(jpc_dec_t *dec, jpc_ms_t *ms)
 	jpc_dec_tile_t *tile;
 	int pos;
 
-	/* Eliminate compiler warnings about unused variables. */
-	(void)ms;
+	JAS_UNUSED(ms);
 
 	if (!(tile = dec->curtile)) {
 		return -1;
@@ -1312,8 +1310,7 @@ static int jpc_dec_process_eoc(jpc_dec_t *dec, jpc_ms_t *ms)
 {
 	jpc_dec_tile_t *tile;
 
-	/* Eliminate compiler warnings about unused variables. */
-	(void)ms;
+	JAS_UNUSED(ms);
 
 	unsigned tileno;
 	for (tileno = 0, tile = dec->tiles; tileno < dec->numtiles; ++tileno,
@@ -1701,17 +1698,15 @@ static int jpc_dec_process_ppt(jpc_dec_t *dec, jpc_ms_t *ms)
 
 static int jpc_dec_process_com(jpc_dec_t *dec, jpc_ms_t *ms)
 {
-	/* Eliminate compiler warnings about unused variables. */
-	(void)dec;
-	(void)ms;
+	JAS_UNUSED(dec);
+	JAS_UNUSED(ms);
 
 	return 0;
 }
 
 static int jpc_dec_process_unk(jpc_dec_t *dec, jpc_ms_t *ms)
 {
-	/* Eliminate compiler warnings about unused variables. */
-	(void)dec;
+	JAS_UNUSED(dec);
 
 	jas_logwarnf("warning: ignoring unknown marker segment (0x%x)\n",
 	  ms->id);
@@ -1913,8 +1908,7 @@ static int jpc_dec_cp_setfromcox(jpc_dec_cp_t *cp, jpc_dec_ccp_t *ccp,
 {
 	int rlvlno;
 
-	/* Eliminate compiler warnings about unused variables. */
-	(void)cp;
+	JAS_UNUSED(cp);
 
 	if ((flags & JPC_COC) || !(ccp->flags & JPC_COC)) {
 		ccp->numrlvls = compparms->numdlvls + 1;
@@ -1958,8 +1952,7 @@ static int jpc_dec_cp_setfromqcx(jpc_dec_cp_t *cp, jpc_dec_ccp_t *ccp,
 {
 	int bandno;
 
-	/* Eliminate compiler warnings about unused variables. */
-	(void)cp;
+	JAS_UNUSED(cp);
 
 	/* Sanity check to prevent buffer overflow */
 	if (compparms->numstepsizes > (3 * JPC_MAXRLVLS + 1)) {

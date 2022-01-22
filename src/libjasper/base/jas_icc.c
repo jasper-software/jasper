@@ -1052,9 +1052,7 @@ static int jas_iccxyz_output(jas_iccattrval_t *attrval, jas_stream_t *out)
 
 static unsigned jas_iccxyz_getsize(const jas_iccattrval_t *attrval)
 {
-	/* Avoid compiler warnings about unused parameters. */
 	JAS_UNUSED(attrval);
-
 	return 12;
 }
 
@@ -1081,7 +1079,6 @@ static void jas_icccurv_destroy(jas_iccattrval_t *attrval)
 static int jas_icccurv_copy(jas_iccattrval_t *attrval,
   const jas_iccattrval_t *othattrval)
 {
-	/* Avoid compiler warnings about unused parameters. */
 	JAS_UNUSED(attrval);
 	JAS_UNUSED(othattrval);
 
@@ -1180,7 +1177,6 @@ static int jas_icctxtdesc_copy(jas_iccattrval_t *attrval,
 {
 	jas_icctxtdesc_t *txtdesc = &attrval->data.txtdesc;
 
-	/* Avoid compiler warnings about unused parameters. */
 	JAS_UNUSED(attrval);
 	JAS_UNUSED(othattrval);
 	JAS_UNUSED(txtdesc);
@@ -1398,7 +1394,6 @@ static void jas_icclut8_destroy(jas_iccattrval_t *attrval)
 static int jas_icclut8_copy(jas_iccattrval_t *attrval,
   const jas_iccattrval_t *othattrval)
 {
-	/* Avoid compiler warnings about unused parameters. */
 	JAS_UNUSED(attrval);
 	JAS_UNUSED(othattrval);
 	abort();
@@ -1584,9 +1579,9 @@ static void jas_icclut16_destroy(jas_iccattrval_t *attrval)
 static int jas_icclut16_copy(jas_iccattrval_t *attrval,
   const jas_iccattrval_t *othattrval)
 {
-	/* Avoid compiler warnings about unused parameters. */
 	JAS_UNUSED(attrval);
 	JAS_UNUSED(othattrval);
+
 	/* Not yet implemented. */
 	abort();
 	return -1;

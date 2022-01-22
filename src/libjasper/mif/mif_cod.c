@@ -162,7 +162,6 @@ jas_image_t *mif_decode(jas_stream_t *in, const char *optstr)
 
 	JAS_LOGDEBUGF(10, "mif_decode(%p, \"%s\")\n", in, (optstr ? optstr : ""));
 
-	/* Avoid warnings about unused parameters. */
 	JAS_UNUSED(optstr);
 
 	hdr = 0;

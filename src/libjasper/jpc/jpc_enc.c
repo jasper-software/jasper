@@ -2630,7 +2630,7 @@ static void cblk_destroy(jpc_enc_cblk_t *cblk)
 static void pass_destroy(jpc_enc_pass_t *pass)
 {
 	/* XXX - need to free resources here */
-	(void)pass;
+	JAS_UNUSED(pass);
 }
 
 void jpc_enc_dump(jpc_enc_t *enc)

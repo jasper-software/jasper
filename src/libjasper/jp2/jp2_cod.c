@@ -831,10 +831,8 @@ static int jp2_cmap_getdata(jp2_box_t *box, jas_stream_t *in)
 
 static int jp2_cmap_putdata(const jp2_box_t *box, jas_stream_t *out)
 {
-	/* Eliminate compiler warning about unused variables. */
-	(void)box;
-	(void)out;
-
+	JAS_UNUSED(box);
+	JAS_UNUSED(out);
 	return -1;
 }
 
@@ -910,9 +908,8 @@ static int jp2_pclr_putdata(const jp2_box_t *box, jas_stream_t *out)
 #if 0
 	const jp2_pclr_t *pclr = &box->data.pclr;
 #endif
-	/* Eliminate warning about unused variable. */
-	(void)box;
-	(void)out;
+	JAS_UNUSED(box);
+	JAS_UNUSED(out);
 	return -1;
 }
 

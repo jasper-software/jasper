@@ -241,8 +241,7 @@ void jpc_tagtree_setvalue(jpc_tagtree_t *tree, jpc_tagtreenode_t *leaf,
 {
 	jpc_tagtreenode_t *node;
 
-	/* Avoid compiler warnings about unused parameters. */
-	(void)tree;
+	JAS_UNUSED(tree);
 
 	assert(value >= 0);
 
@@ -270,8 +269,7 @@ int jpc_tagtree_encode(jpc_tagtree_t *tree, jpc_tagtreenode_t *leaf,
 	jpc_tagtreenode_t *node;
 	int low;
 
-	/* Avoid compiler warnings about unused parameters. */
-	(void)tree;
+	JAS_UNUSED(tree);
 
 	assert(leaf);
 	assert(threshold >= 0);
@@ -331,8 +329,7 @@ int jpc_tagtree_decode(jpc_tagtree_t *tree, jpc_tagtreenode_t *leaf,
 	int low;
 	int ret;
 
-	/* Avoid compiler warnings about unused parameters. */
-	(void)tree;
+	JAS_UNUSED(tree);
 
 	assert(threshold >= 0);
 

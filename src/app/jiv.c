@@ -995,8 +995,9 @@ static void render()
 	if (cmdopts.verbose) {
 //		fprintf(stderr, "vtlx=%f, vtly=%f, vsx=%f, vsy=%f\n",
 //		  vtlx, vtly, gs.sx, gs.sy);
-		/* suppress -Wunused-but-set-variable */
-		(void)vtlx; (void)vtly;
+		/* Suppress -Wunused-but-set-variable */
+		JAS_UNUSED(vtlx);
+		JAS_UNUSED(vtly);
 	}
 
 	if (gs.monomode) {

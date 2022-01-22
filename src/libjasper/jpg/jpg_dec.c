@@ -466,8 +466,7 @@ static int jpg_copystreamtofile(FILE *out, jas_stream_t *in)
 
 static void jpg_start_output(j_decompress_ptr cinfo, jpg_dest_t *dinfo)
 {
-	/* Avoid compiler warnings about unused parameters. */
-	(void)cinfo;
+	JAS_UNUSED(cinfo);
 
 	JAS_LOGDEBUGF(10, "jpg_start_output(%p, %p)\n", cinfo, dinfo);
 
@@ -512,7 +511,6 @@ static void jpg_finish_output(j_decompress_ptr cinfo, jpg_dest_t *dinfo)
 {
 	JAS_LOGDEBUGF(10, "jpg_finish_output(%p, %p)\n", cinfo, dinfo);
 
-	/* Avoid compiler warnings about unused parameters. */
-	(void)cinfo;
-	(void)dinfo;
+	JAS_UNUSED(cinfo);
+	JAS_UNUSED(dinfo);
 }

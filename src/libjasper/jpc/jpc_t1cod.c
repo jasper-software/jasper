@@ -142,8 +142,7 @@ enum jpc_passtype JPC_PASSTYPE(unsigned passno)
 
 unsigned JPC_NOMINALGAIN(unsigned qmfbid, unsigned numlvls, unsigned lvlno, enum jpc_tsfb_orient orient)
 {
-	/* Avoid compiler warnings about unused parameters. */
-	(void)numlvls;
+	JAS_UNUSED(numlvls);
 
 	if (qmfbid == JPC_COX_INS) {
 		return 0;
