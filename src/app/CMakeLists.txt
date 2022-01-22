@@ -1,35 +1,40 @@
-set(programs "")
+# The programs that are for internal use only and not installed.
+set(private_programs "")
+
+# The programs that are to be installed.
+set(public_programs "")
+
+# The manual pages that are to be installed.
 set(man_pages "")
-set(extra_programs "")
 
 # The jasper program
 add_executable(jasper jasper.c)
 target_link_libraries(jasper libjasper ${JAS_LIBJPEG_TARGET} ${HEIF_LIBRARIES}
   ${MATH_LIBRARY} ${THREAD_LIBRARY})
-set(programs "${programs}" jasper)
+set(public_programs "${public_programs}" jasper)
 set(man_pages "${man_pages}" jasper.1)
 
 # The imginfo program
 add_executable(imginfo imginfo.c)
 target_link_libraries(imginfo libjasper ${JAS_LIBJPEG_TARGET} ${HEIF_LIBRARIES}
   ${MATH_LIBRARY} ${THREAD_LIBRARY})
-set(programs "${programs}" imginfo)
+set(public_programs "${public_programs}" imginfo)
 set(man_pages "${man_pages}" imginfo.1)
 
 # The imgcmp program
 add_executable(imgcmp imgcmp.c)
 target_link_libraries(imgcmp libjasper ${JAS_LIBJPEG_TARGET} ${HEIF_LIBRARIES}
   ${MATH_LIBRARY} ${THREAD_LIBRARY})
-set(programs "${programs}" imgcmp)
+set(public_programs "${public_programs}" imgcmp)
 set(man_pages "${man_pages}" imgcmp.1)
 
-# The jiv program (which requires GLUT)
+# The jiv program (which requires OpenGL and GLUT)
 if(JAS_HAVE_OPENGL)
 	add_executable(jiv jiv.c)
 	target_link_libraries(jiv libjasper
 	  ${JAS_LIBJPEG_TARGET} ${HEIF_LIBRARIES} ${JAS_OPENGL_TARGETS}
 	  ${JAS_OPENGL_TARGETS} ${MATH_LIBRARY} ${THREAD_LIBRARY})
-	set(programs "${programs}" jiv)
+	set(public_programs "${public_programs}" jiv)
 	set(man_pages "${man_pages}" jiv.1)
 else()
 	message("GLUT library not found; skipping build of jiv program")
@@ -40,19 +45,20 @@ if(JAS_THREADS)
 	add_executable(multithread multithread.c)
 	target_link_libraries(multithread libjasper ${JAS_LIBJPEG_TARGET}
 	  ${MATH_LIBRARY} ${THREAD_LIBRARY})
-	set(programs "${programs}" multithread)
+	set(private_programs "${private_programs}" multithread)
 endif()
 
+# The test_1 program.
 add_executable(test_1 test_1.c)
 target_link_libraries(test_1 libjasper ${JAS_LIBJPEG_TARGET}
   ${MATH_LIBRARY} ${THREAD_LIBRARY})
-set(programs "${programs}" test_1)
+set(private_programs "${private_programs}" test_1)
 
 if(JAS_ENABLE_FUZZER)
 	add_executable(fuzz fuzz.c)
 	target_link_libraries(fuzz libjasper ${JAS_LIBJPEG_TARGET}
 	  ${MATH_LIBRARY} ${THREAD_LIBRARY})
-	set(programs "${programs}" fuzz)
+	set(private_programs "${private_programs}" fuzz)
 	target_compile_options(fuzz PRIVATE "-fsanitize=fuzzer")
 	if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.13)
 		target_link_options(fuzz PRIVATE "-fsanitize=fuzzer")
@@ -70,7 +76,7 @@ include_directories(BEFORE
 )
 
 # Install of the the programs that were built.
-install(TARGETS ${programs} DESTINATION "${CMAKE_INSTALL_BINDIR}")
+install(TARGETS ${public_programs} DESTINATION "${CMAKE_INSTALL_BINDIR}")
 
 # Install the manual pages for the programs that were built.
 install(FILES ${man_pages} DESTINATION "${CMAKE_INSTALL_MANDIR}/man1")
@@ -89,7 +95,6 @@ if(BASH_PROGRAM AND JAS_HAVE_ALL_NATIVE_CODECS)
 	add_test(run_test_imgcmp
 	  "${BASH_PROGRAM}" "${CMAKE_CURRENT_BINARY_DIR}/../../test/bin/wrapper"
 	  "${CMAKE_CURRENT_SOURCE_DIR}/../../test/bin/run_test_imgcmp" -v)
-#if(NOT WIN32)
 	add_test(run_test_1
 	  "${BASH_PROGRAM}" "${CMAKE_CURRENT_BINARY_DIR}/../../test/bin/wrapper"
 	  "${CMAKE_CURRENT_SOURCE_DIR}/../../test/bin/run_test_1" -v)
@@ -102,15 +107,14 @@ if(BASH_PROGRAM AND JAS_HAVE_ALL_NATIVE_CODECS)
 	add_test(run_test_4
 	  "${BASH_PROGRAM}" "${CMAKE_CURRENT_BINARY_DIR}/../../test/bin/wrapper"
 	  "${CMAKE_CURRENT_SOURCE_DIR}/../../test/bin/run_test_4" -v)
-#endif()
 	if(JAS_THREADS)
 		add_test(run_test_5
 		  "${BASH_PROGRAM}" "${CMAKE_CURRENT_BINARY_DIR}/../../test/bin/wrapper"
 		  "${CMAKE_CURRENT_SOURCE_DIR}/../../test/bin/run_test_5" -v)
-		set(extra_programs "${extra_programs}" multithread)
+		set(private_programs "${private_programs}" multithread)
 	endif()
 	add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS
-	  ${programs} ${extra_programs}
+	  ${public_programs} ${private_programs}
 	  "${CMAKE_CURRENT_BINARY_DIR}/../../test/bin/wrapper") 
 else()
 	if (NOT JAS_HAVE_ALL_NATIVE_CODECS)
