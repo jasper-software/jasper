@@ -474,6 +474,16 @@ int jas_init_library()
 	The following check requires that library configuration be performed on
 	the same thread as library initialization.
 	*/
+	if (!jas_conf.initialized) {
+		jas_eprintf("FATAL ERROR: "
+		  "jas_init_library called before JasPer library configured\n");
+		abort();
+	}
+
+	/*
+	The following check requires that library configuration be performed on
+	the same thread as library initialization.
+	*/
 	assert(jas_conf.initialized);
 	assert(!jas_global.initialized);
 
@@ -605,6 +615,17 @@ int jas_cleanup_library()
 	has_lock = true;
 #endif
 
+	if (!jas_global.initialized) {
+		jas_eprintf("FATAL ERROR: "
+		  "jas_cleanup_library called before JasPer library initialized\n");
+		abort();
+	}
+	if (jas_global.num_active_threads) {
+		jas_eprintf("FATAL ERROR: "
+		  "jas_cleanup_library called with active JasPer threads\n");
+		abort();
+	}
+
 	assert(jas_global.initialized);
 	assert(!jas_global.num_active_threads);
 
@@ -663,6 +684,11 @@ int jas_init_thread()
 	has_lock = true;
 #endif
 
+	if (!jas_global.initialized) {
+		jas_eprintf("FATAL ERROR: "
+		  "jas_init_thread called before JasPer library initialized\n");
+		abort();
+	}
 	assert(jas_global.initialized);
 #if !defined(JAS_THREADS)
 	assert(jas_global.num_active_threads == 0);
@@ -709,6 +735,12 @@ int jas_cleanup_thread()
 	jas_mutex_lock(&jas_global.lock);
 	has_lock = true;
 #endif
+
+	if (!jas_get_default_ctx()) {
+		jas_eprintf("FATAL ERROR: "
+		  "jas_cleanup_thread called before JasPer thread initialized\n");
+		abort();
+	}
 
 	assert(jas_get_default_ctx());
 	assert(jas_get_ctx());

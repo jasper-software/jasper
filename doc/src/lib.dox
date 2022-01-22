@@ -312,11 +312,15 @@ initialized.
   - \subpage lib_images
   - \subpage lib_iostreams
   - \subpage lib_log
+@if DOXYGEN_EXCLUDE
   - \subpage lib_threads
+@endif
   - \subpage lib_string
   - \subpage lib_math
   - \subpage lib_timers
+@if DOXYGEN_EXCLUDE
   - \subpage lib_misc
+@endif
 
 */
 

@@ -106,6 +106,7 @@ extern "C" {
 #endif
 
 /*!
+ * @cond DOXYGEN_EXCLUDE
  * @addtogroup module_threads
  * @{
  */
@@ -782,6 +783,7 @@ jas_thread_id_t jas_thread_current(void)
 
 /*!
  * @}
+ * @endcond
  */
 
 #ifdef __cplusplus

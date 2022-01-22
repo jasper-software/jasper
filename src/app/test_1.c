@@ -72,8 +72,29 @@
 
 #include <jasper/jasper.h>
 
-int alloc_test_main(int argc, char **argv);
-int string_test_main(int argc, char **argv);
+typedef struct {
+	int debug_level;
+	size_t max_mem;
+} global_t;
+
+int test_alloc(int argc, char **argv);
+int test_string(int argc, char **argv);
+int test_1(int argc, char **argv);
+
+int initialize(void);
+void cleanup(void);
+
+/******************************************************************************\
+* Global state.
+\******************************************************************************/
+
+global_t global;
+
+static const jas_opt_t opts[] = {
+	{'d', "debug-level", JAS_OPT_HASARG},
+	{'m', "memory-limit", JAS_OPT_HASARG},
+	{-1, 0, 0}
+};
 
 /******************************************************************************\
 * Main program.
@@ -82,44 +103,109 @@ int string_test_main(int argc, char **argv);
 int main(int argc, char **argv)
 {
 	int ret = 0;
-	int debug = 0;
 
-	jas_conf_clear();
-	static jas_std_allocator_t allocator;
-	jas_std_allocator_init(&allocator);
-	jas_conf_set_allocator(&allocator.base);
-	//jas_conf_set_max_mem_usage(max_mem);
-	jas_conf_set_debug_level(debug);
-	if (jas_init_library()) {
-		fprintf(stderr, "cannot initialize JasPer library\n");
-		return EXIT_FAILURE;
-	}
-	if (jas_init_thread()) {
-		fprintf(stderr, "cannot initialize thread\n");
-		return EXIT_FAILURE;
-	}
+	global.debug_level = 0;
+	global.max_mem = jas_get_total_mem_size();
 
-	if (argc < 2) {
-		abort();
+	int c;
+	while ((c = jas_getopt(argc, argv, opts)) != EOF) {
+		switch (c) {
+		case 'd':
+			global.debug_level = atoi(jas_optarg);
+			break;
+		case 'm':
+			global.max_mem = atoll(jas_optarg);
+			break;
+		default:
+			break;
+		}
 	}
 
-	if (!strcmp(argv[1], "alloc")) {
-		ret = alloc_test_main(argc - 1, &argv[1]);
-	} else if (!strcmp(argv[1], "string")) {
-		ret = string_test_main(argc - 1, &argv[1]);
+	int num_args;
+	num_args = argc - jas_optind;
+	char **args;
+
+	if (num_args < 1) {
+		fprintf(stderr, "invalid usage\n");
+		exit(EXIT_FAILURE);
+	}
+
+	args = &argv[jas_optind];
+	for (int i = 0; i < num_args; ++i) {
+		fprintf(stderr, "args[%d] = %s\n", i, args[i]);
+	}
+
+	if (!strcmp(args[0], "alloc")) {
+		ret = test_alloc(num_args, args);
+	} else if (!strcmp(args[0], "string")) {
+		ret = test_string(num_args, args);
+	} else if (!strcmp(args[0], "test")) {
+		ret = test_1(num_args, args);
 	} else {
+		fprintf(stderr, "invalid usage\n");
+		ret = -1;
 	}
-
-	jas_cleanup_thread();
-	jas_cleanup_library();
 
 	return ret ? EXIT_FAILURE : EXIT_SUCCESS;
 }
 
-int alloc_test_main(int argc, char **argv)
+int test_1(int argc, char **argv)
+{
+	if (argc < 2) {
+		return -1;
+	}
+
+	int mask = strtoul(argv[1], 0, 16);
+
+	fprintf(stderr, "mask %x\n", mask);
+
+	if (mask & 0x0001) {
+		fprintf(stderr, "configuring\n");
+		jas_conf_clear();
+	}
+	jas_conf_set_max_mem_usage(global.max_mem);
+	jas_conf_set_debug_level(global.debug_level);
+
+	if (mask & 0x0010) {
+		fprintf(stderr, "initializing library\n");
+		if (jas_init_library()) {
+			fprintf(stderr, "cannot initialize JasPer library\n");
+			return -1;
+		}
+	}
+	if (mask & 0x0020) {
+		fprintf(stderr, "initializing thread\n");
+		if (jas_init_thread()) {
+			fprintf(stderr, "cannot initialize thread\n");
+			return -1;
+		}
+	}
+
+	if (mask & 0x0200) {
+		fprintf(stderr, "cleaning up thread\n");
+		if (jas_cleanup_thread()) {
+			fprintf(stderr, "cannot clean up thread\n");
+			return -1;
+		}
+	}
+	if (mask & 0x0100) {
+		fprintf(stderr, "cleaning up library\n");
+		if (jas_cleanup_library()) {
+			fprintf(stderr, "cannot clean up library\n");
+			return -1;
+		}
+	}
+
+	return 0;
+}
+
+int test_alloc(int argc, char **argv)
 {
 	JAS_UNUSED(argc);
 	JAS_UNUSED(argv);
+
+	initialize();
+
 	char *buffer;
 	char *new_buffer;
 	buffer = jas_malloc(7);
@@ -132,14 +218,19 @@ int alloc_test_main(int argc, char **argv)
 	printf("%s\n", buffer);
 	assert(buffer);
 	jas_free(buffer);
+
+	cleanup();
 	
 	return 0;
 }
 
-int string_test_main(int argc, char **argv)
+int test_string(int argc, char **argv)
 {
 	JAS_UNUSED(argc);
 	JAS_UNUSED(argv);
+
+	initialize();
+
 	char **tokens;
 	size_t max_tokens;
 	size_t num_tokens;
@@ -157,5 +248,33 @@ int string_test_main(int argc, char **argv)
 		}
 		jas_free(tokens);
 	}
+
+	cleanup();
+
 	return 0;
+}
+
+int initialize(void)
+{
+	jas_conf_clear();
+	static jas_std_allocator_t allocator;
+	jas_std_allocator_init(&allocator);
+	jas_conf_set_allocator(&allocator.base);
+	jas_conf_set_max_mem_usage(global.max_mem);
+	jas_conf_set_debug_level(global.debug_level);
+	if (jas_init_library()) {
+		fprintf(stderr, "cannot initialize JasPer library\n");
+		return EXIT_FAILURE;
+	}
+	if (jas_init_thread()) {
+		fprintf(stderr, "cannot initialize thread\n");
+		return EXIT_FAILURE;
+	}
+	return 0;
+}
+
+void cleanup(void)
+{
+	jas_cleanup_thread();
+	jas_cleanup_library();
 }

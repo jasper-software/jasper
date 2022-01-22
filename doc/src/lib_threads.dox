@@ -1,5 +1,7 @@
 /*!
 
+@if DXOYGEN_EXCLUDE
+
 \page lib_threads Threading Support
 
 \section lib_threads__api API References
@@ -7,5 +9,7 @@
 - \ref module_threads
 
 \section lib_threads__intro Introduction
+
+@endif
 
 */

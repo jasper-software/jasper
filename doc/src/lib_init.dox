@@ -47,7 +47,7 @@ is performed (via `jas_init_library()`):
   - `jas_std_allocator_init()`
 
 <b>In order to use JasPer in multiple threads, the multithread flag must
-be set (to true) during configuration using the jas_conf_set_multithread()`
+be set (to true) during configuration using the `jas_conf_set_multithread()`
 function.</b>
 
 The global initialization stage initializes the library itself using the

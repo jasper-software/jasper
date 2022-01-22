@@ -35,6 +35,9 @@ General information can be found
 General information can be found
 \ref lib_image "here".
 
+@defgroup module_seq One- and Two-Dimensional Sequences
+@brief One- and Two-Dimensional Sequences
+
 @defgroup module_fixed Fixed-Point Arithmetic
 @brief Fixed-Point Arithmetic
 
@@ -45,6 +48,8 @@ General information can be found
 General information can be found
 \ref lib_log "here".
 
+@if DOXYGEN_EXCLUDE
+
 @defgroup module_threads Threading Support
 @brief Threading
 
@@ -52,15 +57,7 @@ General information can be found
 General information can be found
 \ref lib_threads "here".
 
-@defgroup module_seq One- and Two-Dimensional Sequences
-@brief One- and Two-Dimensional Sequences
-
-@defgroup module_threads Threads
-@brief Threads
-
-@details
-General information can be found
-\ref lib_threads "here".
+@endif
 
 @defgroup module_timers Timers
 @brief Timers
