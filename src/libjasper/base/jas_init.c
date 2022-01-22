@@ -830,11 +830,13 @@ static int jas_init_codecs(jas_ctx_t *ctx)
 /******************************************************************************\
 \******************************************************************************/
 
+#if 0
 /* For internal library use only. */
 static jas_conf_t *jas_get_conf_ptr()
 {
 	return &jas_conf;
 }
+#endif
 
 void jas_ctx_init(jas_ctx_t *ctx)
 {

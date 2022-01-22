@@ -116,6 +116,8 @@ static long convert(long val, bool oldsgnd, unsigned oldprec, bool newsgnd,
 static void jas_image_calcbbox2(const jas_image_t *image,
   jas_image_coord_t *tlx, jas_image_coord_t *tly, jas_image_coord_t *brx,
   jas_image_coord_t *bry);
+static void jas_image_fmtinfo_init(jas_image_fmtinfo_t *fmtinfo);
+static void jas_image_fmtinfo_cleanup(jas_image_fmtinfo_t *fmtinfo);
 
 /******************************************************************************\
 * Create and destroy operations.
@@ -679,7 +681,7 @@ int jas_image_writecmpt(jas_image_t *image, unsigned cmptno,
 * File format operations.
 \******************************************************************************/
 
-void jas_image_fmtinfo_init(jas_image_fmtinfo_t *fmtinfo)
+static void jas_image_fmtinfo_init(jas_image_fmtinfo_t *fmtinfo)
 {
 	fmtinfo->id = -1;
 	fmtinfo->name = 0;
@@ -692,7 +694,7 @@ void jas_image_fmtinfo_init(jas_image_fmtinfo_t *fmtinfo)
 	memset(&fmtinfo->ops, 0, sizeof(jas_image_fmtops_t));
 }
 
-void jas_image_fmtinfo_cleanup(jas_image_fmtinfo_t *fmtinfo)
+static void jas_image_fmtinfo_cleanup(jas_image_fmtinfo_t *fmtinfo)
 {
 	if (fmtinfo->name) {
 		jas_free(fmtinfo->name);
