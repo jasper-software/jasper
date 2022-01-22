@@ -71,7 +71,7 @@
 * Includes
 \******************************************************************************/
 
-#define JAS_INTERNAL_USE_ONLY
+#define JAS_FOR_INTERNAL_USE_ONLY
 
 #include "jasper/jas_string.h"
 #include "jasper/jas_malloc.h"

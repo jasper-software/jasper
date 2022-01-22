@@ -78,7 +78,7 @@
 #define _GNU_SOURCE
 #endif
 
-#define JAS_INTERNAL_USE_ONLY
+#define JAS_FOR_INTERNAL_USE_ONLY
 
 #include "jasper/jas_stream.h"
 #include "jasper/jas_debug.h"

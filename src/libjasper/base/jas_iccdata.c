@@ -63,7 +63,7 @@
 * Includes.
 \******************************************************************************/
 
-//#define JAS_INTERNAL_USE_ONLY
+//#define JAS_FOR_INTERNAL_USE_ONLY
 
 #include <jasper/jas_config.h> /* IWYU pragma: keep */
 #include <jasper/jas_types.h>

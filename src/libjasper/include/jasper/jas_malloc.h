@@ -147,7 +147,7 @@ typedef struct {
 
 } jas_std_allocator_t;
 
-#if defined(JAS_INTERNAL_USE_ONLY)
+#if defined(JAS_FOR_INTERNAL_USE_ONLY)
 /*
 The allocator wrapper type.
 This type is an allocator that adds memory usage tracking to another
@@ -181,7 +181,7 @@ typedef struct {
 * Data.
 \******************************************************************************/
 
-#if defined(JAS_INTERNAL_USE_ONLY)
+#if defined(JAS_FOR_INTERNAL_USE_ONLY)
 extern jas_allocator_t *jas_allocator;
 extern jas_std_allocator_t jas_std_allocator;
 extern jas_basic_allocator_t jas_basic_allocator;
@@ -320,7 +320,7 @@ After clean up is performed, the allocator can no longer be used.
 JAS_EXPORT
 void jas_allocator_cleanup(jas_allocator_t *allocator);
 
-#if defined(JAS_INTERNAL_USE_ONLY)
+#if defined(JAS_FOR_INTERNAL_USE_ONLY)
 
 /* This function is for internal library use only. */
 void jas_set_allocator(jas_allocator_t* allocator);

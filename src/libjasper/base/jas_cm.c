@@ -69,7 +69,7 @@
 * Includes.
 \******************************************************************************/
 
-#define JAS_INTERNAL_USE_ONLY
+#define JAS_FOR_INTERNAL_USE_ONLY
 
 #include "jasper/jas_cm.h"
 #include "jasper/jas_icc.h"

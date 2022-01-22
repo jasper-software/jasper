@@ -384,7 +384,7 @@ void jas_set_context(jas_context_t context);
 * Getting/Setting Context Properties
 \******************************************************************************/
 
-//#if defined(JAS_INTERNAL_USE_ONLY)
+//#if defined(JAS_FOR_INTERNAL_USE_ONLY)
 JAS_EXPORT
 jas_ctx_t *jas_get_ctx_impl(void);
 
@@ -463,7 +463,7 @@ jas_vlogmsgf_t *jas_get_vlogmsgf(void)
 }
 
 #if 0
-#if defined(JAS_INTERNAL_USE_ONLY)
+#if defined(JAS_FOR_INTERNAL_USE_ONLY)
 //JAS_EXPORT
 void jas_get_image_fmtinfo_table(const jas_image_fmtinfo_t **fmtinfos,
  size_t *numfmts);
