@@ -19,13 +19,6 @@ eecho()
 	echo "$@" 1>&2
 }
 
-# Print usage information and exit.
-usage()
-{
-	echo "bad usage: $@"
-	exit 2
-}
-
 dir_to_version()
 {
 	local dir="$1"
@@ -43,18 +36,39 @@ dir_to_version()
 }
 
 ################################################################################
+# Usage information.
+################################################################################
+
+# Print usage information and exit.
+usage()
+{
+	echo "bad usage: $@"
+	cat <<- EOF
+	Options
+	=======
+
+	-d \$in_dir
+
+	Examples
+	========
+
+	$0 -d manual_working_tree_root
+	EOF
+	exit 2
+}
+
+################################################################################
 # Parse command line.
 ################################################################################
 
 in_dir=
 
-while getopts d:o: option; do
+while getopts d:o:h option; do
 	case $option in
 	d)
 		in_dir="$OPTARG";;
-	\?)
-		usage
-		break;;
+	h|*)
+		usage;;
 	esac
 done
 shift $((OPTIND - 1))
@@ -72,6 +86,9 @@ for path in $releases_dir/*; do
 	if [ -d "$path" ]; then
 		base=$(basename "$path") || panic
 		case "$base" in
+		version-*.*.*-*)
+			other_list+=("$base")
+			;;
 		version-*)
 			official_list+=("$base")
 			;;
@@ -96,7 +113,7 @@ title="JasPer Reference Manual"
 #'
 
 dquote='"'
-echo "
+cat <<- EOF
 <!DOCTYPE html PUBLIC"ISO/IEC 15445:2000//DTD HTML//EN">
 <html>
 <head>
@@ -104,37 +121,51 @@ echo "
 </head>
 <body>
 <h1>$title</h1>
-"
+EOF
+[ $? -eq 0 ] || panic "cat failed"
 
+cat <<- EOF
+<h2>Official Releases</h2>
+EOF
+[ $? -eq 0 ] || panic "cat failed"
 
-echo "
-<h2>Official Versions</h2>
-"
-
-printf "The following official versions of the manual are available:\n\n"
+printf "The following official versions of the manual are available:\n\n" || \
+  panic "printf failed"
 printf "<ul>\n"
+
+version="latest official release (does not include pre-releases)"
+url="latest/html/index.html"
+printf "    <li><a href=$dquote$url$dquote>$version</a>\n" || \
+  panic "printf failed"
+
 for dir in "${official_list[@]}"; do
 	version=$(dir_to_version "$dir") || panic
 	url="releases/$dir/html/index.html"
-	printf "    <li><a href=$dquote$url$dquote>$version</a>\n"
+	printf "    <li><a href=$dquote$url$dquote>$version</a>\n" || \
+	  panic "printf failed"
 done
-printf "</ul>\n"
+printf "</ul>\n" || panic "printf failed"
 
-echo "
-<h2>Other Versions</h2>
-"
+cat <<- EOF
+<h2>Draft Versions</h2>
+EOF
+[ $? -eq 0 ] || panic "cat failed"
 
-printf "The following other versions of the manual are available:\n\n"
-printf "<ul>\n"
-for dir in "${other_list[@]}"; do
-	version=$(dir_to_version "$dir") || panic
-	url="releases/$dir/html/index.html"
-	printf "    <li><a href=$dquote$url$dquote>$version</a>\n"
-done
-printf "</ul>\n"
+if [ "${#other_list[@]}" -gt 0 ]; then
+	printf "The following other versions of the manual are available:\n\n"
+	printf "<ul>\n"
+	for dir in "${other_list[@]}"; do
+		version=$(dir_to_version "$dir") || panic
+		url="releases/$dir/html/index.html"
+		printf "    <li><a href=$dquote$url$dquote>$version</a>\n"
+	done
+	printf "</ul>\n"
+else
+	echo "No draft versions are available."
+fi
 
-echo "
+cat <<- EOF
 </body>
 </html>
-"
-
+EOF
+[ $? -eq 0 ] || panic "cat failed"
