@@ -58,9 +58,14 @@ In release 3 of JasPer, the following notable changes were made to the API
 and/or behavior of the library relative to earlier releases (and therefore
 impact backward compatibility):
 
-  - The jas_init() function no longer registers jas_cleanup() as an atexit
+  - The `jas_init()` and `jas_cleanup()` functions have been marked as
+    deprecated.
+    The replacements for these functions are described in
+    \ref lib_init.
+
+  - The `jas_init()` function no longer registers `jas_cleanup()` as an atexit
     handler.
-    So, the library user is now responsible for invoking jas_cleanup() at
+    So, the library user is now responsible for invoking `jas_cleanup()` at
     an appropriate time.
     This change was needed in order to better support the use of the JasPer
     library on some platforms.
@@ -69,19 +74,19 @@ impact backward compatibility):
     parameter/return types of the following functions were changed to use
     @c size_t/@c ssize_t in order to address some longstanding API issues:
 
-      - jas_stream_memopen()
-      - jas_stream_read()
-      - jas_stream_write()
-      - jas_stream_copy()
-      - jas_stream_gobble()
-      - jas_stream_copy()
-      - jas_stream_pad()
+      - `jas_stream_memopen()`
+      - `jas_stream_read()`
+      - `jas_stream_write()`
+      - `jas_stream_copy()`
+      - `jas_stream_gobble()`
+      - `jas_stream_copy()`
+      - `jas_stream_pad()`
 
   - In the I/O streams API, in some cases where the integral type
     used was changed from a signed to unsigned type, deprecated
     behavior that allowed for negative values was removed.
 
-  - The jas_stream_memopen2() function has been deprecated.
+  - The `jas_stream_memopen2()` function has been deprecated.
 
 \verbinclude @CMAKE_SOURCE_DIR@/NEWS.txt
 
