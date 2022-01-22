@@ -28,6 +28,12 @@ target_link_libraries(imgcmp libjasper ${JAS_LIBJPEG_TARGET} ${HEIF_LIBRARIES}
 set(public_programs "${public_programs}" imgcmp)
 set(man_pages "${man_pages}" imgcmp.1)
 
+# The tmrdemo program
+add_executable(tmrdemo tmrdemo.c)
+target_link_libraries(tmrdemo libjasper ${JAS_LIBJPEG_TARGET} ${HEIF_LIBRARIES}
+  ${MATH_LIBRARY} ${THREAD_LIBRARY})
+set(private_programs "${private_programs}" tmrdemo)
+
 # The jiv program (which requires OpenGL and GLUT)
 if(JAS_HAVE_OPENGL)
 	add_executable(jiv jiv.c)

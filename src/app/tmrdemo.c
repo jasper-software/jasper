@@ -61,6 +61,12 @@
 
 #include <jasper/jasper.h>
 
+#include <stdlib.h>
+
+#if defined(JAS_HAVE_UNISTD_H)
+#include <unistd.h>
+#endif
+
 int main(int argc, char **argv)
 {
 	int i;
@@ -113,7 +119,9 @@ int main(int argc, char **argv)
 	printf("zero time %.3f us\n", t * 1e6);
 
 	jas_tmr_start(&tmr);
+#if defined(JAS_HAVE_UNISTD_H)
 	sleep(1);
+#endif
 	jas_tmr_stop(&tmr);
 	t = jas_tmr_get(&tmr);
 	printf("time delay %.8f s\n", t);
