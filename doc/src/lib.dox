@@ -13,7 +13,7 @@ The library can be used to manipulate images, import/export image data
 in a variety of formats, and perform basic color management operations.
 
 Conceptually, the JasPer library is structured as shown in
-Fig.~\ref{fig::swstruct}.
+Figure \ref fig__swstruct.
 The library consists of two distinct types of code:
 
   1. core code,
@@ -37,12 +37,9 @@ formats that it will use.
 In this way, an application can avoid the cost of increased memory
 consumption for codec drivers that are never to be employed.
 
-@todo Add figure.
-\begin{figure}
-\centerline{\includegraphics{figures/library/software.eps}}
-\caption{Software structure.}
-\label{fig::swstruct}
-\end{figure}
+\anchor fig__swstruct
+\image latex software.eps "Software structure" width=0.5\textwidth
+\image html software.png "Software structure"
 
 \section lib__core Core Code
 
@@ -145,7 +142,8 @@ by the one used in the JPEG-2000 standard.
 
 An image is comprised of one or more components.
 In turn, each component consists of rectangular array of samples.
-This structure is depicted in Fig.~\ref{fig::imgmodel}.
+This structure is depicted in Figures \ref fig__imgmodel_a and
+\ref fig__imgmodel_b.
 The sample values for each component are integer valued, and can be signed
 or unsigned with precision from 1 to (nominally) 16 bits/sample.
 The maximum allowable precision is platform dependent.
@@ -156,20 +154,13 @@ a per-component basis.
 All of the components are associated with same spatial extent in an image,
 but represent different types of information.
 
-@todo Add figure.
-\begin{figure}
-\begin{minipage}{0.70\columnwidth}%
-\centerline{\includegraphics{figures/library/srcimgmodel.eps}}
-\centerline{(a)}
-\end{minipage}%
-\begin{minipage}{0.30\columnwidth}%
-\centerline{\includegraphics{figures/library/comp.eps}}
-\centerline{(b)}
-\end{minipage}%
-\caption{Image model. (a)~An image with $N$ components.
-(b)~Individual component.}
-\label{fig::imgmodel}
-\end{figure}
+\anchor fig__imgmodel_a
+\image latex srcimgmodel.eps "Image model: An image with \f$N\f$ components."
+\image html srcimgmodel.png "Image model: An image with \f$N\f$ components."
+
+\anchor fig__imgmodel_b
+\image latex comp.eps "Image model: An individual component."
+\image html comp.png "Image model: An individual component."
 
 There is considerable flexibility in the interpretation of components.
 A component may represent spectral information (e.g., a color plane)
@@ -212,30 +203,22 @@ as $\text{HO}_k$, $\text{VO}_k$, $\text{HS}_k$, and $\text{VS}_k$,
 respectively.
 Suppose, for example, that these parameters have the following values:
 
-@todo Format table.
-\begin{center}%
-\begin{tabular}{|c|c|c|}\hline%
-$k$ & $(\text{HO}_k, \text{VO}_k)$ & $(\text{HS}_k, \text{VS}_k)$ \\ \hline
-0 & (0, 0) & (2, 2) \\
-1 & (2, 3) & (3, 4) \\
-2 & (3, 2) & (4, 3) \\
-\hline
-\end{tabular}%
-\end{center}%
+$k$ | $(\text{HO}_k, \text{VO}_k)$ | $(\text{HS}_k, \text{VS}_k)$
+- | ------ | ------
+0 | (0, 0) | (2, 2)
+1 | (2, 3) | (3, 4)
+2 | (3, 2) | (4, 3)
 
 In this scenario, the component samples would be aligned on the reference
-grid as illustrated in Fig.~\ref{fig::refgridex}.
+grid as illustrated in Figure \ref fig__refgridex.
 Perhaps, it is worth nothing that the above set of parameter values was
 chosen in order to provide an enlightening example, and is not meant to
 represent a set of values that is likely to be used with great frequency
 by applications.
 
-@todo Add figure.
-\begin{figure}
-\centerline{\includegraphics{figures/library/refgridex.eps}}
-\caption{Alignment of components on the reference grid.}
-\label{fig::refgridex}
-\end{figure}
+\anchor fig__refgridex
+\image html refgridex.png "Alignment of components on the reference grid."
+\image latex refgridex.eps "Alignment of components on the reference grid."
 
 From above, we can see that the image model used by JasPer is quite general.
 The main constraint imposed by this model is that rectangular sampling must
