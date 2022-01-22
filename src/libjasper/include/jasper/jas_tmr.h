@@ -111,17 +111,20 @@ typedef int jas_tmr_t;
 /*!
 @brief Start a timer.
 */
-JAS_EXPORT void jas_tmr_start(jas_tmr_t *tmr);
+JAS_EXPORT
+void jas_tmr_start(jas_tmr_t *tmr);
 
 /*!
 @brief Stop a timer.
 */
-JAS_EXPORT void jas_tmr_stop(jas_tmr_t *tmr);
+JAS_EXPORT
+void jas_tmr_stop(jas_tmr_t *tmr);
 
 /*!
 @brief Get the elapsed time for a timer.
 */
-JAS_EXPORT double jas_tmr_get(jas_tmr_t *tmr);
+JAS_EXPORT
+double jas_tmr_get(jas_tmr_t *tmr);
 
 /*!
  * @}

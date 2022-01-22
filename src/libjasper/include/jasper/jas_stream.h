@@ -408,7 +408,8 @@ Such functionality may be used by the implementation when available.
 Upon success, a pointer to the opened stream is returned.
 Otherwise, a null pointer is returned.
 */
-JAS_EXPORT jas_stream_t *jas_stream_tmpfile(void);
+JAS_EXPORT
+jas_stream_t *jas_stream_tmpfile(void);
 
 /*!
 @brief Close a stream.
@@ -530,7 +531,8 @@ This operation cannot fail.
 @todo
 TODO/FIXME: Should this macro evaluate to void?
 */
-JAS_EXPORT long jas_stream_setrwcount(jas_stream_t *stream, long rw_count);
+JAS_EXPORT
+long jas_stream_setrwcount(jas_stream_t *stream, long rw_count);
 
 /******************************************************************************\
 * Macros/functions for I/O.
@@ -718,7 +720,8 @@ The null character is not output.
 Upon success, a nonnegative value is returned.
 Upon failure, a negative value is returned.
 */
-JAS_EXPORT int jas_stream_puts(jas_stream_t *stream, const char *s);
+JAS_EXPORT
+int jas_stream_puts(jas_stream_t *stream, const char *s);
 
 /*!
 @brief Read a line of input from a stream.
@@ -743,8 +746,8 @@ If the operation fails (e.g., due to an I/O error or attempted buffer overrun),
 a null pointer is returned.
 Otherwise, buffer is returned.
 */
-JAS_EXPORT char *
-jas_stream_gets(jas_stream_t *stream, char *buffer, int buffer_size);
+JAS_EXPORT
+char *jas_stream_gets(jas_stream_t *stream, char *buffer, int buffer_size);
 
 /*!
 @brief Look at the next character to be read from a stream without actually
@@ -791,8 +794,8 @@ The approximate limit is given by the value of JAS_STREAM_MAXPUTBACK.
 Upon success, zero is returned.
 If the specified character cannot be pushed back, a negative value is returned.
 */
-JAS_EXPORT int
-jas_stream_ungetc(jas_stream_t *stream, int c);
+JAS_EXPORT
+int jas_stream_ungetc(jas_stream_t *stream, int c);
 
 /******************************************************************************\
 * Macros/functions for getting/setting the stream position.
@@ -874,7 +877,8 @@ of jas_stream_seek(stream, 0, SEEK_SET).
 Upon success, the new stream position is returned.
 Otherwise, a negative value is returned.
 */
-JAS_EXPORT int jas_stream_rewind(jas_stream_t *stream);
+JAS_EXPORT
+int jas_stream_rewind(jas_stream_t *stream);
 
 /******************************************************************************\
 * Macros/functions for flushing.
@@ -895,7 +899,8 @@ The function flushes any buffered output to the underlying file object.
 Upon success, zero is returned.
 Otherwise, a negative value is returned.
 */
-JAS_EXPORT int jas_stream_flush(jas_stream_t *stream);
+JAS_EXPORT
+int jas_stream_flush(jas_stream_t *stream);
 
 /******************************************************************************\
 * Miscellaneous macros/functions.

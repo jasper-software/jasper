@@ -97,7 +97,8 @@ Create a copy of a null-terminated string.
 @details
 This function has a behavior similar to the well-known strdup function.
 */
-JAS_EXPORT char *jas_strdup(const char *);
+JAS_EXPORT
+char *jas_strdup(const char *);
 
 /*!
 @brief

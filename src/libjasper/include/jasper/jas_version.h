@@ -95,23 +95,19 @@ extern "C" {
 #define	JAS_NOTES \
 	"For more information about this software, please visit the following\n" \
 	"web sites/pages:\n" \
-	"    http://www.ece.uvic.ca/~mdadams/jasper\n" \
-	"    http://www.jpeg.org/software\n" \
-	"To be added to the (moderated) JasPer software announcements\n" \
-	"mailing list, send an email to:\n" \
-	"    jasper-announce-subscribe@yahoogroups.com\n" \
-	"To be added to the (unmoderated) JasPer software discussion\n" \
-	"mailing list, send an email to:\n" \
-	"    jasper-discussion-subscribe@yahoogroups.com\n" \
-	"Please send any bug reports to:\n" \
-	"    mdadams@ieee.org\n"
+	"    https://jasper-software.github.io/jasper\n" \
+	"    https://jasper-software.github.io/jasper-manual\n" \
+	"    https://www.ece.uvic.ca/~mdadams/jasper\n" \
+	"Please submit bug reports using the bug-tracker at:\n" \
+	"    https://github.com/jasper-software/jasper/issues\n"
 
 /******************************************************************************\
 * Functions.
 \******************************************************************************/
 
 JAS_ATTRIBUTE_CONST
-JAS_EXPORT const char *jas_getversion(void);
+JAS_EXPORT
+const char *jas_getversion(void);
 /* Get the version information for the JasPer library. */
 /* Note:  Since libjasper can be built as a shared library, the version
   returned by this function may not necessarily correspond to JAS_VERSION. */

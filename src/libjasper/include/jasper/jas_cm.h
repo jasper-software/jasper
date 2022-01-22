@@ -296,8 +296,11 @@ Create a transform from a CM profile.
 If successful, a pointer to the created transform is returned.
 Otherwise, a null pointer is returned.
 */
-JAS_EXPORT jas_cmxform_t *jas_cmxform_create(const jas_cmprof_t *inprof, const jas_cmprof_t *outprof,
-  const jas_cmprof_t *proofprof, jas_cmxform_op_t op, jas_cmxform_intent_t intent, jas_cmxform_optm_t optimize);
+JAS_EXPORT
+jas_cmxform_t *jas_cmxform_create(const jas_cmprof_t *inprof,
+  const jas_cmprof_t *outprof, const jas_cmprof_t *proofprof,
+  jas_cmxform_op_t op, jas_cmxform_intent_t intent,
+  jas_cmxform_optm_t optimize);
 
 /*!
 @brief
@@ -305,7 +308,8 @@ Destroy a transform.
 
 @details
 */
-JAS_EXPORT void jas_cmxform_destroy(jas_cmxform_t *xform);
+JAS_EXPORT
+void jas_cmxform_destroy(jas_cmxform_t *xform);
 
 /*!
 @brief
@@ -317,7 +321,8 @@ Apply a transform to data.
 If successful, zero is returned.
 Otherwise, a nonzero value is returned.
 */
-JAS_EXPORT int jas_cmxform_apply(const jas_cmxform_t *xform, const jas_cmpixmap_t *in,
+JAS_EXPORT
+int jas_cmxform_apply(const jas_cmxform_t *xform, const jas_cmpixmap_t *in,
   jas_cmpixmap_t *out);
 
 /*!
@@ -330,7 +335,8 @@ Create a color-management profile from an ICC profile.
 If successful, a pointer to the created CM profile is returned.
 Otherwise, a null pointer is returned.
 */
-JAS_EXPORT jas_cmprof_t *jas_cmprof_createfromiccprof(const jas_iccprof_t *iccprof);
+JAS_EXPORT
+jas_cmprof_t *jas_cmprof_createfromiccprof(const jas_iccprof_t *iccprof);
 
 /*!
 @brief
@@ -342,14 +348,16 @@ Create a color-management profile from a color space.
 If successful, a pointer to the created CM profile is returned.
 Otherwise, a null pointer is returned.
 */
-JAS_EXPORT jas_cmprof_t *jas_cmprof_createfromclrspc(jas_clrspc_t clrspc);
+JAS_EXPORT
+jas_cmprof_t *jas_cmprof_createfromclrspc(jas_clrspc_t clrspc);
 
 /*!
 @brief Destroy a color-management profile.
 
 @details
 */
-JAS_EXPORT void jas_cmprof_destroy(jas_cmprof_t *prof);
+JAS_EXPORT
+void jas_cmprof_destroy(jas_cmprof_t *prof);
 
 /*!
 @brief
@@ -360,7 +368,17 @@ Get the number of channels associated with a particular color space.
 @returns
 */
 unsigned jas_clrspc_numchans(jas_clrspc_t clrspc);
-JAS_EXPORT jas_iccprof_t *jas_iccprof_createfromcmprof(const jas_cmprof_t *prof);
+
+/*!
+@brief
+Create a ICC profile from a CM profile.
+
+@details
+
+@returns
+*/
+JAS_EXPORT
+jas_iccprof_t *jas_iccprof_createfromcmprof(const jas_cmprof_t *prof);
 
 /*!
 @brief
@@ -382,7 +400,8 @@ Copy a color-management profile.
 If successful, a pointer to the newly created CM profile is returned.
 Otherwise, a null pointer is returned.
 */
-JAS_EXPORT jas_cmprof_t *jas_cmprof_copy(const jas_cmprof_t *prof);
+JAS_EXPORT
+jas_cmprof_t *jas_cmprof_copy(const jas_cmprof_t *prof);
 
 /*!
  * @}

@@ -239,19 +239,22 @@ void *jas_calloc(size_t num_elements, size_t element_size);
 @brief
 Allocate array (with overflow checking).
 */
-JAS_EXPORT void *jas_alloc2(size_t num_elements, size_t element_size);
+JAS_EXPORT
+void *jas_alloc2(size_t num_elements, size_t element_size);
 
 /*!
 @brief
 Allocate array of arrays (with overflow checking).
 */
-JAS_EXPORT void *jas_alloc3(size_t num_arrays, size_t array_size, size_t element_size);
+JAS_EXPORT
+void *jas_alloc3(size_t num_arrays, size_t array_size, size_t element_size);
 
 /*!
 @brief
 Resize a block of allocated memory (with overflow checking).
 */
-JAS_EXPORT void *jas_realloc2(void *ptr, size_t num_elements, size_t element_size);
+JAS_EXPORT
+void *jas_realloc2(void *ptr, size_t num_elements, size_t element_size);
 
 /*!
 @brief

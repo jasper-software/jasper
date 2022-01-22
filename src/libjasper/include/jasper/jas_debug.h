@@ -162,6 +162,10 @@ Generate a debugging log message.
 JAS_EXPORT
 int jas_logdebugf(int priority, const char *fmt, ...);
 
+/*!
+@brief
+Dump memory.
+*/
 int jas_logmemdump(const void *data, size_t len);
 
 /*!
