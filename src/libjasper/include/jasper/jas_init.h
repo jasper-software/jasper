@@ -87,9 +87,6 @@ extern "C" {
 
 typedef struct {
 
-	/* The maximum number of samples allowable in an image to be decoded. */
-	size_t dec_default_max_samples;
-
 	/*
 	The level of debugging checks/output enabled by the library.
 	A larger value corresponds to a greater level of debugging checks/output.
@@ -107,6 +104,9 @@ typedef struct {
 	*/
 	size_t image_numfmts;
 	jas_image_fmtinfo_t image_fmtinfos[JAS_IMAGE_MAXFMTS];
+
+	/* The maximum number of samples allowable in an image to be decoded. */
+	size_t dec_default_max_samples;
 
 } jas_ctx_t;
 

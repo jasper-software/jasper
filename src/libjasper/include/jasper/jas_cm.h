@@ -67,6 +67,10 @@
 #ifndef JAS_CM_H
 #define JAS_CM_H
 
+/******************************************************************************\
+*
+\******************************************************************************/
+
 /* The configuration header file should be included first. */
 #include <jasper/jas_config.h>
 
@@ -82,10 +86,19 @@ extern "C" {
  * @{
  */
 
+/******************************************************************************\
+* Types and Macros.
+\******************************************************************************/
+
+/*!
+@brief
+Color space.
+*/
 typedef unsigned jas_clrspc_t;
 
 /*!
-@brief Transform operations
+@brief
+Transform operations
 */
 typedef enum {
 	JAS_CMXFORM_OP_FWD = 0,
@@ -95,7 +108,8 @@ typedef enum {
 } jas_cmxform_op_t;
 
 /*!
-@brief Rendering intents.
+@brief
+Rendering intents.
 */
 typedef enum {
 	JAS_CMXFORM_INTENT_PER = 0,
@@ -105,18 +119,20 @@ typedef enum {
 } jas_cmxform_intent_t;
 
 /*!
-@brief Number of rendering intents.
+@brief
+Number of rendering intents.
 */
 #define	JAS_CMXFORM_NUMINTENTS		4
 
 /*!
+@brief
+Transform optimization.
 */
 typedef enum {
 	JAS_CMXFORM_OPTM_SPEED = 0,
 	JAS_CMXFORM_OPTM_SIZE = 1,
 	JAS_CMXFORM_OPTM_ACC = 2,
 } jas_cmxform_optm_t;
-
 
 #define	jas_clrspc_create(fam, mbr)	(((fam) << 8) | (mbr))
 #define	jas_clrspc_fam(clrspc)	((clrspc) >> 8)
@@ -164,12 +180,15 @@ typedef enum {
 #define	JAS_CLRSPC_CHANIND_GRAY_Y	0
 
 /*!
+Real-number type.
 */
 typedef double jas_cmreal_t;
 
 struct jas_cmpxform_s;
 
 /*!
+@brief
+Component format.
 */
 typedef struct {
 	long *buf;
@@ -180,6 +199,8 @@ typedef struct {
 } jas_cmcmptfmt_t;
 
 /*!
+@brief
+Pixmap (i.e., multicomponent) format.
 */
 typedef struct {
 	unsigned numcmpts;
@@ -187,6 +208,8 @@ typedef struct {
 } jas_cmpixmap_t;
 
 /*!
+@brief
+Transform operations.
 */
 typedef struct {
 	void (*destroy)(struct jas_cmpxform_s *pxform);
@@ -195,6 +218,8 @@ typedef struct {
 } jas_cmpxformops_t;
 
 /*!
+@brief
+Shaper matrix look-up table (LUT).
 */
 typedef struct {
 	jas_cmreal_t *data;
@@ -202,6 +227,8 @@ typedef struct {
 } jas_cmshapmatlut_t;
 
 /*!
+@brief
+Shaper matrix.
 */
 typedef struct {
 	int mono;
@@ -213,12 +240,16 @@ typedef struct {
 } jas_cmshapmat_t;
 
 /*!
+@brief
+Shaper look-up table (LUT).
 */
 typedef struct {
 	int order;
 } jas_cmshaplut_t;
 
 /*!
+@brief
+Color space conversion.
 */
 typedef struct {
 	unsigned inclrspc;
@@ -226,6 +257,8 @@ typedef struct {
 } jas_cmclrspcconv_t;
 
 /*!
+@brief
+Transform class.
 */
 typedef struct jas_cmpxform_s {
 	unsigned refcnt;
@@ -241,6 +274,8 @@ typedef struct jas_cmpxform_s {
 } jas_cmpxform_t;
 
 /*!
+@brief
+Primitive transform sequence class.
 */
 typedef struct {
 	unsigned numpxforms;
@@ -249,6 +284,8 @@ typedef struct {
 } jas_cmpxformseq_t;
 
 /*!
+@brief
+Primitive transform class.
 */
 typedef struct {
 	unsigned numinchans;
@@ -262,6 +299,7 @@ typedef struct {
 #define	JAS_CMPROF_NUMPXFORMSEQS	13
 
 /*!
+Color-management (CM) profile.
 */
 typedef struct {
 	jas_clrspc_t clrspc;
@@ -271,6 +309,10 @@ typedef struct {
 	jas_iccprof_t *iccprof;
 	jas_cmpxformseq_t *pxformseqs[JAS_CMPROF_NUMPXFORMSEQS];
 } jas_cmprof_t;
+
+/******************************************************************************\
+*
+\******************************************************************************/
 
 #if 0
 typedef int_fast32_t jas_cmattrname_t;
@@ -285,6 +327,78 @@ int jas_cm_prof_setattr(jas_cm_prof_t *prof, jas_cm_attrname_t name, void *val);
 /* Get an attribute of a profile. */
 void *jas_cm_prof_getattr(jas_cm_prof_t *prof, jas_cm_attrname_t name);
 #endif
+
+/******************************************************************************\
+* Color-management (CM) profile class.
+\******************************************************************************/
+
+/*!
+@brief
+Create a color-management profile from an ICC profile.
+
+@details
+This function creates a CM profile from an ICC profile.
+
+@returns
+If successful, a pointer to the created CM profile is returned.
+Otherwise, a null pointer is returned.
+*/
+JAS_EXPORT
+jas_cmprof_t *jas_cmprof_createfromiccprof(const jas_iccprof_t *iccprof);
+
+/*!
+@brief
+Create a color-management profile from a color space.
+
+@details
+The function creates a CM profile from a color space.
+
+@returns
+If successful, a pointer to the created CM profile is returned.
+Otherwise, a null pointer is returned.
+*/
+JAS_EXPORT
+jas_cmprof_t *jas_cmprof_createfromclrspc(jas_clrspc_t clrspc);
+
+/*!
+@brief Destroy a color-management profile.
+
+@details
+*/
+JAS_EXPORT
+void jas_cmprof_destroy(jas_cmprof_t *prof);
+
+/*!
+@brief
+Copy a color-management profile.
+
+@details
+This function creates a clone (i.e., copy) of a CM profile.
+
+@returns
+If successful, a pointer to the newly created CM profile is returned.
+Otherwise, a null pointer is returned.
+*/
+JAS_EXPORT
+jas_cmprof_t *jas_cmprof_copy(const jas_cmprof_t *prof);
+
+/*!
+@brief
+Create a ICC profile from a CM profile.
+
+@details
+This function creates an ICC profile from a CM profile.
+
+@returns
+If successful, a pointer to the created ICC profile is returned.
+Otherwise, a null pointer is returned.
+*/
+JAS_EXPORT
+jas_iccprof_t *jas_iccprof_createfromcmprof(const jas_cmprof_t *prof);
+
+/******************************************************************************\
+* Color-Management (CM) Transform.
+\******************************************************************************/
 
 /*!
 @brief
@@ -325,39 +439,9 @@ JAS_EXPORT
 int jas_cmxform_apply(const jas_cmxform_t *xform, const jas_cmpixmap_t *in,
   jas_cmpixmap_t *out);
 
-/*!
-@brief
-Create a color-management profile from an ICC profile.
-
-@details
-
-@returns
-If successful, a pointer to the created CM profile is returned.
-Otherwise, a null pointer is returned.
-*/
-JAS_EXPORT
-jas_cmprof_t *jas_cmprof_createfromiccprof(const jas_iccprof_t *iccprof);
-
-/*!
-@brief
-Create a color-management profile from a color space.
-
-@details
-
-@returns
-If successful, a pointer to the created CM profile is returned.
-Otherwise, a null pointer is returned.
-*/
-JAS_EXPORT
-jas_cmprof_t *jas_cmprof_createfromclrspc(jas_clrspc_t clrspc);
-
-/*!
-@brief Destroy a color-management profile.
-
-@details
-*/
-JAS_EXPORT
-void jas_cmprof_destroy(jas_cmprof_t *prof);
+/******************************************************************************\
+* Miscellany.
+\******************************************************************************/
 
 /*!
 @brief
@@ -371,17 +455,6 @@ unsigned jas_clrspc_numchans(jas_clrspc_t clrspc);
 
 /*!
 @brief
-Create a ICC profile from a CM profile.
-
-@details
-
-@returns
-*/
-JAS_EXPORT
-jas_iccprof_t *jas_iccprof_createfromcmprof(const jas_cmprof_t *prof);
-
-/*!
-@brief
 Get the color space associated with a color-management profile.
 
 @details
@@ -389,19 +462,6 @@ Get the color space associated with a color-management profile.
 @returns
 */
 #define	jas_cmprof_clrspc(prof) ((prof)->clrspc)
-
-/*!
-@brief
-Copy a color-management profile.
-
-@details
-
-@returns
-If successful, a pointer to the newly created CM profile is returned.
-Otherwise, a null pointer is returned.
-*/
-JAS_EXPORT
-jas_cmprof_t *jas_cmprof_copy(const jas_cmprof_t *prof);
 
 /*!
  * @}
