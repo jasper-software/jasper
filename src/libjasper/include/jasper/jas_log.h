@@ -104,11 +104,16 @@ extern "C" {
 
 #define JAS_LOGTYPE_MAX_PRIORITY 16384
 
+// NOTE: without the @struct, jas_logtype_t autolinks are not generated
 /*!
+@struct jas_logtype_t
 @brief Type used for the log type.
 */
 typedef unsigned int jas_logtype_t;
 
+/*!
+@brief Type used for formatted message logging function.
+*/
 typedef int (jas_vlogmsgf_t)(jas_logtype_t, const char *, va_list);
 
 /*!

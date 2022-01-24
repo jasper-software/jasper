@@ -41,7 +41,8 @@ The following functions are provided for image encoding/decoding:
   - `jas_image_decode()`
   - `jas_image_encode()`
 
-other
+The following functions are provided for various other functionality
+for images:
 
   - `jas_image_rawsize()`
   - `jas_image_ishomosamp()`
@@ -52,7 +53,8 @@ other
   - `jas_image_chclrspc()`
   - `jas_image_dump()`
 
-Image Component
+The following functions are provided for accessing/manipulating
+image components:
 
   - `jas_image_cmptwidth()`
   - `jas_image_cmptheight()`
@@ -83,7 +85,9 @@ Image Component
   - `jas_image_writecmptsample()`
   - `jas_image_getcmptbytype()`
 
-image format table
+The following functions are provided for accessing/manipulating the
+image-format table:
+
   - `jas_image_clearfmts()`
   - `jas_image_addfmt()`
   - `jas_image_lookupfmtbyid()`
@@ -93,9 +97,16 @@ image format table
   - `jas_image_strtofmt()`
   - `jas_image_fmttostr()`
 
+  - `jas_image_getnumfmts()`
+  - `jas_image_getfmtbyind()`
+
 \section overview_cm Color Management
 
-color management profile
+The JasPer library provides basic support for color management.
+A color-management (CM) profile is used to describe the color space
+used by an image.
+The following function are provided for accessing/manipulating
+CM profiles:
 
   - `jas_cmxform_create()`
   - `jas_cmxform_destroy()`
@@ -106,7 +117,8 @@ color management profile
   - `jas_cmprof_clrspc()`
   - `jas_cmprof_copy()`
 
-color space
+The following function are provided for accessing/manipulating
+color spaces:
 
   - `jas_clrspc_create()`
   - `jas_clrspc_fam()`

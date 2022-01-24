@@ -992,23 +992,6 @@ const jas_image_fmtinfo_t *jas_image_lookupfmtbyid(int id)
 
 const jas_image_fmtinfo_t *jas_image_lookupfmtbyname(const char *name)
 {
-#if 0
-
-	const jas_image_fmtinfo_t *image_fmtinfos;
-	size_t image_numfmts;
-	jas_get_image_fmtinfo_table(&image_fmtinfos, &image_numfmts);
-
-	unsigned i;
-	const jas_image_fmtinfo_t *fmtinfo;
-	for (i = 0, fmtinfo = image_fmtinfos; i < image_numfmts; ++i, ++fmtinfo) {
-		if (!strcmp(fmtinfo->name, name)) {
-			return fmtinfo;
-		}
-	}
-	return 0;
-
-#else
-
 	jas_ctx_t *ctx = jas_get_ctx();
 	unsigned i;
 	const jas_image_fmtinfo_t *fmtinfo;
@@ -1019,8 +1002,6 @@ const jas_image_fmtinfo_t *jas_image_lookupfmtbyname(const char *name)
 		}
 	}
 	return 0;
-
-#endif
 }
 
 static uint_fast32_t inttobits(jas_seqent_t v, unsigned prec, bool sgnd)

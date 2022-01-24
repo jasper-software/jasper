@@ -203,9 +203,9 @@ error:
 
 static jas_cmprof_t *jas_cmprof_createsycc()
 {
-	jas_cmprof_t *prof;
-	jas_cmpxform_t *fwdpxform = NULL;
-	jas_cmpxform_t *revpxform = NULL;
+	jas_cmprof_t *prof = 0;
+	jas_cmpxform_t *fwdpxform = 0;
+	jas_cmpxform_t *revpxform = 0;
 	jas_cmshapmat_t *fwdshapmat;
 	jas_cmshapmat_t *revshapmat;
 
@@ -247,7 +247,9 @@ static jas_cmprof_t *jas_cmprof_createsycc()
 	revshapmat->order = 1;
 	revshapmat->useluts = 0;
 	revshapmat->usemat = 1;
-	jas_cmshapmat_invmat(revshapmat->mat, fwdshapmat->mat);
+	if (jas_cmshapmat_invmat(revshapmat->mat, fwdshapmat->mat)) {
+		goto error;
+	}
 
 	for (unsigned i = 0; i < JAS_CMXFORM_NUMINTENTS; ++i) {
 		unsigned j = SEQFWD(i);
@@ -275,6 +277,9 @@ error:
 	}
 	if (revpxform) {
 		jas_cmpxform_destroy(revpxform);
+	}
+	if (prof) {
+		jas_cmprof_destroy(prof);
 	}
 	return 0;
 }

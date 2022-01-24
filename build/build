@@ -146,6 +146,10 @@ while [ $# -gt 0 ]; do
 		shift 1
 		crostini=1
 		;;
+	-q|--quiet)
+		shift 1
+		verbose=0
+		;;
 	-v|--verbose)
 		shift 1
 		verbose=$((verbose + 1))
@@ -369,7 +373,9 @@ fi
 
 configure_opts+=("-DCMAKE_INSTALL_PREFIX=$install_dir")
 
-configure_opts+=("-DCMAKE_VERBOSE_MAKEFILE=true")
+if [ "$verbose" -ge 1 ]; then
+	configure_opts+=("-DCMAKE_VERBOSE_MAKEFILE=true")
+fi
 
 case "$build_type" in
 debug)

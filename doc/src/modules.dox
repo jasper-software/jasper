@@ -12,7 +12,7 @@ General information can be found
 
 @details
 General information can be found
-\ref lib_alloc "here".
+\ref init_allocators "here".
 
 @defgroup module_iostreams I/O Streams
 @brief I/O streams
@@ -33,7 +33,7 @@ General information can be found
 
 @details
 General information can be found
-\ref lib_image "here".
+\ref lib_images "here".
 
 @defgroup module_seq One- and Two-Dimensional Sequences
 @brief One- and Two-Dimensional Sequences

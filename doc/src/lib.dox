@@ -43,9 +43,10 @@ consumption for codec drivers that are never to be employed.
 
 \section lib__core Core Code
 
-The core code provides a number of key classes as described below.
 To avoid name space collisions, all of the identifiers used by
 the core code are prefixed with either `jas_` or `JAS_`.
+The core code provides a number of key classes.
+Some of these classes include the following:
 
 - Image class (i.e., `jas_image_t`).
   This class is used to represent an image.
@@ -155,8 +156,8 @@ All of the components are associated with same spatial extent in an image,
 but represent different types of information.
 
 \anchor fig__imgmodel_a
-\image latex srcimgmodel.eps "Image model: An image with \f$N\f$ components."
-\image html srcimgmodel.png "Image model: An image with \f$N\f$ components."
+\image latex srcimgmodel.eps "Image model: An image with $N$ components."
+\image html srcimgmodel.png "Image model: An image with $N$ components."
 
 \anchor fig__imgmodel_b
 \image latex comp.eps "Image model: An individual component."
@@ -262,6 +263,8 @@ By default, an alloator based on `malloc()` is used.
 If one is trying to port the JasPer code to an embedded platform,
 it might be necessary to use a custom
 memory allocator instead.
+More detailed information on memory allocators for JasPer can be
+found in \ref init_allocators.
 
 \section lib__adding_codecs Adding Support for a New Image Format
 
@@ -281,9 +284,46 @@ The validation function is used to quickly test if a data stream is
 formatted correctly for the image format in question.
 (This functionality is necessary for the autodetection of image formats.)
 
-The exact types and arguments taken by the encoding, decoding, and
-validation functions can be found by examining the code for the image
-formats already supported by JasPer (e.g., PNM, BMP, JPEG).
+The precise interface provided by each of the encoding, decoding, and
+validation functions is as follows:
+
+  - `int (*encode)(jas_image_t *image, jas_stream_t *out, const char *opts);`
+
+    Encode image data to a stream.
+    The image pointed to by `image` is encoded in accordance with the options
+    specified in the null-terminated string pointed to by `opts` and
+    written to the stream `out`.
+    The options string is a whitespace-delimited sequence of tag-value
+    pairs.
+    If the encoding operation is successful, zero is returned.
+    Otherwise, a nonzero value is returned.
+
+  - `jas_image_t *(*decode)(jas_stream_t *in, const char *opts);`
+
+    Decode an image from a stream.
+    The image data from the stream `in` is decoded in accordance with the
+    options specified in the null-terminated string pointed to by
+    `opts`.
+    The options string is a whitespace-delimited sequence of tag-value
+    pairs.
+    If the decoding operation is successful, a pointer to the decoded
+    image is returned.
+    Otherwise, a null pointer is returned.
+
+  - `int (*validate)(jas_stream_t *in);`
+
+    Determine if stream data is in a particular format.
+    The first few characters of the stream `in` are examined in order to
+    determine if the stream is encoded in the format supported by the codec.
+    The characters examined are not removed from the stream.
+    (In other words, the current read/write position in the stream is left
+    unchanged by this function.)
+    If the format is supported by the codec, zero is returned.
+    Otherwise, a nonzero value is returned.
+
+Numerous examples of these types of function can be found by examining the
+code for the image formats already supported by JasPer
+(e.g., BMP, JP2, JPC, MIF, PGX, PNM, RAS, and JPEG).
 Once the above functions have been written, the JasPer library can be made
 aware of the new image format through a call to `jas_image_addfmt()`.
 This call, of course, must be made after the JasPer library has been

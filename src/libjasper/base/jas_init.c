@@ -187,7 +187,7 @@ typedef struct {
 * Function prototypes.
 \******************************************************************************/
 
-static jas_conf_t *jas_get_conf_ptr(void);
+//static jas_conf_t *jas_get_conf_ptr(void);
 void jas_ctx_init(jas_ctx_t *ctx);
 static int jas_init_codecs(jas_ctx_t *ctx);
 void jas_ctx_cleanup(jas_ctx_t *ctx);
@@ -981,6 +981,7 @@ void jas_set_vlogmsgf(int (*func)(jas_logtype_t, const char *,
 	ctx->vlogmsgf = func;
 }
 
+#if 0
 JAS_EXPORT
 void jas_get_image_fmtinfo_table(const jas_image_fmtinfo_t **fmtinfos,
   size_t *numfmts)
@@ -989,3 +990,4 @@ void jas_get_image_fmtinfo_table(const jas_image_fmtinfo_t **fmtinfos,
 	*fmtinfos = ctx->image_fmtinfos;
 	*numfmts = ctx->image_numfmts;
 }
+#endif

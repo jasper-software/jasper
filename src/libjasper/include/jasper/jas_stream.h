@@ -192,8 +192,15 @@ typedef struct {
 
 } jas_stream_ops_t;
 
-/*
- * Stream object.
+/*!
+@brief
+I/O stream object.
+
+@warning
+Library users should never directly access any of the members of this
+class.
+The functions/macros provided by the JasPer library API should always
+be used.
  */
 
 typedef struct {
@@ -364,15 +371,15 @@ jas_stream_t *jas_stream_fdopen(int fd, const char *mode);
 @brief Open a stdio (i.e., C standard library) stream as a stream.
 
 @param path
-A pointer to a string containing the path of the filename associated
-with the stdio stream.
+A pointer to a null-terminated string containing the pathname of the file
+to be reopened.
 @param mode
-A pointer to a string containing the open mode to be used for the
-(JasPer) stream.
+A pointer to a null-terminated string containing the mode to be used for
+reopening the file.
 This string is similar to that used by the fdopen function in the
 C standard library.
 @param fp
-A pointer to the stdio stream.
+A pointer to the `FILE` (i.e., stdio stream) to be reopened.
 
 @details
 It is unspecified whether the open mode specified by mode can be
@@ -387,15 +394,6 @@ jas_stream_t *jas_stream_freopen(const char *path, const char *mode, FILE *fp);
 
 /*!
 @brief Open a temporary file as a stream.
-
-@param path
-A pointer to a null-terminated string containing the pathname of the file
-to be reopened.
-@param mode
-A pointer to a null-terminated string containing the mode to be used for
-reopening the file.
-@param fp
-The FILE to be reopened.
 
 @details
 A temporary file is created and opened as a stream.

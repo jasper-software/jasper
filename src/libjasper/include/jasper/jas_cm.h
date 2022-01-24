@@ -134,10 +134,35 @@ typedef enum {
 	JAS_CMXFORM_OPTM_ACC = 2,
 } jas_cmxform_optm_t;
 
+/*!
+@brief
+Create a color space.
+*/
 #define	jas_clrspc_create(fam, mbr)	(((fam) << 8) | (mbr))
+
+/*!
+@brief
+Get the family of a color space.
+*/
+
 #define	jas_clrspc_fam(clrspc)	((clrspc) >> 8)
+
+/*!
+@brief
+Get the (family) member of a color space.
+*/
 #define	jas_clrspc_mbr(clrspc)	((clrspc) & 0xff)
+
+/*!
+@brief
+Test if a color space is generic.
+*/
 #define	jas_clrspc_isgeneric(clrspc)	(!jas_clrspc_mbr(clrspc))
+
+/*!
+@brief
+Test if a color space is unknown.
+*/
 #define	jas_clrspc_isunknown(clrspc)	((clrspc) & JAS_CLRSPC_UNKNOWNMASK)
 
 #define	JAS_CLRSPC_UNKNOWNMASK	0x4000

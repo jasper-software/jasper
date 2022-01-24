@@ -2,7 +2,7 @@
 
 \mainpage Overview
 
-\section intro Introduction
+\section overview__intro Introduction
 
 JasPer is a collection
 of software (i.e., a library and application programs) for the
@@ -14,7 +14,7 @@ This software was developed by
 from the Department of Electrical and Computer Engineering at the 
 University of Victoria, Victoria, BC, Canada.
 
-\section features Features
+\section overview__features Features
 
 Some of the features of the JasPer library are as follows:
 
@@ -52,7 +52,7 @@ Several application programs are also provided:
     such as PAE, MAE, and PSNR
   - an image viewer
 
-\section news News
+\section overview__news News
 
 In release 3 of JasPer, the following notable changes were made to the API
 and/or behavior of the library relative to earlier releases (and therefore

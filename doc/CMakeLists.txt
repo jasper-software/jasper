@@ -1,6 +1,10 @@
 find_package(Doxygen)
 
-find_package(LATEX COMPONENTS PDFLATEX)
+if(JAS_ENABLE_LATEX)
+	find_package(LATEX COMPONENTS PDFLATEX)
+else()
+	set(LATEX_FOUND 0)
+endif()
 
 # On some (or maybe all?) systems, LATEX_FOUND is not set by FindLATEX.
 # So, instead, rely on LATEX_PDFLATEX_FOUND.
@@ -21,8 +25,6 @@ if(DOXYGEN_FOUND)
 	  "${CMAKE_CURRENT_BINARY_DIR}/src/install.dox" @ONLY)
 	configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/license.dox.in"
 	  "${CMAKE_CURRENT_BINARY_DIR}/src/license.dox" @ONLY)
-#	configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/getting_started.dox.in"
-#	  "${CMAKE_CURRENT_BINARY_DIR}/src/getting_started.dox" @ONLY)
 
 	file(GLOB_RECURSE DOXYGEN_DEPENDS "${CMAKE_SOURCE_DIR}/*.[ch]")
 	add_custom_command(OUTPUT "html/index.html" "latex/index.tex"
@@ -50,7 +52,8 @@ if(DOXYGEN_FOUND)
 		)
 	endif()
 
-	set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_CLEAN_FILES "html" "latex")
+	set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_CLEAN_FILES
+	  "html" "latex")
 
 	# Install the HTML version of the manual.
 	install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/html"

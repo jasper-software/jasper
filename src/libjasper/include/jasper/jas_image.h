@@ -155,7 +155,14 @@ typedef int_fast16_t jas_image_smpltype_t;
 \******************************************************************************/
 
 /*!
-@brief Image component class.
+@brief
+Image component class.
+
+@warning
+Library users should never directly access any of the members of this
+class.
+The functions/macros provided by the JasPer library API should always
+be used.
 */
 typedef struct {
 
@@ -198,35 +205,43 @@ typedef struct {
 
 /*!
 @brief Image class.
+
+@warning
+Library users should never directly access any of the members of this
+class.
+The functions/macros provided by the JasPer library API should always
+be used.
 */
 typedef struct {
 
-	jas_image_coord_t tlx_;
 	/* The x-coordinate of the top-left corner of the image bounding box. */
+	jas_image_coord_t tlx_;
 
-	jas_image_coord_t tly_;
 	/* The y-coordinate of the top-left corner of the image bounding box. */
+	jas_image_coord_t tly_;
 
-	jas_image_coord_t brx_;
 	/* The x-coordinate of the bottom-right corner of the image bounding
 	  box (plus one). */
+	jas_image_coord_t brx_;
 
-	jas_image_coord_t bry_;
 	/* The y-coordinate of the bottom-right corner of the image bounding
 	  box (plus one). */
+	jas_image_coord_t bry_;
 
-	unsigned numcmpts_;
 	/* The number of components. */
+	unsigned numcmpts_;
 
-	unsigned maxcmpts_;
 	/* The maximum number of components that this image can have (i.e., the
 	  allocated size of the components array). */
+	unsigned maxcmpts_;
 
-	jas_image_cmpt_t **cmpts_;
 	/* Per-component information. */
+	jas_image_cmpt_t **cmpts_;
 
+	/* The color space. */
 	jas_clrspc_t clrspc_;
 
+	/* The CM profile. */
 	jas_cmprof_t *cmprof_;
 
 	//bool inmem_;
@@ -242,29 +257,29 @@ jas_image_create function.
 */
 typedef struct {
 
-	jas_image_coord_t tlx;
 	/* The x-coordinate of the top-left corner of the component. */
+	jas_image_coord_t tlx;
 
-	jas_image_coord_t tly;
 	/* The y-coordinate of the top-left corner of the component. */
+	jas_image_coord_t tly;
 
-	jas_image_coord_t hstep;
 	/* The horizontal sampling period in units of the reference grid. */
+	jas_image_coord_t hstep;
 
-	jas_image_coord_t vstep;
 	/* The vertical sampling period in units of the reference grid. */
+	jas_image_coord_t vstep;
 
-	jas_image_coord_t width;
 	/* The width of the component in samples. */
+	jas_image_coord_t width;
 
-	jas_image_coord_t height;
 	/* The height of the component in samples. */
+	jas_image_coord_t height;
 
-	unsigned prec;
 	/* The precision of the component sample data. */
+	unsigned prec;
 
-	int sgnd;
 	/* The signedness of the component sample data. */
+	int sgnd;
 
 } jas_image_cmptparm_t;
 
@@ -282,14 +297,14 @@ typedef struct {
 */
 typedef struct {
 
+	/*! Decode image data from a stream. */
 	jas_image_t *(*decode)(jas_stream_t *in, const char *opts);
-	/* Decode image data from a stream. */
 
+	/*! Encode image data to a stream. */
 	int (*encode)(jas_image_t *image, jas_stream_t *out, const char *opts);
-	/* Encode image data to a stream. */
 
+	/*! Determine if stream data is in a particular format. */
 	int (*validate)(jas_stream_t *in);
-	/* Determine if stream data is in a particular format. */
 
 } jas_image_fmtops_t;
 
