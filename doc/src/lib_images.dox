@@ -117,7 +117,7 @@ CM profiles:
   - `jas_cmprof_clrspc()`
   - `jas_cmprof_copy()`
 
-The following function are provided for accessing/manipulating
+The following functions are provided for accessing/manipulating
 color spaces:
 
   - `jas_clrspc_create()`
@@ -127,6 +127,9 @@ color spaces:
   - `jas_clrspc_isunknown()`
 
 \section overview_icc ICC Profiles
+
+The JasPer library offers support for managing ICC profiles.
+The following functions are provided for managing such profiles:
 
   - `jas_iccprof_load()`
   - `jas_iccprof_save()`
@@ -149,6 +152,113 @@ color spaces:
   - `jas_iccprof_createfrombuf()`
   - `jas_iccprof_createfromclrspc()`
 
-\section images_seq Sequences
+\section images_seq Sequences and Matrices
+
+The JasPer library provides classes for representing matrices
+and both 1-D and 2-D sequences.
+
+Matrices are represented in JasPer using the `jas_matrix_t` class.
+A list of the various functions/macros provided for this class is follows:
+
+  - matrix creation/destruction:
+
+      - `jas_matrix_create()`
+      - `jas_matrix_copy()`
+      - `jas_matrix_destroy()`
+
+  - getting/setting various attributes of a matrix:
+
+      - `jas_matrix_numrows()`
+      - `jas_matrix_numcols()`
+      - `jas_matrix_size()`
+      - `jas_matrix_empty()`
+      - `jas_matrix_resize()`
+      - `jas_matrix_rowstep()`
+      - `jas_matrix_step()`
+
+  - getting/setting elements of a matrix:
+
+      - `jas_matrix_get()`
+      - `jas_matrix_set()`
+      - `jas_matrix_getv()`
+      - `jas_matrix_setv()`
+      - `jas_matrix_getref()`
+      - `jas_matrix_getvref()`
+
+  - accessing submatrices of a matrix:
+
+      - `jas_matrix_bindsub()`
+      - `jas_matrix_bindrow()`
+      - `jas_matrix_bindcol()`
+
+  - performing an arithmetic operations on all elements of a matrix:
+
+      - `jas_matrix_clip()`
+      - `jas_matrix_asl()`
+      - `jas_matrix_asr()`
+      - `jas_matrix_divpow2()`
+      - `jas_matrix_setall()`
+
+  - relational operations for matrices:
+
+      - `jas_matrix_cmp()`
+
+  - reading and writing a matrix from and to a stream:
+
+      - `jas_matrix_input()`
+      - `jas_matrix_output()`
+
+Sequences in 2-D are represented using the `jas_seq2d_t` class.
+In effect, a 2-D sequence is simply a matrix whose starting row and
+column indices are arbitrary (instead of being fixed at zero as in the
+case of a matrix).
+A list of the various functions/macros provided for this class is follows:
+
+  - creation/destruction of a sequence:
+
+      - `jas_seq2d_create()`
+      - `jas_seq2d_destroy()`
+      - `jas_seq2d_copy()`
+
+  - getting/setting attributes of a sequence:
+
+      - `jas_seq2d_xstart()`
+      - `jas_seq2d_ystart()`
+      - `jas_seq2d_xend()`
+      - `jas_seq2d_yend()`
+      - `jas_seq2d_rowstep()`
+      - `jas_seq2d_width()`
+      - `jas_seq2d_height()`
+      - `jas_seq2d_setshift()`
+      - `jas_seq2d_size()`
+      - `jas_seq2d_empty()`
+
+  - accessing elements of a sequence:
+
+      - `jas_seq2d_getref()`
+      - `jas_seq2d_get()`
+
+  - referencing a subsequence of a sequence:
+
+      - `jas_seq2d_bindsub()`
+
+Sequences in 1-D are represented using the `jas_seq_t` class.
+A list of the various functions/macros provided for this class is follows:
+
+  - creation/destruction of a sequence:
+
+      - `jas_seq_create()`
+      - `jas_seq_destroy()`
+
+  - querying the attributes of a sequence:
+
+      - `jas_seq_start()`
+      - `jas_seq_end()`
+
+  - accessing the elements of a sequence:
+
+      - `jas_seq_set()`
+      - `jas_seq_getref()`
+      - `jas_seq_get()`
 
 */

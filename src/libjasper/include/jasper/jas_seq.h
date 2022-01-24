@@ -164,11 +164,13 @@ typedef struct {
 } jas_matrix_t;
 
 /*!
+@struct jas_seq2d_t
 @brief Two-dimensional sequence type.
 */
 typedef jas_matrix_t jas_seq2d_t;
 
 /*!
+@struct jas_seq_t
 @brief One-dimensional sequence type.
 */
 typedef jas_matrix_t jas_seq_t;
@@ -198,6 +200,7 @@ static inline jas_matind_t jas_matrix_numcols(const jas_matrix_t *matrix)
 
 /*!
 @brief
+Get the number of elements in a matrix.
 */
 JAS_ATTRIBUTE_PURE
 static inline jas_matind_t jas_matrix_size(const jas_matrix_t *matrix)
@@ -207,6 +210,7 @@ static inline jas_matind_t jas_matrix_size(const jas_matrix_t *matrix)
 
 /*!
 @brief
+Test if a matrix is empty (i.e., contains no elements).
 */
 JAS_ATTRIBUTE_PURE
 static inline bool jas_matrix_empty(const jas_matrix_t *matrix)
@@ -215,7 +219,8 @@ static inline bool jas_matrix_empty(const jas_matrix_t *matrix)
 }
 
 /*!
-@brief Get a matrix element.
+@brief
+Get a matrix element.
 */
 JAS_ATTRIBUTE_PURE
 static inline jas_seqent_t jas_matrix_get(const jas_matrix_t *matrix, jas_matind_t i, jas_matind_t j)
@@ -270,6 +275,7 @@ static inline jas_seqent_t *jas_matrix_getref(const jas_matrix_t *matrix, jas_ma
 
 /*!
 @brief
+Get a reference to a particular row of a 2-D sequence.
 */
 JAS_ATTRIBUTE_PURE
 static inline jas_seqent_t *jas_matrix_getvref(const jas_matrix_t *matrix, jas_matind_t i)
@@ -302,6 +308,7 @@ int jas_matrix_resize(jas_matrix_t *matrix, jas_matind_t numrows, jas_matind_t n
 
 /*!
 @brief
+Write a matrix to a C standard library stream.
 */
 JAS_EXPORT
 int jas_matrix_output(jas_matrix_t *matrix, FILE *out);
@@ -408,7 +415,7 @@ jas_matrix_t *jas_matrix_copy(jas_matrix_t *x);
 
 /*!
 @brief
-Read a matrix from a stream.
+Read a matrix from a C standard library stream.
 */
 JAS_EXPORT
 jas_matrix_t *jas_matrix_input(FILE *);
@@ -458,6 +465,10 @@ JAS_EXPORT
 jas_matrix_t *jas_seq2d_create(jas_matind_t xstart, jas_matind_t ystart,
   jas_matind_t xend, jas_matind_t yend);
 
+/*!
+@brief
+Destroy a 2-D sequence.
+*/
 static inline void jas_seq2d_destroy(jas_seq2d_t *s)
 {
 	jas_matrix_destroy(s);
@@ -465,6 +476,7 @@ static inline void jas_seq2d_destroy(jas_seq2d_t *s)
 
 /*!
 @brief
+Get the starting x-coordinate of the sequence.
 */
 JAS_ATTRIBUTE_PURE
 static inline jas_matind_t jas_seq2d_xstart(const jas_seq2d_t *s)
@@ -474,6 +486,7 @@ static inline jas_matind_t jas_seq2d_xstart(const jas_seq2d_t *s)
 
 /*!
 @brief
+Get the starting y-coordinate of the sequence.
 */
 JAS_ATTRIBUTE_PURE
 static inline jas_matind_t jas_seq2d_ystart(const jas_seq2d_t *s)
@@ -483,6 +496,7 @@ static inline jas_matind_t jas_seq2d_ystart(const jas_seq2d_t *s)
 
 /*!
 @brief
+Get the ending x-coordinate of the sequence.
 */
 JAS_ATTRIBUTE_PURE
 static inline jas_matind_t jas_seq2d_xend(const jas_seq2d_t *s)
@@ -492,6 +506,7 @@ static inline jas_matind_t jas_seq2d_xend(const jas_seq2d_t *s)
 
 /*!
 @brief
+Get the ending y-coordinate of the sequence.
 */
 JAS_ATTRIBUTE_PURE
 static inline jas_matind_t jas_seq2d_yend(const jas_seq2d_t *s)
@@ -501,6 +516,7 @@ static inline jas_matind_t jas_seq2d_yend(const jas_seq2d_t *s)
 
 /*!
 @brief
+Get a pointer (i.e., reference) to an element of a 2-D sequence.
 */
 JAS_ATTRIBUTE_PURE
 static inline jas_seqent_t *jas_seq2d_getref(const jas_seq2d_t *s, jas_matind_t x, jas_matind_t y)
@@ -510,6 +526,7 @@ static inline jas_seqent_t *jas_seq2d_getref(const jas_seq2d_t *s, jas_matind_t 
 
 /*!
 @brief
+Get an element of a 2-D sequence.
 */
 JAS_ATTRIBUTE_PURE
 static inline jas_seqent_t jas_seq2d_get(const jas_seq2d_t *s, jas_matind_t x, jas_matind_t y)
@@ -519,6 +536,7 @@ static inline jas_seqent_t jas_seq2d_get(const jas_seq2d_t *s, jas_matind_t x, j
 
 /*!
 @brief
+Get the stride between successive rows in the sequence.
 */
 JAS_ATTRIBUTE_PURE
 static inline size_t jas_seq2d_rowstep(const jas_seq2d_t *s)
@@ -528,6 +546,7 @@ static inline size_t jas_seq2d_rowstep(const jas_seq2d_t *s)
 
 /*!
 @brief
+Get the number of columns in the sequence.
 */
 JAS_ATTRIBUTE_PURE
 static inline unsigned jas_seq2d_width(const jas_seq2d_t *s)
@@ -537,6 +556,7 @@ static inline unsigned jas_seq2d_width(const jas_seq2d_t *s)
 
 /*!
 @brief
+Get the number of rows in the sequence.
 */
 JAS_ATTRIBUTE_PURE
 static inline unsigned jas_seq2d_height(const jas_seq2d_t *s)
@@ -546,6 +566,7 @@ static inline unsigned jas_seq2d_height(const jas_seq2d_t *s)
 
 /*!
 @brief
+Set the shift (i.e., starting x- and y-coordinates) of the sequence.
 */
 static inline void jas_seq2d_setshift(jas_seq2d_t *s, jas_matind_t x, jas_matind_t y)
 {
@@ -557,6 +578,7 @@ static inline void jas_seq2d_setshift(jas_seq2d_t *s, jas_matind_t x, jas_matind
 
 /*!
 @brief
+Get the number of elements in the sequence.
 */
 JAS_ATTRIBUTE_PURE
 static inline jas_matind_t jas_seq2d_size(const jas_seq2d_t *s)
@@ -566,6 +588,7 @@ static inline jas_matind_t jas_seq2d_size(const jas_seq2d_t *s)
 
 /*!
 @brief
+Test if the sequence is empty (i.e., contains no elements).
 */
 JAS_ATTRIBUTE_PURE
 static inline bool jas_seq2d_empty(const jas_seq2d_t *s)
@@ -575,6 +598,7 @@ static inline bool jas_seq2d_empty(const jas_seq2d_t *s)
 
 /*!
 @brief
+Initialize a sequence to reference a subsequence of another sequence.
 */
 JAS_EXPORT
 int jas_seq2d_bindsub(jas_matrix_t *s, jas_matrix_t *s1, jas_matind_t xstart,
@@ -604,6 +628,7 @@ static inline void jas_seq_destroy(jas_seq_t *seq)
 
 /*!
 @brief
+Set an element of a sequence.
 */
 static inline void jas_seq_set(jas_seq_t *seq, jas_matind_t i, jas_seqent_t v)
 {
@@ -612,6 +637,7 @@ static inline void jas_seq_set(jas_seq_t *seq, jas_matind_t i, jas_seqent_t v)
 
 /*!
 @brief
+Get a pointer (i.e., reference) to an element of a sequence.
 */
 JAS_ATTRIBUTE_PURE
 static inline jas_seqent_t *jas_seq_getref(const jas_seq_t *seq, jas_matind_t i)
@@ -621,6 +647,7 @@ static inline jas_seqent_t *jas_seq_getref(const jas_seq_t *seq, jas_matind_t i)
 
 /*!
 @brief
+Get an element of a sequence.
 */
 JAS_ATTRIBUTE_PURE
 static inline jas_seqent_t jas_seq_get(const jas_seq_t *seq, jas_matind_t i)
@@ -630,6 +657,7 @@ static inline jas_seqent_t jas_seq_get(const jas_seq_t *seq, jas_matind_t i)
 
 /*!
 @brief
+Get the starting index of a sequence.
 */
 JAS_ATTRIBUTE_PURE
 static inline jas_matind_t jas_seq_start(const jas_seq_t *seq)
@@ -639,6 +667,7 @@ static inline jas_matind_t jas_seq_start(const jas_seq_t *seq)
 
 /*!
 @brief
+Get the ending index of a sequence.
 */
 JAS_ATTRIBUTE_PURE
 static inline jas_matind_t jas_seq_end(const jas_seq_t *seq)

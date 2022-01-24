@@ -86,6 +86,7 @@ extern "C" {
  */
 
 /*!
+@struct jas_tmr_t
 @brief Timer type.
 */
 #if defined(JAS_HAVE_GETTIMEOFDAY)
