@@ -1,21 +1,24 @@
 JasPer Image Processing/Coding Tool Kit
 =======================================
 
-This is the source distribution for JasPer.  JasPer is a collection of software
-(i.e., a library and application programs) for the coding and manipulation
-of images.  This software can handle image data in a variety of formats.
-One such format supported by JasPer is the JPEG-2000 format defined in
-ISO/IEC 15444-1.
+This is the source distribution for JasPer.  JasPer is a collection of
+software (i.e., a library and application programs) for the coding and
+manipulation of images.  This software can handle image data in a variety
+of formats.  One such format supported by JasPer is the JPEG-2000 format
+defined in ISO/IEC 15444-1.
 
-The complete licensing terms for the JasPer software can be found in the file
-named "LICENSE.txt" in the top level directory of this software distribution.
-Any use of this software contrary to the terms of the license is strictly
-prohibited.  Recent changes made to the software can be found in the file
-"ChangeLog".  Detailed documentation on the JasPer software can be found
-in the JasPer Software Reference Manual.  This manual is located in the
-"doc" directory, and includes useful information such as: 1) how to build,
-install, and use the software, 2) how to submit report bugs, and 3) where
-to find additional information about the software.
+The complete licensing terms for the JasPer software can be found in the
+file named "LICENSE.txt" in the top level directory of this software
+distribution.  Any use of this software contrary to the terms of the
+license is strictly prohibited.  Recent changes made to the software
+can be found in the file "ChangeLog".  Detailed documentation on the
+JasPer software can be found in the JasPer Software Reference Manual.
+This manual is located in the "doc" directory, and includes useful
+information such as:
+
+  - how to build, install, and use the software,
+  - how to submit report bugs, and
+  - where to find additional information about the software.
 
 The official web site for the JasPer software has the following URL:
 
@@ -41,14 +44,13 @@ The manual is provided in two formats:
 
   2. PDF format in doc/manual.pdf
 
-The old reference manual (which is still useful) can be found in:
-
-  - doc/jasper.pdf
-
-The version of the reference manual corresponding to the most recent commit
-on the master branch of the JasPer Git repository can be found at:
+The reference manual for the JasPer software is also available online at:
 
   - https://jasper-software.github.io/jasper-manual
+
+A detailed introduction to the JPEG-2000 standard can be found in:
+
+  - doc/jpeg2000.pdf
 
 All bug reports should be submitted via the issue-tracking system provided
 by GitHub.  To submit a bug report, go the following URL and click on the
@@ -56,6 +58,5 @@ by GitHub.  To submit a bug report, go the following URL and click on the
 
   - https://github.com/jasper-software/jasper/issues
 
-Please do not submit bug reports directly to the author via email, as bug
-reports that are not submitted via the above issue-tracking system on GitHub
-are easy to be lost.
+Please do not submit bug reports via email, as bug reports that are not
+submitted via the above issue-tracking system on GitHub may be lost.
