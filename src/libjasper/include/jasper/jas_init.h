@@ -202,21 +202,6 @@ JAS_EXPORT
 void jas_conf_set_vlogmsgf(int (*func)(jas_logtype_t, const char *,
   va_list));
 
-#if 0
-/*!
-@brief
-Set the image-format table to be used to initialize the library.
-
-@details
-The entries for the image-format table that reside in the array pointed to
-by @c formats must have a lifetime that includes the point at which the
-JasPer library is cleaned up (via @c jas_cleanup).
-*/
-JAS_EXPORT
-void jas_conf_set_image_format_table(const jas_image_fmt_t *,
-  size_t num_formats);
-#endif
-
 /******************************************************************************\
 * Library Initialization and Cleanup.
 \******************************************************************************/

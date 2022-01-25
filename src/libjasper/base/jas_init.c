@@ -81,6 +81,38 @@
 * Types.
 \******************************************************************************/
 
+/*!
+@brief Entry in image format table.
+*/
+typedef struct {
+
+	/*!
+	A unique name identifying the format.
+	*/
+	const char *name;
+
+	/*!
+	A short description of the format.
+	*/
+	const char *desc;
+
+	/*!
+	A whitespace delimited list of file extensions associated with the format.
+	*/
+	const char *exts;
+
+	/*!
+	The operations for the format (e.g., encode, decode, and validate).
+	*/
+	const jas_image_fmtops_t ops;
+
+	/*!
+	A boolean flag indicating if the format is enabled.
+	*/
+	int enabled;
+
+} jas_image_fmt_t;
+
 /*
 User-configurable settings for library.
 This is for internal library use only.
@@ -353,20 +385,6 @@ jas_global_t jas_global = {
 };
 
 /******************************************************************************\
-* Codec Table Code.
-\******************************************************************************/
-
-#if 0
-JAS_EXPORT
-void jas_get_image_format_table(const jas_image_fmt_t **formats,
-  size_t *num_formats)
-{
-	*formats = jas_image_fmts;
-	*num_formats = sizeof(jas_image_fmts) / sizeof(jas_image_fmt_t);
-}
-#endif
-
-/******************************************************************************\
 * Library Configuration.
 \******************************************************************************/
 
@@ -433,16 +451,6 @@ void jas_conf_set_vlogmsgf(int (*func)(jas_logtype_t type, const char *,
 {
 	jas_conf.vlogmsgf = func;
 }
-
-#if 0
-JAS_EXPORT
-void jas_conf_set_image_format_table(const jas_image_fmt_t *formats,
-  size_t num_formats)
-{
-	jas_conf.image_formats = formats;
-	jas_conf.num_image_formats = num_formats;
-}
-#endif
 
 /******************************************************************************\
 * Library Initialization and Cleanup.

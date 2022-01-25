@@ -129,7 +129,8 @@ extern "C" {
 \******************************************************************************/
 
 /*!
-@brief Image coordinate. */
+@brief Image coordinate.
+*/
 typedef int_fast32_t jas_image_coord_t;
 #define JAS_IMAGE_COORD_MAX INT_FAST32_MAX
 #define JAS_IMAGE_COORD_MIN INT_FAST32_MIN
@@ -166,40 +167,39 @@ be used.
 */
 typedef struct {
 
-	jas_image_coord_t tlx_;
 	/* The x-coordinate of the top-left corner of the component. */
+	jas_image_coord_t tlx_;
 
-	jas_image_coord_t tly_;
 	/* The y-coordinate of the top-left corner of the component. */
+	jas_image_coord_t tly_;
 
-	jas_image_coord_t hstep_;
 	/* The horizontal sampling period in units of the reference grid. */
+	jas_image_coord_t hstep_;
 
-	jas_image_coord_t vstep_;
 	/* The vertical sampling period in units of the reference grid. */
+	jas_image_coord_t vstep_;
 
-	jas_image_coord_t width_;
 	/* The component width in samples. */
+	jas_image_coord_t width_;
 
-	jas_image_coord_t height_;
 	/* The component height in samples. */
+	jas_image_coord_t height_;
 
+	/* The precision of the sample data (i.e., the number of bits per sample).
+	If the samples are signed values, this quantity includes the sign bit. */
 	unsigned prec_;
-	/* The precision of the sample data (i.e., the number of bits per
-	sample).  If the samples are signed values, this quantity
-	includes the sign bit. */
 
-	int sgnd_;
 	/* The signedness of the sample data. */
+	int sgnd_;
 
-	jas_stream_t *stream_;
 	/* The stream containing the component data. */
+	jas_stream_t *stream_;
 
-	unsigned cps_;
 	/* The number of characters per sample in the stream. */
+	unsigned cps_;
 
-	jas_image_cmpttype_t type_;
 	/* The type of component (e.g., opacity, red, green, blue, luma). */
+	jas_image_cmpttype_t type_;
 
 } jas_image_cmpt_t;
 
@@ -338,46 +338,6 @@ typedef struct {
 	jas_image_fmtops_t ops;
 
 } jas_image_fmtinfo_t;
-
-/*!
-@brief Entry in image format table.
-*/
-typedef struct {
-
-	/*!
-	A unique name identifying the format.
-	*/
-	const char *name;
-
-	/*!
-	A short description of the format.
-	*/
-	const char *desc;
-
-	/*!
-	A whitespace delimited list of file extensions associated with the format.
-	*/
-	const char *exts;
-
-	/*!
-	The operations for the format (e.g., encode, decode, and validate).
-	*/
-	const jas_image_fmtops_t ops;
-
-	/*!
-	A boolean flag indicating if the format is enabled.
-	*/
-	int enabled;
-
-} jas_image_fmt_t;
-
-#if 0
-/*!
-@brief Get the image format table (generated when the library was built).
-*/
-JAS_EXPORT
-void jas_get_image_format_table(const jas_image_fmt_t**, size_t *);
-#endif
 
 /******************************************************************************\
 * Image operations.
