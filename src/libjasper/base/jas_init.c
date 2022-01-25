@@ -227,7 +227,7 @@ void jas_set_ctx(jas_ctx_t *ctx);
 void jas_set_default_ctx(jas_ctx_t *ctx);
 jas_ctx_t *jas_ctx_create(void);
 void jas_ctx_destroy(jas_ctx_t *ctx);
-jas_ctx_t *jas_get_ctx_impl(void);
+jas_ctx_t *jas_get_ctx_internal(void);
 jas_ctx_t *jas_get_default_ctx(void);
 
 /******************************************************************************\
@@ -384,6 +384,11 @@ jas_global_t jas_global = {
 #endif
 };
 
+#if defined(JAS_HAVE_THREAD_LOCAL)
+_Thread_local jas_ctx_t *jas_cur_ctx = 0;
+_Thread_local jas_ctx_t *jas_default_ctx = 0;
+#endif
+
 /******************************************************************************\
 * Library Configuration.
 \******************************************************************************/
@@ -538,7 +543,7 @@ int jas_init_library()
 	}
 #endif
 
-#if defined(JAS_THREADS)
+#if defined(JAS_THREADS) && !defined(JAS_HAVE_THREAD_LOCAL)
 	memset(&jas_global.cur_ctx_tss, 0, sizeof(jas_tss_t));
 	memset(&jas_global.default_ctx_tss, 0, sizeof(jas_tss_t));
 #endif
@@ -571,7 +576,7 @@ int jas_init_library()
 		}
 	}
 
-#if defined(JAS_THREADS)
+#if defined(JAS_THREADS) && !defined(JAS_HAVE_THREAD_LOCAL)
 	if ((status = jas_tss_create(&jas_global.cur_ctx_tss, 0))) {
 		jas_eprintf("cannot create thread-specific storage %d\n", status);
 		ret = -1;
@@ -600,7 +605,9 @@ int jas_init_library()
 	JAS_LOGDEBUGF(1, "total memory size: %zu\n", jas_get_total_mem_size());
 	JAS_LOGDEBUGF(1, "library memory limit: %zu\n", max_mem);
 
+#if !defined(JAS_THREADS) || (defined(JAS_THREADS) && !defined(JAS_HAVE_THREAD_LOCAL))
 done:
+#endif
 #if defined(JAS_THREADS)
 	if (has_lock) {
 		jas_mutex_unlock(&jas_global.lock);
@@ -643,7 +650,7 @@ int jas_cleanup_library()
 	jas_ctx_cleanup(ctx);
 	//jas_context_set_debug_level(ctx, 0);
 
-#if defined(JAS_THREADS)
+#if defined(JAS_THREADS) && !defined(JAS_HAVE_THREAD_LOCAL)
 	jas_tss_delete(jas_global.cur_ctx_tss);
 	jas_tss_delete(jas_global.default_ctx_tss);
 #endif
@@ -836,15 +843,8 @@ static int jas_init_codecs(jas_ctx_t *ctx)
 }
 
 /******************************************************************************\
+* Context management (e.g., creation and destruction).
 \******************************************************************************/
-
-#if 0
-/* For internal library use only. */
-static jas_conf_t *jas_get_conf_ptr()
-{
-	return &jas_conf;
-}
-#endif
 
 void jas_ctx_init(jas_ctx_t *ctx)
 {
@@ -889,13 +889,19 @@ void jas_context_destroy(jas_context_t context)
 	jas_ctx_destroy(JAS_CAST(jas_ctx_t *, context));
 }
 
-jas_ctx_t *jas_get_ctx_impl()
+jas_ctx_t *jas_get_ctx_internal()
 {
 #if defined(JAS_THREADS)
-	jas_ctx_t *ctx = JAS_CAST(jas_ctx_t *, jas_tss_get(jas_global.cur_ctx_tss));
+	jas_ctx_t *ctx;
+#if defined(JAS_HAVE_THREAD_LOCAL)
+	ctx = JAS_CAST(jas_ctx_t *, jas_cur_ctx);
+#else
+	ctx = JAS_CAST(jas_ctx_t *, jas_tss_get(jas_global.cur_ctx_tss));
+#endif
 	if (!ctx) {
 		ctx = jas_global.ctx;
 	}
+	assert(ctx);
 	return ctx;
 #else
 	return (jas_global.ctx) ? jas_global.ctx : &jas_global.ctx_buf;
@@ -917,23 +923,20 @@ jas_context_t jas_get_default_context()
 JAS_EXPORT
 void jas_set_context(jas_context_t context)
 {
-#if defined(JAS_THREADS)
-	if (jas_tss_set(jas_global.cur_ctx_tss, JAS_CAST(void *, context))) {
-		assert(0);
-		abort();
-	}
-#else
-	jas_global.ctx = JAS_CAST(jas_ctx_t *, context);
-#endif
+	jas_set_ctx(JAS_CAST(jas_ctx_t *, context));
 }
 
 void jas_set_ctx(jas_ctx_t *ctx)
 {
 #if defined(JAS_THREADS)
+#if defined(JAS_HAVE_THREAD_LOCAL)
+	jas_cur_ctx = ctx;
+#else
 	if (jas_tss_set(jas_global.cur_ctx_tss, ctx)) {
 		assert(0);
 		abort();
 	}
+#endif
 #else
 	jas_global.ctx = JAS_CAST(jas_ctx_t *, ctx);
 #endif
@@ -941,29 +944,44 @@ void jas_set_ctx(jas_ctx_t *ctx)
 
 jas_ctx_t *jas_get_default_ctx()
 {
+	jas_ctx_t *ctx;
+
 #if defined(JAS_THREADS)
-	jas_ctx_t *ctx =
-	  JAS_CAST(jas_ctx_t *, jas_tss_get(jas_global.default_ctx_tss));
+#	if defined(JAS_HAVE_THREAD_LOCAL)
+	ctx = jas_default_ctx;
+#	else
+	ctx = JAS_CAST(jas_ctx_t *, jas_tss_get(jas_global.default_ctx_tss));
+#	endif
 	if (!ctx) {
 		ctx = jas_global.ctx;
 	}
-	return ctx;
 #else
-	return (jas_global.ctx) ? jas_global.ctx : &jas_global.ctx_buf;
+	ctx = (jas_global.ctx) ? jas_global.ctx : &jas_global.ctx_buf;
 #endif
+	//JAS_LOGDEBUGF(100, "jas_get_ctx() returning %p", JAS_CAST(void *, ctx));
+
+	return ctx;
 }
 
 void jas_set_default_ctx(jas_ctx_t *ctx)
 {
 #if defined(JAS_THREADS)
+#if defined(JAS_HAVE_THREAD_LOCAL)
+	jas_default_ctx = ctx;
+#else
 	if (jas_tss_set(jas_global.default_ctx_tss, ctx)) {
 		assert(0);
 		abort();
 	}
+#endif
 #else
 	jas_global.ctx = JAS_CAST(jas_ctx_t *, ctx);
 #endif
 }
+
+/******************************************************************************\
+* Context state management.
+\******************************************************************************/
 
 JAS_EXPORT
 int jas_set_debug_level(int debug_level)
@@ -975,6 +993,13 @@ int jas_set_debug_level(int debug_level)
 }
 
 JAS_EXPORT
+int jas_get_debug_level_internal(void)
+{
+	jas_ctx_t *ctx = jas_get_ctx();
+	return ctx->debug_level;
+}
+
+JAS_EXPORT
 void jas_set_dec_default_max_samples(size_t max_samples)
 {
 	jas_ctx_t *ctx = jas_get_ctx();
@@ -982,20 +1007,22 @@ void jas_set_dec_default_max_samples(size_t max_samples)
 }
 
 JAS_EXPORT
-void jas_set_vlogmsgf(int (*func)(jas_logtype_t, const char *,
-  va_list))
+size_t jas_get_dec_default_max_samples_internal(void)
+{
+	jas_ctx_t *ctx = jas_get_ctx();
+	return ctx->dec_default_max_samples;
+}
+
+JAS_EXPORT
+void jas_set_vlogmsgf(int (*func)(jas_logtype_t, const char *, va_list))
 {
 	jas_ctx_t *ctx = jas_get_ctx();
 	ctx->vlogmsgf = func;
 }
 
-#if 0
 JAS_EXPORT
-void jas_get_image_fmtinfo_table(const jas_image_fmtinfo_t **fmtinfos,
-  size_t *numfmts)
+jas_vlogmsgf_t *jas_get_vlogmsgf_internal(void)
 {
 	jas_ctx_t *ctx = jas_get_ctx();
-	*fmtinfos = ctx->image_fmtinfos;
-	*numfmts = ctx->image_numfmts;
+	return ctx->vlogmsgf;
 }
-#endif

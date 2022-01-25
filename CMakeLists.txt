@@ -94,7 +94,10 @@ option(JAS_ENABLE_LATEX "Allow the use of LaTeX if it is available " ON)
 option(JAS_ENABLE_PROGRAMS "Enable building of the programs" ON)
 option(JAS_ENABLE_MULTITHREADING_SUPPORT "Enable multithreading support" ON)
 option(JAS_PREFER_PTHREAD
-  "Prefer POSIX Threading Library (over C11) for threading support" ON)
+  "Prefer POSIX Threads Library (over C11) for threading support" ON)
+option(JAS_PREFER_PTHREAD_TSS
+  "Prefer POSIX Threads Library thread-specific storage (over _Thread_local)"
+  OFF)
 option(JAS_STRICT "Treat compiler warnings as errors" OFF)
 
 # Options controlling which codec support is built into the JasPer library.
@@ -397,6 +400,7 @@ set(JAS_THREADS FALSE)
 set(JAS_THREADS_C11 FALSE)
 set(JAS_THREADS_PTHREAD FALSE)
 set(JAS_THREADS_WIN32 FALSE)
+set(JAS_HAVE_THREAD_LOCAL FALSE)
 if(JAS_ENABLE_MULTITHREADING_SUPPORT)
 	check_c_source_compiles("
 	#include <threads.h>
@@ -406,6 +410,11 @@ if(JAS_ENABLE_MULTITHREADING_SUPPORT)
 		tss_t tss;
 	}
 	" JAS_TRY_COMPILE_C11_THREADS)
+	check_c_source_compiles("
+	_Thread_local foo;
+	int main() {
+	}
+	" JAS_TRY_COMPILE_THREAD_LOCAL)
 	check_include_files(pthread.h JAS_HAVE_PTHREAD_H)
 
 	# Check for support for various threading libraries.
@@ -430,6 +439,9 @@ if(JAS_ENABLE_MULTITHREADING_SUPPORT)
 		set(THREAD_LIBRARY "${CMAKE_THREAD_LIBS_INIT}")
 		if(JAS_TRY_COMPILE_C11_THREADS)
 			set(JAS_HAVE_C11_THREADS TRUE)
+		endif()
+		if(JAS_TRY_COMPILE_THREAD_LOCAL AND NOT JAS_PREFER_PTHREAD_TSS)
+			set(JAS_HAVE_THREAD_LOCAL TRUE)
 		endif()
 	endif()
 
@@ -464,6 +476,7 @@ if(JAS_ENABLE_MULTITHREADING_SUPPORT)
 	message("POSIX threading support selected: ${JAS_THREADS_PTHREAD}")
 	message("Win32 threading support selected: ${JAS_THREADS_WIN32}")
 	message("Threading library: ${THREAD_LIBRARY}")
+	message("_Thread_local: ${JAS_HAVE_THREAD_LOCAL}")
 else()
 	message("Threading support has been disabled.")
 endif()

@@ -148,7 +148,9 @@ while [ $# -gt 0 ]; do
 		;;
 	-q|--quiet)
 		shift 1
-		verbose=0
+		if [ "$verbose" -gt 0 ]; then
+			verbose=$((verbose - 1))
+		fi
 		;;
 	-v|--verbose)
 		shift 1
@@ -461,7 +463,7 @@ fi
 
 build_opts=()
 
-if [ "$verbose" -ne 0 ]; then
+if [ "$verbose" -ge 1 ]; then
 	build_opts+=(--verbose)
 fi
 
@@ -483,7 +485,7 @@ fi
 
 install_opts=()
 
-if [ "$verbose" -ne 0 ]; then
+if [ "$verbose" -ge 1 ]; then
 	install_opts+=(--verbose)
 fi
 
@@ -507,7 +509,7 @@ fi
 
 test_opts=()
 
-if [ "$verbose" -ne 0 ]; then
+if [ "$verbose" -ge 2 ]; then
 	test_opts+=(--verbose)
 fi
 

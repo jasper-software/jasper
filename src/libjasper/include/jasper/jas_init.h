@@ -85,6 +85,10 @@ extern "C" {
  * @{
  */
 
+#if defined(JAS_FOR_INTERNAL_USE_ONLY)
+/*
+Per-thread library context.
+*/
 typedef struct {
 
 	/*
@@ -95,8 +99,9 @@ typedef struct {
 
 	/*
 	The function used to output error/warning/informational messages.
-	*/
 	int (*vlogmsgf)(jas_logtype_t type, const char *format, va_list ap);
+	*/
+	jas_vlogmsgf_t *vlogmsgf;
 
 	/*
 	The image format information to be used to populate the image format
@@ -109,6 +114,7 @@ typedef struct {
 	size_t dec_default_max_samples;
 
 } jas_ctx_t;
+#endif
 
 /*!
 @brief
@@ -199,8 +205,7 @@ informational messages.
 @details
 */
 JAS_EXPORT
-void jas_conf_set_vlogmsgf(int (*func)(jas_logtype_t, const char *,
-  va_list));
+void jas_conf_set_vlogmsgf(jas_vlogmsgf_t *func);
 
 /******************************************************************************\
 * Library Initialization and Cleanup.
@@ -369,16 +374,34 @@ void jas_set_context(jas_context_t context);
 * Getting/Setting Context Properties
 \******************************************************************************/
 
-//#if defined(JAS_FOR_INTERNAL_USE_ONLY)
+/* This function is only for internal use by the library. */
 JAS_EXPORT
-jas_ctx_t *jas_get_ctx_impl(void);
+int jas_get_debug_level_internal(void);
+
+/* This function is only for internal use by the library. */
+JAS_EXPORT
+size_t jas_get_dec_default_max_samples_internal(void);
+
+/* This function is only for internal use by the library. */
+JAS_EXPORT
+jas_vlogmsgf_t *jas_get_vlogmsgf_internal(void);
+
+#if defined(JAS_FOR_INTERNAL_USE_ONLY)
+extern _Thread_local jas_ctx_t *jas_cur_ctx;
+
+/* This function is only for internal use by the library. */
+jas_ctx_t *jas_get_ctx_internal(void);
 
 /* This function is only for internal use by the library. */
 static inline jas_ctx_t *jas_get_ctx(void)
 {
-	return JAS_CAST(jas_ctx_t *, jas_get_ctx_impl());
+#if defined(JAS_HAVE_THREAD_LOCAL)
+	return jas_cur_ctx ? jas_cur_ctx : jas_get_ctx_internal();
+#else
+	return JAS_CAST(jas_ctx_t *, jas_get_ctx_internal());
+#endif
 }
-//#endif
+#endif
 
 /*!
 @brief
@@ -397,8 +420,12 @@ Get the debug level for a particular context.
 */
 static inline int jas_get_debug_level(void)
 {
+#if defined(JAS_FOR_INTERNAL_USE_ONLY)
 	jas_ctx_t *ctx = jas_get_ctx();
 	return ctx->debug_level;
+#else
+	return jas_get_debug_level_internal();
+#endif
 }
 
 /*!
@@ -420,8 +447,12 @@ process.
 */
 static inline size_t jas_get_dec_default_max_samples(void)
 {
+#if defined(JAS_FOR_INTERNAL_USE_ONLY)
 	jas_ctx_t *ctx = jas_get_ctx();
 	return ctx->dec_default_max_samples;
+#else
+	return jas_get_dec_default_max_samples_internal();
+#endif
 }
 
 /*!
@@ -431,7 +462,6 @@ Set the function to be used for log messages.
 @details
 */
 JAS_EXPORT
-//void jas_set_vlogmsgf(int (*func)(jas_logtype_t, const char *, va_list));
 void jas_set_vlogmsgf(jas_vlogmsgf_t *func);
 
 /*!
@@ -443,17 +473,13 @@ Get the function to be used for log messages.
 static inline
 jas_vlogmsgf_t *jas_get_vlogmsgf(void)
 {
+#if defined(JAS_FOR_INTERNAL_USE_ONLY)
 	jas_ctx_t *ctx = jas_get_ctx();
 	return ctx->vlogmsgf;
+#else
+	return jas_get_vlogmsgf_internal();
+#endif
 }
-
-#if 0
-#if defined(JAS_FOR_INTERNAL_USE_ONLY)
-//JAS_EXPORT
-void jas_get_image_fmtinfo_table(const jas_image_fmtinfo_t **fmtinfos,
- size_t *numfmts);
-#endif
-#endif
 
 /*!
  * @}

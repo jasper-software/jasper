@@ -23,7 +23,7 @@ usage()
 	exit 2
 }
 
-verbose=0
+verbose=1
 build_dir=
 crostini=0
 enable=1
@@ -32,7 +32,7 @@ strict=1
 command_file=
 enable_test=1
 
-while getopts vb:cnd:swC:X option; do
+while getopts vb:cnd:swC:Xq option; do
 	case "$option" in
 	n)
 		enable=0;;
@@ -46,6 +46,11 @@ while getopts vb:cnd:swC:X option; do
 		debug_level="$OPTARG";;
 	v)
 		verbose=$((verbose + 1));;
+	q)
+		if [ "$verbose" -gt 0 ]; then
+			verbose=$((verbose - 1))
+		fi
+		;;
 	w)
 		strict=0;;
 	s)
@@ -95,9 +100,9 @@ Operating System: $os
 EOF
 
 global_options=()
-if [ "$verbose" -ge 1 ]; then
+for ((i=0; i < "$verbose"; ++i)); do
 	global_options+=(--verbose)
-fi
+done
 if [ "$strict" -ge 1 ]; then
 	global_options+=(--strict)
 else

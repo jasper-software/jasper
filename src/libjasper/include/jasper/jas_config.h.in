@@ -59,6 +59,8 @@
 #cmakedefine JAS_THREADS_PTHREAD
 #cmakedefine JAS_THREADS_WIN32
 
+#cmakedefine JAS_HAVE_THREAD_LOCAL
+
 #cmakedefine JAS_ENABLE_NON_THREAD_SAFE_DEBUGGING
 
 #cmakedefine JAS_HAVE_SNPRINTF
