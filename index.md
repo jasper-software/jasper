@@ -110,6 +110,11 @@ the software.
 
 # Documentation
 
+Detailed information about the JasPer software can be found in the
+JasPer Software Reference Manual, which is available online at:
+
+  - <https://jasper-software.github.io/jasper-manual>
+
 Some high level descriptions of JasPer can be found in:
 
  - M. D. Adams and R. K. Ward,
