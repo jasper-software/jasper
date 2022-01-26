@@ -932,9 +932,11 @@ Upon success, 0 is returned; otherwise, -1 is returned.
 @todo
 TODO/FIXME: should return type be jas_ssize_t and the return value be
 the count of the characters copied?
+Perhaps, it might be safer to introduce a new function with differing
+semantics and deprecate this one?
 */
 JAS_EXPORT
-jas_ssize_t jas_stream_copy(jas_stream_t *destination, jas_stream_t *source,
+int jas_stream_copy(jas_stream_t *destination, jas_stream_t *source,
   jas_ssize_t count);
 
 /*!

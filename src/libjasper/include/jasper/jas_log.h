@@ -60,8 +60,8 @@
  */
 
 /*!
- * @file jas_debug.h
- * @brief JasPer Debugging-Related Functionality
+ * @file jas_log.h
+ * @brief JasPer Logging Functionality
  */
 
 #ifndef JAS_LOG_H

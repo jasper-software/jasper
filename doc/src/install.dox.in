@@ -89,11 +89,16 @@ In order to have access to the full functionality of the JasPer sofware,
 you may need to install some additional software on your system.
 This software must be installed before you attempt to build JasPer.
 
-In order to compile the JasPer software with JPEG support, you will need
+In order to build the JasPer software with JPEG support, you will need
 to download and install the free IJG JPEG library which is available
 from the IJG web site:
 
   - <http://www.ijg.org>
+
+In order to build the JasPer software with HEIC support, the Libheif
+library is needed.  This library is available from:
+
+  - <https://github.com/strukturag/libheif>
 
 In order to build the jiv application, you will need the OpenGL and GLUT
 libraries installed on your system.

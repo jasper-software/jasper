@@ -1097,7 +1097,7 @@ static int jas_strtoopenmode(const char *s)
 	return openmode;
 }
 
-jas_ssize_t jas_stream_copy(jas_stream_t *out, jas_stream_t *in, jas_ssize_t n)
+int jas_stream_copy(jas_stream_t *out, jas_stream_t *in, jas_ssize_t n)
 {
 	jas_ssize_t m;
 
