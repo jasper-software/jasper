@@ -387,7 +387,9 @@ JAS_EXPORT
 jas_vlogmsgf_t *jas_get_vlogmsgf_internal(void);
 
 #if defined(JAS_FOR_INTERNAL_USE_ONLY)
+#if defined(JAS_HAVE_THREAD_LOCAL)
 extern _Thread_local jas_ctx_t *jas_cur_ctx;
+#endif
 
 /* This function is only for internal use by the library. */
 jas_ctx_t *jas_get_ctx_internal(void);
