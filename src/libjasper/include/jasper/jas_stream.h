@@ -341,7 +341,9 @@ JAS_EXPORT
 jas_stream_t *jas_stream_memopen(char *buffer, size_t buffer_size);
 
 /*!
-@warning
+@brief
+Do not use.
+@deprecated
 Do not use this function.
 This function is deprecated.
 Use jas_stream_memopen instead.

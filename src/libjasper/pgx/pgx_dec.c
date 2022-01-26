@@ -173,7 +173,7 @@ jas_image_t *pgx_decode(jas_stream_t *in, const char *optstr)
 		goto error;
 	}
 
-	if (jas_getdbglevel() >= 10) {
+	if (jas_get_debug_level() >= 10) {
 		pgx_dumphdr(stderr, &hdr);
 	}
 

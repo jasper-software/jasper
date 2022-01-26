@@ -286,7 +286,7 @@ jpc_ms_t *jpc_getms(jas_stream_t *in, jpc_cstate_t *cstate)
 			return 0;
 		}
 
-		if (jas_getdbglevel() > 0) {
+		if (jas_get_debug_level() > 0) {
 			jpc_ms_dump(ms);
 		}
 
@@ -303,7 +303,7 @@ jpc_ms_t *jpc_getms(jas_stream_t *in, jpc_cstate_t *cstate)
 		/* There are no marker segment parameters. */
 		ms->len = 0;
 
-		if (jas_getdbglevel() > 0) {
+		if (jas_get_debug_level() > 0) {
 			jpc_ms_dump(ms);
 		}
 	}
@@ -365,7 +365,7 @@ int jpc_putms(jas_stream_t *out, jpc_cstate_t *cstate, jpc_ms_t *ms)
 		cstate->numcomps = ms->parms.siz.numcomps;
 	}
 
-	if (jas_getdbglevel() > 0) {
+	if (jas_get_debug_level() > 0) {
 		jpc_ms_dump(ms);
 	}
 

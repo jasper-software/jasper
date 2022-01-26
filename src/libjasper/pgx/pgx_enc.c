@@ -133,7 +133,7 @@ int pgx_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 	hdr.width = width;
 	hdr.height = height;
 
-	if (jas_getdbglevel() >= 10) {
+	if (jas_get_debug_level() >= 10) {
 		pgx_dumphdr(stderr, &hdr);
 	}
 

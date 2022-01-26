@@ -1148,7 +1148,7 @@ static int jpc_enc_encodemainbody(jpc_enc_t *enc)
 
 		tile = enc->curtile;
 
-		if (jas_getdbglevel() >= 10) {
+		if (jas_get_debug_level() >= 10) {
 			jpc_enc_dump(enc);
 		}
 
@@ -1898,7 +1898,7 @@ int rateallocate(jpc_enc_t *enc, unsigned numlyrs, uint_fast32_t *cumlens)
 		}
 	}
 
-	if (jas_getdbglevel() >= 5) {
+	if (jas_get_debug_level() >= 5) {
 		dump_layeringinfo(enc);
 	}
 

@@ -170,7 +170,7 @@ jas_image_t *jp2_decode(jas_stream_t *in, const char *optstr)
 	/* Get more boxes... */
 	found = 0;
 	while ((box = jp2_box_get(in))) {
-		if (jas_getdbglevel() >= 1) {
+		if (jas_get_debug_level() >= 1) {
 			jas_logdebugf(1, "got box type %s\n", box->info->name);
 		}
 		switch (box->type) {

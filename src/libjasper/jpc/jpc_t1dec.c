@@ -110,7 +110,7 @@ static bool JPC_T1D_GETBIT(jpc_mqdec_t *mqdec, const char *passtypename, const c
 {
 	bool v = jpc_mqdec_getbit(mqdec);
 #if defined(JAS_ENABLE_NON_THREAD_SAFE_DEBUGGING)
-	if (jas_getdbglevel() >= 100) {
+	if (jas_get_debug_level() >= 100) {
 		jas_logdebugf(100, "index = %zu; passtype = %s; symtype = %s; sym = %d\n",
 		  t1dec_cnt, passtypename, symtypename, v);
 		++t1dec_cnt;
@@ -133,7 +133,7 @@ static int JPC_T1D_RAWGETBIT(jpc_bitstream_t *bitstream, const char *passtypenam
 {
 	int v = jpc_bitstream_getbit(bitstream);
 #if defined(JAS_ENABLE_NON_THREAD_SAFE_DEBUGGING)
-	if (jas_getdbglevel() >= 100) {
+	if (jas_get_debug_level() >= 100) {
 		jas_logdebugf(100, "index = %ld; passtype = %s; symtype = %s; sym = %d\n", t1dec_cnt, passtypename, symtypename, v);
 		++t1dec_cnt;
 	}

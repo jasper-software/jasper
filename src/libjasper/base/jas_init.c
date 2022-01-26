@@ -984,12 +984,10 @@ void jas_set_default_ctx(jas_ctx_t *ctx)
 \******************************************************************************/
 
 JAS_EXPORT
-int jas_set_debug_level(int debug_level)
+void jas_set_debug_level(int debug_level)
 {
 	jas_ctx_t *ctx = jas_get_ctx();
-	int old = ctx->debug_level;
 	ctx->debug_level = debug_level;
-	return old;
 }
 
 JAS_EXPORT

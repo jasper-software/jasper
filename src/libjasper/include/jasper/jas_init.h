@@ -302,6 +302,9 @@ otherwise, a nonzero value is returned.
 @warning
 Configuration, initialization, and cleanup of the library must be performed
 on the same thread.
+
+@deprecated
+This function is deprecated.
 */
 JAS_EXPORT
 int jas_init(void);
@@ -316,6 +319,9 @@ This function performs any clean up for the JasPer library.
 @warning
 Configuration, initialization, and cleanup of the library must be performed
 on the same thread.
+
+@deprecated
+This function is deprecated.
 */
 JAS_EXPORT
 void jas_cleanup(void);
@@ -412,7 +418,7 @@ Set the debug level for a particular context.
 @details
 */
 JAS_EXPORT
-int jas_set_debug_level(int debug_level);
+void jas_set_debug_level(int debug_level);
 
 /*!
 @brief

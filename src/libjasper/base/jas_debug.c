@@ -66,6 +66,7 @@
 #define JAS_FOR_INTERNAL_USE_ONLY
 
 #include "jasper/jas_init.h"
+#include "jasper/jas_compiler.h"
 #include "jasper/jas_debug.h"
 #include "jasper/jas_types.h"
 #include "jasper/jas_log.h"
@@ -78,8 +79,10 @@
 \******************************************************************************/
 
 /* Set the library debug level. */
+JAS_DEPRECATED
 int jas_setdbglevel(int level)
 {
+	jas_deprecated("jas_setdbglevel is deprecated");
 	int old_level = jas_get_debug_level();
 	jas_set_debug_level(level);
 	return old_level;

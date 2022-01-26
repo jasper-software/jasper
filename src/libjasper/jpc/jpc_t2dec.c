@@ -366,7 +366,7 @@ static int jpc_dec_decodepkt(jpc_dec_t *dec, jas_stream_t *pkthdrstream, jas_str
 	}
 	jpc_bitstream_close(inb);
 
-	if (jas_getdbglevel() >= 5) {
+	if (jas_get_debug_level() >= 5) {
 		const uint_least64_t hdroffend = jas_stream_getrwcount(pkthdrstream);
 		const unsigned long hdrlen = hdroffend - hdroffstart;
 		jas_logdebugf(5, "hdrlen=%lu bodylen=%lu \n", (unsigned long) hdrlen,
@@ -388,7 +388,7 @@ static int jpc_dec_decodepkt(jpc_dec_t *dec, jas_stream_t *pkthdrstream, jas_str
 
 	/* decode the packet body. */
 
-	if (jas_getdbglevel() >= 1) {
+	if (jas_get_debug_level() >= 1) {
 		jas_logdebugf(1, "packet body offset=%06ld\n", (long) jas_stream_getrwcount(in));
 	}
 
@@ -479,7 +479,7 @@ int jpc_dec_decodepkts(jpc_dec_t *dec, jas_stream_t *pkthdrstream, jas_stream_t 
 			jas_logwarnf("warning: stopping decode prematurely as requested\n");
 			return 0;
 		}
-		if (jas_getdbglevel() >= 1) {
+		if (jas_get_debug_level() >= 1) {
 			jas_logdebugf(1, "packet offset=%08ld prg=%d cmptno=%02d "
 			  "rlvlno=%02d prcno=%03d lyrno=%02d\n", (long)
 			  jas_stream_getrwcount(in), jpc_pi_prg(pi), jpc_pi_cmptno(pi),

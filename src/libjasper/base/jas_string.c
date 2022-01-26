@@ -207,7 +207,7 @@ done:
 		*max_tokens_buf = max_tokens;
 		*num_tokens_buf = num_tokens;
 	}
-	if (jas_getdbglevel() >= 100) {
+	if (jas_get_debug_level() >= 100) {
 		jas_eprintf("tokens %p; max_tokens %zu; num_tokens %zu\n",
 		  JAS_CAST(void *, tokens), max_tokens, num_tokens);
 		for (int i = 0; i < num_tokens; ++i) {

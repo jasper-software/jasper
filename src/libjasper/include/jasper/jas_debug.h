@@ -75,6 +75,7 @@
 #include <jasper/jas_config.h>
 
 #include "jasper/jas_init.h"
+#include "jasper/jas_debug.h"
 
 #include <stdio.h>
 #include <stdarg.h>
@@ -91,25 +92,40 @@ extern "C" {
   level is set sufficiently high. */
 #if !defined(NDEBUG)
 #define	JAS_DBGLOG(n, x) \
-	((jas_getdbglevel() >= (n)) ? (jas_eprintf x) : 0)
+	((jas_get_debug_level() >= (n)) ? (jas_eprintf x) : 0)
 #else
 #define	JAS_DBGLOG(n, x)
 #endif
 
 #if !defined(NDEBUG)
 #define	JAS_LOGDEBUGF(n, ...) \
-	((jas_getdbglevel() >= (n)) ? jas_logdebugf((n), __VA_ARGS__) : 0)
+	((jas_get_debug_level() >= (n)) ? jas_logdebugf((n), __VA_ARGS__) : 0)
 #else
 #define	JAS_LOGDEBUGF(n, ...)
 #endif
 
 /*!
 @brief
-Get the library debug level.
+Warn about the use of deprecated functionality.
+
+@deprecated
+The use of this function is deprecated.
 */
+JAS_EXPORT
+void jas_deprecated(const char *fmt, ...);
+
+/*!
+@brief
+Get the library debug level.
+
+@deprecated
+This function is deprecated.
+*/
+JAS_DEPRECATED
 static inline
 int jas_getdbglevel(void)
 {
+	jas_deprecated("jas_getdbglevel is deprecated\n");
 	return jas_get_debug_level();
 }
 
@@ -174,13 +190,6 @@ Dump memory to a stream.
 */
 JAS_EXPORT
 int jas_memdump(FILE *out, const void *data, size_t len);
-
-/*!
-@brief
-Warn about the use of deprecated functionality.
-*/
-JAS_EXPORT
-void jas_deprecated(const char *fmt, ...);
 
 /*!
 @brief

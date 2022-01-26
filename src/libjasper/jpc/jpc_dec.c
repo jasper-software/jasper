@@ -632,7 +632,7 @@ static int jpc_dec_process_sod(jpc_dec_t *dec, jpc_ms_t *ms)
 		tile->pptstab = 0;
 	}
 
-	if (jas_getdbglevel() >= 10) {
+	if (jas_get_debug_level() >= 10) {
 		jpc_dec_dump(dec);
 	}
 
@@ -718,7 +718,7 @@ static int jpc_dec_tileinit(jpc_dec_t *dec, jpc_dec_tile_t *tile)
 	jpc_pchg_t *pchg;
 	int retval = 0;
 
-	if (jas_getdbglevel() >= 1) {
+	if (jas_get_debug_level() >= 1) {
 		jas_logerrorf("jpc_dec_tileinit called\n");
 	}
 
@@ -733,7 +733,7 @@ static int jpc_dec_tileinit(jpc_dec_t *dec, jpc_dec_tile_t *tile)
 	for (compno = 0, tcomp = tile->tcomps, cmpt = dec->cmpts; compno <
 	  dec->numcomps; ++compno, ++tcomp, ++cmpt) {
 		const jpc_dec_ccp_t *ccp = &tile->cp->ccps[compno];
-		if (jas_getdbglevel() >= 10) {
+		if (jas_get_debug_level() >= 10) {
 			jas_logdebugf(10, "[compno %d]\n", compno);
 		}
 		if (ccp->qmfbid == JPC_COX_INS) {
@@ -797,7 +797,7 @@ static int jpc_dec_tileinit(jpc_dec_t *dec, jpc_dec_tile_t *tile)
 			  rlvl->prcheightexpn;
 			rlvl->numprcs = rlvl->numhprcs * rlvl->numvprcs;
 
-			if (jas_getdbglevel() >= 10) {
+			if (jas_get_debug_level() >= 10) {
 				jas_logdebugf(10,
 				  "[compno %d rlvlno %d]: xstart %d ystart %d "
 				  "xend %d yend %d prcwidthexpn %d prcheightexpn %d "
@@ -865,7 +865,7 @@ static int jpc_dec_tileinit(jpc_dec_t *dec, jpc_dec_tile_t *tile)
 				  bandno + 1);
 				const jpc_tsfb_band_t *bnd = &bnds[bndno];
 
-				if (jas_getdbglevel() >= 10) {
+				if (jas_get_debug_level() >= 10) {
 					jas_logdebugf(10, "[compno %d rlvlno %d bandno %d]\n", compno, rlvlno, bandno);
 				}
 
@@ -915,7 +915,7 @@ static int jpc_dec_tileinit(jpc_dec_t *dec, jpc_dec_tile_t *tile)
 #endif
 				for (prccnt = rlvl->numprcs, prc = band->prcs;
 				  prccnt > 0; --prccnt, ++prc) {
-					if (jas_getdbglevel() >= 10) {
+					if (jas_get_debug_level() >= 10) {
 						jas_logdebugf(10, "[compno %d rlvlno %d bandno %d prccnt %d]\n", compno, rlvlno, bandno, prccnt);
 					}
 					cbgxend = cbgxstart + (1 << rlvl->cbgwidthexpn);
@@ -944,7 +944,7 @@ static int jpc_dec_tileinit(jpc_dec_t *dec, jpc_dec_tile_t *tile)
 						prc->numcblks = prc->numhcblks * prc->numvcblks;
 						assert(prc->numcblks > 0);
 
-						if (jas_getdbglevel() >= 10) {
+						if (jas_get_debug_level() >= 10) {
 							jas_logdebugf(10, "[compno %d rlvlno %d bandno %d prccnt %d]: "
 							  "numhcblks %d numvcblks %d numcblks %d\n",
 							  compno, rlvlno, bandno, prccnt, prc->numhcblks, prc->numvcblks,
@@ -978,7 +978,7 @@ static int jpc_dec_tileinit(jpc_dec_t *dec, jpc_dec_tile_t *tile)
 #endif
 						for (cblkcnt = prc->numcblks, cblk = prc->cblks;
 						  cblkcnt > 0;) {
-							if (jas_getdbglevel() >= 10000) {
+							if (jas_get_debug_level() >= 10000) {
 								jas_logdebugf(10000, "[compno %d rlvlno %d bandno %d prcno %d cblkcnt %d]\n", compno, rlvlno, bandno, prccnt, cblkcnt);
 							}
 							cblkxend = cblkxstart + (1 << rlvl->cblkwidthexpn);
@@ -1047,7 +1047,7 @@ static int jpc_dec_tileinit(jpc_dec_t *dec, jpc_dec_tile_t *tile)
 
 done:
 
-	if (jas_getdbglevel() >= 1) {
+	if (jas_get_debug_level() >= 1) {
 		jas_logdebugf(1, "jpc_dec_tileinit returning %d\n", retval);
 	}
 
@@ -1061,7 +1061,7 @@ static int jpc_dec_tilefini(jpc_dec_t *dec, jpc_dec_tile_t *tile)
 	jpc_dec_seg_t *seg;
 	jpc_dec_cblk_t *cblk;
 
-	if (jas_getdbglevel() >= 1) {
+	if (jas_get_debug_level() >= 1) {
 		jas_logdebugf(1, "jpc_dec_tilefini called\n");
 	}
 
@@ -2157,8 +2157,8 @@ static jpc_dec_t *jpc_dec_create(jpc_dec_importopts_t *impopts, jas_stream_t *in
 	dec->curtileendoff = 0;
 	dec->max_samples = impopts->max_samples;
 
-	if (jas_getdbglevel() >= 1) {
-		jas_logdebugf(1, "debug %d\n", jas_getdbglevel());
+	if (jas_get_debug_level() >= 1) {
+		jas_logdebugf(1, "debug %d\n", jas_get_debug_level());
 	}
 
 	return dec;
