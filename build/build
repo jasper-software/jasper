@@ -97,7 +97,8 @@ enable_multithread=1
 build_dir=
 install_dir=
 crostini=0
-clean_tmp_dir=0
+clean_build_dir=0
+clean_install_dir=0
 debug_level=0
 os=
 use_jas_init=0
@@ -138,9 +139,13 @@ while [ $# -gt 0 ]; do
 		shift 1
 		use_jas_init=0
 		;;
-	--clean-tmp-dir)
+	--clean-build-dir)
 		shift 1
-		clean_tmp_dir=1
+		clean_build_dir=1
+		;;
+	--clean-install-dir)
+		shift 1
+		clean_install_dir=1
 		;;
 	--crostini)
 		shift 1
@@ -329,12 +334,12 @@ if [ "$crostini" -ne 0 ]; then
 fi
 
 source_dir="$abs_program_dir/.."
-tmp_dir="$source_dir/tmp_cmake"
+
 if [ -z "$build_dir" ]; then
-	build_dir="$tmp_dir/build"
+	build_dir="$source_dir/tmp_cmake/build"
 fi
 if [ -z "$install_dir" ]; then
-	install_dir="$tmp_dir/install"
+	install_dir="$source_dir/tmp_cmake/install"
 fi
 
 echo "operating system: $os"
@@ -351,9 +356,20 @@ if [ -n "$sde_top_dir" ]; then
 	eval $("$sde_setup") || panic "setup failed"
 fi
 
-if [ "$clean_tmp_dir" -ne 0 -a -e "$tmp_dir" ]; then
-	echo "Removing $tmp_dir"
-	rm -rf "$tmp_dir" || panic "cannot remove directory $tmp_dir"
+if [ "$clean_build_dir" -ne 0 -a -e "$build_dir" ]; then
+	echo "Removing $build_dir"
+	rm -rf "$build_dir" || panic "cannot remove directory $build_dir"
+fi
+if [ "$clean_install_dir" -ne 0 -a -e "$install_dir" ]; then
+	echo "Removing $install_dir"
+	rm -rf "$install_dir" || panic "cannot remove directory $install_dir"
+fi
+
+if [ ! -d "$build_dir" ]; then
+	mkdir -p "$build_dir" || panic "cannot make directory $build_dir"
+fi
+if [ ! -d "$install_dir" ]; then
+	mkdir -p "$install_dir" || panic "cannot make directory $install_dir"
 fi
 
 ################################################################################
@@ -469,7 +485,7 @@ fi
 
 command=(cmake)
 command+=(--build "$build_dir")
-command+=(--clean-first)
+#command+=(--clean-first)
 command+=("${build_opts[@]}")
 echo "============================================================"
 echo "RUNNING: ${command[@]}"

@@ -411,7 +411,7 @@ if(JAS_ENABLE_MULTITHREADING_SUPPORT)
 	}
 	" JAS_TRY_COMPILE_C11_THREADS)
 	check_c_source_compiles("
-	_Thread_local foo;
+	_Thread_local int foo;
 	int main() {
 	}
 	" JAS_TRY_COMPILE_THREAD_LOCAL)
