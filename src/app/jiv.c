@@ -111,6 +111,8 @@ typedef struct {
 
 	size_t max_mem;
 
+	int debug_level;
+
 } cmdopts_t;
 
 typedef struct {
@@ -203,6 +205,7 @@ static const jas_opt_t opts[] = {
 	{'l', "loop", 0},
 	{'t', "title", JAS_OPT_HASARG},
 	{'m', "memory-limit", JAS_OPT_HASARG},
+	{'D', "debug-level", JAS_OPT_HASARG},
 	{-1, 0, 0}
 };
 
@@ -243,6 +246,7 @@ int main(int argc, char **argv)
 	cmdopts.loop = 0;
 	cmdopts.verbose = 0;
 	cmdopts.max_mem = get_default_max_mem_usage();
+	cmdopts.debug_level = 0;
 
 	while ((c = jas_getopt(argc, argv, opts)) != EOF) {
 		switch (c) {
@@ -260,6 +264,9 @@ int main(int argc, char **argv)
 			break;
 		case 'm':
 			cmdopts.max_mem = strtoull(jas_optarg, 0, 10);
+			break;
+		case 'D':
+			cmdopts.debug_level = atoi(jas_optarg);
 			break;
 		case 'V':
 			printf("%s\n", JAS_VERSION);
@@ -292,13 +299,14 @@ int main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	}
 	jas_set_max_mem_usage(cmdopts.max_mem);
+	jas_conf_set_debug_level(cmdopts.debug_level);
 	atexit(jas_cleanup);
 #else
 	jas_conf_clear();
 	static jas_std_allocator_t allocator;
 	jas_std_allocator_init(&allocator);
 	jas_conf_set_allocator(&allocator.base);
-	//jas_conf_set_debug_level(debug);
+	jas_conf_set_debug_level(cmdopts.debug_level);
 	jas_conf_set_max_mem_usage(cmdopts.max_mem);
 	if (jas_init_library()) {
 		fprintf(stderr, "cannot initialize JasPer library\n");
