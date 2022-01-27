@@ -191,6 +191,7 @@ static int jpc_dec_decodepkt(jpc_dec_t *dec, jas_stream_t *pkthdrstream, jas_str
 	if (cp->csty & JPC_COD_SOP) {
 		if (jpc_dec_lookahead(in) == JPC_MS_SOP) {
 			if (!(ms = jpc_getms(in, dec->cstate))) {
+				jas_logerrorf("cannot get marker segment\n");
 				return -1;
 			}
 			if (jpc_ms_gettype(ms) != JPC_MS_SOP) {
@@ -213,10 +214,12 @@ static int jpc_dec_decodepkt(jpc_dec_t *dec, jas_stream_t *pkthdrstream, jas_str
 	const uint_least64_t hdroffstart = jas_stream_getrwcount(pkthdrstream);
 
 	if (!(inb = jpc_bitstream_sopen(pkthdrstream, "r"))) {
+		jas_logerrorf("cannot open bitstream\n");
 		return -1;
 	}
 
 	if ((present = jpc_bitstream_getbit(inb)) < 0) {
+		jas_logerrorf("cannot get bit\n");
 		jpc_bitstream_close(inb);
 		return 1;
 	}
@@ -247,11 +250,13 @@ static int jpc_dec_decodepkt(jpc_dec_t *dec, jas_stream_t *pkthdrstream, jas_str
 				if (!cblk->numpasses) {
 					leaf = jpc_tagtree_getleaf(prc->incltagtree, usedcblkcnt - 1);
 					if ((included = jpc_tagtree_decode(prc->incltagtree, leaf, lyrno + 1, inb)) < 0) {
+						jas_logerrorf("cannot decode tagtree\n");
 						jpc_bitstream_close(inb);
 						return -1;
 					}
 				} else {
 					if ((included = jpc_bitstream_getbit(inb)) < 0) {
+						jas_logerrorf("cannot get bit\n");
 						jpc_bitstream_close(inb);
 						return -1;
 					}
@@ -266,6 +271,7 @@ static int jpc_dec_decodepkt(jpc_dec_t *dec, jas_stream_t *pkthdrstream, jas_str
 					leaf = jpc_tagtree_getleaf(prc->numimsbstagtree, usedcblkcnt - 1);
 					for (;;) {
 						if ((ret = jpc_tagtree_decode(prc->numimsbstagtree, leaf, i, inb)) < 0) {
+							jas_logerrorf("cannot decode tagtree\n");
 							jpc_bitstream_close(inb);
 							return -1;
 						}
@@ -278,6 +284,7 @@ static int jpc_dec_decodepkt(jpc_dec_t *dec, jas_stream_t *pkthdrstream, jas_str
 					cblk->firstpassno = cblk->numimsbs * 3;
 				}
 				if ((numnewpasses = jpc_getnumnewpasses(inb)) < 0) {
+					jas_logerrorf("cannot get number of new passes\n");
 					jpc_bitstream_close(inb);
 					return -1;
 				}
@@ -297,10 +304,12 @@ static int jpc_dec_decodepkt(jpc_dec_t *dec, jas_stream_t *pkthdrstream, jas_str
 						   assertion failure
 						   in
 						   jpc_floorlog2() */
+						jas_logerrorf("first pass number unreasonably large\n");
 						jpc_bitstream_close(inb);
 						return -1;
 					}
 					if ((m = jpc_getcommacode(inb)) < 0) {
+						jas_logerrorf("cannot get comma code\n");
 						jpc_bitstream_close(inb);
 						return -1;
 					}
@@ -316,6 +325,7 @@ static int jpc_dec_decodepkt(jpc_dec_t *dec, jas_stream_t *pkthdrstream, jas_str
 							   value and would
 							   later crash in
 							   jpc_floorlog2() */
+							jas_logerrorf("pass number unreasonably large\n");
 							jpc_bitstream_close(inb);
 							return -1;
 						}
@@ -323,6 +333,7 @@ static int jpc_dec_decodepkt(jpc_dec_t *dec, jas_stream_t *pkthdrstream, jas_str
 						const unsigned maxpasses = JPC_SEGPASSCNT(passno, cblk->firstpassno, 10000, (ccp->cblkctx & JPC_COX_LAZY) != 0, (ccp->cblkctx & JPC_COX_TERMALL) != 0);
 						if (!discard && !seg) {
 							if (!(seg = jpc_seg_alloc())) {
+								jas_logerrorf("cannot allocate segment\n");
 								jpc_bitstream_close(inb);
 								return -1;
 							}
@@ -339,6 +350,7 @@ static int jpc_dec_decodepkt(jpc_dec_t *dec, jas_stream_t *pkthdrstream, jas_str
 						numnewpasses -= n;
 						if ((len = jpc_bitstream_getbits(inb, cblk->numlenbits + jpc_floorlog2(n))) < 0) {
 							jpc_bitstream_close(inb);
+							jas_logerrorf("cannot get bits\n");
 							return -1;
 						}
 						JAS_LOGDEBUGF(10, "len=%d ", len);
@@ -412,6 +424,7 @@ static int jpc_dec_decodepkt(jpc_dec_t *dec, jas_stream_t *pkthdrstream, jas_str
 				while (seg) {
 					if (!seg->stream) {
 						if (!(seg->stream = jas_stream_memopen(0, 0))) {
+							jas_logerrorf("cannot open memory stream\n");
 							return -1;
 						}
 					}
@@ -423,6 +436,7 @@ static int jpc_dec_decodepkt(jpc_dec_t *dec, jas_stream_t *pkthdrstream, jas_str
 #endif
 					if (seg->cnt > 0) {
 						if (jpc_getdata(in, seg->stream, seg->cnt) < 0) {
+							jas_logerrorf("jas_getdata failed\n");
 							return -1;
 						}
 						seg->cnt = 0;
@@ -436,6 +450,7 @@ static int jpc_dec_decodepkt(jpc_dec_t *dec, jas_stream_t *pkthdrstream, jas_str
 		}
 	} else {
 		if (jas_stream_gobble(in, bodylen) != JAS_CAST(int, bodylen)) {
+			jas_logerrorf("jas_stream_gobble failed\n");
 			return -1;
 		}
 	}

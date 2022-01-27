@@ -82,7 +82,7 @@
 JAS_DEPRECATED
 int jas_setdbglevel(int level)
 {
-	jas_deprecated("jas_setdbglevel is deprecated");
+	jas_deprecated("jas_setdbglevel is deprecated\n");
 	int old_level = jas_get_debug_level();
 	jas_set_debug_level(level);
 	return old_level;
