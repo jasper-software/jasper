@@ -1408,12 +1408,21 @@ static jas_ssize_t sfile_read(jas_stream_obj_t *obj, char *buf, size_t cnt)
 	int result;
 	JAS_LOGDEBUGF(100, "sfile_read(%p, %p, %zu)\n", obj, buf, cnt);
 	fp = JAS_CAST(FILE *, obj);
+#if 0
 	n = fread(buf, 1, cnt, fp);
 	if (n != cnt) {
-		result = (!ferror(fp) && feof(fp)) ? 0 : -1;
+		result = (!ferror(fp) && feof(fp)) ? n : -1;
 	} else {
 		result = n;
 	}
+#else
+	if (ferror(fp)) {
+		result = -1;
+	} else {
+		n = fread(buf, 1, cnt, fp);
+		return n;
+	}
+#endif
 	return result;
 }
 
@@ -1424,8 +1433,19 @@ static jas_ssize_t sfile_write(jas_stream_obj_t *obj, const char *buf,
 	size_t n;
 	JAS_LOGDEBUGF(100, "sfile_write(%p, %p, %zu)\n", obj, buf, cnt);
 	fp = JAS_CAST(FILE *, obj);
+	jas_ssize_t result;
+#if 0
 	n = fwrite(buf, 1, cnt, fp);
 	return (n != cnt) ? (-1) : cnt;
+#else
+	if (ferror(fp)) {
+		result = -1;
+	} else {
+		n = fwrite(buf, 1, cnt, fp);
+		result = n;
+	}
+	return result;
+#endif
 }
 
 /* FIXME integral type */
