@@ -505,6 +505,11 @@ int jas_init_library()
 
 	size_t max_mem;
 	size_t total_mem_size = jas_get_total_mem_size();
+	/*
+	NOTE: The values of jas_global.conf.max_mem_valid and max_mem are
+	used later in a deferred warning message.  So, their values should be
+	kept for later.
+	*/
 	if (!jas_global.conf.max_mem_valid) {
 		max_mem = total_mem_size / 2;
 		if (!max_mem) {
@@ -512,20 +517,6 @@ int jas_init_library()
 		}
 		assert(max_mem);
 		jas_global.conf.max_mem = max_mem;
-		jas_eprintf(
-		  "warning: The application program did not set the memory limit "
-		  "for the JasPer library.\n"
-		  );
-		jas_eprintf(
-		  "warning: The JasPer memory limit is being defaulted to a "
-		  "value that may be inappropriate for the system.  If the default "
-		  "is too small, some reasonable encoding/decoding operations will "
-		  "fail.  If the default is too large, security vulnerabilities "
-		  "will result (e.g., decoding a malicious image could exhaust all "
-		  "memory and crash the system.\n"
-		  );
-		jas_eprintf("warning: setting JasPer memory limit to %zu bytes\n",
-		  max_mem);
 	} else {
 		max_mem = jas_global.conf.max_mem;
 	}
@@ -601,9 +592,29 @@ int jas_init_library()
 	has_lock = false;
 #endif
 
-	JAS_LOGDEBUGF(1, "library initialization complete\n");
+	JAS_LOGDEBUGF(1, "JasPer library version: %s (%d.%d.%d)\n", JAS_VERSION,
+	  JAS_VERSION_MAJOR, JAS_VERSION_MINOR, JAS_VERSION_PATCH);
+
+	if (!jas_global.conf.max_mem_valid) {
+		jas_eprintf(
+		  "warning: The application program did not set the memory limit "
+		  "for the JasPer library.\n"
+		  );
+		jas_eprintf(
+		  "warning: The JasPer memory limit is being defaulted to a "
+		  "value that may be inappropriate for the system.  If the default "
+		  "is too small, some reasonable encoding/decoding operations will "
+		  "fail.  If the default is too large, security vulnerabilities "
+		  "will result (e.g., decoding a malicious image could exhaust all "
+		  "memory and crash the system.\n"
+		  );
+		jas_eprintf("warning: setting JasPer memory limit to %zu bytes\n",
+		  max_mem);
+	}
+
+	JAS_LOGDEBUGF(1, "JasPer library initialization complete\n");
 	JAS_LOGDEBUGF(1, "total memory size: %zu\n", jas_get_total_mem_size());
-	JAS_LOGDEBUGF(1, "library memory limit: %zu\n", max_mem);
+	JAS_LOGDEBUGF(1, "JasPer library memory limit: %zu\n", max_mem);
 
 #if !defined(JAS_THREADS) || (defined(JAS_THREADS) && !defined(JAS_HAVE_THREAD_LOCAL))
 done:

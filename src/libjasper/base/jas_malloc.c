@@ -90,6 +90,8 @@
 #elif defined(__APPLE__)
 #	include <sys/types.h>
 #	include <sys/sysctl.h>
+#elif defined(__unix__) && (!defined(__linux__) && !defined(__APPLE__))
+#	include <unistd.h>
 #elif defined(_WIN32)
 #	include <windows.h>
 #	include <sysinfoapi.h>
@@ -638,6 +640,14 @@ size_t jas_get_total_mem_size()
 		return 0;
 	}
 	return JAS_CAST(size_t, value);
+#elif defined(__unix__) && (!defined(__linux__) && !defined(__APPLE__))
+	/*
+	Reference:
+	https://stackoverflow.com/questions/2513505/how-to-get-available-memory-c-g
+	*/
+	long pages = sysconf(_SC_PHYS_PAGES);
+	long page_size = sysconf(_SC_PAGE_SIZE);
+	return pages * page_size;
 #elif defined(_WIN32)
 	/*
 	Reference:
