@@ -73,6 +73,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include <libheif/heif.h>
 
 /******************************************************************************\
@@ -99,9 +100,7 @@ typedef enum {
 
 static const jas_taginfo_t decopts[] = {
 	{OPT_VERSION, "version"},
-#if 0
 	{OPT_MAXSIZE, "max_samples"},
-#endif
 	{-1, 0}
 };
 
@@ -119,11 +118,9 @@ static int heic_dec_parseopts(const char *optstr, heic_dec_importopts_t *opts)
 	while (!jas_tvparser_next(tvp)) {
 		switch (jas_taginfo_nonull(jas_taginfos_lookup(decopts,
 		  jas_tvparser_gettag(tvp)))->id) {
-#if 0
 		case OPT_MAXSIZE:
 			opts->max_samples = strtoull(jas_tvparser_getval(tvp), 0, 10);
 			break;
-#endif
 		case OPT_VERSION:
 			opts->print_version = true;
 			break;
@@ -170,6 +167,7 @@ jas_image_t *jas_heic_decode(jas_stream_t *in, const char *optstr)
 	JAS_LOGDEBUGF(10, "HEIF library version: %08x\n",
 	  heif_get_version_number());
 	JAS_LOGDEBUGF(10, "HEIF library version: %s\n", heif_get_version());
+	JAS_LOGDEBUGF(10, "max_samples %zu\n", opts.max_samples);
 
 	if (!(input_stream = jas_stream_memopen(0, 0))) {
 		jas_logerrorf("cannot create memory stream\n");
@@ -190,10 +188,33 @@ jas_image_t *jas_heic_decode(jas_stream_t *in, const char *optstr)
 		jas_logerrorf("heif_context_alloc failed\n");
 		goto error;
 	}
+#if 0
+#endif
 	heif_context_read_from_memory_without_copy(ctx, ptr, size, 0);
 
 	/* Get a handle to the primary image. */
 	heif_context_get_primary_image_handle(ctx, &handle);
+
+	int width = heif_image_handle_get_width(handle);
+	int height = heif_image_handle_get_height(handle);
+	JAS_LOGDEBUGF(1, "width %d; height %d\n", width, height);
+
+	size_t num_samples;
+	if (!jas_safe_size_mul(width, height, &num_samples)) {
+		jas_logerrorf("overflow detected\n");
+		goto error;
+	}
+	JAS_LOGDEBUGF(1, "num_samples %zu\n", num_samples);
+	if (opts.max_samples && num_samples > opts.max_samples) {
+		jas_logerrorf(
+		  "maximum number of samples would be exceeded (%zu > %zu)\n",
+		  num_samples, opts.max_samples);
+		goto error;
+	}
+
+	/* Should I use:
+	heif_context_set_maximum_image_size_limit(ctx, max_dim);
+	*/
 
 	/* Decode the image and convert the colorspace to RGB,
 	  saved as 24bit interleaved. */
@@ -208,16 +229,12 @@ jas_image_t *jas_heic_decode(jas_stream_t *in, const char *optstr)
 	enum heif_colorspace colorspace = heif_image_get_colorspace(img);
 	enum heif_chroma chroma = heif_image_get_chroma_format(img);
 	assert(chroma == heif_chroma_interleaved_RGB);
+	JAS_LOGDEBUGF(1, "colorspace %d; chroma %d\n", colorspace, chroma);
 
 	int stride;
 	const uint8_t* data = heif_image_get_plane_readonly(img,
 	  heif_channel_interleaved, &stride);
-
-	int width = heif_image_handle_get_width(handle);
-	int height = heif_image_handle_get_height(handle);
-	JAS_LOGDEBUGF(1, "width %d; height %d\n", width, height);
 	JAS_LOGDEBUGF(1, "stride %d\n", stride);
-	JAS_LOGDEBUGF(1, "colorspace %d; chroma %d\n", colorspace, chroma);
 
 	jas_image_cmptparm_t cmptparm;
 	int numcmpts;

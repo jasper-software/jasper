@@ -235,7 +235,7 @@ int test_string(int argc, char **argv)
 	size_t max_tokens;
 	size_t num_tokens;
 	char delim[] = " ";
-	if (jas_string_tokenize("This is a test.", delim, &tokens, &max_tokens,
+	if (jas_stringtokenize("This is a test.", delim, &tokens, &max_tokens,
 	  &num_tokens)) {
 		return 1;
 	};

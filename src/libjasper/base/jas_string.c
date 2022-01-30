@@ -132,7 +132,7 @@ char *jas_strtok(char *s, const char *delim, char **save_ptr)
 }
 
 JAS_EXPORT
-int jas_string_tokenize(const char *string, const char *delim,
+int jas_stringtokenize(const char *string, const char *delim,
   char ***tokens_buf, size_t *max_tokens_buf, size_t *num_tokens_buf)
 {
 	char **tokens = 0;

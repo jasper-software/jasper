@@ -129,7 +129,7 @@ static inline jas_logtype_t jas_logtype_init(int class, int priority)
 /*!
 @brief Get the class of a logtype.
 */
-static inline int jas_logtype_get_class(jas_logtype_t type)
+static inline int jas_logtype_getclass(jas_logtype_t type)
 {
 	return type & 0xf;
 }
@@ -137,7 +137,7 @@ static inline int jas_logtype_get_class(jas_logtype_t type)
 /*!
 @brief Get the priority of a logtype.
 */
-static inline int jas_logtype_get_priority(jas_logtype_t type)
+static inline int jas_logtype_getpriority(jas_logtype_t type)
 {
 	return type >> 4;
 }

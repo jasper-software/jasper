@@ -5,9 +5,29 @@
 #include <jasper/jas_dll.h>
 
 /* This preprocessor symbol identifies the version of JasPer. */
+
+/*!
+@brief
+A null-terminated string containing the JasPer library version
+*/
 #define	JAS_VERSION "@JAS_VERSION@"
+
+/*!
+@brief
+The JasPer library major version number.
+*/
 #define JAS_VERSION_MAJOR @JAS_VERSION_MAJOR@
+
+/*!
+@brief
+The JasPer library minor version number.
+*/
 #define JAS_VERSION_MINOR @JAS_VERSION_MINOR@
+
+/*!
+@brief
+The JasPer library patch version number.
+*/
 #define JAS_VERSION_PATCH @JAS_VERSION_PATCH@
 
 #cmakedefine JAS_ENABLE_32BIT
@@ -64,13 +84,6 @@
 #cmakedefine JAS_ENABLE_NON_THREAD_SAFE_DEBUGGING
 
 #cmakedefine JAS_HAVE_SNPRINTF
-
-
-//#if defined(JAS_ENABLE_DANGEROUS_INTERNAL_TESTING_MODE)
-//#define JAS_ENABLE_MIF_CODEC 1
-//#else
-//#undef JAS_ENABLE_MIF_CODEC
-//#endif
 
 #if !defined(JAS_DEC_DEFAULT_MAX_SAMPLES)
 #define JAS_DEC_DEFAULT_MAX_SAMPLES (64 * ((size_t) 1048576))

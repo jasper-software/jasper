@@ -76,7 +76,12 @@
 
 #define	HEIF_VALIDATELEN	(JAS_MIN(4 + 4 + 8, JAS_STREAM_MAXPUTBACK))
 #define	HEIF_FTYP 0x66747970U
-#define	HEIC_MAGIC 0x68656963U
+#define	HEIC_MIF1 0x6d696631U
+#define	HEIC_MSF1 0x6d736631U
+#define	HEIC_HEIC 0x68656963U
+#define	HEIC_HEIX 0x68656978U
+#define	HEIC_HEVC 0x68657663U
+#define	HEIC_HEVX 0x68657678U
 
 int jas_heic_validate(jas_stream_t *in)
 {
@@ -86,24 +91,30 @@ int jas_heic_validate(jas_stream_t *in)
 
 	/* Read the validation data (i.e., the data used for detecting
 	  the format). */
-	if (jas_stream_peek(in, buf, sizeof(buf)) != sizeof(buf))
+	if (jas_stream_peek(in, buf, sizeof(buf)) != sizeof(buf)) {
 		return -1;
+	}
 
 	/* Is the box type correct? */
-	if (((JAS_CAST(uint_least32_t, buf[4]) << 24) |
+	uint_least32_t box_type = (JAS_CAST(uint_least32_t, buf[4]) << 24) |
 	  (JAS_CAST(uint_least32_t, buf[5]) << 16) |
 	  (JAS_CAST(uint_least32_t, buf[6]) << 8) |
-	  JAS_CAST(uint_least32_t, buf[7])) != HEIF_FTYP)
-	{
+	  JAS_CAST(uint_least32_t, buf[7]);
+	if (box_type != HEIF_FTYP) {
 		return -1;
 	}
 
 	/* Is the signature correct? */
-	if (((JAS_CAST(uint_least32_t, buf[8]) << 24) |
+	uint_least32_t sig = (JAS_CAST(uint_least32_t, buf[8]) << 24) |
 	  (JAS_CAST(uint_least32_t, buf[9]) << 16) |
 	  (JAS_CAST(uint_least32_t, buf[10]) << 8) |
-	  JAS_CAST(uint_least32_t, buf[11])) != HEIC_MAGIC)
-	{
+	  JAS_CAST(uint_least32_t, buf[11]);
+	if (sig != HEIC_MIF1 &&
+	  sig != HEIC_MSF1 &&
+	  sig != HEIC_HEIC &&
+	  sig != HEIC_HEIX &&
+	  sig != HEIC_HEVC &&
+	  sig != HEIC_HEVX) {
 		return -1;
 	}
 

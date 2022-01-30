@@ -774,7 +774,7 @@ int jas_image_addfmt_internal(jas_image_fmtinfo_t *image_fmtinfos,
 	fmtinfo = &image_fmtinfos[*image_numfmts];
 	jas_image_fmtinfo_init(fmtinfo);
 	fmtinfo->id = id;
-	if (jas_string_tokenize(ext, delim, &fmtinfo->exts, &fmtinfo->max_exts,
+	if (jas_stringtokenize(ext, delim, &fmtinfo->exts, &fmtinfo->max_exts,
 	  &fmtinfo->num_exts)) {
 		assert(!fmtinfo->exts && !fmtinfo->max_exts && !fmtinfo->num_exts);
 		ret = -1;

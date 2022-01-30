@@ -20,8 +20,8 @@ This type has two components:
 The class and priority of a log message can be obtained from its type
 by using the functions:
 
-  - `jas_logtype_get_class()`
-  - `jas_logtype_get_priority()`
+  - `jas_logtype_getclass()`
+  - `jas_logtype_getpriority()`
 
 A log type can be initialized via the function:
 

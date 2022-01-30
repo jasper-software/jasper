@@ -64,7 +64,14 @@ The support is experimental and likely has numerous bugs.
 
 \subsection codecs__heic__enc_options Encoder Options
 
-HEIC encoding is not currently supported.
+The HEIC encoder supports the following special options:
+
+  - `version`.
+    Print the version of the Libheif library being used without performing
+    any decoding.
+
+  - `quality $quality`.
+    Set the quality factor to `$quality`.
 
 \subsection codecs__heic__dec_options Decoder Options
 

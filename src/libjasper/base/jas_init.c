@@ -404,7 +404,11 @@ void jas_conf_clear()
 	jas_conf.num_image_formats = sizeof(jas_image_fmts) /
 	  sizeof(jas_image_fmt_t);
 	jas_conf.image_formats = jas_image_fmts;
+#if defined(JAS_LEGACY_MODE)
 	jas_conf.dec_default_max_samples = JAS_DEC_DEFAULT_MAX_SAMPLES;
+#else
+	jas_conf.dec_default_max_samples = 0;
+#endif
 	jas_conf.debug_level = 0;
 	jas_conf.vlogmsgf = jas_vlogmsgf_stderr;
 	//jas_conf.vlogmsgf = jas_vlogmsgf_discard;

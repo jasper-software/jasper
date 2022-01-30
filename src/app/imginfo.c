@@ -96,6 +96,7 @@ typedef enum {
 	OPT_LIST_ENABLED_CODECS,
 	OPT_LIST_ALL_CODECS,
 	OPT_ENABLE_FORMAT,
+	OPT_ENABLE_ALL_FORMATS,
 } optid_t;
 
 /******************************************************************************\
@@ -126,6 +127,7 @@ static const jas_opt_t opts[] = {
 	{OPT_LIST_ENABLED_CODECS, "list-enabled-formats", 0},
 	{OPT_LIST_ALL_CODECS, "list-all-formats", 0},
 	{OPT_ENABLE_FORMAT, "enable-format", JAS_OPT_HASARG},
+	{OPT_ENABLE_ALL_FORMATS, "enable-all-formats", 0},
 	{-1, 0, 0}
 };
 
@@ -168,6 +170,7 @@ int main(int argc, char **argv)
 	dec_opt_spec[0] = '\0';
 	bool default_mem_limit = false;
 	const char *enable_format = 0;
+	bool enable_all_formats = false;
 
 	/* Parse the command line options. */
 	while ((id = jas_getopt(argc, argv, opts)) >= 0) {
@@ -217,6 +220,9 @@ int main(int argc, char **argv)
 		case OPT_ENABLE_FORMAT:
 			enable_format = jas_optarg;
 			break;
+		case OPT_ENABLE_ALL_FORMATS:
+			enable_all_formats = 1;
+			break;
 		case OPT_HELP:
 		default:
 			usage();
@@ -264,10 +270,10 @@ int main(int argc, char **argv)
 	atexit(cleanup);
 #endif
 
-	if (enable_format) {
+	if (enable_all_formats || enable_format) {
 		for (int i = 0; i < jas_image_getnumfmts(); ++i) {
 			const jas_image_fmtinfo_t *fmtinfo = jas_image_getfmtbyind(i);
-			if (!strcmp(fmtinfo->name, enable_format)) {
+			if (enable_all_formats || !strcmp(fmtinfo->name, enable_format)) {
 				jas_image_setfmtenable(i, 1);
 			}
 		}

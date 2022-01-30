@@ -80,14 +80,8 @@ extern "C" {
 * Constants and types.
 \******************************************************************************/
 
-#if !defined(JAS_VERSION)
-/* The version information below should match that specified in
-  the "configure.in" file! */
-#define	JAS_VERSION		"unknown"
-#endif
-
 #define	JAS_COPYRIGHT \
-	"Copyright (c) 2001-2006 Michael David Adams.\n" \
+	"Copyright (c) 2001-2022 Michael David Adams.\n" \
 	"Copyright (c) 1999-2000 Image Power, Inc. and the University of\n" \
 	"  British Columbia.\n" \
 	"All rights reserved.\n"

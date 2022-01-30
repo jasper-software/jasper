@@ -55,7 +55,7 @@ string processing:
     `strtok()` function in the C standard library, and is
     similar to the `strtok_r()` function in the POSIX standard.
 
-  - `jas_string_tokenize()`
+  - `jas_stringtokenize()`
     This function can be used to split a string into tokens based on
     a specified set of delimiters.
 

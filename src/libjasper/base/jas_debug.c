@@ -186,7 +186,7 @@ int jas_vlogmsgf_stderr(jas_logtype_t type, const char *fmt, va_list ap)
 	return result;
 #else
 	const char *s = "INVALID";
-	switch (jas_logtype_get_class(type)) {
+	switch (jas_logtype_getclass(type)) {
 	case JAS_LOGTYPE_CLASS_NULL:
 		s = "OTHER";
 		break;

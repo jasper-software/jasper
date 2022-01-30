@@ -130,6 +130,8 @@ typedef struct {
 
 	const char *enable_format;
 
+	bool enable_all_formats;
+
 } cmdopts_t;
 
 /******************************************************************************\
@@ -213,10 +215,11 @@ int main(int argc, char **argv)
 	atexit(cleanup);
 #endif
 
-	if (cmdopts->enable_format) {
+	if (cmdopts->enable_all_formats || cmdopts->enable_format) {
 		for (i = 0; i < jas_image_getnumfmts(); ++i) {
 			const jas_image_fmtinfo_t *fmtinfo = jas_image_getfmtbyind(i);
-			if (!strcmp(fmtinfo->name, cmdopts->enable_format)) {
+			if (cmdopts->enable_all_formats || !strcmp(fmtinfo->name,
+			  cmdopts->enable_format)) {
 				jas_image_setfmtenable(i, 1);
 			}
 		}
@@ -401,6 +404,7 @@ cmdopts_t *cmdopts_parse(int argc, char **argv)
 		CMDOPT_LIST_ENABLED_CODECS,
 		CMDOPT_LIST_ALL_CODECS,
 		CMDOPT_ENABLE_FORMAT,
+		CMDOPT_ENABLE_ALL_FORMATS,
 	};
 
 	static const jas_opt_t cmdoptions[] = {
@@ -427,6 +431,7 @@ cmdopts_t *cmdopts_parse(int argc, char **argv)
 		{CMDOPT_LIST_ENABLED_CODECS, "list-enabled-formats", 0},
 		{CMDOPT_LIST_ALL_CODECS, "list-all-formats", 0},
 		{CMDOPT_ENABLE_FORMAT, "enable-format", JAS_OPT_HASARG},
+		{CMDOPT_ENABLE_ALL_FORMATS, "enable-all-formats", 0},
 		{-1, 0, 0}
 	};
 
@@ -458,6 +463,7 @@ cmdopts_t *cmdopts_parse(int argc, char **argv)
 	cmdopts->help = 0;
 	cmdopts->max_mem = get_default_max_mem_usage();
 	cmdopts->enable_format = 0;
+	cmdopts->enable_all_formats = 0;
 
 	while ((c = jas_getopt(argc, argv, cmdoptions)) != EOF) {
 		switch (c) {
@@ -512,6 +518,9 @@ cmdopts_t *cmdopts_parse(int argc, char **argv)
 			break;
 		case CMDOPT_ENABLE_FORMAT:
 			cmdopts->enable_format = jas_optarg;
+			break;
+		case CMDOPT_ENABLE_ALL_FORMATS:
+			cmdopts->enable_all_formats = 1;
 			break;
 		default:
 			badusage();

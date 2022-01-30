@@ -113,6 +113,10 @@ typedef struct {
 
 	int debug_level;
 
+	int enable_all_formats;
+
+	size_t max_samples;
+
 } cmdopts_t;
 
 typedef struct {
@@ -205,7 +209,9 @@ static const jas_opt_t opts[] = {
 	{'l', "loop", 0},
 	{'t', "title", JAS_OPT_HASARG},
 	{'m', "memory-limit", JAS_OPT_HASARG},
+	{'S', "max-samples", JAS_OPT_HASARG},
 	{'D', "debug-level", JAS_OPT_HASARG},
+	{'E', "enable-all-formats", 0},
 	{-1, 0, 0}
 };
 
@@ -247,6 +253,7 @@ int main(int argc, char **argv)
 	cmdopts.verbose = 0;
 	cmdopts.max_mem = get_default_max_mem_usage();
 	cmdopts.debug_level = 0;
+	cmdopts.enable_all_formats = 0;
 
 	while ((c = jas_getopt(argc, argv, opts)) != EOF) {
 		switch (c) {
@@ -267,6 +274,12 @@ int main(int argc, char **argv)
 			break;
 		case 'D':
 			cmdopts.debug_level = atoi(jas_optarg);
+			break;
+		case 'S':
+			cmdopts.max_samples = strtoull(jas_optarg, 0, 10);
+			break;
+		case 'E':
+			cmdopts.enable_all_formats = 1;
 			break;
 		case 'V':
 			printf("%s\n", JAS_VERSION);
@@ -318,6 +331,22 @@ int main(int argc, char **argv)
 	}
 	//atexit(jas_cleanup);
 #endif
+
+	if (cmdopts.enable_all_formats) {
+		for (int i = 0; i < jas_image_getnumfmts(); ++i) {
+			const jas_image_fmtinfo_t *fmtinfo = jas_image_getfmtbyind(i);
+			if (!fmtinfo->enabled) {
+				fprintf(stderr, "enable disabled format %s\n", fmtinfo->name);
+				jas_image_setfmtenable(i, 1);
+			}
+		}
+	}
+	if (cmdopts.max_samples) {
+		jas_set_dec_default_max_samples(cmdopts.max_samples);
+	}
+	if (cmdopts.max_mem) {
+		jas_set_max_mem_usage(cmdopts.max_mem);
+	}
 
 	streamin = jas_stream_fdopen(0, "rb");
 
@@ -377,7 +406,6 @@ static void usage()
 
 static void displayfunc()
 {
-
 	float w;
 	float h;
 	int regbotleftx;
@@ -422,7 +450,6 @@ static void displayfunc()
 	  gs.vp.data);
 	glFlush();
 	glutSwapBuffers();
-
 }
 
 /* Reshape callback function. */
@@ -846,8 +873,9 @@ static int loadimage()
 	return 0;
 
  error:
-	if (outprof != NULL)
+	if (outprof != NULL) {
 		jas_cmprof_destroy(outprof);
+	}
 	unloadimage();
 	return -1;
 }
