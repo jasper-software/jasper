@@ -291,7 +291,7 @@ typedef struct jas_cmpxform_s {
 	unsigned numinchans;
 	unsigned numoutchans;
 	union {
-		jas_max_align_t dummy;
+		max_align_t dummy;
 		jas_cmshapmat_t shapmat;
 		jas_cmshaplut_t shaplut;
 		jas_cmclrspcconv_t clrspcconv;

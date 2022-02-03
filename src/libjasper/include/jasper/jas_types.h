@@ -138,10 +138,26 @@ extern "C" {
 /* NOTE: This could underestimate the size on some exotic architectures. */
 #define JAS_UINTFAST32_NUMBITS (8 * sizeof(uint_fast32_t))
 
+#if 0
 #if defined(JAS_HAVE_MAX_ALIGN_T)
 #define	jas_max_align_t	max_align_t
 #else
 #define	jas_max_align_t	long double
+#endif
+#endif
+
+/*
+Assume that a compiler claiming to be compliant with C11 or a later version
+of the C standard provides max_align_t.
+Provide the JAS_DEFINE_MAX_ALIGN_T preprocessor symbol as way to override
+this behavior to workaround braindamaged C implementations.
+*/
+#if defined(JAS_DEFINE_MAX_ALIGN_T)
+JAS_DEFINE_MAX_ALIGN_T
+#else
+#	if !(defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L)
+typedef long double max_align_t;
+#	endif
 #endif
 
 #if 0

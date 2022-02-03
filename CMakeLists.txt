@@ -145,6 +145,15 @@ if(JAS_USE_JAS_INIT)
 	add_compile_definitions(JAS_USE_JAS_INIT)
 endif()
 
+# If your C implementation violates the C11 (or later) standard by not
+# providing max_align_t, you can try using the command in the if-statement
+# below.
+if(FALSE)
+add_compile_definitions(
+	"JAS_DEFINE_MAX_ALIGN_T=typedef long double max_align_t\;"
+)
+endif()
+
 # WARNING: THE FOLLOWING OPTION SHOULD ONLY BE ENABLED BY THE JASPER SOFTWARE
 # DEVELOPMENT TEAM.  IT IS NECESSARY FOR INTERNAL TESTING PURPOSES AND POSES
 # SIGNIFICANT SECURITY RISKS IF ENABLED.
@@ -335,13 +344,13 @@ check_include_files(unistd.h JAS_HAVE_UNISTD_H)
 check_include_files(sys/time.h JAS_HAVE_SYS_TIME_H)
 check_include_files(sys/types.h JAS_HAVE_SYS_TYPES_H)
 
-check_type_size(max_align_t MAX_ALIGN_T)
-if(HAVE_MAX_ALIGN_T)
-	set(JAS_HAVE_MAX_ALIGN_T 1 CACHE INTERNAL "Test JAS_HAVE_MAX_ALIGN_T")
-else()
-	set(JAS_HAVE_MAX_ALIGN_T 0 CACHE INTERNAL "Test JAS_HAVE_MAX_ALIGN_T")
-endif()
-message("JAS_HAVE_MAX_ALIGN_T: ${JAS_HAVE_MAX_ALIGN_T}")
+#check_type_size(max_align_t MAX_ALIGN_T)
+#if(HAVE_MAX_ALIGN_T)
+#	set(JAS_HAVE_MAX_ALIGN_T 1 CACHE INTERNAL "Test JAS_HAVE_MAX_ALIGN_T")
+#else()
+#	set(JAS_HAVE_MAX_ALIGN_T 0 CACHE INTERNAL "Test JAS_HAVE_MAX_ALIGN_T")
+#endif()
+#message("JAS_HAVE_MAX_ALIGN_T: ${JAS_HAVE_MAX_ALIGN_T}")
 
 check_type_size(ssize_t SSIZE_T)
 if(HAVE_SSIZE_T)
