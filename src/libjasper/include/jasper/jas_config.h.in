@@ -43,9 +43,9 @@ The version of the C standard against which JasPer was built.
 #cmakedefine JAS_HAVE_SYS_TIME_H
 #cmakedefine JAS_HAVE_SYS_TYPES_H
 #cmakedefine JAS_HAVE_SSIZE_T
+#cmakedefine JAS_HAVE_MAX_ALIGN_T
 
 #if 0
-#cmakedefine JAS_HAVE_MAX_ALIGN_T
 #cmakedefine JAS_HAVE_UINTMAX_T
 #cmakedefine JAS_HAVE_INTMAX_T
 #endif
@@ -101,7 +101,7 @@ The version of the C standard against which JasPer was built.
 #define JAS_DEFAULT_MAX_MEM_USAGE (1024ULL * 1024ULL * 1024ULL)
 #endif
 
-#if (__STDC_VERSION__ < JAS_STDC_VERSION)
+#if (__STDC_VERSION__ - 0 < JAS_STDC_VERSION)
 #warning "Your code is being built against an older version of the C standard than JasPer was.  Although this is supported, this may require some extra preprocessor defines when building."
 #endif
 

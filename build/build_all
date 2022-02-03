@@ -20,6 +20,21 @@ list_directory()
 usage()
 {
 	echo "bad usage: $@"
+	cat <<- EOF
+	Options
+	=======
+
+	-X
+	    Disable tests.
+	-s
+	    Enable strict mode.
+	-w
+	    Disable strict mode.
+	-v
+	    Enable verbose mode.
+	-b \$dir
+	    Set the build directory to \$dir.
+	EOF
 	exit 2
 }
 
@@ -32,7 +47,7 @@ strict=1
 command_file=
 enable_test=1
 
-while getopts vb:cnd:swC:Xq option; do
+while getopts hvb:cnd:swC:Xq option; do
 	case "$option" in
 	n)
 		enable=0;;
@@ -57,6 +72,8 @@ while getopts vb:cnd:swC:Xq option; do
 		strict=1;;
 	X)
 		enable_test=0;;
+	h)
+		usage;;
 	*)
 		usage "invalid option $option";;
 	esac
