@@ -154,6 +154,8 @@ this behavior to workaround braindamaged C implementations.
 */
 #if defined(JAS_DEFINE_MAX_ALIGN_T)
 	JAS_DEFINE_MAX_ALIGN_T
+#elif defined(_MSC_VER)
+#	define max_align_t long double
 #elif !(defined(__STDC_VERSION__) && (__STDC_VERSION__ - 0 >= 201112L))
 #	define max_align_t long double
 	/* typedef long double max_align_t; */
