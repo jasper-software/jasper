@@ -170,8 +170,11 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 # Prefer C11 (if available) but do not require it.
 set(CMAKE_C_STANDARD 11)
 
-# Enable extensions so that POSIX support is visible (e.g., ssize_t).
-set(CMAKE_C_EXTENSIONS OFF)
+# Enable extensions so that POSIX support is visible (e.g., ssize_t) without
+# having to manually define _POSIX_C_SOURCE.
+# Note: This could be set to OFF if it were not for MacOS breaking things
+# (e.g, due to u_char, u_short, and u_int being undefined).
+set(CMAKE_C_EXTENSIONS ON)
 
 # Ensure that that the try_compile command (and the commands that use it)
 # use the compiler option for the language standard being used.
