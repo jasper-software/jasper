@@ -74,6 +74,9 @@ include(Sanitizers)
 include(GenerateExportHeader)
 include(JasGetIncludes)
 
+# Note: JasGetStdcVersion uses try_run.
+include(JasGetStdcVersion)
+
 ################################################################################
 # Define options.
 ################################################################################
@@ -157,6 +160,16 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 
 # Prefer C11 (if available) but do not require it.
 set(CMAKE_C_STANDARD 11)
+
+# Enable extensions so that POSIX support is visible (e.g., ssize_t).
+set(CMAKE_C_EXTENSIONS ON)
+
+# Ensure that that the try_compile command (and the commands that use it)
+# use the compiler option for the language standard being used.
+cmake_policy(SET CMP0067 NEW)
+
+# Eliminate a CMake warning.
+cmake_policy(SET CMP0115 NEW)
 
 if(APPLE AND CMAKE_SYSTEM_NAME MATCHES "Darwin")
 	set(MACOS TRUE)
@@ -307,6 +320,13 @@ message("CMAKE_C_FLAGS_DEBUG: ${CMAKE_C_FLAGS_DEBUG}")
 # Perform platform checks.
 ################################################################################
 
+# Get the value of the __STDC_VERSION__ preprocessor define.
+jas_get_stdc_version(status JAS_STDC_VERSION)
+if(NOT status)
+	message(FATAL_ERROR "Cannot determine the value of __STDC_VERSION__.")
+endif()
+message("__STDC_VERSION__: ${JAS_STDC_VERSION}")
+
 find_program(BASH_PROGRAM bash)
 
 check_include_files(fcntl.h JAS_HAVE_FCNTL_H)
@@ -411,7 +431,10 @@ if(JAS_ENABLE_MULTITHREADING_SUPPORT)
 	}
 	" JAS_TRY_COMPILE_C11_THREADS)
 	check_c_source_compiles("
-	_Thread_local int foo;
+	typedef struct {int x;} foo_t;
+	/* Use a pointer to a struct to entice a warning from GCC
+	in C99 mode with -Wpedantic. */
+	extern _Thread_local foo_t *foo;
 	int main() {
 	}
 	" JAS_TRY_COMPILE_THREAD_LOCAL)

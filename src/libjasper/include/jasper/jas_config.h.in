@@ -30,6 +30,11 @@ The JasPer library patch version number.
 */
 #define JAS_VERSION_PATCH @JAS_VERSION_PATCH@
 
+/*
+The version of the C standard against which JasPer was built.
+*/
+#define JAS_STDC_VERSION @JAS_STDC_VERSION@
+
 #cmakedefine JAS_ENABLE_32BIT
 
 #cmakedefine JAS_HAVE_FCNTL_H
@@ -91,6 +96,10 @@ The JasPer library patch version number.
 
 #if (JAS_DEFAULT_MAX_MEM_USAGE == 0)
 #define JAS_DEFAULT_MAX_MEM_USAGE (1024ULL * 1024ULL * 1024ULL)
+#endif
+
+#if (__STDC_VERSION__ < JAS_STDC_VERSION)
+#warning "Your code is being built against an older version of the C standard than JasPer was.  Although this is supported, this may require some extra preprocessor defines when building."
 #endif
 
 #endif
