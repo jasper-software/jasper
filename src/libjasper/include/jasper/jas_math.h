@@ -407,7 +407,7 @@ typedef struct {
 } jas_safeui64_t;
 
 static inline
-jas_safeui64_t jas_safeui64_from_intmax(jas_intmax_t x)
+jas_safeui64_t jas_safeui64_from_intmax(intmax_t x)
 {
 	jas_safeui64_t result;
 	if (x >= 0 && x <= UINT_LEAST64_MAX) {
@@ -478,7 +478,7 @@ jas_safeui64_t jas_safeui64_div(jas_safeui64_t x, jas_safeui64_t y)
 }
 
 static inline
-jas_safeui64_t jas_safeui64_pow2_intmax(jas_intmax_t x)
+jas_safeui64_t jas_safeui64_pow2_intmax(intmax_t x)
 {
 	jas_safeui64_t result;
 	if (x >= 0 && x < 64) {

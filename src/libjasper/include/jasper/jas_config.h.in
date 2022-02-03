@@ -44,8 +44,11 @@ The version of the C standard against which JasPer was built.
 #cmakedefine JAS_HAVE_SYS_TYPES_H
 #cmakedefine JAS_HAVE_MAX_ALIGN_T
 #cmakedefine JAS_HAVE_SSIZE_T
+
+#if 0
 #cmakedefine JAS_HAVE_UINTMAX_T
 #cmakedefine JAS_HAVE_INTMAX_T
+#endif
 
 #cmakedefine JAS_HAVE_MKOSTEMP
 #cmakedefine JAS_HAVE_GETTIMEOFDAY
