@@ -1,13 +1,17 @@
 #include <stdio.h>
 int main(void)
 {
-#ifdef __STDC__
-	printf("%ldL", __STDC_VERSION__);
+	long stdc_version;
+
+#if defined(__STDC__) && defined(__STDC_VERSION__)
+	stdc_version = __STDC_VERSION__;
+#else
+	stdc_version = 198900L;
+#endif
+
+	printf("%ldL", stdc_version);
 	if (fflush(stdout)) {
 		return 1;
 	}
 	return 0;
-#else
-	return 1;
-#endif
 }
