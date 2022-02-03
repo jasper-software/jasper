@@ -132,16 +132,23 @@ cp -a "$build_dir/doc/html/." "$out_dir/doc/html" || \
 #  panic "cannot move manual.pdf"
 
 remove_list=()
+
 remove_list+=(appveyor.yml)
-remove_list+=(.github)
-remove_list+=(.travis.yml)
-remove_list+=(.gitignore)
 remove_list+=(.gitattributes)
-remove_list+=(build/my_build)
+remove_list+=(.github)
+remove_list+=(.gitignore)
+remove_list+=(.travis.yml)
+
 remove_list+=(build/appveyor)
-remove_list+=(build/travis)
+remove_list+=(build/extract_release_notes)
+remove_list+=(build/github)
 remove_list+=(build/make_dist)
+remove_list+=(build/make_release)
+remove_list+=(build/my_build)
+remove_list+=(build/travis)
+
 remove_list+=(data/test/bad/1_crash.jpg)
+
 for file in "${remove_list[@]}"; do
 	if [ ! -e "$source_dir/$file" ]; then
 		warn "missing file/directory $file"
