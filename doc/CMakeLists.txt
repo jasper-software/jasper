@@ -66,6 +66,5 @@ if(DOXYGEN_FOUND)
 	endif()
 endif()
 
-# Install papers and technical reports.
-install(FILES "jasper.pdf" "jpeg2000.pdf"
-  DESTINATION "${CMAKE_INSTALL_DOCDIR}")
+# Install JPEG-2000 tutorial paper.
+install(FILES jpeg2000.pdf DESTINATION "${CMAKE_INSTALL_DOCDIR}")
