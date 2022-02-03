@@ -149,9 +149,9 @@ endif()
 # providing max_align_t, you can try using the command in the if-statement
 # below.
 if(FALSE)
-add_compile_definitions(
-	"JAS_DEFINE_MAX_ALIGN_T=typedef long double max_align_t\;"
-)
+	add_compile_definitions(
+		"JAS_DEFINE_MAX_ALIGN_T=typedef long double max_align_t\;"
+	)
 endif()
 
 # WARNING: THE FOLLOWING OPTION SHOULD ONLY BE ENABLED BY THE JASPER SOFTWARE

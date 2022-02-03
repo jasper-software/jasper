@@ -153,11 +153,9 @@ Provide the JAS_DEFINE_MAX_ALIGN_T preprocessor symbol as way to override
 this behavior to workaround braindamaged C implementations.
 */
 #if defined(JAS_DEFINE_MAX_ALIGN_T)
-JAS_DEFINE_MAX_ALIGN_T
-#else
-#	if !(defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L)
-typedef long double max_align_t;
-#	endif
+	JAS_DEFINE_MAX_ALIGN_T
+#elif !(defined(__STDC_VERSION__) && (__STDC_VERSION__ - 0 >= 201112L))
+	typedef long double max_align_t;
 #endif
 
 #if 0
