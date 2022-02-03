@@ -1,7 +1,9 @@
 #ifndef JAS_CONFIG_H
 #define JAS_CONFIG_H
 
+#if 0
 #define _POSIX_C_SOURCE 200809L
+#endif
 
 #include <jasper/jas_compiler.h>
 #include <jasper/jas_dll.h>

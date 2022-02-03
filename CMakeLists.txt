@@ -167,7 +167,14 @@ option(JAS_ENABLE_DANGEROUS_INTERNAL_TESTING_MODE
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 
-# Prefer C11 (if available) but do not require it.
+# It is recommended that a compiler with C11 support be used to build JasPer
+# if such a compiler is available.  This said, however, the code should
+# also build successfully with a C99 compiler.  The C11 standard provides
+# language support for thread-local storage, which is typically more efficient
+# non-language mechanisms such as POSIX thread-specific storage.  If JasPer is
+# being built with multithreading support enabled, it would be prudent to use
+# a compiler with C11 support (although this is not a requirement).
+#set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD 11)
 
 # Enable extensions so that POSIX support is visible (e.g., ssize_t) without
@@ -262,7 +269,12 @@ if(CMAKE_C_COMPILER_ID STREQUAL "Clang" OR CMAKE_C_COMPILER_ID STREQUAL "GNU")
 	check_c_compiler_flag("-Wno-tautological-constant-out-of-range-compare"
 	  JAS_CLANG_WARN_NO_OUT_OF_RANGE_COMPARE)
 	add_compile_options(-Wall)
-	add_compile_options(-pedantic)
+
+	# Note: Use CMAKE_C_FLAGS (instead of add_compile_options) so that the
+	# flags are also used for compile checks.
+	#add_compile_options(-pedantic)
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pedantic")
+
 	add_compile_options(-W)
 	add_compile_options(-Wno-sign-compare)
 	add_compile_options(-Wformat)
@@ -286,8 +298,12 @@ if(CMAKE_C_COMPILER_ID STREQUAL "Clang" OR CMAKE_C_COMPILER_ID STREQUAL "GNU")
 	endif()
 	if(JAS_STRICT)
 		# Treat all compiler warnings as errors.
-		add_compile_options(-pedantic-errors)
-		add_compile_options(-Werror)
+		# Note: Use CMAKE_C_FLAGS (instead of add_compile_options) so that the
+		# flags are also used for compile checks.
+		#add_compile_options(-pedantic-errors)
+		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pedantic-errors")
+		#add_compile_options(-Werror)
+		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror")
 	endif()
 elseif(CMAKE_C_COMPILER_ID STREQUAL "MSVC")
 	# possibly lossy conversion
@@ -332,12 +348,16 @@ message("CMAKE_C_FLAGS_DEBUG: ${CMAKE_C_FLAGS_DEBUG}")
 # Perform platform checks.
 ################################################################################
 
-if(CMAKE_C_COMPILER_ID STREQUAL "Clang" OR CMAKE_C_COMPILER_ID STREQUAL "GNU")
-	set(JAS_CMAKE_REQUIRED_FLAGS "-Wpedantic -Werror")
-	set(JAS_CMAKE_REQUIRED_DEFINITIONS "_POSIX_C_SOURCE=200809L")
-endif()
-set(CMAKE_REQUIRED_FLAGS ${JAS_CMAKE_REQUIRED_FLAGS})
-set(JAS_CMAKE_REQUIRED_DEFINITIONS ${JAS_CMAKE_REQUIRED_DEFINITIONS})
+#unset(JAS_CMAKE_REQUIRED_FLAGS)
+#unset(JAS_CMAKE_REQUIRED_DEFINITIONS)
+#if(CMAKE_C_COMPILER_ID STREQUAL "Clang" OR CMAKE_C_COMPILER_ID STREQUAL "GNU")
+#	set(JAS_CMAKE_REQUIRED_FLAGS ${JAS_CMAKE_REQUIRED_FLAGS}
+#	  -Wpedantic -pedantic-errors -Werror)
+#	#set(JAS_CMAKE_REQUIRED_DEFINITIONS ${JAS_CMAKE_REQUIRED_DEFINITIONS}
+#	#  "_POSIX_C_SOURCE=200809L")
+#endif()
+#set(CMAKE_REQUIRED_FLAGS ${JAS_CMAKE_REQUIRED_FLAGS})
+#set(JAS_CMAKE_REQUIRED_DEFINITIONS ${JAS_CMAKE_REQUIRED_DEFINITIONS})
 
 # Get the value of the __STDC_VERSION__ preprocessor define.
 jas_get_stdc_version(status JAS_STDC_VERSION)
