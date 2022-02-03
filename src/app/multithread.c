@@ -73,6 +73,9 @@
 
 #define JAS_FOR_JASPER_APP_USE_ONLY
 
+/* For nanosleep. */
+#define _POSIX_C_SOURCE 200809L
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>

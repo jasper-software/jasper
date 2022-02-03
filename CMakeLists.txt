@@ -171,7 +171,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 set(CMAKE_C_STANDARD 11)
 
 # Enable extensions so that POSIX support is visible (e.g., ssize_t).
-set(CMAKE_C_EXTENSIONS ON)
+set(CMAKE_C_EXTENSIONS OFF)
 
 # Ensure that that the try_compile command (and the commands that use it)
 # use the compiler option for the language standard being used.
@@ -328,6 +328,13 @@ message("CMAKE_C_FLAGS_DEBUG: ${CMAKE_C_FLAGS_DEBUG}")
 ################################################################################
 # Perform platform checks.
 ################################################################################
+
+if(CMAKE_C_COMPILER_ID STREQUAL "Clang" OR CMAKE_C_COMPILER_ID STREQUAL "GNU")
+	set(JAS_CMAKE_REQUIRED_FLAGS "-Wpedantic -Werror")
+	set(JAS_CMAKE_REQUIRED_DEFINITIONS "_POSIX_C_SOURCE=200809L")
+endif()
+set(CMAKE_REQUIRED_FLAGS ${JAS_CMAKE_REQUIRED_FLAGS})
+set(JAS_CMAKE_REQUIRED_DEFINITIONS ${JAS_CMAKE_REQUIRED_DEFINITIONS})
 
 # Get the value of the __STDC_VERSION__ preprocessor define.
 jas_get_stdc_version(status JAS_STDC_VERSION)
