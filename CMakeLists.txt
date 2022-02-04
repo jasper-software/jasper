@@ -185,10 +185,13 @@ set(CMAKE_C_EXTENSIONS ON)
 
 # Ensure that that the try_compile command (and the commands that use it)
 # use the compiler option for the language standard being used.
+# This policy was added in CMake 3.8.
 cmake_policy(SET CMP0067 NEW)
 
 # Eliminate a CMake warning.
-cmake_policy(SET CMP0115 NEW)
+# Note: This policy was added in CMake 3.20.  Do not add this for now,
+# since it will cause older versions of CMake to barf.
+#cmake_policy(SET CMP0115 NEW)
 
 if(APPLE AND CMAKE_SYSTEM_NAME MATCHES "Darwin")
 	set(MACOS TRUE)
