@@ -179,10 +179,10 @@ typedef void jas_stream_obj_t;
 typedef struct {
 
 	/* Read characters from a file object. */
-	jas_ssize_t (*read_)(jas_stream_obj_t *obj, char *buf, size_t cnt);
+	ssize_t (*read_)(jas_stream_obj_t *obj, char *buf, size_t cnt);
 
 	/* Write characters to a file object. */
-	jas_ssize_t (*write_)(jas_stream_obj_t *obj, const char *buf, size_t cnt);
+	ssize_t (*write_)(jas_stream_obj_t *obj, const char *buf, size_t cnt);
 
 	/* Set the position for a file object. */
 	long (*seek_)(jas_stream_obj_t *obj, long offset, int origin);
@@ -930,14 +930,14 @@ destination stream @c destination.
 Upon success, 0 is returned; otherwise, -1 is returned.
 
 @todo
-TODO/FIXME: should return type be jas_ssize_t and the return value be
+TODO/FIXME: should return type be ssize_t and the return value be
 the count of the characters copied?
 Perhaps, it might be safer to introduce a new function with differing
 semantics and deprecate this one?
 */
 JAS_EXPORT
 int jas_stream_copy(jas_stream_t *destination, jas_stream_t *source,
-  jas_ssize_t count);
+  ssize_t count);
 
 /*!
 @brief Print a hex dump of data read from a stream.
@@ -984,7 +984,7 @@ To distinguish EOF from an I/O error, jas_stream_eof() and jas_stream_error()
 can be used.
 */
 JAS_EXPORT
-jas_ssize_t jas_stream_gobble(jas_stream_t *stream, size_t count);
+ssize_t jas_stream_gobble(jas_stream_t *stream, size_t count);
 
 /*!
 @brief Write a fill character multiple times to a stream.
@@ -1008,7 +1008,7 @@ If this value is less than the specified count, an error must have
 occurred.
 */
 JAS_EXPORT
-jas_ssize_t jas_stream_pad(jas_stream_t *stream, size_t count, int value);
+ssize_t jas_stream_pad(jas_stream_t *stream, size_t count, int value);
 
 /*!
 @brief Get the size of the file associated with the specified stream.

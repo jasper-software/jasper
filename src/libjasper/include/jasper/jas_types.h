@@ -92,12 +92,27 @@ extern "C" {
 #define jas_longlong long long
 #define jas_ulonglong unsigned long long
 
+#if !defined(SSIZE_MAX)
+#	if (JAS_SIZEOF_INT == JAS_SIZEOF_SIZE_T)
+#		define ssize_t int
+#		define SSIZE_MAX INT_MAX
+#	elif (JAS_SIZEOF_LONG == JAS_SIZEOF_SIZE_T)
+#		define SSIZE_MAX LONG_MAX
+#		define ssize_t long
+#	else
+#		define SSIZE_MAX LLONG_MAX
+#		define ssize_t jas_longlong
+#	endif
+#endif
+
+#if 0
 #if defined(JAS_HAVE_SSIZE_T)
 #define jas_ssize_t ssize_t
 #define JAS_SSIZE_MAX SSIZE_MAX
 #else
 #define jas_ssize_t jas_longlong
 #define JAS_SSIZE_MAX LLONG_MAX
+#endif
 #endif
 
 #if defined(_MSC_VER) && (_MSC_VER < 1800)

@@ -76,6 +76,7 @@ include(JasGetIncludes)
 
 # Note: JasGetStdcVersion uses try_run.
 include(JasGetStdcVersion)
+include(JasCheckType)
 
 ################################################################################
 # Define options.
@@ -385,13 +386,29 @@ else()
 endif()
 message("JAS_HAVE_MAX_ALIGN_T: ${JAS_HAVE_MAX_ALIGN_T}")
 
-check_type_size(ssize_t SSIZE_T)
-if(HAVE_SSIZE_T)
-	set(JAS_HAVE_SSIZE_T 1 CACHE INTERNAL "Test JAS_HAVE_SSIZE_T")
-else()
-	set(JAS_HAVE_SSIZE_T 0 CACHE INTERNAL "Test JAS_HAVE_SSIZE_T")
-endif()
+jas_check_type("char" JAS_HAVE_CHAR SIZE JAS_SIZEOF_CHAR)
+message("JAS_SIZEOF_CHAR: ${JAS_SIZEOF_CHAR}")
+jas_check_type("int" JAS_HAVE_INT SIZE JAS_SIZEOF_INT)
+message("JAS_SIZEOF_INT: ${JAS_SIZEOF_INT}")
+jas_check_type("long" JAS_HAVE_LONG SIZE JAS_SIZEOF_LONG)
+message("JAS_SIZEOF_LONG: ${JAS_SIZEOF_LONG}")
+jas_check_type("long long" JAS_HAVE_LLONG SIZE JAS_SIZEOF_LLONG)
+message("JAS_SIZEOF_LLONG: ${JAS_SIZEOF_LLONG}")
+jas_check_type("size_t" JAS_HAVE_SIZE_T SIZE JAS_SIZEOF_SIZE_T)
+message("JAS_SIZEOF_SIZE_T: ${JAS_SIZEOF_SIZE_T}")
+jas_check_type("ssize_t" JAS_HAVE_SSIZE_T SIZE JAS_SIZEOF_SSIZE_T)
 message("JAS_HAVE_SSIZE_T: ${JAS_HAVE_SSIZE_T}")
+if(JAS_HAVE_SSIZE_T)
+	message("JAS_SIZEOF_SSIZE_T: ${JAS_SIZEOF_SSIZE_T}")
+endif()
+
+#check_type_size(ssize_t SSIZE_T)
+#if(HAVE_SSIZE_T)
+#	set(JAS_HAVE_SSIZE_T 1 CACHE INTERNAL "Test JAS_HAVE_SSIZE_T")
+#else()
+#	set(JAS_HAVE_SSIZE_T 0 CACHE INTERNAL "Test JAS_HAVE_SSIZE_T")
+#endif()
+#message("JAS_HAVE_SSIZE_T: ${JAS_HAVE_SSIZE_T}")
 
 #check_type_size(uintmax_t UINTMAX_T)
 #if(HAVE_UINTMAX_T)
