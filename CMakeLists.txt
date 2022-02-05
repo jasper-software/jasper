@@ -146,13 +146,20 @@ if(JAS_USE_JAS_INIT)
 	add_compile_definitions(JAS_USE_JAS_INIT)
 endif()
 
-# If your C implementation violates the C11 (or later) standard by not
-# providing max_align_t, you can try using the command in the if-statement
-# below.
+# To override the default setting of max_align_t, something like what
+# appears in the body of the if-statement following this comment can be used.
+# WARNING: Do not do this unless you know what you are doing.
 if(FALSE)
-	add_compile_definitions(
-		"JAS_DEFINE_MAX_ALIGN_T=typedef long double max_align_t\;"
-	)
+	add_compile_definitions("JAS_NO_SET_MAX_ALIGN_T")
+	add_compile_definitions("max_align_t=__INSERT_APPROPRIATE_TYPE_HERE__"")
+endif()
+
+# To override the default setting of ssize_t, something like what
+# appears in the body of the if-statement following this comment can be used.
+# WARNING: Do not do this unless you know what you are doing.
+if(FALSE)
+	add_compile_definitions("JAS_NO_SET_SSIZE_T")
+	add_compile_definitions("ssize_t=__INSERT_APPROPRIATE_TYPE_HERE__"")
 endif()
 
 # WARNING: THE FOLLOWING OPTION SHOULD ONLY BE ENABLED BY THE JASPER SOFTWARE
@@ -168,20 +175,20 @@ option(JAS_ENABLE_DANGEROUS_INTERNAL_TESTING_MODE
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 
-# It is recommended that a compiler with C11 support be used to build JasPer
-# if such a compiler is available.  This said, however, the code should
-# also build successfully with a C99 compiler.  The C11 standard provides
-# language support for thread-local storage, which is typically more efficient
-# non-language mechanisms such as POSIX thread-specific storage.  If JasPer is
-# being built with multithreading support enabled, it would be prudent to use
-# a compiler with C11 support (although this is not a requirement).
-#set(CMAKE_C_STANDARD 99)
+# It is strongly recommended that the JasPer software be built using a
+# compiler that supports the C11 (or later) version of the C standard, if
+# such a compiler is available.  The use of compilers supporting older
+# versions of the language standard, such as C99, should only be used when
+# no C11 support is available.
+#set(CMAKE_C_STANDARD 99) # This should work but is not recommended.
 set(CMAKE_C_STANDARD 11)
 
 # Enable extensions so that POSIX support is visible (e.g., ssize_t) without
 # having to manually define _POSIX_C_SOURCE.
-# Note: This could be set to OFF if it were not for MacOS breaking things
+# Setting this to OFF will break things for at least some versions of MacOS
 # (e.g, due to u_char, u_short, and u_int being undefined).
+# In any case, it might be a bad idea to set this to OFF due to issues
+# related to max_align_t and ssize_t.
 set(CMAKE_C_EXTENSIONS ON)
 
 # Ensure that that the try_compile command (and the commands that use it)

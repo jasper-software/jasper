@@ -92,16 +92,18 @@ extern "C" {
 #define jas_longlong long long
 #define jas_ulonglong unsigned long long
 
-#if !defined(SSIZE_MAX)
-#	if (JAS_SIZEOF_INT == JAS_SIZEOF_SIZE_T)
-#		define ssize_t int
-#		define SSIZE_MAX INT_MAX
-#	elif (JAS_SIZEOF_LONG == JAS_SIZEOF_SIZE_T)
-#		define SSIZE_MAX LONG_MAX
-#		define ssize_t long
-#	else
-#		define SSIZE_MAX LLONG_MAX
-#		define ssize_t jas_longlong
+#if !defined(JAS_NO_SET_SSIZE_T)
+#	if !defined(SSIZE_MAX)
+#		if (JAS_SIZEOF_INT == JAS_SIZEOF_SIZE_T)
+#			define ssize_t int
+#			define SSIZE_MAX INT_MAX
+#		elif (JAS_SIZEOF_LONG == JAS_SIZEOF_SIZE_T)
+#			define ssize_t long
+#			define SSIZE_MAX LONG_MAX
+#		else
+#			define ssize_t jas_longlong
+#			define SSIZE_MAX LLONG_MAX
+#		endif
 #	endif
 #endif
 
@@ -164,17 +166,23 @@ extern "C" {
 
 /*
 Assume that a compiler claiming to be compliant with C11 or a later version
-of the C standard provides max_align_t.
-Provide the JAS_DEFINE_MAX_ALIGN_T preprocessor symbol as way to override
-this behavior to workaround braindamaged C implementations.
+of the C standard provides a suitable definition of max_align_t.
+The JAS_NO_SET_MAX_ALIGN_T preprocessor symbol can be used to override
+this behavior.
 */
-#if defined(JAS_DEFINE_MAX_ALIGN_T)
-	JAS_DEFINE_MAX_ALIGN_T
+#if defined(JAS_NO_SET_MAX_ALIGN_T)
+	/*
+	The user of this header is assuming responsibility for providing a
+	suitable definition for max_align_t.
+	*/
 #elif defined(_MSC_VER)
+	/*
+	Define max_align_t as a preprocessor symbol since using typedef will
+	cause problems.
+	*/
 #	define max_align_t long double
 #elif !(defined(__STDC_VERSION__) && (__STDC_VERSION__ - 0 >= 201112L))
 #	define max_align_t long double
-	/* typedef long double max_align_t; */
 #endif
 
 #if 0
