@@ -18,7 +18,8 @@ University of Victoria, Victoria, BC, Canada.
 
 Some of the features of the JasPer library are as follows:
 
-  - has multithreading support (e.g., supports per-thread contexts)
+  - has multithreading support (e.g., the JasPer library can be used
+    concurrently in multiple threads)
   - native support for several image codecs, including:
       - JPEG-2000 JP2 File Format Syntax (ISO/IEC 15444-1)
       - JPEG-2000 Code Stream Syntax (ISO/IEC 15444-1)
@@ -30,8 +31,8 @@ Some of the features of the JasPer library are as follows:
       - JPEG (ISO/IEC 10918-1) via IJG JPEG Library
       - HEIC via the libheif Library
   - can add new codecs (or enable/disable codecs) at run time
-  - can provide custom memory allocator to be used by library
-  - can provide custom logging function to be used by library for
+  - can specify memory allocator to be used by library
+  - can specify logging function to be used by library for
     error, warning, informational, and debugging messages
   - can place upper limit on total amount of memory used by library
     (which is useful in protecting against malicious image streams
@@ -45,16 +46,17 @@ Some of the features of the JasPer library are as follows:
 
 Several application programs are also provided:
 
-  - an image transcoder program for converting between image formats
-  - a program for querying the properties of image, such as:
-    size, number of components, and the number of bits per sample
-  - a program for comparing two images using various distance metrics,
-    such as PAE, MAE, and PSNR
-  - an image viewer
+  - `jasper`, an image transcoder program for converting between image formats
+  - `imginfo`, a program for querying the properties of an image, such as:
+    width, height, number of components, and the number of bits per sample
+  - `imgcmp`, a program for comparing two images using various distance
+    metrics, such as peak absolute error (PAE), mean absolute error (MAE), and
+    peak signal to noise ratio (PSNR)
+  - `jiv`, an image viewer
 
 \section overview__news News
 
-In release 3 of JasPer, the following notable changes were made to the API
+In release 3.0.0 of JasPer, the following notable changes were made to the API
 and/or behavior of the library relative to earlier releases (and therefore
 impact backward compatibility):
 
@@ -87,6 +89,17 @@ impact backward compatibility):
     behavior that allowed for negative values was removed.
 
   - The `jas_stream_memopen2()` function has been deprecated.
+
+  - More effort has been made to hide functions/macros that are
+    internal to the JasPer library in an effort to prevent applications
+    using such functions/macros (which can lead to many types of
+    problems).
+
+As part of the work done in preparing the JasPer 3.0.0 release, support
+for JasPer 3.0.0 was merged into the popular XV software, which can be
+obtained at:
+
+  - https://github.com/jasper-software/xv.git
 
 \verbinclude @CMAKE_SOURCE_DIR@/NEWS.txt
 

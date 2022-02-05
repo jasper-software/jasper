@@ -20,8 +20,11 @@ this manual is available online (for various JasPer releases) at:
 * Add the running of the full test suite in CI builds for the Windows platform.
   (Previously, the full test suite was only run for CI builds on Unix-based
   platforms.)
-* Fix numerous bugs (e.g., #305, #307, #308, #309, #312, #314, and many others
+* Fix many bugs (e.g., #305, #307, #308, #309, #312, #314, and many others
   not associated with any issue numbers).
+
+* Merged support for JasPer 3.0.0 into the XV software at:
+      https://github.com/jasper-software/xv.git
 
 2.0.33 (2021-08-01)
 ===================

@@ -107,9 +107,6 @@ extern "C" {
 /*!
 @brief
 Warn about the use of deprecated functionality.
-
-@deprecated
-The use of this function is deprecated.
 */
 JAS_EXPORT
 void jas_deprecated(const char *fmt, ...);
