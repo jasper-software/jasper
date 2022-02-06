@@ -35,6 +35,15 @@ dir_to_version()
 	esac
 }
 
+get_realpath()
+{
+	if [ $# -ne 1 ]; then
+		return 1
+	fi
+	local path="$1"
+	python -c 'import os,sys;print(os.path.realpath(sys.argv[1]))' "$path"
+}
+
 ################################################################################
 # Usage information.
 ################################################################################
@@ -47,7 +56,11 @@ usage()
 	Options
 	=======
 
+	-v
+	    Enable verbose mode.
+
 	-d \$in_dir
+	    Set input directory to \$in_dir.
 
 	Examples
 	========
@@ -61,9 +74,10 @@ usage()
 # Parse command line.
 ################################################################################
 
+verbose=0
 in_dir=
 
-while getopts d:o:h option; do
+while getopts d:o:hv option; do
 	case $option in
 	d)
 		in_dir="$OPTARG";;
@@ -87,13 +101,16 @@ for path in $releases_dir/*; do
 		base=$(basename "$path") || panic
 		case "$base" in
 		version-*.*.*-*)
-			other_list+=("$base")
+			#other_list+=("$base")
+			other_list=("$base" "${other_list[@]}")
 			;;
 		version-*)
-			official_list+=("$base")
+			#official_list+=("$base")
+			official_list=("$base" "${official_list[@]}")
 			;;
 		*)
-			other_list+=("$base")
+			#other_list+=("$base")
+			other_list=("$base" "${other_list[@]}")
 			;;
 		esac
 	fi
@@ -133,7 +150,17 @@ printf "The following official versions of the manual are available:\n\n" || \
   panic "printf failed"
 printf "<ul>\n"
 
-version="latest official release (does not include pre-releases)"
+buffer=$(get_realpath "$in_dir/latest") || \
+  panic "cannot get realpath"
+buffer=$(basename "$buffer") || \
+  panic "cannot get basename"
+latest_version=$(dir_to_version "$buffer") || \
+  panic "cannot get latest version"
+if [ "$verbose" -ge 1 ]; then
+	eecho "latest version: $latest_version"
+fi
+
+version="latest release (i.e., $latest_version)"
 url="latest/html/index.html"
 printf "    <li><a href=$dquote$url$dquote>$version</a>\n" || \
   panic "printf failed"
