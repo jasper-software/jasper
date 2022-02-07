@@ -47,6 +47,8 @@ message("Software version: ${JAS_VERSION}")
 message("Shared library ABI version: ${JAS_SO_VERSION}")
 message("Shared library build version: ${JAS_SO_NAME}")
 
+message("CMAKE_VERSION: ${CMAKE_VERSION}")
+
 project(JasPer VERSION ${JAS_VERSION} LANGUAGES C)
 
 ################################################################################
