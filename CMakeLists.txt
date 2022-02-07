@@ -151,7 +151,7 @@ endif()
 # WARNING: Do not do this unless you know what you are doing.
 if(FALSE)
 	add_compile_definitions("JAS_NO_SET_MAX_ALIGN_T")
-	add_compile_definitions("max_align_t=__INSERT_APPROPRIATE_TYPE_HERE__"")
+	add_compile_definitions("max_align_t=__INSERT_APPROPRIATE_TYPE_HERE__")
 endif()
 
 # To override the default setting of ssize_t, something like what
@@ -159,7 +159,7 @@ endif()
 # WARNING: Do not do this unless you know what you are doing.
 if(FALSE)
 	add_compile_definitions("JAS_NO_SET_SSIZE_T")
-	add_compile_definitions("ssize_t=__INSERT_APPROPRIATE_TYPE_HERE__"")
+	add_compile_definitions("ssize_t=__INSERT_APPROPRIATE_TYPE_HERE__")
 endif()
 
 # WARNING: THE FOLLOWING OPTION SHOULD ONLY BE ENABLED BY THE JASPER SOFTWARE
