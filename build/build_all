@@ -17,6 +17,185 @@ list_directory()
 	(cd "$dir" && find . -type f -printf "%M %010s %P\n" | sort -k3)
 }
 
+set_build_config()
+{
+	[ $# -eq 1 ] || return 1
+
+	build_name=""
+	base_dir=""
+	command=()
+
+	local id="$1"
+	case "$id" in
+
+	############################################################
+	# Debug Builds
+	############################################################
+
+	static_debug_mt0|static_debug_mt1)
+		local multithread
+		multithread=0
+		case "$id" in
+		*mt1)
+			multithread=1;;
+		esac
+		build_name="static debug ASan+LSan+UBSan mt=$multithread"
+		base_dir="$build_dir/test_static_debug-$multithread"
+		command=("$build_program")
+		command+=("${global_options[@]}")
+		command+=(--build-dir "$base_dir/build")
+		command+=(--install-dir "$base_dir/install")
+		command+=(--static)
+		command+=(--debug)
+		command+=(--ubsan)
+		command+=("${asan_option[@]}")
+		command+=("${lsan_option[@]}")
+		command+=("${test_option[@]}")
+		command+=(--install)
+		command+=(--no-documentation)
+		command+=(--no-use-jas-init)
+		if [ "$multithread" -ne 0 ]; then
+			command+=(--multithread)
+		else
+			command+=(--no-multithread)
+		fi
+		;;
+
+	static_debug_ji_mt0|static_debug_ji_mt1)
+		local multithread
+		multithread=0
+		case "$id" in
+		*mt1)
+			multithread=1;;
+		esac
+		build_name="static debug jas_init ASan+LSan+UBSan mt=$multithread"
+		base_dir="$build_dir/test_static_debug-ji-$multithread"
+		command=("$build_program")
+		command+=("${global_options[@]}")
+		command+=(--build-dir "$base_dir/build")
+		command+=(--install-dir "$base_dir/install")
+		command+=(--static)
+		command+=(--debug)
+		command+=(--ubsan)
+		command+=("${asan_option[@]}")
+		command+=("${lsan_option[@]}")
+		command+=("${test_option[@]}")
+		command+=(--install)
+		command+=(--no-documentation)
+		command+=(--use-jas-init)
+		if [ "$multithread" -ne 0 ]; then
+			command+=(--multithread)
+		else
+			command+=(--no-multithread)
+		fi
+		;;
+
+	tsan)
+		build_name="multithread static debug TSan+UBSan"
+		base_dir="$build_dir/test_static_debug_tsan"
+		command=("$build_program")
+		command+=("${global_options[@]}")
+		command+=(--build-dir "$base_dir/build")
+		command+=(--install-dir "$base_dir/install")
+		command+=(--prefer-pthread)
+		command+=(--static)
+		command+=(--debug)
+		command+=(--ubsan)
+		command+=(--tsan)
+		command+=("${test_option[@]}")
+		command+=(--install)
+		command+=(--no-documentation)
+		command+=(--multithread)
+		command+=(--no-use-jas-init)
+		;;
+
+	############################################################
+	# Release Builds
+	############################################################
+
+	# release without run-time tests
+	static_release|shared_release)
+		local shared
+		if [ "$id" = shared_release ]; then
+			shared=1
+		else
+			shared=0
+		fi
+		build_name="release shared=$shared"
+		base_dir="$build_dir/release-$shared"
+		command=("$build_program")
+		command+=("${global_options[@]}")
+		command+=(--build-dir "$base_dir/build")
+		command+=(--install-dir "$base_dir/install")
+		command+=(--shared)
+		command+=(--release)
+		command+=(--multithread)
+		command+=(--documentation)
+		command+=(--no-test)
+		command+=(--no-cxx)
+		command+=(--install)
+		;;
+
+	static_release_mt0|static_release_mt1)
+		local multithread
+		multithread=0
+		case "$id" in
+		*mt1)
+			multithread=1;;
+		esac
+		build_name="static release mt=$multithread"
+		base_dir="$build_dir/static_release-$multithread"
+		command=("$build_program")
+		command+=("${global_options[@]}")
+		command+=(--build-dir "$base_dir/build")
+		command+=(--install-dir "$base_dir/install")
+		command+=(--static)
+		command+=(--release)
+		command+=(--documentation)
+		command+=("${test_option[@]}")
+		command+=(--install)
+		if [ "$multithread" -ne 0 ]; then
+			command+=(--multithread)
+		else
+			command+=(--no-multithread)
+		fi
+		;;
+
+	shared_release_mt0|shared_release_mt1)
+		local multithread
+		multithread=0
+		case "$id" in
+		*mt1)
+			multithread=1;;
+		esac
+		build_name="shared release mt=$multithread"
+		base_dir="$build_dir/shared_release-$multithread"
+		command=("$build_program")
+		command+=("${global_options[@]}")
+		command+=(--build-dir "$base_dir/build")
+		command+=(--install-dir "$base_dir/install")
+		command+=(--shared)
+		command+=(--release)
+		command+=(--documentation)
+		command+=("${test_option[@]}")
+		command+=(--install)
+		command+=(--no-use-jas-init)
+		if [ "$multithread" -ne 0 ]; then
+			command+=(--multithread)
+		else
+			command+=(--no-multithread)
+		fi
+		;;
+
+	############################################################
+	############################################################
+
+	*)
+		return 1;;
+
+	esac
+}
+
 usage()
 {
 	echo "bad usage: $@"
@@ -155,225 +334,89 @@ fi
 
 ################################################################################
 
-#if [ "$os" = windows ]; then
-	cat <<- EOF
-	================================================================================
-	File System Mount Information
-	================================================================================
-	EOF
-	mount || panic "mount failed"
-#fi
+cat <<- EOF
+================================================================================
+File System Mount Information
+================================================================================
+EOF
+mount || panic "mount failed"
 
 ################################################################################
 
-for multithread in 0 1; do
+tests=()
+
+# debug builds
+tests+=(static_debug_mt0)
+tests+=(static_debug_mt1)
+tests+=(static_debug_ji_mt0)
+tests+=(static_debug_ji_mt1)
+tests+=(tsan)
+
+# release builds
+tests+=(shared_release_mt0)
+tests+=(shared_release_mt1)
+tests+=(static_release_mt0)
+tests+=(static_release_mt1)
+tests+=(static_release)
+tests+=(shared_release)
+
+failed_tests=()
+passed_tests=()
+
+for id in "${tests[@]}"; do
+
+	set_build_config "$id"
+	if [ $? -ne 0 ]; then
+		failed_tests+=("id")
+		continue
+	fi
 
 	cat <<- EOF
 	================================================================================
-	BUILD: Static Library Debug Build Using jas_init (ASan, LSan, UBSan)
-	(Multithread $multithread)
+	BUILD: ${build_name}
 	================================================================================
 	EOF
-	base_dir="$build_dir/test_static_debug-ji-$multithread"
-	command=("$build_program")
-	command+=("${global_options[@]}")
-	command+=(--build-dir "$base_dir/build")
-	command+=(--install-dir "$base_dir/install")
-	command+=(--static)
-	command+=(--debug)
-	command+=(--ubsan)
-	command+=("${asan_option[@]}")
-	command+=("${lsan_option[@]}")
-	command+=("${test_option[@]}")
-	command+=(--install)
-	command+=(--no-documentation)
-	command+=(--use-jas-init)
-	if [ "$multithread" -ne 0 ]; then
-		command+=(--multithread)
-	else
-		command+=(--no-multithread)
-	fi
+
 	echo "RUNNING: ${command[@]}"
 	if [ "$enable" -ne 0 ]; then
-		"${command[@]}" || panic
+		"${command[@]}"
+		if [ $? -ne 0 ]; then
+			failed_tests+=("$id")
+			continue
+		fi
 		echo "build directory:"
 		list_directory "$base_dir/build" || panic
 		echo "install directory:"
 		list_directory "$base_dir/install" || panic
+		passed_tests+=("$id")
 	fi
 
 done
-
-################################################################################
-
-for multithread in 0 1; do
-
-	cat <<- EOF
-	================================================================================
-	BUILD: Static Library Debug Build (ASan, LSan, UBSan)
-	(Multithread $multithread)
-	================================================================================
-	EOF
-	base_dir="$build_dir/test_static_debug-$multithread"
-	command=("$build_program")
-	command+=("${global_options[@]}")
-	command+=(--build-dir "$base_dir/build")
-	command+=(--install-dir "$base_dir/install")
-	command+=(--static)
-	command+=(--debug)
-	command+=(--ubsan)
-	command+=("${asan_option[@]}")
-	command+=("${lsan_option[@]}")
-	command+=("${test_option[@]}")
-	command+=(--install)
-	command+=(--no-documentation)
-	command+=(--no-use-jas-init)
-	if [ "$multithread" -ne 0 ]; then
-		command+=(--multithread)
-	else
-		command+=(--no-multithread)
-	fi
-	echo "RUNNING: ${command[@]}"
-	if [ "$enable" -ne 0 ]; then
-		"${command[@]}" || panic
-		echo "build directory:"
-		list_directory "$base_dir/build" || panic
-		echo "install directory:"
-		list_directory "$base_dir/install" || panic
-	fi
-
-done
-
-################################################################################
 
 cat <<- EOF
 ================================================================================
-BUILD: Multi-Thread Static Library Debug Build (TSan, UBSan)
+SUMMARY
 ================================================================================
 EOF
-base_dir="$build_dir/test_static_debug_tsan"
-command=("$build_program")
-command+=("${global_options[@]}")
-command+=(--build-dir "$base_dir/build")
-command+=(--install-dir "$base_dir/install")
-command+=(--prefer-pthread)
-command+=(--static)
-command+=(--debug)
-command+=(--ubsan)
-command+=(--tsan)
-command+=("${test_option[@]}")
-command+=(--install)
-command+=(--no-documentation)
-command+=(--multithread)
-command+=(--no-use-jas-init)
-echo "RUNNING: ${command[@]}"
-if [ "$enable" -ne 0 ]; then
-	"${command[@]}" || panic
-	echo "build directory:"
-	list_directory "$base_dir/build" || panic
-	echo "install directory:"
-	list_directory "$base_dir/install" || panic
+
+echo "Total number of tests: ${#tests[@]}"
+
+if [ "${#passed_tests[@]}" -gt 0 ]; then
+	echo "The following tests passed:"
+	for test in "${passed_tests[@]}"; do
+		echo "    $test"
+	done
 fi
 
-################################################################################
-
-for multithread in 0 1; do
-
-	cat <<- EOF
-	================================================================================
-	BUILD: Shared Library Release Build
-	(Multithread $multithread)
-	================================================================================
-	EOF
-	base_dir="$build_dir/shared_release-$multithread"
-	command=("$build_program")
-	command+=("${global_options[@]}")
-	command+=(--build-dir "$base_dir/build")
-	command+=(--install-dir "$base_dir/install")
-	command+=(--shared)
-	command+=(--release)
-	command+=(--documentation)
-	command+=("${test_option[@]}")
-	command+=(--install)
-	command+=(--no-use-jas-init)
-	if [ "$multithread" -ne 0 ]; then
-		command+=(--multithread)
-	else
-		command+=(--no-multithread)
-	fi
-	echo "RUNNING: ${command[@]}"
-	if [ "$enable" -ne 0 ]; then
-		"${command[@]}" || panic
-		echo "build directory:"
-		list_directory "$base_dir/build" || panic
-		echo "install directory:"
-		list_directory "$base_dir/install" || panic
-	fi
-
-done
-
-################################################################################
-
-for multithread in 0 1; do
-
-	cat <<- EOF
-	================================================================================
-	BUILD: Static Library Release Build
-	(Multithread $multithread)
-	================================================================================
-	EOF
-	base_dir="$build_dir/static_release-$multithread"
-	command=("$build_program")
-	command+=("${global_options[@]}")
-	command+=(--build-dir "$base_dir/build")
-	command+=(--install-dir "$base_dir/install")
-	command+=(--static)
-	command+=(--release)
-	command+=(--documentation)
-	command+=("${test_option[@]}")
-	command+=(--install)
-	if [ "$multithread" -ne 0 ]; then
-		command+=(--multithread)
-	else
-		command+=(--no-multithread)
-	fi
-	echo "RUNNING: ${command[@]}"
-	if [ "$enable" -ne 0 ]; then
-		"${command[@]}" || panic
-		echo "build directory:"
-		list_directory "$base_dir/build" || panic
-		echo "install directory:"
-		list_directory "$base_dir/install" || panic
-	fi
-
-done
-
-################################################################################
-
-cat <<- EOF
-================================================================================
-BUILD: Shared Library Release Build (JAS_ENABLE_DEVELOPER_MODE=OFF)
-================================================================================
-EOF
-base_dir="$build_dir/shared_nocxx"
-command=("$build_program")
-command+=("${global_options[@]}")
-command+=(--build-dir "$base_dir/build")
-command+=(--install-dir "$base_dir/install")
-command+=(--shared)
-command+=(--release)
-command+=(--multithread)
-command+=(--documentation)
-command+=(--no-test)
-command+=(--no-cxx)
-command+=(--install)
-echo "RUNNING: ${command[@]}"
-if [ "$enable" -ne 0 ]; then
-	"${command[@]}" || panic
-	echo "build directory:"
-	list_directory "$base_dir/build" || panic
-	echo "install directory:"
-	list_directory "$base_dir/install" || panic
+if [ "${#failed_tests[@]}" -gt 0 ]; then
+	echo "ERROR: One or more tests failed."
+	echo "The following tests failed:"
+	for test in "${failed_tests[@]}"; do
+		echo "    $test"
+	done
+	exit 1
 fi
+
+exit 0
 
 ################################################################################

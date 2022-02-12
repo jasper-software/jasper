@@ -51,6 +51,9 @@ message("CMAKE_VERSION: ${CMAKE_VERSION}")
 
 project(JasPer VERSION ${JAS_VERSION} LANGUAGES C)
 
+message("CMAKE_C_COMPILER_ID: ${CMAKE_C_COMPILER_ID}")
+message("CMAKE_C_COMPILER_VERISON: ${CMAKE_C_COMPILER_VERSION}")
+
 ################################################################################
 # Include modules and set policies.
 ################################################################################
@@ -185,7 +188,10 @@ option(JAS_ENABLE_CXX "Enable C++ code (for testing)." OFF)
 ################################################################################
 
 if(JAS_ENABLE_CXX)
+	message("Enabling C++")
 	enable_language(CXX)
+	message("CMAKE_CXX_COMPILER_ID: ${CMAKE_CXX_COMPILER_ID}")
+	message("CMAKE_CXX_COMPILER_VERISON: ${CMAKE_CXX_COMPILER_VERSION}")
 endif()
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
