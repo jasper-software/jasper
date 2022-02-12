@@ -117,18 +117,25 @@ Operating System: $os
 EOF
 
 global_options=()
+
 for ((i=0; i < "$verbose"; ++i)); do
 	global_options+=(--verbose)
 done
+
 if [ "$strict" -ge 1 ]; then
 	global_options+=(--strict)
 else
 	global_options+=(--no-strict)
 fi
+
 if [ "$crostini" -ne 0 ]; then
 	global_options+=(--crostini)
 fi
+
+global_options+=(--cxx)
+
 global_options+=(--debug-level "$debug_level")
+
 lsan_option=(--lsan)
 asan_option=(--asan)
 case "$os" in
@@ -139,6 +146,7 @@ windows)
 	asan_option=()
 	;;
 esac
+
 if [ "$enable_test" -ne 0 ]; then
 	test_option=(--test)
 else
@@ -339,5 +347,33 @@ for multithread in 0 1; do
 	fi
 
 done
+
+################################################################################
+
+cat <<- EOF
+================================================================================
+BUILD: Shared Library Release Build (JAS_ENABLE_DEVELOPER_MODE=OFF)
+================================================================================
+EOF
+base_dir="$build_dir/shared_nocxx"
+command=("$build_program")
+command+=("${global_options[@]}")
+command+=(--build-dir "$base_dir/build")
+command+=(--install-dir "$base_dir/install")
+command+=(--shared)
+command+=(--release)
+command+=(--multithread)
+command+=(--documentation)
+command+=(--no-test)
+command+=(--no-cxx)
+command+=(--install)
+echo "RUNNING: ${command[@]}"
+if [ "$enable" -ne 0 ]; then
+	"${command[@]}" || panic
+	echo "build directory:"
+	list_directory "$base_dir/build" || panic
+	echo "install directory:"
+	list_directory "$base_dir/install" || panic
+fi
 
 ################################################################################

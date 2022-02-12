@@ -119,11 +119,11 @@ typedef int (jas_vlogmsgf_t)(jas_logtype_t, const char *, va_list);
 /*!
 @brief Create an instance of a logtype.
 */
-static inline jas_logtype_t jas_logtype_init(int class, int priority)
+static inline jas_logtype_t jas_logtype_init(int clas, int priority)
 {
-	assert(class >= 0 && class < JAS_LOGTYPE_NUM_CLASSES);
+	assert(clas >= 0 && clas < JAS_LOGTYPE_NUM_CLASSES);
 	assert(priority >= 0 && priority <= JAS_LOGTYPE_MAX_PRIORITY);
-	return (class & 0xf) | (priority << 4);
+	return (clas & 0xf) | (priority << 4);
 }
 
 /*!

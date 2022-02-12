@@ -80,6 +80,13 @@ include(JasGetIncludes)
 include(JasGetStdcVersion)
 include(JasCheckType)
 
+# Save some typing below.
+function(add_c_compile_options args)
+	foreach(arg IN LISTS ARGV)
+		add_compile_options($<$<COMPILE_LANGUAGE:C>:${arg}>)
+	endforeach()
+endfunction()
+
 ################################################################################
 # Define options.
 ################################################################################
@@ -171,9 +178,15 @@ option(JAS_ENABLE_DANGEROUS_INTERNAL_TESTING_MODE
   "DO NOT ENABLE FOR SECURITY REASONS! (For internal use by JasPer development team only"
   OFF)
 
+option(JAS_ENABLE_CXX "Enable C++ code (for testing)." OFF)
+
 ################################################################################
 #
 ################################################################################
+
+if(JAS_ENABLE_CXX)
+	enable_language(CXX)
+endif()
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 
@@ -281,57 +294,57 @@ if(CMAKE_C_COMPILER_ID STREQUAL "Clang" OR CMAKE_C_COMPILER_ID STREQUAL "GNU")
 	  JAS_GCC_WARN_NO_STRINGOP_OVERFLOW)
 	check_c_compiler_flag("-Wno-tautological-constant-out-of-range-compare"
 	  JAS_CLANG_WARN_NO_OUT_OF_RANGE_COMPARE)
-	add_compile_options(-Wall)
+	add_c_compile_options(-Wall)
 
 	# Note: Use CMAKE_C_FLAGS (instead of add_compile_options) so that the
 	# flags are also used for compile checks.
-	#add_compile_options(-pedantic)
+	#add_c_compile_options(-pedantic)
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pedantic")
 
-	add_compile_options(-W)
-	add_compile_options(-Wno-sign-compare)
-	add_compile_options(-Wformat)
-	add_compile_options(-Wmissing-prototypes)
-	add_compile_options(-Wstrict-prototypes)
-	add_compile_options(-Wno-type-limits)
+	add_c_compile_options(-W)
+	add_c_compile_options(-Wno-sign-compare)
+	add_c_compile_options(-Wformat)
+	add_c_compile_options(-Wmissing-prototypes)
+	add_c_compile_options(-Wstrict-prototypes)
+	add_c_compile_options(-Wno-type-limits)
 	if (JAS_CLANG_WARN_NO_OUT_OF_RANGE_COMPARE)
-		add_compile_options(-Wno-tautological-constant-out-of-range-compare)
+		add_c_compile_options(-Wno-tautological-constant-out-of-range-compare)
 	endif()
 	if(JAS_GCC_WARN_NO_STRINGOP_TRUNCATION)
-		add_compile_options(-Wno-stringop-truncation)
+		add_c_compile_options(-Wno-stringop-truncation)
 	endif()
 	if(JAS_GCC_WARN_NO_STRINGOP_OVERFLOW)
 		# Note: Sometimes spurious warnings that have nothing to do with
 		# string are generated.
-		add_compile_options(-Wno-stringop-overflow)
+		add_c_compile_options(-Wno-stringop-overflow)
 	endif()
-	add_compile_options(-Wmissing-declarations)
+	add_c_compile_options(-Wmissing-declarations)
 	if(CMAKE_C_COMPILER_ID STREQUAL "Clang")
-		add_compile_options(-Wno-unused-command-line-argument)
+		add_c_compile_options(-Wno-unused-command-line-argument)
 	endif()
 	if(JAS_STRICT)
 		# Treat all compiler warnings as errors.
 		# Note: Use CMAKE_C_FLAGS (instead of add_compile_options) so that the
 		# flags are also used for compile checks.
-		#add_compile_options(-pedantic-errors)
+		#add_c_compile_options(-pedantic-errors)
 		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pedantic-errors")
-		#add_compile_options(-Werror)
+		#add_c_compile_options(-Werror)
 		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror")
 	endif()
 elseif(CMAKE_C_COMPILER_ID STREQUAL "MSVC")
 	# possibly lossy conversion
-	add_compile_options(/wd4244)
+	add_c_compile_options(/wd4244)
 	# different const qualifiers
-	add_compile_options(/wd4090)
+	add_c_compile_options(/wd4090)
 	# signed/unsigned mismatch
-	add_compile_options(/wd4018)
+	add_c_compile_options(/wd4018)
 	# function may be unsafe (e.g., sprintf, strncat)
-	add_compile_options(/wd4996)
+	add_c_compile_options(/wd4996)
 	# allow some kinds of narrowing conversions
-	add_compile_options(/wd4267)
+	add_c_compile_options(/wd4267)
 	if(JAS_STRICT)
 		# Treat all compiler warnings as errors.
-		add_compile_options(/WX)
+		add_c_compile_options(/WX)
 	endif()
 endif()
 
@@ -345,9 +358,9 @@ if(JAS_ENABLE_HIDDEN)
 			check_c_compiler_flag("-Wl,--gc-sections" HAVE_GC_SECTIONS)
 			if(HAVE_FUNCTION_SECTIONS AND HAVE_DATA_SECTIONS AND
 			  HAVE_GC_SECTIONS)
-				add_compile_options(-ffunction-sections)
-				add_compile_options(-fdata-sections)
-				add_compile_options(-Wl,--gc-sections)
+				add_c_compile_options(-ffunction-sections)
+				add_c_compile_options(-fdata-sections)
+				add_c_compile_options(-Wl,--gc-sections)
 			endif()
 		endif()
 	endif()

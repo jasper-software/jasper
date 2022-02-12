@@ -60,6 +60,14 @@ target_link_libraries(test_1 libjasper ${JAS_LIBJPEG_TARGET}
   ${MATH_LIBRARY} ${THREAD_LIBRARY})
 set(private_programs "${private_programs}" test_1)
 
+if(JAS_ENABLE_CXX)
+	# The test_2 program.
+	add_executable(test_2 test_2.cpp)
+	target_link_libraries(test_2 libjasper ${JAS_LIBJPEG_TARGET}
+	  ${THREAD_LIBRARY})
+	set(private_programs "${private_programs}" test_2)
+endif()
+
 if(JAS_ENABLE_FUZZER)
 	add_executable(fuzz fuzz.c)
 	target_link_libraries(fuzz libjasper ${JAS_LIBJPEG_TARGET}

@@ -105,6 +105,7 @@ use_jas_init=0
 enable_strict=1
 cmake_generator=
 enable_32bit=0
+enable_cxx=0
 
 while [ $# -gt 0 ]; do
 	option="$1"
@@ -209,13 +210,25 @@ while [ $# -gt 0 ]; do
 		shift 1
 		enable_msan=1
 		;;
+	--no-msan)
+		shift 1
+		enable_msan=0
+		;;
 	--ubsan)
 		shift 1
 		enable_ubsan=1
 		;;
+	--no-ubsan)
+		shift 1
+		enable_ubsan=0
+		;;
 	--tsan)
 		shift 1
 		enable_tsan=1
+		;;
+	--no-tsan)
+		shift 1
+		enable_tsan=0
 		;;
 	--release)
 		shift 1
@@ -291,6 +304,14 @@ while [ $# -gt 0 ]; do
 	--32bit)
 		shift 1
 		enable_32bit=1
+		;;
+	--cxx)
+		shift 1
+		enable_cxx=1
+		;;
+	--no-cxx)
+		shift 1
+		enable_cxx=0
 		;;
 	--help)
 		usage
@@ -431,6 +452,11 @@ if [ "$enable_32bit" -ne 0 ]; then
 	configure_opts+=("-DJAS_ENABLE_32BIT=true")
 fi
 
+if [ "$enable_cxx" -ne 0 ]; then
+	configure_opts+=("-DJAS_ENABLE_CXX=true")
+else
+	configure_opts+=("-DJAS_ENABLE_CXX=false")
+fi
 configure_opts+=("-DJAS_ENABLE_DANGEROUS_INTERNAL_TESTING_MODE=true")
 
 if [ "$enable_doc" -ne 0 ]; then
