@@ -291,11 +291,14 @@ fi
 ubuntu_clang_hack=0
 # If invoked by GitHub Actions CI...
 if [ -n "$RUNNER_OS" ]; then
-	case "$CC" in
-	clang*)
-		ubuntu_clang_hack=1
-		;;
-	esac
+	if [ "$os" = linux ]; then
+		# Assume that the OS being Linux means Ubuntu.
+		case "$CC" in
+		clang*)
+			ubuntu_clang_hack=1
+			;;
+		esac
+	fi
 fi
 
 ################################################################################
