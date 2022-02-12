@@ -287,6 +287,17 @@ if [ -n "$RUNNER_OS" ]; then
 	esac
 fi
 
+# TODO: Fix this later.
+ubuntu_clang_hack=0
+# If invoked by GitHub Actions CI...
+if [ -n "$RUNNER_OS" ]; then
+	case "$CC" in
+	clang*)
+		ubuntu_clang_hack=1
+		;;
+	break
+fi
+
 ################################################################################
 
 cat <<- EOF
@@ -346,17 +357,21 @@ mount || panic "mount failed"
 tests=()
 
 # debug builds
-tests+=(static_debug_mt0)
-tests+=(static_debug_mt1)
-tests+=(static_debug_ji_mt0)
-tests+=(static_debug_ji_mt1)
-tests+=(tsan)
+if [ "$ubuntu_clang_hack" -eq 0 ]; then
+	tests+=(static_debug_mt0)
+	tests+=(static_debug_mt1)
+	tests+=(static_debug_ji_mt0)
+	tests+=(static_debug_ji_mt1)
+	tests+=(tsan)
+fi
 
 # release builds
 tests+=(shared_release_mt0)
 tests+=(shared_release_mt1)
-tests+=(static_release_mt0)
-tests+=(static_release_mt1)
+if [ "$ubuntu_clang_hack" -eq 0 ]; then
+	tests+=(static_release_mt0)
+	tests+=(static_release_mt1)
+fi
 tests+=(static_release)
 tests+=(shared_release)
 
