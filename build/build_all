@@ -225,15 +225,21 @@ debug_level=0
 strict=1
 command_file=
 enable_test=1
+requested_tests=()
+hard_fail=0
 
-while getopts hvb:cnd:swC:Xq option; do
+while getopts hvb:cnd:swC:Xqt:F option; do
 	case "$option" in
 	n)
 		enable=0;;
+	F)
+		hard_fail=1;;
 	c)
 		crostini=1;;
 	C)
 		command_file="$OPTARG";;
+	t)
+		requested_tests+=("$OPTARG");;
 	b)
 		build_dir="$OPTARG";;
 	d)
@@ -357,41 +363,55 @@ mount || panic "mount failed"
 
 ################################################################################
 
-tests=()
-
-# debug builds
-if [ "$ubuntu_clang_hack" -eq 0 ]; then
-	tests+=(static_debug_mt0)
-	tests+=(static_debug_mt1)
-	tests+=(static_debug_ji_mt0)
-	tests+=(static_debug_ji_mt1)
-	tests+=(tsan)
+if [ "${#requested_tests[@]}" -gt 0 ]; then
+	tests=("${requested_tests[@]}")
 fi
 
-# release builds
-tests+=(shared_release_mt0)
-tests+=(shared_release_mt1)
-if [ "$ubuntu_clang_hack" -eq 0 ]; then
-	tests+=(static_release_mt0)
-	tests+=(static_release_mt1)
+if [ "${#tests[@]}" -eq 0 ]; then
+
+	tests=()
+
+	# debug builds
+	if [ "$ubuntu_clang_hack" -eq 0 ]; then
+		tests+=(static_debug_mt0)
+		tests+=(static_debug_mt1)
+		tests+=(static_debug_ji_mt0)
+		tests+=(static_debug_ji_mt1)
+		tests+=(tsan)
+	fi
+
+	# release builds
+	tests+=(shared_release_mt0)
+	tests+=(shared_release_mt1)
+	if [ "$ubuntu_clang_hack" -eq 0 ]; then
+		tests+=(static_release_mt0)
+		tests+=(static_release_mt1)
+	fi
+	tests+=(static_release)
+	tests+=(shared_release)
+
 fi
-tests+=(static_release)
-tests+=(shared_release)
 
 failed_tests=()
 passed_tests=()
+attempted_tests=()
 
 for id in "${tests[@]}"; do
 
+	attempted_tests+=("$id")
+
 	set_build_config "$id"
 	if [ $? -ne 0 ]; then
-		failed_tests+=("id")
+		failed_tests+=("$id")
+		if [ "$hard_fail" -ne 0 ]; then
+			break
+		fi
 		continue
 	fi
 
 	cat <<- EOF
 	================================================================================
-	BUILD: ${build_name}
+	BUILD (${#attempted_tests[@]}/${#tests[@]}): ${build_name}
 	================================================================================
 	EOF
 
@@ -400,6 +420,9 @@ for id in "${tests[@]}"; do
 		"${command[@]}"
 		if [ $? -ne 0 ]; then
 			failed_tests+=("$id")
+			if [ "$hard_fail" -ne 0 ]; then
+				break
+			fi
 			continue
 		fi
 		echo "build directory:"
@@ -419,6 +442,9 @@ EOF
 
 echo "Total number of tests: ${#tests[@]}"
 
+echo "Number of attempted tests: ${#attempted_tests[@]}"
+
+echo "Number of passed tests: ${#passed_tests[@]}"
 if [ "${#passed_tests[@]}" -gt 0 ]; then
 	echo "The following tests passed:"
 	for test in "${passed_tests[@]}"; do
@@ -426,6 +452,7 @@ if [ "${#passed_tests[@]}" -gt 0 ]; then
 	done
 fi
 
+echo "Number of failed tests: ${#failed_tests[@]}"
 if [ "${#failed_tests[@]}" -gt 0 ]; then
 	echo "ERROR: One or more tests failed."
 	echo "The following tests failed:"
