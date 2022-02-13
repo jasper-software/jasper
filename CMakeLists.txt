@@ -94,6 +94,9 @@ endfunction()
 # Define options.
 ################################################################################
 
+# Note: The variable JAS_CROSSCOMPILING can be defined on the command line
+# in order to override the value of CMAKE_CROSSCOMPILING (if necessary).
+
 if(DEFINED BUILD_SHARED_LIBS)
 	option(JAS_ENABLE_SHARED "Enable building of shared library"
 	  ${BUILD_SHARED_LIBS})
@@ -392,9 +395,30 @@ message("CMAKE_C_FLAGS_DEBUG: ${CMAKE_C_FLAGS_DEBUG}")
 #set(JAS_CMAKE_REQUIRED_DEFINITIONS ${JAS_CMAKE_REQUIRED_DEFINITIONS})
 
 # Get the value of the __STDC_VERSION__ preprocessor define.
-jas_get_stdc_version(status JAS_STDC_VERSION)
-if(NOT status)
-	message(FATAL_ERROR "Cannot determine the value of __STDC_VERSION__.")
+if((DEFINED JAS_CROSSCOMPILING AND JAS_CROSSCOMPILING) OR
+  (NOT DEFINED JAS_CROSSCOMPILING AND CMAKE_CROSSCOMPILING))
+	message("A cross-compiling environment has been detected.")
+	# Note: The variable JAS_STDC_VERSION should be set to the value of the
+	# preprocessor symbol __STDC_VERSION__ on the target platform.
+	# Since CMake is unable to run a cross-compiled program, the value of
+	# __STDC_VERSION__ cannot be automatically determined when
+	# cross-compiling.  If cross-compiling, the value of JAS_STDC_VERSION
+	# will need to be set manually from the command line
+	# (e.g., using -DJAS_STDC_VERSION=YYYYMML) or by changing the line below.
+	set(JAS_STDC_VERSION "0L" CACHE INTERNAL "The value of __STDC_VERSION__.")
+	if (JAS_STDC_VERSION STREQUAL "0L")
+		message(FATAL_ERROR
+		  "The value of __STDC_VERSION__ cannot be automatically determined "
+		  "when cross-compiling.  Please set JAS_STDC_VERSION to the value "
+		  "of __STDC_VERSION__ when invoking CMake (e.g., by using the "
+		  "option -DJAS_STDC_VERSION=...) or modify the CMakeLists.txt "
+		  "appropriately.")
+	endif()
+else()
+	jas_get_stdc_version(status JAS_STDC_VERSION)
+	if(NOT status)
+		message(FATAL_ERROR "Cannot determine the value of __STDC_VERSION__.")
+	endif()
 endif()
 message("__STDC_VERSION__: ${JAS_STDC_VERSION}")
 
