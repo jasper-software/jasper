@@ -21,6 +21,17 @@ join_by()
 	echo "$*"
 }
 
+is_preview_release()
+{
+	local version="$1"
+	local pattern='^[0-9]+\.[0-9]+\.[0-9]+$'
+	if [[ "$version" =~ $pattern ]]; then
+		output="0"
+	else
+		output="1"
+	fi
+	echo "$output"
+}
 
 # Print usage information and exit.
 usage()
@@ -73,7 +84,7 @@ usage()
 program_dir="$(dirname "$0")" || panic
 make_main_gh_page="$program_dir/make_main_gh_page"
 
-latest=0
+latest=
 branch="gh-pages"
 in_dir=
 repo_name=
@@ -84,8 +95,10 @@ prepare_only=0
 verbose=1
 deploy_mode=
 
-while getopts b:i:r:t:z:fnvqm:l opt; do
+while getopts b:i:r:t:z:fnvqm:lL opt; do
 	case $opt in
+	L)
+		latest=0;;
 	l)
 		latest=1;;
 	m)
@@ -167,6 +180,16 @@ version="$(awk -v FS="/" '{print $3;}' <<< "$github_ref")" || \
   panic "cannot determine document version"
 if [ "$verbose" -ge 1 ]; then
 	echo "version $version"
+fi
+
+preview_release="$(is_preview_release "$version")" || \
+  panic "cannot determine if release is preview release"
+
+if [ -z "$latest" ]; then
+	latest=1
+	if [ "$preview_release" -ne 0 ]; then
+		latest=0
+	fi
 fi
 
 tmp_dir="$tmp_dir/deploy"
