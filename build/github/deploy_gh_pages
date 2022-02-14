@@ -24,7 +24,7 @@ join_by()
 is_preview_release()
 {
 	local version="$1"
-	local pattern='^[0-9]+\.[0-9]+\.[0-9]+$'
+	local pattern='^version-[0-9]+\.[0-9]+\.[0-9]+$'
 	if [[ "$version" =~ $pattern ]]; then
 		output="0"
 	else
