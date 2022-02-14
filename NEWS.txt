@@ -1,3 +1,8 @@
+3.0.2 (2022-02-14)
+==================
+
+* Fix a build issue that occurs when a cross-compiler is used (e.g., #319).
+
 3.0.1 (2022-02-12)
 ==================
 
