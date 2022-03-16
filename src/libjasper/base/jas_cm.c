@@ -721,11 +721,11 @@ static int jas_cmpxformseq_delete(jas_cmpxformseq_t *pxformseq, unsigned i)
 static int jas_cmpxformseq_appendcnvt(jas_cmpxformseq_t *pxformseq,
   unsigned dstclrspc, unsigned srcclrspc)
 {
+	JAS_UNUSED(pxformseq);
 	if (dstclrspc == srcclrspc) {
 		return 0;
 	}
 	abort();
-	JAS_UNUSED(pxformseq);
 	return -1;
 }
 
