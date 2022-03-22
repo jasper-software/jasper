@@ -149,7 +149,9 @@ jas_image_t *jp2_decode(jas_stream_t *in, const char *optstr)
 		goto error;
 	}
 	if (box->data.jp.magic != JP2_JP_MAGIC) {
-		jas_logerrorf("incorrect magic number\n");
+		jas_logerrorf("incorrect magic number (%lx != %lx)\n",
+		  JAS_CAST(ulong, box->data.jp.magic),
+		  JAS_CAST(ulong, JP2_JP_MAGIC));
 		goto error;
 	}
 	jp2_box_destroy(box);
