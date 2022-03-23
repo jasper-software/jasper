@@ -522,10 +522,10 @@ error:
 	return 0;
 }
 
+#define JP2_VALIDATE_LEN JAS_MIN(JP2_JP_LEN + 4, JAS_STREAM_MAXPUTBACK)
 int jp2_validate(jas_stream_t *in)
 {
-	const size_t validate_len = JAS_MIN(JP2_JP_LEN + 4, JAS_STREAM_MAXPUTBACK);
-	unsigned char buf[validate_len];
+	unsigned char buf[JP2_VALIDATE_LEN];
 
 	/* Read the validation data (i.e., the data used for detecting
 	  the format). */
@@ -535,7 +535,7 @@ int jp2_validate(jas_stream_t *in)
 	}
 
 	/* Is the box type correct? */
-	assert(validate_len >= 8);
+	assert(JP2_VALIDATE_LEN >= 8);
 	if (((JAS_CAST(uint_least32_t, buf[4]) << 24) |
 	  (JAS_CAST(uint_least32_t, buf[5]) << 16) |
 	  (JAS_CAST(uint_least32_t, buf[6] << 8)) |
