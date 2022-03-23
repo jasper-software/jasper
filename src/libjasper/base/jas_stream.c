@@ -700,14 +700,15 @@ size_t jas_stream_read(jas_stream_t *stream, void *buf, size_t cnt)
 	return n;
 }
 
+/* TODO: The return type should probably be changed to size_t. */
 unsigned jas_stream_peek(jas_stream_t *stream, void *buf, size_t cnt)
 {
 	char *bufptr = buf;
 
-	const unsigned n = jas_stream_read(stream, bufptr, cnt);
+	const size_t n = jas_stream_read(stream, bufptr, cnt);
 
 	/* Put the characters read back onto the stream. */
-	for (unsigned i = n; i-- > 0;) {
+	for (size_t i = n; i-- > 0;) {
 		if (jas_stream_ungetc(stream, bufptr[i]) == EOF) {
 			return 0;
 		}

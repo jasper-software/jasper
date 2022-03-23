@@ -85,11 +85,6 @@
 #include <stdio.h>
 
 /******************************************************************************\
-\******************************************************************************/
-
-#define	JP2_VALIDATELEN	(JAS_MIN(JP2_JP_LEN + 16, JAS_STREAM_MAXPUTBACK))
-
-/******************************************************************************\
 * Function prototypes.
 \******************************************************************************/
 
@@ -149,9 +144,9 @@ jas_image_t *jp2_decode(jas_stream_t *in, const char *optstr)
 		goto error;
 	}
 	if (box->data.jp.magic != JP2_JP_MAGIC) {
-		jas_logerrorf("incorrect magic number (%lx != %lx)\n",
-		  JAS_CAST(ulong, box->data.jp.magic),
-		  JAS_CAST(ulong, JP2_JP_MAGIC));
+		jas_logerrorf("incorrect magic number (0x%lx != 0x%lx)\n",
+		  JAS_CAST(unsigned long, box->data.jp.magic),
+		  JAS_CAST(unsigned long, JP2_JP_MAGIC));
 		goto error;
 	}
 	jp2_box_destroy(box);
@@ -529,23 +524,23 @@ error:
 
 int jp2_validate(jas_stream_t *in)
 {
-	unsigned char buf[JP2_VALIDATELEN];
-#if 0
-	jas_stream_t *tmpstream;
-	jp2_box_t *box;
-#endif
-
-	assert(JAS_STREAM_MAXPUTBACK >= JP2_VALIDATELEN);
+	const size_t validate_len = JAS_MIN(JP2_JP_LEN + 4, JAS_STREAM_MAXPUTBACK);
+	unsigned char buf[validate_len];
 
 	/* Read the validation data (i.e., the data used for detecting
 	  the format). */
-	if (jas_stream_peek(in, buf, sizeof(buf)) != sizeof(buf))
+	assert(sizeof(buf) <= JAS_STREAM_MAXPUTBACK);
+	if (jas_stream_peek(in, buf, sizeof(buf)) != sizeof(buf)) {
 		return -1;
+	}
 
 	/* Is the box type correct? */
-	if ((((uint_least32_t)buf[4] << 24) | ((uint_least32_t)buf[5] << 16) | ((uint_least32_t)buf[6] << 8) | (uint_least32_t)buf[7]) !=
-	  JP2_BOX_JP)
-	{
+	assert(validate_len >= 8);
+	if (((JAS_CAST(uint_least32_t, buf[4]) << 24) |
+	  (JAS_CAST(uint_least32_t, buf[5]) << 16) |
+	  (JAS_CAST(uint_least32_t, buf[6] << 8)) |
+	  (JAS_CAST(uint_least32_t, buf[7]))) !=
+	  JP2_BOX_JP) {
 		return -1;
 	}
 
