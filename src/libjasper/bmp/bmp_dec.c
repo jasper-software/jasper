@@ -300,14 +300,20 @@ int bmp_validate(jas_stream_t *in)
 	assert(JAS_STREAM_MAXPUTBACK >= 2);
 
 	/* Read the first two characters that constitute the signature. */
-	if (jas_stream_peek(in, buf, sizeof(buf)) != sizeof(buf))
+	if (jas_stream_peek(in, buf, sizeof(buf)) != sizeof(buf)) {
 		return -1;
+	}
+
+	unsigned magic = (buf[0] | (buf[1] << 8));
 
 	/* Is the signature correct for the BMP format? */
-	if (buf[0] == (BMP_MAGIC & 0xff) && buf[1] == (BMP_MAGIC >> 8)) {
-		return 0;
+	if (magic != BMP_MAGIC) {
+		JAS_LOGDEBUGF(20, "bad signature (0x%04lx != 0x%04lx)\n",
+		  JAS_CAST(unsigned long, magic),
+		  JAS_CAST(unsigned long, BMP_MAGIC));
+		return -1;
 	}
-	return -1;
+	return 0;
 }
 
 /******************************************************************************\

@@ -861,7 +861,7 @@ int jas_image_getfmt(jas_stream_t *in)
 	  ++fmtinfo) {
 		if (fmtinfo->enabled && fmtinfo->ops.validate) {
 			/* Is the input data valid for this format? */
-			JAS_LOGDEBUGF(20, "testing for format %s ... ", fmtinfo->name);
+			JAS_LOGDEBUGF(20, "testing for format %s\n", fmtinfo->name);
 			if (!(*fmtinfo->ops.validate)(in)) {
 				JAS_LOGDEBUGF(20, "test succeeded\n");
 				return fmtinfo->id;

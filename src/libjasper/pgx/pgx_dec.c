@@ -245,6 +245,9 @@ int pgx_validate(jas_stream_t *in)
 
 	/* Ensure that the signature is correct for this format. */
 	if (magic != PGX_MAGIC) {
+		JAS_LOGDEBUGF(20, "bad signature (0x%08lx != 0x%08lx)\n",
+		  JAS_CAST(unsigned long, magic),
+		  JAS_CAST(unsigned long, PGX_MAGIC));
 		return -1;
 	}
 

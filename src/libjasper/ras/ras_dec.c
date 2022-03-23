@@ -271,8 +271,9 @@ int ras_validate(jas_stream_t *in)
 
 	/* Read the validation data (i.e., the data used for detecting
 	  the format). */
-	if (jas_stream_peek(in, buf, sizeof(buf)) != sizeof(buf))
+	if (jas_stream_peek(in, buf, sizeof(buf)) != sizeof(buf)) {
 		return -1;
+	}
 
 	magic = (JAS_CAST(uint_fast32_t, buf[0]) << 24) |
 	  (JAS_CAST(uint_fast32_t, buf[1]) << 16) |
@@ -281,6 +282,9 @@ int ras_validate(jas_stream_t *in)
 
 	/* Is the signature correct for the Sun Rasterfile format? */
 	if (magic != RAS_MAGIC) {
+		JAS_LOGDEBUGF(20, "bad signature (0x%08lx != 0x%08lx)\n",
+		  JAS_CAST(unsigned long, magic),
+		  JAS_CAST(unsigned long, RAS_MAGIC));
 		return -1;
 	}
 	return 0;
