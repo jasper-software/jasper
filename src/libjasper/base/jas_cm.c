@@ -168,6 +168,8 @@ static const jas_cmpxformops_t shapmat_ops = {
 
 jas_cmprof_t *jas_cmprof_createfromclrspc(jas_clrspc_t clrspc)
 {
+	JAS_LOGDEBUGF(1, "jas_cmprof_createfromclrspc(%d)\n", clrspc);
+
 	jas_iccprof_t *iccprof;
 	jas_cmprof_t *prof;
 
@@ -203,6 +205,8 @@ error:
 
 static jas_cmprof_t *jas_cmprof_createsycc()
 {
+	JAS_LOGDEBUGF(1, "jas_cmprof_createsycc()\n");
+
 	jas_cmprof_t *prof = 0;
 	jas_cmpxform_t *fwdpxform = 0;
 	jas_cmpxform_t *revpxform = 0;
@@ -286,6 +290,8 @@ error:
 
 jas_cmprof_t *jas_cmprof_createfromiccprof(const jas_iccprof_t *iccprof)
 {
+	JAS_LOGDEBUGF(1, "jas_cmprof_createfromiccprof(%p)\n", iccprof);
+
 	jas_cmprof_t *prof;
 	jas_icchdr_t icchdr;
 	jas_cmpxformseq_t *fwdpxformseq;
@@ -1092,11 +1098,9 @@ static int jas_cmshapmat_invmat(jas_cmreal_t out[3][4], jas_cmreal_t in[3][4])
 	d = in[0][0] * (in[1][1] * in[2][2] - in[1][2] * in[2][1])
 	  - in[0][1] * (in[1][0] * in[2][2] - in[1][2] * in[2][0])
 	  + in[0][2] * (in[1][0] * in[2][1] - in[1][1] * in[2][0]);
-#if 0
-	jas_eprintf("delta=%f\n", d);
-#endif
 	if (JAS_ABS(d) < 1e-6) {
-		jas_logerrorf("jas_cmshapmat_invmat: matrix is not invertible\n");
+		jas_logerrorf("jas_cmshapmat_invmat: matrix is not invertible "
+		  "(determinant %a)\n", d);
 		return -1;
 	}
 	out[0][0] = (in[1][1] * in[2][2] - in[1][2] * in[2][1]) / d;
@@ -1284,8 +1288,9 @@ static int triclr(const jas_iccprof_t *iccprof, int op,
 			shapmat->mat[1][i] = (jas_cmreal_t)cols[i]->data.xyz.y / 65536.0;
 			shapmat->mat[2][i] = (jas_cmreal_t)cols[i]->data.xyz.z / 65536.0;
 		}
-		for (unsigned i = 0; i < 3; ++i)
+		for (unsigned i = 0; i < 3; ++i) {
 			shapmat->mat[i][3] = 0.0;
+		}
 		for (unsigned i = 0; i < 3; ++i) {
 			if (jas_cmshapmatlut_set(&shapmat->luts[i], &trcs[i]->data.curv)) {
 				jas_logerrorf("error: jas_cmshapmatlut_set failed\n");
@@ -1299,8 +1304,9 @@ static int triclr(const jas_iccprof_t *iccprof, int op,
 			mat[1][i] = (jas_cmreal_t)cols[i]->data.xyz.y / 65536.0;
 			mat[2][i] = (jas_cmreal_t)cols[i]->data.xyz.z / 65536.0;
 		}
-		for (unsigned i = 0; i < 3; ++i)
+		for (unsigned i = 0; i < 3; ++i) {
 			mat[i][3] = 0.0;
+		}
 		if (jas_cmshapmat_invmat(shapmat->mat, mat)) {
 			jas_logerrorf("error: jas_cmshapmat_invmat failed\n");
 			goto error;
