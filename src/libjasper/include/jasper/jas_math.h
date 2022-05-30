@@ -469,7 +469,7 @@ jas_safeui64_t jas_safeui64_div(jas_safeui64_t x, jas_safeui64_t y)
 	jas_safeui64_t result;
 	if (x.valid && y.valid && y.value) {
 		result.valid = true;
-		result.value = x.value / y.valid;
+		result.value = x.value / y.value;
 	} else {
 		result.valid = false;
 		result.value = 0;
