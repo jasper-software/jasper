@@ -1166,7 +1166,6 @@ int jas_stream_display(jas_stream_t *stream, FILE *fp, int n)
 		m = JAS_MIN(n - i, 16);
 		for (j = 0; j < m; ++j) {
 			if ((c = jas_stream_getc(stream)) == EOF) {
-				abort();
 				return -1;
 			}
 			buf[j] = c;

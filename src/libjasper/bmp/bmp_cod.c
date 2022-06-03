@@ -126,8 +126,8 @@ int bmp_numcmpts(bmp_info_t *info)
 		numcmpts = bmp_isgrayscalepal(info->palents, info->numcolors) ?
 		  1 : 3;
 	} else {
-		numcmpts = 0;
-		abort();
+		/* Cannot determine the number of components. */
+		numcmpts = -1;
 	}
 	return numcmpts;
 }

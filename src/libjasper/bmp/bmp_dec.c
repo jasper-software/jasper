@@ -240,7 +240,10 @@ jas_image_t *bmp_decode(jas_stream_t *in, const char *optstr)
 	}
 
 	/* Get the number of components. */
-	numcmpts = bmp_numcmpts(info);
+	if ((numcmpts = bmp_numcmpts(info)) < 0) {
+		jas_logerrorf("error: cannot determine number of components\n");
+		goto error;
+	}
 
 	for (cmptno = 0, cmptparm = cmptparms; cmptno < numcmpts; ++cmptno,
 	  ++cmptparm) {

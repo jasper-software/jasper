@@ -737,6 +737,11 @@ static int jas_cmpxformseq_appendcnvt(jas_cmpxformseq_t *pxformseq,
 	if (dstclrspc == srcclrspc) {
 		return 0;
 	}
+	/*
+	I think that this function should not be called if the source and
+	destination color spaces are of different types.
+	That is, it is considered a programmer error, not a run-time error.
+	*/
 	abort();
 	return -1;
 }

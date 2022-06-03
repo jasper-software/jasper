@@ -1597,7 +1597,7 @@ jas_image_t *jas_image_chclrspc(jas_image_t *image,
 		continuing would crash because we'd attempt to
 		obtain information about the first component
 		*/
-		return NULL;
+		return 0;
 	}
 
 	outimage = 0;
@@ -1640,7 +1640,8 @@ jas_image_t *jas_image_chclrspc(jas_image_t *image,
 	const unsigned vstep = jas_image_cmptvstep(inimage, 0);
 
 	if (!(inprof = jas_image_cmprof(inimage))) {
-		abort();
+		// formerly call to abort()
+		goto error;
 	}
 	const unsigned numinclrchans =
 	  jas_clrspc_numchans(jas_cmprof_clrspc(inprof));
@@ -1662,8 +1663,9 @@ jas_image_t *jas_image_chclrspc(jas_image_t *image,
 		cmptparm.height = height;
 		cmptparm.prec = prec;
 		cmptparm.sgnd = 0;
-		if (jas_image_addcmpt(outimage, -1, &cmptparm))
+		if (jas_image_addcmpt(outimage, -1, &cmptparm)) {
 			goto error;
+		}
 		jas_image_setcmpttype(outimage, i, JAS_IMAGE_CT_COLOR(i));
 	}
 #if 0
@@ -1691,7 +1693,8 @@ jas_image_t *jas_image_chclrspc(jas_image_t *image,
 
 	inpixmap.numcmpts = numinclrchans;
 	if (!(incmptfmts = jas_alloc2(numinclrchans, sizeof(jas_cmcmptfmt_t)))) {
-		abort();
+		// formerly call to abort()
+		goto error;
 	}
 	inpixmap.cmptfmts = incmptfmts;
 	for (unsigned i = 0; i < numinclrchans; ++i) {
@@ -1707,8 +1710,8 @@ jas_image_t *jas_image_chclrspc(jas_image_t *image,
 
 	outpixmap.numcmpts = numoutclrchans;
 	if (!(outcmptfmts = jas_alloc2(numoutclrchans, sizeof(jas_cmcmptfmt_t)))) {
-		/* TODO - return error instead of abort. */
-		abort();
+		// formerly call to abort()
+		goto error;
 	}
 	outpixmap.cmptfmts = outcmptfmts;
 
