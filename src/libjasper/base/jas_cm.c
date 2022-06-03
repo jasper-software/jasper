@@ -145,7 +145,7 @@ static int jas_cmpxformseq_insertpxform(jas_cmpxformseq_t *pxformseq,
 
 #define gampxformseq(prof)	((prof)->pxformseqs[SEQGAM])
 
-static jas_clrspc_t icctoclrspc(jas_iccsig_t iccclrspc, int refflag);
+static int icctoclrspc(jas_iccsig_t iccclrspc, jas_clrspc_t* clrspc, int refflag);
 static jas_cmpxform_t *jas_cmpxform_create0(void);
 static jas_cmpxform_t *jas_cmpxform_createshapmat(void);
 static void jas_cmshapmatlut_init(jas_cmshapmatlut_t *lut);
@@ -310,8 +310,14 @@ jas_cmprof_t *jas_cmprof_createfromiccprof(const jas_iccprof_t *iccprof)
 		jas_logerrorf("error: cannot copy ICC profile\n");
 		goto error;
 	}
-	prof->clrspc = icctoclrspc(icchdr.colorspc, 0);
-	prof->refclrspc = icctoclrspc(icchdr.refcolorspc, 1);
+	if (icctoclrspc(icchdr.colorspc, &prof->clrspc, 0)) {
+		jas_logerrorf("error: unknown color profile\n");
+		goto error;
+	}
+	if (icctoclrspc(icchdr.refcolorspc, &prof->refclrspc, 1)) {
+		jas_logerrorf("error: unknown reference color profile\n");
+		goto error;
+	}
 	prof->numchans = jas_clrspc_numchans(prof->clrspc);
 	prof->numrefchans = jas_clrspc_numchans(prof->refclrspc);
 
@@ -1132,27 +1138,32 @@ static int jas_cmshapmat_invmat(jas_cmreal_t out[3][4], jas_cmreal_t in[3][4])
 *
 \******************************************************************************/
 
-static jas_clrspc_t icctoclrspc(jas_iccsig_t iccclrspc, int refflag)
+static int icctoclrspc(jas_iccsig_t iccclrspc, jas_clrspc_t* clrspc, int refflag)
 {
 	if (refflag) {
 		switch (iccclrspc) {
 		case JAS_ICC_COLORSPC_XYZ:
-			return JAS_CLRSPC_CIEXYZ;
+			*clrspc = JAS_CLRSPC_CIEXYZ;
+			return 0;
 		case JAS_ICC_COLORSPC_LAB:
-			return JAS_CLRSPC_CIELAB;
+			*clrspc = JAS_CLRSPC_CIELAB;
+			return 0;
 		default:
-			abort();
+			return -1;
 		}
 	} else {
 		switch (iccclrspc) {
 		case JAS_ICC_COLORSPC_YCBCR:
-			return JAS_CLRSPC_GENYCBCR;
+			*clrspc = JAS_CLRSPC_GENYCBCR;
+			return 0;
 		case JAS_ICC_COLORSPC_RGB:
-			return JAS_CLRSPC_GENRGB;
+			*clrspc = JAS_CLRSPC_GENRGB;
+			return 0;
 		case JAS_ICC_COLORSPC_GRAY:
-			return JAS_CLRSPC_GENGRAY;
+			*clrspc = JAS_CLRSPC_GENGRAY;
+			return 0;
 		default:
-			abort();
+			return -1;
 		}
 	}
 }

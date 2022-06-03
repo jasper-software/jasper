@@ -317,12 +317,12 @@ jas_image_t *jp2_decode(jas_stream_t *in, const char *optstr)
 		}
 		jas_iccprof_gethdr(iccprof, &icchdr);
 		jas_loginfof("ICC Profile CS %08x\n", icchdr.colorspc);
-		jas_image_setclrspc(dec->image, fromiccpcs(icchdr.colorspc));
 		dec->image->cmprof_ = jas_cmprof_createfromiccprof(iccprof);
 		if (!dec->image->cmprof_) {
-			jas_iccprof_destroy(iccprof);
-			jas_logerrorf("error: cannot create CM profile from ICC profile\n");
-			goto error;
+			jas_image_setclrspc(dec->image, JAS_CLRSPC_UNKNOWN);
+			jas_logwarnf("warning: cannot create CM profile from ICC profile\n");
+		} else {
+			jas_image_setclrspc(dec->image, fromiccpcs(icchdr.colorspc));
 		}
 		jas_iccprof_destroy(iccprof);
 		break;
