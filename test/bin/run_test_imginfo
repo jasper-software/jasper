@@ -171,6 +171,7 @@ images/test.pnm pnm 1 8 8 12 96
 test/good/105-PoC1.jp2 jp2 2 1 32 8 288
 test/good/109-PoC.jp2 jp2 1 32 32 4 512
 test/good/jasper-nullptr-jpc_pi_destroy.jp2 jpc 1 20 20 8 400
+test/other/pr325-bad-icc-profile.jp2 jp2 3 400 300 8 360000
 
 "
 
