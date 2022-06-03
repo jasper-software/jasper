@@ -1,3 +1,11 @@
+3.0.4 (2022-06-02)
+==================
+
+* Eliminate some bogus calls to abort.
+* Fix a typo in jas_safeui64_div (#323).
+* Add some additional logging messages.
+* Fix the source of a potential compiler warning (#321).
+
 3.0.3 (2022-03-15)
 ==================
 
