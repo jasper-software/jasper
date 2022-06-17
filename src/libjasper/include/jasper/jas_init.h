@@ -306,6 +306,7 @@ on the same thread.
 @deprecated
 This function is deprecated.
 */
+JAS_DEPRECATED
 JAS_EXPORT
 int jas_init(void);
 
@@ -323,6 +324,7 @@ on the same thread.
 @deprecated
 This function is deprecated.
 */
+JAS_DEPRECATED
 JAS_EXPORT
 void jas_cleanup(void);
 
