@@ -3,8 +3,12 @@ function(jas_get_stdc_version status_out stdc_version_out)
 	#set(verbose TRUE)
 	set(verbose FALSE)
 
-	set(source_dir ${CMAKE_SOURCE_DIR}/build/cmake/src)
-	set(bin_dir ${CMAKE_BINARY_DIR}/build/cmake/src)
+	if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.17")
+		set(source_dir ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../src)
+	else()
+		set(source_dir ${CMAKE_CURRENT_SOURCE_DIR}/build/cmake/src)
+	endif()
+	set(bin_dir ${CMAKE_CURRENT_BINARY_DIR}/build/cmake/src)
 
 	try_run(print_stdc_run_status print_stdc_compile_status
 	    ${bin_dir}
