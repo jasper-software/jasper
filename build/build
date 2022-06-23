@@ -1,14 +1,14 @@
 #! /usr/bin/env bash
 
+################################################################################
+# Functions
+################################################################################
+
 panic()
 {
 	echo "ERROR: $@"
 	exit 1
 }
-
-program_dir=$(dirname "$0") || exit 1
-jas_realpath="$program_dir/jas_realpath"
-abs_program_dir=$("$jas_realpath" "$program_dir") || panic
 
 usage()
 {
@@ -77,6 +77,18 @@ usage()
 	EOF
 	exit 2
 }
+
+################################################################################
+# Early initialization.
+################################################################################
+
+program_dir=$(dirname "$0") || exit 1
+jas_realpath="$program_dir/jas_realpath"
+abs_program_dir=$("$jas_realpath" "$program_dir") || panic
+
+################################################################################
+# Process command line.
+################################################################################
 
 enable=1
 enable_install=0
@@ -350,9 +362,23 @@ if [ -z "$os" ]; then
 	fi
 fi
 
+################################################################################
+# Apply some platform-specific hacks.
+################################################################################
+
 if [ "$crostini" -ne 0 ]; then
 	enable_tsan=0
 fi
+if [ "$os" == windows ]; then
+	if [ "$enable_doc" -ne 0 ]; then
+		echo "WARNING: disabling the generation of documentation"
+		enable_doc=0
+	fi
+fi
+
+################################################################################
+# Perform some initialization.
+################################################################################
 
 source_dir="$abs_program_dir/.."
 
@@ -376,6 +402,10 @@ if [ -n "$sde_top_dir" ]; then
 	sde_setup="$sde_top_dir/bin/sde_make_setup"
 	eval $("$sde_setup") || panic "setup failed"
 fi
+
+################################################################################
+# Create the build and install directories (possibly emptying them first).
+################################################################################
 
 if [ "$clean_build_dir" -ne 0 -a -e "$build_dir" ]; then
 	echo "Removing $build_dir"
