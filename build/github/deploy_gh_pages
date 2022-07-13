@@ -320,7 +320,7 @@ if [ "$latest" -ne 0 ]; then
 	if [ -h "$target" -o -e "$target" ]; then
 		rm -f "$target" || panic "rm failed"
 	fi
-	ln -s "releases/$version/html" "$target" || \
+	ln -s "releases/$version" "$target" || \
 	  panic "ln failed"
 fi
 
