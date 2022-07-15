@@ -95,13 +95,13 @@ function image_info()
 	local key="$2"
 	local value
 	local imginfo="${IMGINFO_COMMAND:-imginfo}"
-	eecho "invoked image_info with file=$file key=$key"
+	#eecho "invoked image_info with file=$file key=$key"
 	if [ ! -x "$imginfo" ]; then
 		eecho "cannot find command $imginfo"
 		return 1
 	fi
-	#local buffer=$("$imginfo" < "$file" 2> /dev/null) || return 1
-	local buffer=$("$imginfo" < "$file") || return 1
+	#local buffer=$("$imginfo" -q < "$file" 2> /dev/null) || return 1
+	local buffer=$("$imginfo" -q < "$file") || return 1
 	case "$key" in
 	format)
 		value=$(awk '{print $1}' <<< "$buffer") || return 1
@@ -222,3 +222,9 @@ tcf_gettestids()
 	eval declare -g -a "$name"=\("$buffer"\)
 }
 
+function evaluate_expression()
+{
+	[ $# -eq 1 ] || return 1
+	local expr="$1"
+	bc -l <<< "$expr"
+}

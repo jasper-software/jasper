@@ -89,13 +89,15 @@ typedef enum {
 	OPT_HELP,
 	OPT_VERSION,
 	OPT_VERBOSE,
+	OPT_QUIET,
 	OPT_ORIG,
 	OPT_RECON,
 	OPT_METRIC,
 	OPT_MAXONLY,
 	OPT_MINONLY,
 	OPT_DIFFIMAGE,
-	OPT_MAXMEM
+	OPT_MAXMEM,
+	OPT_DEBUGLEVEL,
 } optid_t;
 
 typedef enum {
@@ -140,6 +142,9 @@ static const jas_opt_t opts[] = {
 	{OPT_HELP, "help", 0},
 	{OPT_VERSION, "version", 0},
 	{OPT_VERBOSE, "verbose", 0},
+	{OPT_VERBOSE, "v", 0},
+	{OPT_QUIET, "quiet", 0},
+	{OPT_QUIET, "q", 0},
 	{OPT_ORIG, "f", JAS_OPT_HASARG},
 	{OPT_RECON, "F", JAS_OPT_HASARG},
 	{OPT_METRIC, "m", JAS_OPT_HASARG},
@@ -147,6 +152,7 @@ static const jas_opt_t opts[] = {
 	{OPT_MINONLY, "min", 0},
 	{OPT_DIFFIMAGE, "d", JAS_OPT_HASARG},
 	{OPT_MAXMEM, "memory-limit", JAS_OPT_HASARG},
+	{OPT_DEBUGLEVEL, "debug-level", JAS_OPT_HASARG},
 	{-1, 0, 0}
 };
 
@@ -180,7 +186,17 @@ int main(int argc, char **argv)
 	int maxonly;
 	int minonly;
 	int fmtid;
+	int lib_initialized;
+	int debug_level;
+	int exit_status;
 
+	origstream = 0;
+	reconstream = 0;
+	diffstream = 0;
+	origimage = 0;
+	reconimage = 0;
+
+	exit_status = EXIT_ERROR;
 	verbose = 0;
 	origpath = 0;
 	reconpath = 0;
@@ -190,6 +206,8 @@ int main(int argc, char **argv)
 	maxonly = 0;
 	minonly = 0;
 	size_t max_mem = get_default_max_mem_usage();
+	lib_initialized = 0;
+	debug_level = 0;
 
 	cmdname = argv[0];
 
@@ -212,17 +230,24 @@ int main(int argc, char **argv)
 			reconpath = jas_optarg;
 			break;
 		case OPT_VERBOSE:
-			verbose = 1;
+			++verbose;
+			break;
+		case OPT_QUIET:
+			verbose = -1;
 			break;
 		case OPT_DIFFIMAGE:
 			diffpath = jas_optarg;
 			break;
 		case OPT_VERSION:
 			printf("%s\n", JAS_VERSION);
-			exit(EXIT_OK);
+			exit_status = EXIT_OK;
+			goto cleanup;
 			break;
 		case OPT_MAXMEM:
 			max_mem = strtoull(jas_optarg, 0, 10);
+			break;
+		case OPT_DEBUGLEVEL:
+			debug_level = atoi(jas_optarg);
 			break;
 		case OPT_HELP:
 		default:
@@ -231,31 +256,40 @@ int main(int argc, char **argv)
 		}
 	}
 
-	if (verbose) {
+	if (verbose > 0) {
 		cmdinfo();
 	}
 
 #if defined(JAS_USE_JAS_INIT)
 	if (jas_init()) {
 		fprintf(stderr, "cannot initialize JasPer library\n");
-		exit(EXIT_ERROR);
+		exit_status = EXIT_ERROR;
+		goto cleanup;
 	}
+	lib_initialized = 1;
 	jas_set_max_mem_usage(max_mem);
 	atexit(cleanup);
+	JAS_UNUSED(debug_level);
 #else
 	jas_conf_clear();
 	static jas_std_allocator_t allocator;
 	jas_std_allocator_init(&allocator);
 	jas_conf_set_allocator(&allocator.base);
 	jas_conf_set_max_mem_usage(max_mem);
-	//jas_conf_set_debug_level(debug);
+	jas_conf_set_debug_level(debug_level);
+	if (verbose < 0) {
+		jas_conf_set_vlogmsgf(jas_vlogmsgf_discard);
+	}
 	if (jas_init_library()) {
 		fprintf(stderr, "cannot initialize JasPer library\n");
-		exit(EXIT_ERROR);
+		exit_status = EXIT_ERROR;
+		goto cleanup;
 	}
+	lib_initialized = 1;
 	if (jas_init_thread()) {
 		fprintf(stderr, "cannot initialize thread\n");
-		exit(EXIT_ERROR);
+		exit_status = EXIT_ERROR;
+		goto cleanup;
 	}
 
 	atexit(cleanup);
@@ -278,39 +312,71 @@ int main(int argc, char **argv)
 	/* Open the original image file. */
 	if (!(origstream = jas_stream_fopen(origpath, "rb"))) {
 		fprintf(stderr, "cannot open %s\n", origpath);
-		return EXIT_ERROR;
+		exit_status = EXIT_ERROR;
+		goto cleanup;
 	}
 
 	/* Open the reconstructed image file. */
 	if (!(reconstream = jas_stream_fopen(reconpath, "rb"))) {
 		fprintf(stderr, "cannot open %s\n", reconpath);
-		return EXIT_ERROR;
+		exit_status = EXIT_ERROR;
+		goto cleanup;
 	}
 
 	/* Decode the original image. */
 	if (!(origimage = jas_image_decode(origstream, -1, 0))) {
 		fprintf(stderr, "cannot load original image\n");
-		return EXIT_ERROR;
+		exit_status = EXIT_ERROR;
+		goto cleanup;
 	}
 
 	/* Decoder the reconstructed image. */
 	if (!(reconimage = jas_image_decode(reconstream, -1, 0))) {
 		fprintf(stderr, "cannot load reconstructed image\n");
-		return EXIT_ERROR;
+		exit_status = EXIT_ERROR;
+		goto cleanup;
 	}
 
 	/* Close the original image file. */
 	jas_stream_close(origstream);
+	origstream = 0;
 
 	/* Close the reconstructed image file. */
 	jas_stream_close(reconstream);
+	reconstream = 0;
 
 	/* Ensure that both images have the same number of components. */
 	const unsigned numcomps = jas_image_numcmpts(origimage);
 	if (jas_image_numcmpts(reconimage) != numcomps) {
 		fprintf(stderr, "number of components differ (%d != %d)\n",
 		  numcomps, jas_image_numcmpts(reconimage));
-		return EXIT_DIFFER;
+		exit_status = EXIT_DIFFER;
+		goto cleanup;
+	}
+
+	bool found_diff = false;
+	for (unsigned compno = 0; compno < numcomps; ++compno) {
+		const uint_least32_t width = jas_image_cmptwidth(origimage, compno);
+		const uint_least32_t height = jas_image_cmptheight(origimage, compno);
+		const unsigned depth = jas_image_cmptprec(origimage, compno);
+		if (jas_image_cmptwidth(reconimage, compno) != width ||
+		 jas_image_cmptheight(reconimage, compno) != height) {
+			fprintf(stderr,
+			  "component %d dimensions differ ((%ld,%ld) != (%ld,%ld))\n",
+			  compno, JAS_CAST(long, width), JAS_CAST(long, height),
+			  JAS_CAST(long, jas_image_cmptwidth(reconimage, compno)),
+			  JAS_CAST(long, jas_image_cmptheight(reconimage, compno)));
+			found_diff = true;
+		}
+		if (jas_image_cmptprec(reconimage, compno) != depth) {
+			fprintf(stderr, "component %d precisions differ (%d != %d)\n",
+			  compno, depth, jas_image_cmptprec(reconimage, compno));
+			found_diff = true;
+		}
+	}
+	if (found_diff) {
+		exit_status = EXIT_DIFFER;
+		goto cleanup;
 	}
 
 	/* Compute the difference for each component. */
@@ -320,51 +386,54 @@ int main(int argc, char **argv)
 		const uint_least32_t width = jas_image_cmptwidth(origimage, compno);
 		const uint_least32_t height = jas_image_cmptheight(origimage, compno);
 		const unsigned depth = jas_image_cmptprec(origimage, compno);
-		if (jas_image_cmptwidth(reconimage, compno) != width ||
-		 jas_image_cmptheight(reconimage, compno) != height) {
-			fprintf(stderr, "image dimensions differ\n");
-			return EXIT_DIFFER;
-		}
-		if (jas_image_cmptprec(reconimage, compno) != depth) {
-			fprintf(stderr, "precisions differ\n");
-			return EXIT_DIFFER;
-		}
+		assert(jas_image_cmptwidth(reconimage, compno) == width);
+		assert(jas_image_cmptheight(reconimage, compno) == height);
+		assert(jas_image_cmptprec(reconimage, compno) == depth);
 
 		if (!(origdata = jas_matrix_create(height, width))) {
 			fprintf(stderr, "internal error\n");
-			return EXIT_ERROR;
+			exit_status = EXIT_ERROR;
+			goto cleanup;
 		}
 		if (!(recondata = jas_matrix_create(height, width))) {
 			fprintf(stderr, "internal error\n");
-			return EXIT_ERROR;
+			exit_status = EXIT_ERROR;
+			goto cleanup;
 		}
 		if (jas_image_readcmpt(origimage, compno, 0, 0, width, height,
 		  origdata)) {
 			fprintf(stderr, "cannot read component data\n");
-			return EXIT_ERROR;
+			exit_status = EXIT_ERROR;
+			goto cleanup;
 		}
 		if (jas_image_readcmpt(reconimage, compno, 0, 0, width, height,
 		  recondata)) {
 			fprintf(stderr, "cannot read component data\n");
-			return EXIT_ERROR;
+			exit_status = EXIT_ERROR;
+			goto cleanup;
 		}
 
 		if (diffpath) {
 			if (!(diffstream = jas_stream_fopen(diffpath, "rwb"))) {
 				fprintf(stderr, "cannot open diff stream\n");
-				return EXIT_ERROR;
+				exit_status = EXIT_ERROR;
+				goto cleanup;
 			}
 			if (!(diffimage = makediffimage(origdata, recondata))) {
 				fprintf(stderr, "cannot make diff image\n");
-				return EXIT_ERROR;
+				exit_status = EXIT_ERROR;
+				goto cleanup;
 			}
 			fmtid = jas_image_strtofmt("pnm");
 			if (jas_image_encode(diffimage, diffstream, fmtid, 0)) {
 				fprintf(stderr, "cannot save\n");
-				return EXIT_ERROR;
+				exit_status = EXIT_ERROR;
+				goto cleanup;
 			}
 			jas_stream_close(diffstream);
+			diffstream = 0;
 			jas_image_destroy(diffimage);
+			diffimage = 0;
 		}
 
 		if (metric != metricid_none) {
@@ -384,7 +453,9 @@ int main(int argc, char **argv)
 			}
 		}
 		jas_matrix_destroy(origdata);
+		origdata = 0;
 		jas_matrix_destroy(recondata);
+		recondata = 0;
 	}
 
 	if (metric != metricid_none && (maxonly || minonly)) {
@@ -403,15 +474,34 @@ int main(int argc, char **argv)
 		}
 	}
 
-	jas_image_destroy(origimage);
-	jas_image_destroy(reconimage);
+	exit_status = EXIT_OK;
+
+cleanup:
+
+	if (origstream) {
+		jas_stream_close(origstream);
+	}
+	if (reconstream) {
+		jas_stream_close(reconstream);
+	}
+	if (diffstream) {
+		jas_stream_close(diffstream);
+	}
+	if (origimage) {
+		jas_image_destroy(origimage);
+	}
+	if (reconimage) {
+		jas_image_destroy(reconimage);
+	}
 	/*
 	The following function call is not needed.
 	It is only here for testing backward compatibility.
 	*/
-	jas_image_clearfmts();
+	if (lib_initialized) {
+		jas_image_clearfmts();
+	}
 
-	return EXIT_OK;
+	return exit_status;
 }
 
 /******************************************************************************\

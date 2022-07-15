@@ -298,4 +298,10 @@ void jpc_pchg_destroy(jpc_pchg_t *pchg);
 /* Copy a progression change. */
 jpc_pchg_t *jpc_pchg_copy(const jpc_pchg_t *pchg);
 
+/******************************************************************************\
+* Functions/macros for debugging.
+\******************************************************************************/
+
+void jpc_pi_dump(const jpc_pi_t *pi);
+
 #endif

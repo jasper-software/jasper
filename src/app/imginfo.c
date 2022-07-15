@@ -86,6 +86,7 @@ typedef enum {
 	OPT_HELP,
 	OPT_VERSION,
 	OPT_VERBOSE,
+	OPT_QUIET,
 	OPT_INFILE,
 	OPT_DEBUG,
 	OPT_MAXSAMPLES,
@@ -116,6 +117,8 @@ static const jas_opt_t opts[] = {
 	{OPT_HELP, "help", 0},
 	{OPT_VERSION, "version", 0},
 	{OPT_VERBOSE, "verbose", 0},
+	{OPT_QUIET, "quiet", 0},
+	{OPT_QUIET, "q", 0},
 	{OPT_INFILE, "f", JAS_OPT_HASARG},
 	{OPT_DEBUG, "debug-level", JAS_OPT_HASARG},
 	{OPT_MAXSAMPLES, "max-samples", JAS_OPT_HASARG},
@@ -177,6 +180,9 @@ int main(int argc, char **argv)
 		switch (id) {
 		case OPT_VERBOSE:
 			++verbose;
+			break;
+		case OPT_QUIET:
+			verbose = -1;
 			break;
 		case OPT_VERSION:
 			printf("%s\n", JAS_VERSION);
@@ -257,6 +263,9 @@ int main(int argc, char **argv)
 	}
 	jas_conf_set_debug_level(debug);
 	if (special) {
+		jas_conf_set_vlogmsgf(jas_vlogmsgf_discard);
+	}
+	if (verbose < 0) {
 		jas_conf_set_vlogmsgf(jas_vlogmsgf_discard);
 	}
 	if (jas_init_library()) {

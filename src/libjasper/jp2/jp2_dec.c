@@ -316,7 +316,7 @@ jas_image_t *jp2_decode(jas_stream_t *in, const char *optstr)
 			goto error;
 		}
 		jas_iccprof_gethdr(iccprof, &icchdr);
-		jas_loginfof("ICC Profile CS %08x\n", icchdr.colorspc);
+		JAS_LOGDEBUGF(2, "ICC Profile CS %08x\n", icchdr.colorspc);
 		dec->image->cmprof_ = jas_cmprof_createfromiccprof(iccprof);
 		if (!dec->image->cmprof_) {
 			jas_image_setclrspc(dec->image, JAS_CLRSPC_UNKNOWN);

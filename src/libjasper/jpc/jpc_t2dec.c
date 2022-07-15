@@ -484,6 +484,7 @@ int jpc_dec_decodepkts(jpc_dec_t *dec, jas_stream_t *pkthdrstream, jas_stream_t 
 				return -1;
 			}
 		}
+		// jpc_pi_dump(pi);
 		if ((ret = jpc_pi_next(pi))) {
 			if (ret < 0) {
 				jas_logerrorf("jpc_pi_next failed\n");

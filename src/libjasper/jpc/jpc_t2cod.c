@@ -95,6 +95,30 @@ static int jpc_pi_nextcprl(jpc_pi_t *pi);
 *
 \******************************************************************************/
 
+static void jpc_pirlvl_destroy(jpc_pirlvl_t *rlvl)
+{
+	if (rlvl->prclyrnos) {
+		jas_free(rlvl->prclyrnos);
+	}
+}
+
+static void jpc_picomp_destroy(jpc_picomp_t *picomp)
+{
+	unsigned rlvlno;
+	jpc_pirlvl_t *pirlvl;
+	if (picomp->pirlvls) {
+		for (rlvlno = 0, pirlvl = picomp->pirlvls; rlvlno <
+		  picomp->numrlvls; ++rlvlno, ++pirlvl) {
+			jpc_pirlvl_destroy(pirlvl);
+		}
+		jas_free(picomp->pirlvls);
+	}
+}
+
+/******************************************************************************\
+*
+\******************************************************************************/
+
 int jpc_pi_next(jpc_pi_t *pi)
 {
 	int ret;
@@ -566,25 +590,9 @@ skip:
 	return 1;
 }
 
-static void pirlvl_destroy(jpc_pirlvl_t *rlvl)
-{
-	if (rlvl->prclyrnos) {
-		jas_free(rlvl->prclyrnos);
-	}
-}
-
-static void jpc_picomp_destroy(jpc_picomp_t *picomp)
-{
-	unsigned rlvlno;
-	jpc_pirlvl_t *pirlvl;
-	if (picomp->pirlvls) {
-		for (rlvlno = 0, pirlvl = picomp->pirlvls; rlvlno <
-		  picomp->numrlvls; ++rlvlno, ++pirlvl) {
-			pirlvl_destroy(pirlvl);
-		}
-		jas_free(picomp->pirlvls);
-	}
-}
+/******************************************************************************\
+*
+\******************************************************************************/
 
 void jpc_pi_destroy(jpc_pi_t *pi)
 {
@@ -618,10 +626,67 @@ jpc_pi_t *jpc_pi_create0()
 	return pi;
 }
 
+int jpc_pi_init(jpc_pi_t *pi)
+{
+	unsigned compno;
+	unsigned rlvlno;
+	unsigned prcno;
+	unsigned *prclyrno;
+
+	pi->prgvolfirst = 0;
+	pi->valid = 0;
+	pi->pktno = -1;
+	pi->pchgno = -1;
+	pi->pchg = 0;
+
+	const jpc_picomp_t *picomp;
+	for (compno = 0, picomp = pi->picomps; compno < pi->numcomps;
+	  ++compno, ++picomp) {
+		const jpc_pirlvl_t *pirlvl;
+		for (rlvlno = 0, pirlvl = picomp->pirlvls; rlvlno <
+		  picomp->numrlvls; ++rlvlno, ++pirlvl) {
+			for (prcno = 0, prclyrno = pirlvl->prclyrnos;
+			  prcno < pirlvl->numprcs; ++prcno, ++prclyrno) {
+				*prclyrno = 0;
+			}
+		}
+	}
+	return 0;
+}
+
 int jpc_pi_addpchg(jpc_pi_t *pi, jpc_pocpchg_t *pchg)
 {
 	return jpc_pchglist_insert(pi->pchglist, -1, pchg);
 }
+
+/* For debugging only. */
+void jpc_pi_dump(const jpc_pi_t *pi)
+{
+	jas_eprintf("numlyrs=%d\n", pi->numlyrs);
+	jas_eprintf("maxrlvls=%d\n", pi->maxrlvls);
+	jas_eprintf("numcomps=%d\n", pi->numcomps);
+	jas_eprintf("compno=%d\n", pi->compno);
+	jas_eprintf("rlvlno=%d\n", pi->rlvlno);
+	jas_eprintf("prcno=%d\n", pi->prcno);
+	jas_eprintf("lyrno=%d\n", pi->lyrno);
+	jas_eprintf("x=%d\n", pi->x);
+	jas_eprintf("y=%d\n", pi->y);
+	jas_eprintf("xstep=%d\n", pi->xstep);
+	jas_eprintf("ystep=%d\n", pi->ystep);
+	jas_eprintf("xstart=%d\n", pi->xstart);
+	jas_eprintf("ystart=%d\n", pi->ystart);
+	jas_eprintf("xend=%d\n", pi->xend);
+	jas_eprintf("yend=%d\n", pi->yend);
+	jas_eprintf("defaultpchg=%d\n", pi->defaultpchg);
+	jas_eprintf("pchgno=%d\n", pi->pchgno);
+	jas_eprintf("prgvolfirst=%d\n", pi->prgvolfirst);
+	jas_eprintf("valid=%d\n", pi->valid);
+	jas_eprintf("pktno=%d\n", pi->pktno);
+}
+
+/******************************************************************************\
+*
+\******************************************************************************/
 
 jpc_pchglist_t *jpc_pchglist_create()
 {
@@ -721,32 +786,4 @@ const jpc_pchg_t *jpc_pchglist_get(const jpc_pchglist_t *pchglist, unsigned pchg
 unsigned jpc_pchglist_numpchgs(const jpc_pchglist_t *pchglist)
 {
 	return pchglist->numpchgs;
-}
-
-int jpc_pi_init(jpc_pi_t *pi)
-{
-	unsigned compno;
-	unsigned rlvlno;
-	unsigned prcno;
-	unsigned *prclyrno;
-
-	pi->prgvolfirst = 0;
-	pi->valid = 0;
-	pi->pktno = -1;
-	pi->pchgno = -1;
-	pi->pchg = 0;
-
-	const jpc_picomp_t *picomp;
-	for (compno = 0, picomp = pi->picomps; compno < pi->numcomps;
-	  ++compno, ++picomp) {
-		const jpc_pirlvl_t *pirlvl;
-		for (rlvlno = 0, pirlvl = picomp->pirlvls; rlvlno <
-		  picomp->numrlvls; ++rlvlno, ++pirlvl) {
-			for (prcno = 0, prclyrno = pirlvl->prclyrnos;
-			  prcno < pirlvl->numprcs; ++prcno, ++prclyrno) {
-				*prclyrno = 0;
-			}
-		}
-	}
-	return 0;
 }

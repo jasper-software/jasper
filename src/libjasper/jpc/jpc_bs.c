@@ -365,6 +365,7 @@ int jpc_bitstream_inalign(jpc_bitstream_t *bitstream, int fillmask,
 	}
 	if (n > 0) {
 		if ((u = jpc_bitstream_getbits(bitstream, n)) < 0) {
+			JAS_LOGDEBUGF(1, "jpc_bitstream_inalign failed\n");
 			return -1;
 		}
 		m += n;
@@ -372,6 +373,7 @@ int jpc_bitstream_inalign(jpc_bitstream_t *bitstream, int fillmask,
 	}
 	if ((bitstream->buf_ & 0xff) == 0xff) {
 		if ((u = jpc_bitstream_getbits(bitstream, 7)) < 0) {
+			JAS_LOGDEBUGF(1, "jpc_bitstream_inalign failed\n");
 			return -1;
 		}
 		v = (v << 7) | u;
@@ -385,6 +387,7 @@ int jpc_bitstream_inalign(jpc_bitstream_t *bitstream, int fillmask,
 	}
 	if (((~(v ^ filldata)) & fillmask) != fillmask) {
 		/* The actual fill pattern does not match the expected one. */
+		JAS_LOGDEBUGF(1, "jpc_bitstream_inalign failed (mismatch)\n");
 		return 1;
 	}
 
