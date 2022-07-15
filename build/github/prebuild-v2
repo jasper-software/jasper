@@ -64,7 +64,8 @@ linux)
 	packages+=(netpbm)
 	packages+=(wget)
 	packages+=(unzip)
-	apt-get install "${packages[@]}" || panic "cannot install packages"
+	sudo apt-get update || panic "apt-get update failed"
+	sudo apt-get install "${packages[@]}" || panic "apt-get install failed"
 	;;
 macos)
 	packages=()
