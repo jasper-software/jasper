@@ -4,11 +4,16 @@
 Conformance Tests from ISO/IEC 15444-4:2020 
 */
 
+//#define ENABLE_TABLE_G1_TESTS
+//#define ENABLE_TABLE_C1_TESTS
+#define ENABLE_TABLE_C6_TESTS
+#define ENABLE_TABLE_C7_TESTS
+
 /******************************************************************************\
 Table G.1: JP2 reference images and allowable error
 \******************************************************************************/
 
-#if 1
+#ifdef ENABLE_TABLE_G1_TESTS
 
 id=j2kc_jp2_01 \
 	collection=j2kc \
@@ -70,7 +75,7 @@ id=j2kc_jp2_09 \
 Table C.1: Class 0 Profile 0 reference images and allowable errors
 \******************************************************************************/
 
-#if 1
+#ifdef ENABLE_TABLE_C1_TESTS
 
 id=j2kc_c0p0_01 \
 	collection=j2kc \
@@ -197,7 +202,7 @@ id=j2kc_c0p0_16 \
 Table C.6: Class 1 Profile 0 reference files and maximum error
 \******************************************************************************/
 
-#if 1
+#ifdef ENABLE_TABLE_C6_TESTS
 
 /* 128x128, 8 bits/sample, unsigned */
 id=j2kc_c1p0_01 \
@@ -486,6 +491,163 @@ id=j2kc_c1p0_16_0 \
 	encoded_file=codestreams_profile0/p0_16.j2k \
 	decoded_file=reference_class1_profile0/c1p0_16-0.pgx \
 	cmptno=0 \
+	pae=0
+
+#endif
+
+/******************************************************************************\
+Table C.7: Class 1 Profile 1 reference images and allowable error
+\******************************************************************************/
+
+#ifdef ENABLE_TABLE_C7_TESTS
+
+/* 61x99, 8 bits/sample */
+id=j2kc_c1p1_01_0 \
+	collection=j2kc \
+	encoded_file=codestreams_profile1/p1_01.j2k \
+	decoded_file=reference_class1_profile1/c1p1_01-0.pgx \
+	cmptno=0 \
+	pae=0
+
+/* 640x480, 8 bits/sample */
+id=j2kc_c1p1_02_0 \
+	collection=j2kc \
+	encoded_file=codestreams_profile1/p1_02.j2k \
+	decoded_file=reference_class1_profile1/c1p1_02-0.pgx \
+	cmptno=0 \
+	pae=5 \
+	mse=0.765
+
+/* 640x480, 8 bits/sample */
+id=j2kc_c1p1_02_1 \
+	collection=j2kc \
+	encoded_file=codestreams_profile1/p1_02.j2k \
+	decoded_file=reference_class1_profile1/c1p1_02-1.pgx \
+	cmptno=1 \
+	pae=4 \
+	mse=0.616
+
+/* 640x480, 8 bits/sample */
+id=j2kc_c1p1_02_2 \
+	collection=j2kc \
+	encoded_file=codestreams_profile1/p1_02.j2k \
+	decoded_file=reference_class1_profile1/c1p1_02-2.pgx \
+	cmptno=2 \
+	pae=6 \
+	mse=1.051
+
+/* 1024x1024, 8 bits/sample */
+id=j2kc_c1p1_03_0 \
+	collection=j2kc \
+	encoded_file=codestreams_profile1/p1_03.j2k \
+	decoded_file=reference_class1_profile1/c1p1_03-0.pgx \
+	cmptno=0 \
+	pae=2 \
+	mse=0.300
+
+/* 1024x1024, 8 bits/sample */
+id=j2kc_c1p1_03_1 \
+	collection=j2kc \
+	encoded_file=codestreams_profile1/p1_03.j2k \
+	decoded_file=reference_class1_profile1/c1p1_03-1.pgx \
+	cmptno=1 \
+	pae=2 \
+	mse=0.210
+
+/* 512x512, 8 bits/sample */
+id=j2kc_c1p1_03_2 \
+	collection=j2kc \
+	encoded_file=codestreams_profile1/p1_03.j2k \
+	decoded_file=reference_class1_profile1/c1p1_03-2.pgx \
+	cmptno=2 \
+	pae=1 \
+	mse=0.200
+
+/* 512x512, 8 bits/sample */
+id=j2kc_c1p1_03_3 \
+	collection=j2kc \
+	encoded_file=codestreams_profile1/p1_03.j2k \
+	decoded_file=reference_class1_profile1/c1p1_03-3.pgx \
+	cmptno=3 \
+	pae=0
+
+/* 1024x1024, 12 bits/sample */
+id=j2kc_c1p1_04_0 \
+	collection=j2kc \
+	encoded_file=codestreams_profile1/p1_04.j2k \
+	decoded_file=reference_class1_profile1/c1p1_04-0.pgx \
+	cmptno=0 \
+	pae=624 \
+	mse=3080
+
+/* 512x512, 8 bits/sample */
+id=j2kc_c1p1_05_0 \
+	collection=j2kc \
+	encoded_file=codestreams_profile1/p1_05.j2k \
+	decoded_file=reference_class1_profile1/c1p1_05-0.pgx \
+	cmptno=0 \
+	pae=40 \
+	mse=8.458
+
+/* 512x512, 8 bits/sample */
+id=j2kc_c1p1_05_1 \
+	collection=j2kc \
+	encoded_file=codestreams_profile1/p1_05.j2k \
+	decoded_file=reference_class1_profile1/c1p1_05-1.pgx \
+	cmptno=1 \
+	pae=40 \
+	mse=9.716
+
+/* 512x512, 8 bits/sample */
+id=j2kc_c1p1_05_2 \
+	collection=j2kc \
+	encoded_file=codestreams_profile1/p1_05.j2k \
+	decoded_file=reference_class1_profile1/c1p1_05-2.pgx \
+	cmptno=2 \
+	pae=40 \
+	mse=10.154
+
+/* 12x12, 12 bits/sample */
+id=j2kc_c1p1_06_0 \
+	collection=j2kc \
+	encoded_file=codestreams_profile1/p1_06.j2k \
+	decoded_file=reference_class1_profile1/c1p1_06-0.pgx \
+	cmptno=0 \
+	pae=2 \
+	mse=0.600
+
+/* 12x12, 12 bits/sample */
+id=j2kc_c1p1_06_1 \
+	collection=j2kc \
+	encoded_file=codestreams_profile1/p1_06.j2k \
+	decoded_file=reference_class1_profile1/c1p1_06-1.pgx \
+	cmptno=1 \
+	pae=2 \
+	mse=0.600
+
+/* 12x12, 12 bits/sample */
+id=j2kc_c1p1_06_2 \
+	collection=j2kc \
+	encoded_file=codestreams_profile1/p1_06.j2k \
+	decoded_file=reference_class1_profile1/c1p1_06-2.pgx \
+	cmptno=2 \
+	pae=2 \
+	mse=0.600
+
+/* 2x12, 12 bits/sample */
+id=j2kc_c1p1_07_0 \
+	collection=j2kc \
+	encoded_file=codestreams_profile1/p1_07.j2k \
+	decoded_file=reference_class1_profile1/c1p1_07-0.pgx \
+	cmptno=0 \
+	pae=0
+
+/* 8x12, 12 bits/sample */
+id=j2kc_c1p1_07_1 \
+	collection=j2kc \
+	encoded_file=codestreams_profile1/p1_07.j2k \
+	decoded_file=reference_class1_profile1/c1p1_07-1.pgx \
+	cmptno=1 \
 	pae=0
 
 #endif

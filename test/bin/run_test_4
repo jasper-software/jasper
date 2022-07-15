@@ -127,7 +127,7 @@ if [ "$enable_imginfo_tests" -ne 0 ]; then
 		if [ "$debug_level" -ge 1 ]; then
 			imginfo_opts+=(--debug-level "$debug_level")
 		fi
-		if [ "$verbose" -ge 1 ]; then
+		if [ "$verbose" -ge 2 ]; then
 			echo "Running $imginfo -q ${imginfo_opts[@]} < $enc_file"
 		fi
 		"$imginfo" -q "${imginfo_opts[@]}" < "$enc_file"
@@ -156,7 +156,7 @@ if [ "$enable_jasper_tests" -ne 0 ]; then
 
 	for testcase in "${testcases[@]}"; do
 
-		if [ "$verbose" -ge 1 ]; then
+		if [ "$verbose" -ge 2 ]; then
 			echo "############################################################"
 			echo "Test case: $testcase"
 		fi
@@ -187,7 +187,7 @@ if [ "$enable_jasper_tests" -ne 0 ]; then
 		if [ "$debug_level" -ge 1 ]; then
 			dec_opts+=(debug="$debug_level")
 		fi
-		if [ "$verbose" -ne 0 ]; then
+		if [ "$verbose" -ne 2 ]; then
 			dec_opts+=(verbose=1)
 		fi
 		width=$(image_info "$enc_file" width) || width=
@@ -203,7 +203,7 @@ if [ "$enable_jasper_tests" -ne 0 ]; then
 			continue
 		fi
 
-		if [ "$verbose" -ge 1 ]; then
+		if [ "$verbose" -ge 2 ]; then
 			python -c 'print("*" * 80)'
 			cat <<- EOF
 			test case ID: $testcase
@@ -231,13 +231,13 @@ if [ "$enable_jasper_tests" -ne 0 ]; then
 		if [ -n "$comp_no" ]; then
 			jasper_opts+=(--cmptno "$comp_no")
 		fi
-		if [ "$verbose" -ge 1 ]; then
+		if [ "$verbose" -ge 2 ]; then
 			echo "RUNNING: $jasper ${jasper_opts[@]} < $enc_file > $dec_file"
 		fi
 		"$jasper" "${jasper_opts[@]}" < "$enc_file" > "$dec_file" 2> /dev/null
 		status=$?
 		if [ $status -eq 0 ]; then
-			if [ "$verbose" -ge 1 ]; then
+			if [ "$verbose" -ge 2 ]; then
 				echo "RUNNING: $imgcmp --quiet -f $orig_file -F $dec_file -m pae --max"
 			fi
 			failed=0
