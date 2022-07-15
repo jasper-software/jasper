@@ -121,7 +121,7 @@ if(BASH_PROGRAM AND JAS_HAVE_ALL_NATIVE_CODECS)
 	if(JAS_ENABLE_CONFORMANCE_TESTS)
 		add_test(run_conformance_tests
 		  "${BASH_PROGRAM}" "${CMAKE_CURRENT_BINARY_DIR}/../../test/bin/wrapper"
-		  "${CMAKE_CURRENT_SOURCE_DIR}/../../test/bin/run_conformance_tests" -v -d -f)
+		  "${CMAKE_CURRENT_SOURCE_DIR}/../../test/bin/run_conformance_tests" -v -d)
 	endif()
 	if(JAS_THREADS)
 		add_test(run_test_5

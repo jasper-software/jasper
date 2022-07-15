@@ -73,7 +73,8 @@ macos)
 	packages+=(netpbm)
 	packages+=(wget)
 	packages+=(unzip)
-	brew install "${packages[@]}" || panic "cannot install findutils"
+	brew update || panic "brew update failed"
+	brew install "${packages[@]}" || panic "brew install failed"
 	cat >> "$out_file" <<- EOF
 	export PATH=\$(brew --prefix)/opt/findutils/libexec/gnubin:\$PATH
 	EOF

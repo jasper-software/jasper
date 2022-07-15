@@ -98,7 +98,7 @@ typedef int_fast32_t jpc_fix_t;
 typedef int_fast64_t jpc_fix_big_t;
 
 /* The number of bits used for the fractional part of a fixed-point number. */
-#define JPC_FIX_FRACBITS	13
+#define JPC_FIX_FRACBITS	18
 
 /******************************************************************************\
 * Instantiations of the generic fixed-point number macros for the

@@ -66,9 +66,9 @@ archive_file="$archive_dir/j2k_codestreams.zip"
 if [ "$download" -ne 0 ]; then
 	mkdir -p "$archive_dir" || \
 	  panic "cannot make directory $archive_dir"
-	wget -O "$archive_file" "$j2k_codestreams_url" || \
+	wget -nv -O "$archive_file" "$j2k_codestreams_url" || \
 	  panic "cannot download archive"
-	(cd "$tmp_dir" && unzip "$archive_file") || \
+	(cd "$tmp_dir" && unzip -q "$archive_file") || \
 	  panic "cannot extract archive"
 	jas_jp2k_test_top_dir="$tmp_dir/Software/T.803-15444-4-Ed3_Codestreams_20210901"
 fi
@@ -130,16 +130,22 @@ passed_testcases=()
 
 if [ "$enable_imginfo_tests" -ne 0 ]; then
 
-	cat <<- EOF
-	############################################################
-	imginfo test cases
-	############################################################
-	EOF
+	if [ "$verbose" -ge 2 ]; then
+		cat <<- EOF
+		############################################################
+		imginfo test cases
+		############################################################
+		EOF
+	fi
 
 	for testcase in "${testcases[@]}"; do
 
-		echo "############################################################"
-		echo "Test case: $testcase"
+		if [ "$verbose" -ge 2 ]; then
+			cat <<- EOF
+			############################################################"
+			Test case: $testcase
+			EOF
+		fi
 
 		tcf_gettest "$testcase_file" "$testcase" record || \
 		  panic "cannot get test case"
@@ -148,14 +154,17 @@ if [ "$enable_imginfo_tests" -ne 0 ]; then
 		if [ "$debug_level" -ge 1 ]; then
 			imginfo_opts+=(--debug-level "$debug_level")
 		fi
-		if [ "$verbose" -ge 2 ]; then
+		if [ "$verbose" -ge 3 ]; then
 			echo "Running $imginfo -q ${imginfo_opts[@]} < $enc_file"
 		fi
-		"$imginfo" -q "${imginfo_opts[@]}" < "$enc_file"
+		buffer="$("$imginfo" -q "${imginfo_opts[@]}" < "$enc_file")"
 		status=$?
 		if [ "$status" -ne 0 ]; then
 			echo "error: cannot decode $enc_file"
 			failed_testcases+=("$testcase")
+		fi
+		if [ "$verbose" -ge 1 ]; then
+			echo "OK [$testcase]: $buffer"
 		fi
 
 		passed_testcases+=("$testcase")
@@ -169,11 +178,13 @@ fi
 
 if [ "$enable_jasper_tests" -ne 0 ]; then
 
-	cat <<- EOF
-	############################################################
-	jasper test cases
-	############################################################
-	EOF
+	if [ "$verbose" -ge 2 ]; then
+		cat <<- EOF
+		############################################################
+		jasper test cases
+		############################################################
+		EOF
+	fi
 
 	for testcase in "${testcases[@]}"; do
 
@@ -236,7 +247,7 @@ if [ "$enable_jasper_tests" -ne 0 ]; then
 			continue
 		fi
 
-		if [ "$verbose" -ge 2 ]; then
+		if [ "$verbose" -ge 3 ]; then
 			python -c 'print("*" * 80)'
 			cat <<- EOF
 			test case ID: $testcase
@@ -246,8 +257,6 @@ if [ "$enable_jasper_tests" -ne 0 ]; then
 			number of components: $num_comps
 			size: $width $height
 			precision: $prec
-			PAE tolerance: $pae
-			MSE tolerance: $mse
 			EOF
 			python -c 'print("*" * 80)'
 		fi
@@ -264,13 +273,13 @@ if [ "$enable_jasper_tests" -ne 0 ]; then
 		if [ -n "$comp_no" ]; then
 			jasper_opts+=(--cmptno "$comp_no")
 		fi
-		if [ "$verbose" -ge 2 ]; then
+		if [ "$verbose" -ge 3 ]; then
 			echo "RUNNING: $jasper ${jasper_opts[@]} < $enc_file > $dec_file"
 		fi
 		"$jasper" "${jasper_opts[@]}" < "$enc_file" > "$dec_file" 2> /dev/null
 		status=$?
 		if [ $status -eq 0 ]; then
-			if [ "$verbose" -ge 2 ]; then
+			if [ "$verbose" -ge 3 ]; then
 				echo "RUNNING: $imgcmp --quiet -f $orig_file -F $dec_file -m pae --max"
 			fi
 			failed=0
@@ -337,17 +346,21 @@ if [ "${#failed_testcases[@]}" -ne 0 ]; then
 	exit_status=1
 fi
 
-if [ "${#passed_testcases[@]}" -ne 0 ]; then
-	echo "The following test cases passed:"
-	for testcase in "${passed_testcases[@]}"; do
-		echo "    $testcase"
-	done
+if [ "$verbose" -ge 3 ]; then
+	if [ "${#passed_testcases[@]}" -ne 0 ]; then
+		echo "The following test cases passed:"
+		for testcase in "${passed_testcases[@]}"; do
+			echo "    $testcase"
+		done
+	fi
 fi
-if [ "${#skipped_testcases[@]}" -ne 0 ]; then
-	echo "The following test cases were skipped:"
-	for testcase in "${skipped_testcases[@]}"; do
-		echo "    $testcase"
-	done
+if [ "$verbose" -ge 1 ]; then
+	if [ "${#skipped_testcases[@]}" -ne 0 ]; then
+		echo "The following test cases were skipped:"
+		for testcase in "${skipped_testcases[@]}"; do
+			echo "    $testcase"
+		done
+	fi
 fi
 if [ "${#failed_testcases[@]}" -ne 0 ]; then
 	echo "The following test cases failed:"
