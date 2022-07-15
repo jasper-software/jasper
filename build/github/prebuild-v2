@@ -60,9 +60,19 @@ touch "$out_file" || panic "cannot create file $out_file"
 
 case "$os" in
 linux)
+	packages=()
+	packages+=(netpbm)
+	packages+=(wget)
+	packages+=(unzip)
+	apt-get install "${packages[@]}" || panic "cannot install packages"
 	;;
 macos)
-	brew install findutils || panic "cannot install findutils"
+	packages=()
+	packages+=(findutils)
+	packages+=(netpbm)
+	packages+=(wget)
+	packages+=(unzip)
+	brew install "${packages[@]}" || panic "cannot install findutils"
 	cat >> "$out_file" <<- EOF
 	export PATH=\$(brew --prefix)/opt/findutils/libexec/gnubin:\$PATH
 	EOF

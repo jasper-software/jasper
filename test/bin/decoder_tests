@@ -4,10 +4,12 @@
 Conformance Tests from ISO/IEC 15444-4:2020 
 */
 
-//#define ENABLE_TABLE_G1_TESTS
+#define ENABLE_TABLE_G1_TESTS
 //#define ENABLE_TABLE_C1_TESTS
 #define ENABLE_TABLE_C6_TESTS
 #define ENABLE_TABLE_C7_TESTS
+
+//#define ENABLE_BAD_TESTS
 
 /******************************************************************************\
 Table G.1: JP2 reference images and allowable error
@@ -15,59 +17,78 @@ Table G.1: JP2 reference images and allowable error
 
 #ifdef ENABLE_TABLE_G1_TESTS
 
+/* 768x512, 3 components, 8 bits/sample, sRGB */
 id=j2kc_jp2_01 \
 	collection=j2kc \
 	encoded_file=testfiles_jp2/file1.jp2 \
 	decoded_file=reference_jp2/jp2_1.tif \
-	pae=0
+	pae=4
 
+/* 3 components, 8 bits/sample, sRGB-YCC */
 id=j2kc_jp2_02 \
 	collection=j2kc \
 	encoded_file=testfiles_jp2/file2.jp2 \
 	decoded_file=reference_jp2/jp2_2.tif \
-	pae=0
+	force_srgb=1 \
+	pae=4
 
+/* 3 components, 8 bits/sample, sRGB-YCC */
 id=j2kc_jp2_03 \
 	collection=j2kc \
 	encoded_file=testfiles_jp2/file3.jp2 \
 	decoded_file=reference_jp2/jp2_3.tif \
-	pae=0
+	force_srgb=1 \
+	pae=4
 
+#ifdef ENABLE_BAD_TESTS
+/* 1 component, 8 bits/sample, sRGB-gray */
 id=j2kc_jp2_04 \
 	collection=j2kc \
 	encoded_file=testfiles_jp2/file4.jp2 \
 	decoded_file=reference_jp2/jp2_4.tif \
-	pae=0
+	pae=4
+#endif
 
+/* 3 component, 8 bits/sample, ROMM-RGB */
 id=j2kc_jp2_05 \
 	collection=j2kc \
 	encoded_file=testfiles_jp2/file5.jp2 \
 	decoded_file=reference_jp2/jp2_5.tif \
-	pae=0
+	force_srgb=1 \
+	pae=4
 
+#ifdef ENABLE_BAD_TESTS
+/* 1 component, 12 bits/sample, sRGB-grey */
 id=j2kc_jp2_06 \
 	collection=j2kc \
 	encoded_file=testfiles_jp2/file6.jp2 \
 	decoded_file=reference_jp2/jp2_6.tif \
-	pae=0
+	pae=4
+#endif
 
+/* 3 components, 16 bits/sample, e-sRGB */
 id=j2kc_jp2_07 \
 	collection=j2kc \
 	encoded_file=testfiles_jp2/file7.jp2 \
 	decoded_file=reference_jp2/jp2_7.tif \
-	pae=0
+	force_srgb=1 \
+	pae=4
 
+/* 1 component, 8 bits/sample, gamma 1.8 */
 id=j2kc_jp2_08 \
 	collection=j2kc \
 	encoded_file=testfiles_jp2/file8.jp2 \
 	decoded_file=reference_jp2/jp2_8.tif \
-	pae=0
+	force_srgb=1 \
+	pae=4
 
+/* 1 component, 8 bits/sample, palette */
 id=j2kc_jp2_09 \
 	collection=j2kc \
 	encoded_file=testfiles_jp2/file9.jp2 \
 	decoded_file=reference_jp2/jp2_9.tif \
-	pae=0
+	force_srgb=1 \
+	pae=4
 
 #endif
 

@@ -51,6 +51,9 @@ set_build_config()
 		command+=("${asan_option[@]}")
 		command+=("${lsan_option[@]}")
 		command+=("${test_option[@]}")
+		if [ "$id" = "static_debug_mt1" ]; then
+			command+=("${conformance_tests_option[@]}")
+		fi
 		command+=(--install)
 		command+=(--no-documentation)
 		command+=(--no-use-jas-init)
@@ -348,9 +351,16 @@ esac
 
 if [ "$enable_test" -ne 0 ]; then
 	test_option=(--test)
+	conformance_tests_option=(--conformance-tests)
 else
 	test_option=(--no-test)
+	conformance_tests_option=(--no-conformance-tests)
 fi
+case "$os" in
+windows)
+	conformance_tests_option=(--no-conformance-tests)
+	;;
+esac
 
 ################################################################################
 

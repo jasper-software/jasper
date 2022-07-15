@@ -20,6 +20,9 @@ init
 
 ################################################################################
 
+#j2k_codestreams_url="https://standards.iso.org/iso-iec/15444/-4/ed-3/en/ISO_IEC_15444-4-Ed3_Codestreams.zip"
+j2k_codestreams_url="https://www.ece.uvic.ca/~mdadams/jasper/downloads/ISO_IEC_15444-4-Ed3_Codestreams.zip"
+
 cmd_name=$(basename "$0") || panic "cannot get command name"
 tmp_dir=$(make_tmp_dir "$cmd_name") || panic "cannot make temporary directory"
 
@@ -29,8 +32,10 @@ jas_jp2k_test_top_dir="$JAS_JP2K_TEST_TOP_DIR"
 testcases=()
 enable_imginfo_tests=1
 enable_jasper_tests=1
+download=0
+force_success=0
 
-while getopts T:D:vt:JI opt; do
+while getopts T:D:vt:JIdf opt; do
 	case $opt in
 	J)
 		enable_jasper_tests=0;;
@@ -44,6 +49,10 @@ while getopts T:D:vt:JI opt; do
 		debug_level="$OPTARG";;
 	v)
 		verbose=$((verbose + 1));;
+	d)
+		download=1;;
+	f)
+		force_success=1;;
 	\?)
 		usage
 		break;;
@@ -51,8 +60,20 @@ while getopts T:D:vt:JI opt; do
 done
 shift `expr $OPTIND - 1`
 
+archive_dir="$tmp_dir/archives"
+archive_file="$archive_dir/j2k_codestreams.zip"
+
+if [ "$download" -ne 0 ]; then
+	mkdir -p "$archive_dir" || \
+	  panic "cannot make directory $archive_dir"
+	wget -O "$archive_file" "$j2k_codestreams_url" || \
+	  panic "cannot download archive"
+	(cd "$tmp_dir" && unzip "$archive_file") || \
+	  panic "cannot extract archive"
+	jas_jp2k_test_top_dir="$tmp_dir/Software/T.803-15444-4-Ed3_Codestreams_20210901"
+fi
+
 if [ ! -d "$jas_jp2k_test_top_dir" ]; then
-	echo "The directory named by JAS_JP2K_TEST_TOP_DIR does not exist."
 	echo "The data for this test is not available."
 	echo "Skipping test."
 	exit 0
@@ -123,7 +144,7 @@ if [ "$enable_imginfo_tests" -ne 0 ]; then
 		tcf_gettest "$testcase_file" "$testcase" record || \
 		  panic "cannot get test case"
 
-		enc_file="$JAS_JP2K_TEST_TOP_DIR/${record[encoded_file]}"
+		enc_file="$jas_jp2k_test_top_dir/${record[encoded_file]}"
 		if [ "$debug_level" -ge 1 ]; then
 			imginfo_opts+=(--debug-level "$debug_level")
 		fi
@@ -168,20 +189,32 @@ if [ "$enable_jasper_tests" -ne 0 ]; then
 #		echo "$key -> ${record[$key]}"
 #	done
 
-		enc_file="$JAS_JP2K_TEST_TOP_DIR/${record[encoded_file]}"
-		orig_file="$JAS_JP2K_TEST_TOP_DIR/${record[decoded_file]}"
+		enc_file="$jas_jp2k_test_top_dir/${record[encoded_file]}"
+		orig_file="$jas_jp2k_test_top_dir/${record[decoded_file]}"
 		pae="${record[pae]}"
 		mse="${record[mse]}"
 		comp_no="${record[cmptno]}"
+		force_srgb="${record[force_srgb]}"
 		dec_file="$tmp_dir/decoded.jp2"
 		orig_pnm_file="$tmp_dir/orig_file.pnm"
+		tmp_enc_file="$tmp_dir/tmp_enc_file.pnm"
+
+		if [ -z "$force_srgb" ]; then
+			force_srgb=0
+		fi
 
 		case "$orig_file" in
 		*.tif|*.tiff)
-			tifftopnm "$orig_file" > "$orig_pnm_file" 2> /dev/null || panic
+			tifftopnm "$orig_file" > "$orig_pnm_file" 2> /dev/null || \
+			  panic "tifftopnm failed"
 			orig_file="$orig_pnm_file"
 			;;
 		esac
+		if [ "$force_srgb" -ne 0 ]; then
+			"$jasper" -q -t jp2 -f "$enc_file" -T pnm -F "$tmp_enc_file" \
+			  --force-srgb || panic "jasper failed"
+			enc_file="$tmp_enc_file"
+		fi
 
 		dec_opts=()
 		if [ "$debug_level" -ge 1 ]; then
@@ -245,7 +278,8 @@ if [ "$enable_jasper_tests" -ne 0 ]; then
 				actual_pae=$("$imgcmp" --quiet -f "$orig_file" -F "$dec_file" \
 				  -m pae --max) || actual_pae=
 				if [ -n "$actual_pae" ]; then
-					pae_ok=$(evaluate_expression "$actual_pae <= $pae") || panic
+					pae_ok=$(evaluate_expression "$actual_pae <= $pae") || \
+					  panic "evaluate expression failed"
 					if [ "$pae_ok" -eq 0 ]; then
 						failed=1
 						echo "ERROR [$testcase]: PAE constraint violated ($actual_pae > $pae)"
@@ -263,7 +297,8 @@ if [ "$enable_jasper_tests" -ne 0 ]; then
 				actual_mse=$("$imgcmp" --quiet -f "$orig_file" -F "$dec_file" \
 				  -m mse --max) || actual_mse=
 				if [ -n "$actual_mse" ]; then
-					mse_ok=$(evaluate_expression "$actual_mse <= $mse") || panic
+					mse_ok=$(evaluate_expression "$actual_mse <= $mse") || \
+					  panic "evaluate expression failed"
 					if [ "$mse_ok" -eq 0 ]; then
 						failed=1
 						echo "ERROR [$testcase]: MSE constraint violated ($actual_mse > $mse)"
@@ -302,15 +337,15 @@ if [ "${#failed_testcases[@]}" -ne 0 ]; then
 	exit_status=1
 fi
 
-if [ "${#skipped_testcases[@]}" -ne 0 ]; then
-	echo "The following test cases passed:"
-	for testcase in "${skipped_testcases[@]}"; do
-		echo "    $testcase"
-	done
-fi
 if [ "${#passed_testcases[@]}" -ne 0 ]; then
 	echo "The following test cases passed:"
 	for testcase in "${passed_testcases[@]}"; do
+		echo "    $testcase"
+	done
+fi
+if [ "${#skipped_testcases[@]}" -ne 0 ]; then
+	echo "The following test cases were skipped:"
+	for testcase in "${skipped_testcases[@]}"; do
 		echo "    $testcase"
 	done
 fi
@@ -320,8 +355,11 @@ if [ "${#failed_testcases[@]}" -ne 0 ]; then
 		echo "    $testcase"
 	done
 fi
-echo "skip count: ${#skipped_testcases[@]}"
 echo "pass count: ${#passed_testcases[@]}"
+echo "skip count: ${#skipped_testcases[@]}"
 echo "fail count: ${#failed_testcases[@]}"
 
+if [ "$force_success" -ne 0 ]; then
+	exit_status=0
+fi
 exit "$exit_status"

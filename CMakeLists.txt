@@ -185,6 +185,7 @@ option(JAS_ENABLE_DANGEROUS_INTERNAL_TESTING_MODE
   OFF)
 
 option(JAS_ENABLE_CXX "Enable C++ code (for testing)." OFF)
+option(JAS_ENABLE_CONFORMANCE_TESTS "Enable conformance tests." OFF)
 
 ################################################################################
 #
