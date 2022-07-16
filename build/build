@@ -118,7 +118,7 @@ use_jas_init=0
 enable_strict=1
 cmake_generator=
 enable_32bit=0
-enable_cxx=0
+enable_cxx=1
 
 while [ $# -gt 0 ]; do
 	option="$1"

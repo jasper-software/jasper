@@ -225,6 +225,9 @@ set(CMAKE_C_EXTENSIONS ON)
 # This policy was added in CMake 3.8.
 cmake_policy(SET CMP0067 NEW)
 
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_EXTENSIONS ON)
+
 # Eliminate a CMake warning.
 # Note: This policy was added in CMake 3.20.  Do not add this for now,
 # since it will cause older versions of CMake to barf.
@@ -547,11 +550,19 @@ endif()
 # Configure threading support
 ################################################################################
 
+find_library(PTHREAD_LIBRARY pthread)
+if(NOT PTHREAD_LIBRARY)
+	set(PTHREAD_LIBRARY "")
+endif()
+
 set(JAS_THREADS FALSE)
 set(JAS_THREADS_C11 FALSE)
 set(JAS_THREADS_PTHREAD FALSE)
 set(JAS_THREADS_WIN32 FALSE)
 set(JAS_HAVE_THREAD_LOCAL FALSE)
+set(JAS_HAVE_C11_THREADS FALSE)
+set(JAS_HAVE_PTHREAD_THREADS FALSE)
+set(JAS_HAVE_WIN32_THREADS FALSE)
 if(JAS_ENABLE_MULTITHREADING_SUPPORT)
 	check_c_source_compiles("
 	#include <threads.h>
@@ -621,6 +632,13 @@ if(JAS_ENABLE_MULTITHREADING_SUPPORT)
 		message(WARNING "No threading support found.")
 	endif()
 
+	# TODO/NOTE: This is an attempt at a CMake/Ubuntu bug workaround.
+	if(LINUX AND JAS_THREADS_PTHREAD)
+		set(THREAD_LIBRARY ${THREAD_LIBRARY} ${PTHREAD_LIBRARY})
+	endif()
+
+	message("Threads_FOUND: ${Threads_FOUND}")
+	message("Pthread library: ${PTHREAD_LIBRARY}")
 	message("Prefer POSIX threading support: ${JAS_PREFER_PTHREAD}")
 	message("Threading support found: ${JAS_THREADS}")
 	message("C11 threading support detected: ${JAS_HAVE_C11_THREADS}")
