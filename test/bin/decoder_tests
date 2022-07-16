@@ -288,6 +288,7 @@ id=j2kc_c1p0_05_0 \
 	pae=2 \
 	mse=0.302
 
+#ifdef ENABLE_BAD_TESTS
 /* 1024x1024, 8 bits/sample, unsigned */
 id=j2kc_c1p0_05_1 \
 	collection=j2kc \
@@ -296,6 +297,7 @@ id=j2kc_c1p0_05_1 \
 	cmptno=1 \
 	pae=2 \
 	mse=0.307
+#endif
 
 #ifdef ENABLE_BAD_TESTS
 /* 512x512, 8 bits/sample, unsigned */
