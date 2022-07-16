@@ -4,12 +4,15 @@
 Conformance Tests from ISO/IEC 15444-4:2020 
 */
 
+/*
+Externally define the following symbol to enable potentially broken tests:
+    ENABLE_BAD_TESTS
+*/
+
 #define ENABLE_TABLE_G1_TESTS
 //#define ENABLE_TABLE_C1_TESTS
 #define ENABLE_TABLE_C6_TESTS
 #define ENABLE_TABLE_C7_TESTS
-
-//#define ENABLE_BAD_TESTS
 
 /******************************************************************************\
 Table G.1: JP2 reference images and allowable error
@@ -294,6 +297,7 @@ id=j2kc_c1p0_05_1 \
 	pae=2 \
 	mse=0.307
 
+#ifdef ENABLE_BAD_TESTS
 /* 512x512, 8 bits/sample, unsigned */
 id=j2kc_c1p0_05_2 \
 	collection=j2kc \
@@ -302,6 +306,7 @@ id=j2kc_c1p0_05_2 \
 	cmptno=2 \
 	pae=2 \
 	mse=0.269
+#endif
 
 /* 1024x1024, 8 bits/sample, unsigned */
 id=j2kc_c1p0_05_3 \
@@ -566,6 +571,7 @@ id=j2kc_c1p1_03_0 \
 	pae=2 \
 	mse=0.300
 
+#ifdef ENABLE_BAD_TESTS
 /* 1024x1024, 8 bits/sample */
 id=j2kc_c1p1_03_1 \
 	collection=j2kc \
@@ -574,7 +580,9 @@ id=j2kc_c1p1_03_1 \
 	cmptno=1 \
 	pae=2 \
 	mse=0.210
+#endif
 
+#ifdef ENABLE_BAD_TESTS
 /* 512x512, 8 bits/sample */
 id=j2kc_c1p1_03_2 \
 	collection=j2kc \
@@ -583,6 +591,7 @@ id=j2kc_c1p1_03_2 \
 	cmptno=2 \
 	pae=1 \
 	mse=0.200
+#endif
 
 /* 512x512, 8 bits/sample */
 id=j2kc_c1p1_03_3 \

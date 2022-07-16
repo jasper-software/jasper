@@ -149,19 +149,20 @@ stripblanklines()
 
 tcf_preprocessor()
 {
-	cpp -P 2> /dev/null | stripblanklines
+	cpp "$@" -P 2> /dev/null | stripblanklines
 }
 
 tcf_gettest()
 {
-	if [ $# -ne 3 ]; then
-		return 3
-	fi
+	[ $# -ge 3 ] || return 3
 	local file="$1"
 	local id="$2"
 	local name="$3"
+	shift 3
+	local options=("$@")
 	#eecho "$file $id $name"
-	local buffer=$(cat "$file" | tcf_preprocessor | awk -v TESTID="$id" '
+	local buffer=$(cat "$file" | tcf_preprocessor "${options[@]}" | \
+	  awk -v TESTID="$id" '
 	{
 		id="";
 		buf="";
@@ -192,13 +193,13 @@ tcf_gettest()
 
 tcf_gettestids()
 {
-	if [ $# -ne 2 ]; then
-		return 2
-	fi
+	[ $# -ge 2 ] || return 2
 	local file="$1"
 	local name="$2"
+	shift 2
+	options=("$@")
 	#eecho "$file $name"
-	local buffer=$(cat "$file" | tcf_preprocessor | awk '
+	local buffer=$(cat "$file" | tcf_preprocessor "${options[@]}" | awk '
 	{
 		id="";
 		for (i = 1; i <= NF; ++i) {

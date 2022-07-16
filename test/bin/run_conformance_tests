@@ -34,9 +34,12 @@ enable_imginfo_tests=1
 enable_jasper_tests=1
 download=0
 force_success=0
+enable_all_tests=0
 
-while getopts T:D:vt:JIdf opt; do
+while getopts T:D:vt:JIdfa opt; do
 	case $opt in
+	a)
+		enable_all_tests=1;;
 	J)
 		enable_jasper_tests=0;;
 	I)
@@ -59,6 +62,11 @@ while getopts T:D:vt:JIdf opt; do
 	esac
 done
 shift `expr $OPTIND - 1`
+
+if [ "$enable_all_tests" -ne 0 ]; then
+	tcf_options=()
+	tcf_options+=(-DENABLE_BAD_TESTS)
+fi
 
 archive_dir="$tmp_dir/archives"
 archive_file="$archive_dir/j2k_codestreams.zip"
@@ -88,7 +96,7 @@ jasper="$abs_top_builddir/src/app/jasper"
 
 testcase_file="$cmd_dir/decoder_tests"
 if [ "${#testcases[@]}" -eq 0 ]; then
-	tcf_gettestids "$testcase_file" testcases || \
+	tcf_gettestids "$testcase_file" testcases "${tcf_options[@]}" || \
 	  panic "cannot get test cases"
 fi
 
@@ -147,7 +155,7 @@ if [ "$enable_imginfo_tests" -ne 0 ]; then
 			EOF
 		fi
 
-		tcf_gettest "$testcase_file" "$testcase" record || \
+		tcf_gettest "$testcase_file" "$testcase" record "${tcf_options[@]}" || \
 		  panic "cannot get test case"
 
 		enc_file="$jas_jp2k_test_top_dir/${record[encoded_file]}"
@@ -193,7 +201,7 @@ if [ "$enable_jasper_tests" -ne 0 ]; then
 			echo "Test case: $testcase"
 		fi
 
-		tcf_gettest "$testcase_file" "$testcase" record || \
+		tcf_gettest "$testcase_file" "$testcase" record "${tcf_options[@]}" || \
 		  panic "cannot get test case"
 
 #	for key in "${!record[@]}"; do
