@@ -20,11 +20,59 @@ init
 
 ################################################################################
 
+perform_cleanup()
+{
+	if [ -n "$tmp_dir" -a -d "$tmp_dir" ]; then
+		rm -rf "$tmp_dir" || echo "warning: cannot remove directory $tmp_dir"
+	fi
+}
+
+################################################################################
+
+usage()
+{
+	if [ $# -ne 0 ]; then
+		echo "bad usage: $*"
+	fi
+	cat <<- EOF
+	usage: $0 [options]
+
+	Options
+	=======
+
+	-d
+	    Download conformance-test codestreams.
+	-v
+	    Increase the verbosity of the output.
+	-a
+	    Run all tests (including ones that might potentially fail).
+	-t \$test_case
+	    Specify that only the test case \$test_case should be run.
+
+	Examples
+	========
+
+	Download the test data and run the normal test cases with mildly
+	verbose output:
+	$0 -d -v
+
+	Download the test data and run the normal test cases with moderately
+	verbose output:
+	$0 -d -v -v
+
+	Download the test data and run all of the test cases with mildly verbose
+	output:
+	$0 -d -v -a
+	EOF
+	exit 2
+}
+
 #j2k_codestreams_url="https://standards.iso.org/iso-iec/15444/-4/ed-3/en/ISO_IEC_15444-4-Ed3_Codestreams.zip"
 j2k_codestreams_url="https://www.ece.uvic.ca/~mdadams/jasper/downloads/ISO_IEC_15444-4-Ed3_Codestreams.zip"
 
-cmd_name=$(basename "$0") || panic "cannot get command name"
-tmp_dir=$(make_tmp_dir "$cmd_name") || panic "cannot make temporary directory"
+cmd_name="$(basename "$0")" || panic "cannot get command name"
+tmp_dir=
+tmp_dir_template="/tmp/$cmd_name-XXXXXXXXXX"
 
 debug_level="${JAS_DEBUG_LEVEL:-0}"
 verbose=0
@@ -35,10 +83,14 @@ enable_jasper_tests=1
 download=0
 force_success=0
 enable_all_tests=0
+enable_extra_tests=0
 show_actual=0
+cleanup=1
 
-while getopts T:D:vt:JIdfa opt; do
-	case $opt in
+while getopts CT:D:vt:JIdfah option; do
+	case "$option" in
+	C)
+		cleanup=0;;
 	a)
 		enable_all_tests=1;;
 	J)
@@ -57,20 +109,30 @@ while getopts T:D:vt:JIdfa opt; do
 		download=1;;
 	f)
 		force_success=1;;
+	h)
+		usage;;
 	\?)
-		usage
-		break;;
+		usage "invalid option $option";;
 	esac
 done
-shift `expr $OPTIND - 1`
+shift $((OPTIND - 1))
 
+tcf_options=()
 if [ "$enable_all_tests" -ne 0 ]; then
-	tcf_options=()
 	tcf_options+=(-DENABLE_BAD_TESTS)
+fi
+if [ "$enable_extra_tests" -ne 0 ]; then
+	tcf_options+=(-DENABLE_EXTRA_TESTS)
 fi
 
 if [ "$verbose" -ge 2 ]; then
 	show_actual=1
+fi
+
+tmp_dir="$(make_tmp_dir_2 "$tmp_dir_template")" || \
+  panic "cannot create temporary directory"
+if [ "$cleanup" -ne 0 ]; then
+	trap perform_cleanup EXIT
 fi
 
 archive_dir="$tmp_dir/archives"

@@ -62,6 +62,15 @@ function make_tmp_dir()
 	echo "$tmp_dir"
 }
 
+function make_tmp_dir_2()
+{
+	[ $# -eq 1 ] || return 1
+	local template="$1"
+	local tmp_dir
+	tmp_dir="$(mktemp -d "$template")" || return 1
+	echo "$tmp_dir"
+}
+
 ################################################################################
 # Image characteristics.
 ################################################################################

@@ -7,6 +7,8 @@ Conformance Tests from ISO/IEC 15444-4:2020
 /*
 Externally define the following symbol to enable potentially broken tests:
     ENABLE_BAD_TESTS
+Externally define the following symbol to enable extra tests:
+    ENABLE_EXTRA_TESTS
 */
 
 #define ENABLE_TABLE_G1_TESTS
@@ -43,7 +45,7 @@ id=j2kc_jp2_03 \
 	force_srgb=1 \
 	pae=4
 
-#ifdef ENABLE_BAD_TESTS
+#if defined(ENABLE_BAD_TESTS) && defined(ENABLE_EXTRA_TESTS)
 /* 1 component, 8 bits/sample, sRGB-gray */
 id=j2kc_jp2_04 \
 	collection=j2kc \
@@ -60,7 +62,7 @@ id=j2kc_jp2_05 \
 	force_srgb=1 \
 	pae=4
 
-#ifdef ENABLE_BAD_TESTS
+#if defined(ENABLE_BAD_TESTS) && defined(ENABLE_EXTRA_TESTS)
 /* 1 component, 12 bits/sample, sRGB-grey */
 id=j2kc_jp2_06 \
 	collection=j2kc \

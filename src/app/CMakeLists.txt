@@ -123,6 +123,12 @@ if(BASH_PROGRAM AND JAS_HAVE_ALL_NATIVE_CODECS)
 		  "${BASH_PROGRAM}" "${CMAKE_CURRENT_BINARY_DIR}/../../test/bin/wrapper"
 		  "${CMAKE_CURRENT_SOURCE_DIR}/../../test/bin/run_conformance_tests" -v -d)
 	endif()
+	add_custom_target(conformance_check
+	  COMMAND
+	  "${BASH_PROGRAM}" "${CMAKE_CURRENT_BINARY_DIR}/../../test/bin/wrapper"
+	  "${CMAKE_CURRENT_SOURCE_DIR}/../../test/bin/run_conformance_tests" -d -v -a
+	  DEPENDS jasper imgcmp imginfo
+	)
 	if(JAS_THREADS)
 		add_test(run_test_5
 		  "${BASH_PROGRAM}" "${CMAKE_CURRENT_BINARY_DIR}/../../test/bin/wrapper"
