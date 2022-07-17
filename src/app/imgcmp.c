@@ -179,7 +179,9 @@ int main(int argc, char **argv)
 	jas_stream_t *diffstream;
 	double d;
 	double maxdist;
+	bool maxdist_valid;
 	double mindist;
+	bool mindist_valid;
 	jas_stream_t *origstream;
 	jas_stream_t *reconstream;
 	const char *diffpath;
@@ -380,8 +382,10 @@ int main(int argc, char **argv)
 	}
 
 	/* Compute the difference for each component. */
-	maxdist = 0;
-	mindist = FLT_MAX;
+	maxdist = -1.0;
+	maxdist_valid = false;
+	mindist = -1.0;
+	mindist_valid = false;
 	for (unsigned compno = 0; compno < numcomps; ++compno) {
 		const uint_least32_t width = jas_image_cmptwidth(origimage, compno);
 		const uint_least32_t height = jas_image_cmptheight(origimage, compno);
@@ -438,11 +442,17 @@ int main(int argc, char **argv)
 
 		if (metric != metricid_none) {
 			d = getdistortion(origdata, recondata, depth, metric);
-			if (d > maxdist) {
+			if (maxdist_valid) {
+				maxdist = JAS_MAX(maxdist, d);
+			} else {
 				maxdist = d;
+				maxdist_valid = true;
 			}
-			if (d < mindist) {
+			if (mindist_valid) {
+				mindist = JAS_MIN(mindist, d);
+			} else {
 				mindist = d;
+				mindist_valid = true;
 			}
 			if (!maxonly && !minonly) {
 				if (metric == metricid_pae || metric == metricid_equal) {
