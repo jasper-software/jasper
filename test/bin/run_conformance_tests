@@ -35,6 +35,7 @@ enable_jasper_tests=1
 download=0
 force_success=0
 enable_all_tests=0
+show_actual=0
 
 while getopts T:D:vt:JIdfa opt; do
 	case $opt in
@@ -66,6 +67,10 @@ shift `expr $OPTIND - 1`
 if [ "$enable_all_tests" -ne 0 ]; then
 	tcf_options=()
 	tcf_options+=(-DENABLE_BAD_TESTS)
+fi
+
+if [ "$verbose" -ge 2 ]; then
+	show_actual=1
 fi
 
 archive_dir="$tmp_dir/archives"
@@ -204,14 +209,15 @@ if [ "$enable_jasper_tests" -ne 0 ]; then
 		tcf_gettest "$testcase_file" "$testcase" record "${tcf_options[@]}" || \
 		  panic "cannot get test case"
 
-#	for key in "${!record[@]}"; do
-#		echo "$key -> ${record[$key]}"
-#	done
+		#for key in "${!record[@]}"; do
+		#	echo "$key -> ${record[$key]}"
+		#done
 
 		enc_file="$jas_jp2k_test_top_dir/${record[encoded_file]}"
 		orig_file="$jas_jp2k_test_top_dir/${record[decoded_file]}"
 		pae="${record[pae]}"
 		mse="${record[mse]}"
+		psnr="${record[psnr]}"
 		comp_no="${record[cmptno]}"
 		force_srgb="${record[force_srgb]}"
 		dec_file="$tmp_dir/decoded.jp2"
@@ -270,12 +276,6 @@ if [ "$enable_jasper_tests" -ne 0 ]; then
 		fi
 
 		buffer=$("$imginfo" -q < "$enc_file" 2> /dev/null)
-		#echo "IMAGE INFO width=$width height=$height prec=$depth num_components=$num_comps"
-		#echo "IMAGE INFO $buffer"
-#continue
-		#echo "Decoding $enc_file"
-#	"$jpdec" software="$dec" input="$enc_file" output="$dec_file" \
-#	  "${dec_opts[@]}"
 		jasper_opts=()
 		jasper_opts+=(-T jp2)
 		if [ -n "$comp_no" ]; then
@@ -286,16 +286,44 @@ if [ "$enable_jasper_tests" -ne 0 ]; then
 		fi
 		"$jasper" "${jasper_opts[@]}" < "$enc_file" > "$dec_file" 2> /dev/null
 		status=$?
+
 		if [ $status -eq 0 ]; then
-			if [ "$verbose" -ge 3 ]; then
-				echo "RUNNING: $imgcmp --quiet -f $orig_file -F $dec_file -m pae --max"
+
+			if [ -n "$pae" -o "$show_actual" -ne 0 ]; then
+				command=("$imgcmp" --quiet -f "$orig_file" -F "$dec_file" \
+				  -m pae --max)
+				if [ "$verbose" -ge 3 ]; then
+					echo "RUNNING: ${command[*]}"
+				fi
+				actual_pae="$(${command[@]})" || actual_pae=
+			else
+				actual_pae=
 			fi
+			if [ -n "$mse" -o "$show_actual" -ne 0 ]; then
+				command=("$imgcmp" --quiet -f "$orig_file" -F "$dec_file" \
+				  -m mse --max)
+				if [ "$verbose" -ge 3 ]; then
+					echo "RUNNING: ${command[*]}"
+				fi
+				actual_mse="$(${command[@]})" || actual_mse=
+			else
+				actual_mse=
+			fi
+			if [ -n "$psnr" -o "$show_actual" -ne 0 ]; then
+				command=("$imgcmp" --quiet -f "$orig_file" -F "$dec_file" \
+				  -m psnr --min)
+				actual_psnr="$(${command[@]})" || actual_psnr=
+			else
+				actual_psnr=
+			fi
+			if [ "$show_actual" -ne 0 ]; then
+				echo "INFO: [$testcase]: PAE=${actual_pae:-unknown} MSE=${actual_mse:-unknown} PSNR=${actual_psnr:-unknown}"
+			fi
+
 			failed=0
 			if [ -n "$pae" ]; then
-				actual_pae=$("$imgcmp" --quiet -f "$orig_file" -F "$dec_file" \
-				  -m pae --max) || actual_pae=
 				if [ -n "$actual_pae" ]; then
-					pae_ok=$(evaluate_expression "$actual_pae <= $pae") || \
+					pae_ok="$(evaluate_expression "$actual_pae <= $pae")" || \
 					  panic "evaluate expression failed"
 					if [ "$pae_ok" -eq 0 ]; then
 						failed=1
@@ -311,10 +339,8 @@ if [ "$enable_jasper_tests" -ne 0 ]; then
 				fi
 			fi
 			if [ -n "$mse" ]; then
-				actual_mse=$("$imgcmp" --quiet -f "$orig_file" -F "$dec_file" \
-				  -m mse --max) || actual_mse=
 				if [ -n "$actual_mse" ]; then
-					mse_ok=$(evaluate_expression "$actual_mse <= $mse") || \
+					mse_ok="$(evaluate_expression "$actual_mse <= $mse")" || \
 					  panic "evaluate expression failed"
 					if [ "$mse_ok" -eq 0 ]; then
 						failed=1
