@@ -534,6 +534,7 @@ cmdopts_t *cmdopts_parse(int argc, char **argv)
 			cmdopts->enable_all_formats = 1;
 			break;
 		default:
+			cmdopts_destroy(cmdopts);
 			badusage();
 			break;
 		}
@@ -552,6 +553,7 @@ cmdopts_t *cmdopts_parse(int argc, char **argv)
 
 	if (!cmdopts->outfmt_str && !cmdopts->outfile) {
 		fprintf(stderr, "error: cannot determine output format\n");
+		cmdopts_destroy(cmdopts);
 		badusage();
 	}
 
