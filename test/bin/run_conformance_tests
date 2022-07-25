@@ -45,7 +45,10 @@ usage()
 	-v
 	    Increase the verbosity of the output.
 	-a
-	    Run all tests (including ones that might potentially fail).
+	    Enable all (non-extra) tests (including ones that might potentially
+	    fail).
+	-x
+	    Enable extra tests.
 	-t \$test_case
 	    Specify that only the test case \$test_case should be run.
 
@@ -55,6 +58,7 @@ usage()
 	Download the test data and run the normal test cases with mildly
 	verbose output:
 	$0 -d -v
+	[This is used in the CI framework for JasPer.]
 
 	Download the test data and run the normal test cases with moderately
 	verbose output:
@@ -86,13 +90,18 @@ enable_all_tests=0
 enable_extra_tests=0
 show_actual=0
 cleanup=1
+skip_resolution_reduction=1
 
-while getopts CT:D:vt:JIdfah option; do
+while getopts CT:D:vt:JIdfahxr option; do
 	case "$option" in
 	C)
 		cleanup=0;;
+	r)
+		skip_resolution_reduction=0;;
 	a)
 		enable_all_tests=1;;
+	x)
+		enable_extra_tests=1;;
 	J)
 		enable_jasper_tests=0;;
 	I)
@@ -161,7 +170,7 @@ imginfo="$abs_top_builddir/src/app/imginfo"
 export IMGINFO_COMMAND="$imginfo"
 jasper="$abs_top_builddir/src/app/jasper"
 
-testcase_file="$cmd_dir/decoder_tests"
+testcase_file="$cmd_dir/conformance_tests"
 if [ "${#testcases[@]}" -eq 0 ]; then
 	tcf_gettestids "$testcase_file" testcases "${tcf_options[@]}" || \
 	  panic "cannot get test cases"
@@ -170,29 +179,29 @@ fi
 skipped_testcases=()
 
 # Disable test cases that are known to be problematic.
-if [ 1 -ne 0 ]; then
-	tmp_testcases=("${testcases[@]}")
-	testcases=()
-	for testcase in "${tmp_testcases[@]}"; do
-		skip=0
-		case "$testcase" in
-		j2kc_c0p0_13*)
-			skip=1;;
-		j2kc_c1p0_13*)
-			skip=1;;
-		j2kc_c0p0_08*)
-			skip=1;;
-		j2kc_c1p0_08*)
-			skip=1;;
-		esac
-		if [ "$skip" -eq 0 ]; then
-			testcases+=("$testcase")
-		else
-			skipped_testcases+=("$testcase")
-			echo "SKIPPING: $testcase"
-		fi
-	done
-fi
+#if [ 1 -ne 0 ]; then
+#	tmp_testcases=("${testcases[@]}")
+#	testcases=()
+#	for testcase in "${tmp_testcases[@]}"; do
+#		skip=0
+#		case "$testcase" in
+#		j2kc_c0p0_13*)
+#			skip=1;;
+#		j2kc_c1p0_13*)
+#			skip=1;;
+#		j2kc_c0p0_08*)
+#			skip=1;;
+#		j2kc_c1p0_08*)
+#			skip=1;;
+#		esac
+#		if [ "$skip" -eq 0 ]; then
+#			testcases+=("$testcase")
+#		else
+#			skipped_testcases+=("$testcase")
+#			echo "SKIPPING: $testcase"
+#		fi
+#	done
+#fi
 
 echo "Number of test cases: ${#testcases[@]}"
 
@@ -280,11 +289,19 @@ if [ "$enable_jasper_tests" -ne 0 ]; then
 		pae="${record[pae]}"
 		mse="${record[mse]}"
 		psnr="${record[psnr]}"
+		resolution_reduction="${record[resolution_reduction]}"
 		comp_no="${record[cmptno]}"
 		force_srgb="${record[force_srgb]}"
 		dec_file="$tmp_dir/decoded.jp2"
 		orig_pnm_file="$tmp_dir/orig_file.pnm"
 		tmp_enc_file="$tmp_dir/tmp_enc_file.pnm"
+
+		if [ -n "$resolution_reduction" -a \
+		  "$skip_resolution_reduction" -ne 0 ]; then
+			echo "SKIPPING [$testcase]: decoder does not support resolution reduction"
+			skipped_testcases+=("$testcase")
+			continue
+		fi
 
 		if [ -z "$force_srgb" ]; then
 			force_srgb=0
@@ -396,7 +413,7 @@ if [ "$enable_jasper_tests" -ne 0 ]; then
 						fi
 					fi
 				else
-					echo "ERROR [$testcase]: PAE check failed"
+					echo "ERROR [$testcase]: PAE check failed (resolution_reduction=$resolution_reduction)"
 					failed=1
 				fi
 			fi
@@ -413,7 +430,7 @@ if [ "$enable_jasper_tests" -ne 0 ]; then
 						fi
 					fi
 				else
-					echo "ERROR [$testcase]: MSE check failed"
+					echo "ERROR [$testcase]: MSE check failed (resolution_reduction=$resolution_reduction)"
 					failed=1
 				fi
 			fi

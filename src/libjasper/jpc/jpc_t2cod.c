@@ -180,6 +180,8 @@ static int jpc_pi_nextlrcp(register jpc_pi_t *pi)
 {
 	unsigned *prclyrno;
 
+	JAS_LOGDEBUGF(10, "jpc_pi_nextlrcp\n");
+
 	const jpc_pchg_t *pchg = pi->pchg;
 	if (!pi->prgvolfirst) {
 		prclyrno = &pi->pirlvl->prclyrnos[pi->prcno];
@@ -221,6 +223,7 @@ skip:
 static int jpc_pi_nextrlcp(register jpc_pi_t *pi)
 {
 	unsigned *prclyrno;
+	JAS_LOGDEBUGF(10, "jpc_pi_nextrlcp\n");
 
 	const jpc_pchg_t *pchg = pi->pchg;
 	if (!pi->prgvolfirst) {
@@ -271,6 +274,8 @@ static int jpc_pi_nextrpcl(register jpc_pi_t *pi)
 	uint_fast32_t rpy;
 	uint_fast32_t trx0;
 	uint_fast32_t try0;
+
+	JAS_LOGDEBUGF(10, "jpc_pi_nextrpcl\n");
 
 	const jpc_pchg_t *pchg = pi->pchg;
 	if (!pi->prgvolfirst) {
@@ -378,6 +383,8 @@ static int jpc_pi_nextpcrl(register jpc_pi_t *pi)
 	uint_fast32_t rpx;
 	uint_fast32_t rpy;
 
+	JAS_LOGDEBUGF(10, "jpc_pi_nextpcrl\n");
+
 	const jpc_pchg_t *pchg = pi->pchg;
 	if (!pi->prgvolfirst) {
 		goto skip;
@@ -478,6 +485,8 @@ static int jpc_pi_nextcprl(register jpc_pi_t *pi)
 	uint_fast32_t rpx;
 	uint_fast32_t rpy;
 
+	JAS_LOGDEBUGF(10, "jpc_pi_nextcprl\n");
+
 	const jpc_pchg_t *pchg = pi->pchg;
 	if (!pi->prgvolfirst) {
 		goto skip;
@@ -485,11 +494,17 @@ static int jpc_pi_nextcprl(register jpc_pi_t *pi)
 		pi->prgvolfirst = 0;
 	}
 
+#if 0
+	/*
+	This disabled code is wrong.  xstep and ystep need not be set yet.
+	This will cause some valid code streams to fail to be decoded.
+	*/
 	if (pi->xstep == 0 || pi->ystep == 0) {
 		/* avoid later division by zero */
 		jas_logerrorf("xstep and ystep must be nonzero\n");
 		return -1;
 	}
+#endif
 
 	for (pi->compno = pchg->compnostart, pi->picomp = &pi->picomps[pi->compno];
 	  pi->compno < pchg->compnoend && pi->compno < pi->numcomps;
