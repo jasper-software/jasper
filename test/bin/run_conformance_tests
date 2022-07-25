@@ -40,10 +40,9 @@ usage()
 	Options
 	=======
 
-	-d
-	    Download conformance-test codestreams.
 	-v
 	    Increase the verbosity of the output.
+	    This option can be specified multiple times.
 	-a
 	    Enable all (non-extra) tests (including ones that might potentially
 	    fail).
@@ -51,33 +50,38 @@ usage()
 	    Enable extra tests.
 	-t \$test_case
 	    Specify that only the test case \$test_case should be run.
+	    This option can be specified more than once to run multiple
+	    specific tests.
 
 	Examples
 	========
 
 	Download the test data and run the normal test cases with mildly
 	verbose output:
-	$0 -d -v
+	$0 -v
 	[This is used in the CI framework for JasPer.]
 
 	Download the test data and run the normal test cases with moderately
 	verbose output:
-	$0 -d -v -v
+	$0 -v -v
 
 	Download the test data and run all of the test cases with mildly verbose
 	output:
-	$0 -d -v -a
+	$0 -v -a
 	EOF
 	exit 2
 }
 
 #j2k_codestreams_url="https://standards.iso.org/iso-iec/15444/-4/ed-3/en/ISO_IEC_15444-4-Ed3_Codestreams.zip"
 j2k_codestreams_url="https://www.ece.uvic.ca/~mdadams/jasper/downloads/ISO_IEC_15444-4-Ed3_Codestreams.zip"
+j2k_codestreams_git_url="https://gitlab.com/wg1/htj2k-codestreams.git"
+j2k_codestreams_git_commit=0d319b5fd2e6eb40e05aa27fcac71354d58d48d1
 
 cmd_name="$(basename "$0")" || panic "cannot get command name"
 tmp_dir=
 tmp_dir_template="/tmp/$cmd_name-XXXXXXXXXX"
 
+j2k_codestreams_source=git
 debug_level="${JAS_DEBUG_LEVEL:-0}"
 verbose=0
 jas_jp2k_test_top_dir="$JAS_JP2K_TEST_TOP_DIR"
@@ -92,8 +96,10 @@ show_actual=0
 cleanup=1
 skip_resolution_reduction=1
 
-while getopts CT:D:vt:JIdfahxr option; do
+while getopts CT:D:vt:JIfahxrs: option; do
 	case "$option" in
+	s)
+		j2k_codestreams_source="$OPTARG";;
 	C)
 		cleanup=0;;
 	r)
@@ -147,7 +153,19 @@ fi
 archive_dir="$tmp_dir/archives"
 archive_file="$archive_dir/j2k_codestreams.zip"
 
-if [ "$download" -ne 0 ]; then
+case "$j2k_codestreams_source" in
+git)
+	git_dir="$tmp_dir/git"
+	if [ "$verbose" -ge 1 ]; then
+		echo "cloning Git repository $j2k_codestreams_git_url"
+	fi
+	git clone -q "$j2k_codestreams_git_url" "$git_dir" || \
+	  panic "cannot clone repository $git_url"
+	git -C "$git_dir" checkout -q "$j2k_codestreams_git_commit" || \
+	  panic "cannot checkout commit $j2k_codestreams_git_commit"
+	jas_jp2k_test_top_dir="$git_dir"
+	;;
+zip)
 	mkdir -p "$archive_dir" || \
 	  panic "cannot make directory $archive_dir"
 	wget -nv -O "$archive_file" "$j2k_codestreams_url" || \
@@ -155,7 +173,10 @@ if [ "$download" -ne 0 ]; then
 	(cd "$tmp_dir" && unzip -q "$archive_file") || \
 	  panic "cannot extract archive"
 	jas_jp2k_test_top_dir="$tmp_dir/Software/T.803-15444-4-Ed3_Codestreams_20210901"
-fi
+	;;
+*)
+	;;
+esac
 
 if [ ! -d "$jas_jp2k_test_top_dir" ]; then
 	echo "The data for this test is not available."
