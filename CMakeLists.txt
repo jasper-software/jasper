@@ -108,7 +108,7 @@ option(JAS_ENABLE_PIC "Enable position-independent code" ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ${JAS_ENABLE_PIC})
 
 option(JAS_ENABLE_HIDDEN "Hide internal symbols" ON)
-option(JAS_ENABLE_32BIT "Use 32 bit integers on 64 bit CPUs" OFF)
+option(JAS_ENABLE_32BIT "In the JPC/JP2 codec, use a fixed-point word size of 32 bits (instead of 64 bits)" OFF)
 option(JAS_ENABLE_LIBJPEG "Enable the use of the JPEG Library" ON)
 option(JAS_ENABLE_LIBHEIF "Enable the use of the HEIF Library" ON)
 option(JAS_ENABLE_OPENGL "Enable the use of the OpenGL/GLUT Library" ON)
@@ -448,34 +448,44 @@ message("JAS_HAVE_MAX_ALIGN_T: ${JAS_HAVE_MAX_ALIGN_T}")
 
 jas_check_type("char" JAS_HAVE_CHAR SIZE JAS_SIZEOF_CHAR)
 message("JAS_SIZEOF_CHAR: ${JAS_SIZEOF_CHAR}")
+
 jas_check_type("int" JAS_HAVE_INT SIZE JAS_SIZEOF_INT)
 message("JAS_SIZEOF_INT: ${JAS_SIZEOF_INT}")
+
 jas_check_type("long" JAS_HAVE_LONG SIZE JAS_SIZEOF_LONG)
 message("JAS_SIZEOF_LONG: ${JAS_SIZEOF_LONG}")
+
 jas_check_type("long long" JAS_HAVE_LLONG SIZE JAS_SIZEOF_LLONG)
 message("JAS_SIZEOF_LLONG: ${JAS_SIZEOF_LLONG}")
+
 jas_check_type("size_t" JAS_HAVE_SIZE_T SIZE JAS_SIZEOF_SIZE_T)
 message("JAS_SIZEOF_SIZE_T: ${JAS_SIZEOF_SIZE_T}")
+
 jas_check_type("ssize_t" JAS_HAVE_SSIZE_T SIZE JAS_SIZEOF_SSIZE_T)
 message("JAS_HAVE_SSIZE_T: ${JAS_HAVE_SSIZE_T}")
 if(JAS_HAVE_SSIZE_T)
 	message("JAS_SIZEOF_SSIZE_T: ${JAS_SIZEOF_SSIZE_T}")
 endif()
+
 jas_check_type("int_fast32_t" JAS_HAVE_INT_FAST32_T SIZE
   JAS_SIZEOF_INT_FAST32_T)
 message("JAS_SIZEOF_INT_FAST32_T: ${JAS_SIZEOF_INT_FAST32_T}")
-jas_check_type("int_fast64_t" JAS_HAVE_INT_FAST64_T SIZE
-  JAS_SIZEOF_INT_FAST64_T)
-message("JAS_SIZEOF_INT_FAST64_T: ${JAS_SIZEOF_INT_FAST64_T}")
-#jas_check_type("int_fast128_t" JAS_HAVE_INT_FAST128_T SIZE
-#  JAS_SIZEOF_INT_FAST128_T)
-#message("JAS_SIZEOF_INT_FAST128_T: ${JAS_SIZEOF_INT_FAST128_T}")
+
 jas_check_type("int_least32_t" JAS_HAVE_INT_LEAST32_T SIZE
   JAS_SIZEOF_INT_LEAST32_T)
 message("JAS_SIZEOF_INT_LEAST32_T: ${JAS_SIZEOF_INT_LEAST32_T}")
-#jas_check_type("int_least128_t" JAS_HAVE_INT_LEAST128_T SIZE
-#  JAS_SIZEOF_INT_LEAST128_T)
-#message("JAS_SIZEOF_INT_LEAST128_T: ${JAS_SIZEOF_INT_LEAST128_T}")
+
+jas_check_type("int_fast64_t" JAS_HAVE_INT_FAST64_T SIZE
+  JAS_SIZEOF_INT_FAST64_T)
+message("JAS_SIZEOF_INT_FAST64_T: ${JAS_SIZEOF_INT_FAST64_T}")
+
+jas_check_type("int_least64_t" JAS_HAVE_INT_LEAST64_T SIZE
+  JAS_SIZEOF_INT_LEAST64_T)
+message("JAS_SIZEOF_INT_LEAST64_T: ${JAS_SIZEOF_INT_LEAST64_T}")
+
+jas_check_type("__int128_t" JAS_HAVE_INT128_T SIZE
+  JAS_SIZEOF_INT128_T)
+message("JAS_SIZEOF_INT128_T: ${JAS_SIZEOF_INT128_T}")
 
 #check_type_size(ssize_t SSIZE_T)
 #if(HAVE_SSIZE_T)

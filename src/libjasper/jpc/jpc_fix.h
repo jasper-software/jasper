@@ -83,23 +83,39 @@
 * Basic parameters of the fixed-point type.
 \******************************************************************************/
 
-/* The integral type used to represent a fixed-point number.  This
-  type must be capable of representing values from -(2^31) to 2^31-1
-  (inclusive). */
+/*
+jpc_fix_t.
+The integral type used to represent a fixed-point number.  This
+type must be capable of representing values from -(2^31) to 2^31-1
+(inclusive).
+
+jpc_fix_big_t.
+The integral type used to respresent higher-precision intermediate results.
+This type should be capable of representing values from -(2^63) to 2^63-1
+(inclusive).
+
+JPC_FIX_FRACBITS.
+The number of bits used for the fractional part of a fixed-point number.
+*/
+
 #ifdef JAS_ENABLE_32BIT
+/* 32-bit fixed point (with 64-bit for some intermediate results) */
 typedef int_least32_t jpc_fix_t;
-#else
-typedef int_fast32_t jpc_fix_t;
-//typedef int_least64_t jpc_fix_t;
-#endif
-
-/* The integral type used to respresent higher-precision intermediate results.
-  This type should be capable of representing values from -(2^63) to 2^63-1
-  (inclusive). */
 typedef int_fast64_t jpc_fix_big_t;
-
-/* The number of bits used for the fractional part of a fixed-point number. */
 #define JPC_FIX_FRACBITS	13
+#else
+#if defined(JAS_HAVE_INT128_T)
+/* 64-bit fixed point (with 128-bit for some intermediate results) */
+typedef int_least64_t jpc_fix_t;
+typedef __int128_t jpc_fix_big_t;
+#define JPC_FIX_FRACBITS	18
+#else
+/* 64-bit fixed point (with 64-bit for some intermediate results) */
+typedef int_least64_t jpc_fix_t;
+typedef int_fast64_t jpc_fix_big_t;
+#define JPC_FIX_FRACBITS	18
+#endif
+#endif
 
 /******************************************************************************\
 * Instantiations of the generic fixed-point number macros for the
