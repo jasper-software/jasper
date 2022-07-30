@@ -41,6 +41,8 @@ The version of the C standard against which JasPer was built.
 
 #cmakedefine JAS_ENABLE_32BIT
 
+#cmakedefine JAS_HAVE_INT128_T
+
 #define JAS_SIZEOF_INT @JAS_SIZEOF_INT@
 #define JAS_SIZEOF_LONG @JAS_SIZEOF_LONG@
 #define JAS_SIZEOF_LLONG @JAS_SIZEOF_LLONG@

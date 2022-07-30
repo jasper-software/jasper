@@ -98,23 +98,13 @@ JPC_FIX_FRACBITS.
 The number of bits used for the fractional part of a fixed-point number.
 */
 
-#ifdef JAS_ENABLE_32BIT
-/* 32-bit fixed point (with 64-bit for some intermediate results) */
-typedef int_least32_t jpc_fix_t;
-typedef int_fast64_t jpc_fix_big_t;
+typedef jas_fix_t jpc_fix_t;
+typedef jas_fix_big_t jpc_fix_big_t;
+
+#if defined(JAS_ENABLE_32BIT)
 #define JPC_FIX_FRACBITS	13
 #else
-#if defined(JAS_HAVE_INT128_T)
-/* 64-bit fixed point (with 128-bit for some intermediate results) */
-typedef int_least64_t jpc_fix_t;
-typedef __int128_t jpc_fix_big_t;
 #define JPC_FIX_FRACBITS	18
-#else
-/* 64-bit fixed point (with 64-bit for some intermediate results) */
-typedef int_least64_t jpc_fix_t;
-typedef int_fast64_t jpc_fix_big_t;
-#define JPC_FIX_FRACBITS	18
-#endif
 #endif
 
 /******************************************************************************\
@@ -191,6 +181,7 @@ static inline jpc_fix_t jpc_fix_neg(jpc_fix_t x)
 //#define	jpc_fix_asl(x, n)	JAS_FIX_ASL(jpc_fix_t, JPC_FIX_FRACBITS, x, n)
 //#define	jpc_fix_asr(x, n)	JAS_FIX_ASR(jpc_fix_t, JPC_FIX_FRACBITS, x, n)
 
+#if 0
 #ifdef JAS_ENABLE_32BIT
 #define jpc_fix_asl jas_least32_asl
 #define jpc_fix_asr jas_least32_asr
@@ -198,9 +189,14 @@ static inline jpc_fix_t jpc_fix_neg(jpc_fix_t x)
 #define jpc_fix_asl jas_fast32_asl
 #define jpc_fix_asr jas_fast32_asr
 #endif
+#endif
+#define jpc_fix_asl jas_fix_asl
+#define jpc_fix_asr jas_fix_asr
 
-#define jpc_fix_pluseq(x, y)	JAS_FIX_PLUSEQ(jpc_fix_t, JPC_FIX_FRACBITS, x, y)
-#define jpc_fix_minuseq(x, y)	JAS_FIX_MINUSEQ(jpc_fix_t, JPC_FIX_FRACBITS, x, y)
+#define jpc_fix_pluseq(x, y) \
+	JAS_FIX_PLUSEQ(jpc_fix_t, JPC_FIX_FRACBITS, x, y)
+#define jpc_fix_minuseq(x, y) \
+	JAS_FIX_MINUSEQ(jpc_fix_t, JPC_FIX_FRACBITS, x, y)
 #define	jpc_fix_muleq(x, y)	\
 	JAS_FIX_MULEQ(jpc_fix_t, JPC_FIX_FRACBITS, jpc_fix_big_t, x, y)
 

@@ -77,6 +77,7 @@
 #include <jasper/jas_config.h> /* IWYU pragma: keep */
 
 #include <jasper/jas_types.h>
+#include <jasper/jas_fix.h>
 #include <jasper/jas_math.h>
 
 #include <stdio.h>
@@ -102,26 +103,13 @@ extern "C" {
 \******************************************************************************/
 
 /* An element in a sequence. */
-#ifdef JAS_ENABLE_32BIT
-typedef int_least32_t jas_seqent_t;
-#define PRIjas_seqent PRIiLEAST32
-#else
-typedef int_fast32_t jas_seqent_t;
-#define PRIjas_seqent PRIiFAST32
-#endif
+typedef jas_fix_t jas_seqent_t;
+#define PRIjas_seqent PRIjas_fix
 
 /* An element in a matrix. */
-#ifdef JAS_ENABLE_32BIT
-typedef int_least32_t jas_matent_t;
-#else
-typedef int_fast32_t jas_matent_t;
-#endif
+typedef jas_fix_t jas_matent_t;
 
-#ifdef JAS_ENABLE_32BIT
-typedef int_least32_t jas_matind_t;
-#else
-typedef int_fast32_t jas_matind_t;
-#endif
+typedef jas_fix_t jas_matind_t;
 
 /*!
 @brief Matrix type.
@@ -426,11 +414,14 @@ jas_matrix_t *jas_matrix_input(FILE *);
 JAS_ATTRIBUTE_CONST
 static inline jas_seqent_t jas_seqent_asl(jas_seqent_t x, unsigned n)
 {
+#if 0
 #ifdef JAS_ENABLE_32BIT
 	return jas_least32_asl(x, n);
 #else
 	return jas_fast32_asl(x, n);
 #endif
+#endif
+	return jas_fix_asl(x, n);
 }
 
 /*!
@@ -439,11 +430,14 @@ static inline jas_seqent_t jas_seqent_asl(jas_seqent_t x, unsigned n)
 JAS_ATTRIBUTE_CONST
 static inline jas_seqent_t jas_seqent_asr(jas_seqent_t x, unsigned n)
 {
+#if 0
 #ifdef JAS_ENABLE_32BIT
 	return jas_least32_asr(x, n);
 #else
 	return jas_fast32_asr(x, n);
 #endif
+#endif
+	return jas_fix_asr(x, n);
 }
 
 /******************************************************************************\

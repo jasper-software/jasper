@@ -88,6 +88,34 @@ extern "C" {
  */
 
 /******************************************************************************\
+* Types.
+\******************************************************************************/
+
+/*!
+Integral type used for fixed-point representations.
+*/
+#if defined(JAS_ENABLE_32BIT)
+typedef int_least32_t jas_fix_t;
+#define PRIjas_fix PRIiLEAST32
+#else
+typedef int_least64_t jas_fix_t;
+#define PRIjas_fix PRIiLEAST64
+#endif
+
+/*
+Integral type used for double-precision fixed-point representations.
+*/
+#if defined(JAS_ENABLE_32BIT)
+typedef int_least64_t jas_fix_big_t;
+#else
+#if defined(JAS_HAVE_INT128_T)
+typedef __int128_t jas_fix_big_t;
+#else
+typedef int_least64_t jas_fix_big_t;
+#endif
+#endif
+
+/******************************************************************************\
 * Constants.
 \******************************************************************************/
 
@@ -346,6 +374,22 @@ extern "C" {
 /* Handle underflow. */
 #define	JAS_FIX_UFLOW() \
 	jas_logerrorf("underflow error: file %s, line %d\n", __FILE__, __LINE__)
+
+/******************************************************************************\
+*
+\******************************************************************************/
+
+JAS_ATTRIBUTE_DISABLE_UBSAN
+static inline jas_fix_t jas_fix_asl(jas_fix_t x, unsigned n)
+{
+	return JAS_FIX_ASL(jas_fix_t, 0, x, n);
+}
+
+JAS_ATTRIBUTE_DISABLE_UBSAN
+static inline jas_fix_t jas_fix_asr(jas_fix_t x, unsigned n)
+{
+	return JAS_FIX_ASR(jas_fix_t, 0, x, n);
+}
 
 /*!
  * @}
