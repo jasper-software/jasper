@@ -1274,8 +1274,8 @@ assert(jas_image_numcmpts(enc->image) == 3);
 			jas_eprintf("mingbits %d\n", mingbits);
 #endif
 			if (mingbits > cp->tccp.numgbits) {
-				jas_logerrorf("error: too few guard bits (need at least %d)\n",
-				  mingbits);
+				jas_logerrorf("error: too few guard bits (%d not < %d)\n",
+				  cp->tccp.numgbits, mingbits);
 				return -1;
 			}
 		}
