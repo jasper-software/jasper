@@ -85,6 +85,7 @@ usage()
 program_dir=$(dirname "$0") || exit 1
 jas_realpath="$program_dir/jas_realpath"
 abs_program_dir=$("$jas_realpath" "$program_dir") || panic
+sysinfo_program="$program_dir/sysinfo"
 
 ################################################################################
 # Process command line.
@@ -394,6 +395,16 @@ if [ -z "$os" ]; then
 		os=unknown
 	fi
 fi
+
+sysinfo_data="$("$sysinfo_program" -a)" || \
+  panic "cannot get system information"
+cat <<- EOF
+================================================================================
+System Information
+$sysinfo_data
+================================================================================
+EOF
+[ $? -eq 0 ] || panic "cat failed"
 
 ################################################################################
 # Apply some platform-specific hacks.

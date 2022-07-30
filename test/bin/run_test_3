@@ -12,6 +12,8 @@ fi
 
 cmd_dir=$(dirname "$0") || exit 1
 source "$cmd_dir"/utilities || exit 1
+top_dir="$cmd_dir/../.."
+sysinfo_program="$top_dir/build/sysinfo"
 
 debug_level="${JAS_DEBUG_LEVEL:-0}"
 if [ "$debug_level" -ge 1 ]; then
@@ -51,6 +53,22 @@ fi
 ###codec_selectors+=(jasper_vm)
 ###codec_selectors+=(vm_jasper)
 
+exclude_tests=()
+
+os="$("$sysinfo_program" -o)" || \
+  panic "cannot get OS information"
+echo "OS: $os"
+
+if [ "$os" = windows ]; then
+	eecho "WARNING: some tests disabled"
+	exclude_tests+=(sgn_1)
+fi
+
+base_opts=()
+for test in "${exclude_tests[@]}"; do
+	base_opts+=(-X "$test")
+done
+
 echo "STARTING AT `date`"
 
 num_errors=0
@@ -67,6 +85,7 @@ for codec_selector in "${codec_selectors[@]}"; do
 	opts+=(-e "$enc")
 	opts+=(-d "$dec")
 	opts+=(-E ignore)
+	opts+=("${base_opts[@]}")
 	#opts+=(-B)
 	opts+=("$@")
 	"$run_test" "${opts[@]}"

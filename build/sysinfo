@@ -1,0 +1,79 @@
+#! /usr/bin/env bash
+
+panic()
+{
+	echo "ERROR: $@" 1>&2
+	exit 1
+}
+
+eecho()
+{
+	echo "$@" 1>&2
+}
+
+all_keys=(os kernel release)
+verbose=0
+keys=()
+
+while getopts avork option; do
+	case "$option" in
+	a)
+		keys=("${all_keys[@]}");;
+	v)
+		verbose=$((verbose + 1));;
+	o)
+		keys+=(os);;
+	k)
+		keys+=(kernel);;
+	r)
+		keys+=(release);;
+	\?)
+		panic "invalid option $option"
+		break;;
+	esac
+done
+shift $((OPTIND - 1))
+
+if [ "${#keys[@]}" -eq 0 ]; then
+	exit 0
+fi
+
+release="$(uname -r)" || panic
+kernel="$(uname)" || panic
+
+if [ "$verbose" -ge 1 ]; then
+	eecho "uname $name"
+	eecho "uname -r $release"
+fi
+
+os=
+
+case "$release" in
+*[Mm]icrosoft*)
+	os=windows;;
+esac
+
+if [ -z "$os" ]; then
+	case "$kernel" in
+	*[Ll]inux*)
+		os=linux;;
+	esac
+fi
+
+if [ -z "$os" ]; then
+	os=unknown
+fi
+
+for key in "${keys[@]}"; do
+	case "$key" in
+	os)
+		value="$os";;
+	kernel)
+		value="$kernel";;
+	release)
+		value="$release";;
+	*)
+		panic;;
+	esac
+	echo "$value" || panic
+done

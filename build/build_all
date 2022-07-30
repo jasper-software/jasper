@@ -10,6 +10,7 @@ program_dir=$(dirname "$0") || exit 1
 jas_realpath="$program_dir/jas_realpath"
 abs_program_dir=$("$jas_realpath" "$program_dir") || panic
 build_program="$program_dir/build"
+sysinfo_program="$program_dir/sysinfo"
 
 list_directory()
 {
@@ -283,6 +284,15 @@ fi
 if [ -n "$command_file" ]; then
 	source "$command_file" || panic "source failed"
 fi
+
+sysinfo_data="$("$sysinfo_program" -a)" || \
+  panic "cannot get system information"
+cat <<- EOF
+================================================================================
+System Information
+$sysinfo_data
+================================================================================
+EOF
 
 os=unknown
 if [ -n "$RUNNER_OS" ]; then
