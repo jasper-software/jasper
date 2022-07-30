@@ -219,7 +219,7 @@ static int pgx_putword(jas_stream_t *out, bool bigendian, int prec,
 static uint_fast32_t pgx_inttoword(jas_seqent_t v, int prec, bool sgnd)
 {
 	uint_fast32_t ret;
-	ret = JAS_CAST(uint_fast32_t, ((sgnd && v < 0) ? ((1 << prec) + v) : v) &
-	  ((1 << prec) - 1));
+	ret = ((sgnd && v < 0) ? (JAS_POW2_X(jas_seqent_t, prec) + v) : v) &
+	  ((1 << prec) - 1);
 	return ret;
 }

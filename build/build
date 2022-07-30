@@ -109,6 +109,7 @@ use_pthread=0
 enable_multithread=1
 build_dir=
 install_dir=
+out_dir=
 crostini=0
 clean_build_dir=0
 clean_install_dir=0
@@ -167,6 +168,12 @@ while [ $# -gt 0 ]; do
 	--install)
 		shift 1
 		enable_install=1
+		;;
+	--out-dir)
+		shift 1
+		[ $# -gt 0 ] || usage
+		out_dir="$1"
+		shift 1
 		;;
 	--build-dir)
 		shift 1
@@ -408,11 +415,14 @@ fi
 
 source_dir="$abs_program_dir/.."
 
+if [ -z "$out_dir" ]; then
+	out_dir="$source_dir/tmp_cmake"
+fi
 if [ -z "$build_dir" ]; then
-	build_dir="$source_dir/tmp_cmake/build"
+	build_dir="$out_dir/build"
 fi
 if [ -z "$install_dir" ]; then
-	install_dir="$source_dir/tmp_cmake/install"
+	install_dir="$out_dir/install"
 fi
 
 echo "operating system: $os"

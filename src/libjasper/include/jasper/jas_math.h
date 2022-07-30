@@ -116,6 +116,12 @@ extern "C" {
   set to one. */
 #define	JAS_ONES(n) \
   ((1 << (n)) - 1)
+#if 0
+#define	JAS_ONES_X(type, n) \
+  ((JAS_CAST(type, 1) << (n)) - 1)
+#endif
+#define	JAS_POW2_X(type, n) \
+  (JAS_CAST(type, 1) << (n))
 
 /******************************************************************************\
 *
