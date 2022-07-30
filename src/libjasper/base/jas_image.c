@@ -1007,7 +1007,8 @@ const jas_image_fmtinfo_t *jas_image_lookupfmtbyname(const char *name)
 static uint_fast32_t inttobits(jas_seqent_t v, unsigned prec, bool sgnd)
 {
 	uint_fast32_t ret;
-	ret = ((sgnd && v < 0) ? ((1 << prec) + v) : v) & JAS_ONES(prec);
+	ret = JAS_CAST(uint_fast32_t, ((sgnd && v < 0) ? ((1 << prec) + v) : v) &
+	  JAS_ONES(prec));
 	return ret;
 }
 

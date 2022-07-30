@@ -2195,14 +2195,14 @@ static jpc_enc_rlvl_t *rlvl_create(jpc_enc_rlvl_t *rlvl, jpc_enc_cp_t *cp,
 
 	/* Compute the coordinates of the top-left and bottom-right
 	  corners of the tile-component at this resolution. */
-	rlvl->tlx = JPC_CEILDIVPOW2(jas_seq2d_xstart(tcmpt->data), tcmpt->numrlvls -
-	  1 - rlvlno);
-	rlvl->tly = JPC_CEILDIVPOW2(jas_seq2d_ystart(tcmpt->data), tcmpt->numrlvls -
-	  1 - rlvlno);
-	rlvl->brx = JPC_CEILDIVPOW2(jas_seq2d_xend(tcmpt->data), tcmpt->numrlvls -
-	  1 - rlvlno);
-	rlvl->bry = JPC_CEILDIVPOW2(jas_seq2d_yend(tcmpt->data), tcmpt->numrlvls -
-	  1 - rlvlno);
+	rlvl->tlx = JPC_CEILDIVPOW2(JAS_CAST(uint_fast32_t,
+	  jas_seq2d_xstart(tcmpt->data)), tcmpt->numrlvls - 1 - rlvlno);
+	rlvl->tly = JPC_CEILDIVPOW2(JAS_CAST(uint_fast32_t,
+	  jas_seq2d_ystart(tcmpt->data)), tcmpt->numrlvls - 1 - rlvlno);
+	rlvl->brx = JPC_CEILDIVPOW2(JAS_CAST(uint_fast32_t,
+	  jas_seq2d_xend(tcmpt->data)), tcmpt->numrlvls - 1 - rlvlno);
+	rlvl->bry = JPC_CEILDIVPOW2(JAS_CAST(uint_fast32_t,
+	  jas_seq2d_yend(tcmpt->data)), tcmpt->numrlvls - 1 - rlvlno);
 
 	if (rlvl->tlx >= rlvl->brx || rlvl->tly >= rlvl->bry) {
 		rlvl->numhprcs = 0;
