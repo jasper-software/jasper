@@ -8,3 +8,4 @@ Version: @JAS_VERSION@
 
 Libs: -L${libdir} -ljasper
 Cflags: -I${includedir}/jasper -I${includedir}
+Cflags.private: -DLIBJASPER_STATIC_DEFINE
