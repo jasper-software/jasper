@@ -1,3 +1,20 @@
+unreleased
+==================
+
+* Improve static linking (##336).
+* Fix path relocation in mingw environment (#335).
+* Improve logging and build scripts.
+* Improve JPEG-2000 conformance test results.
+* Enable PIC by default.
+* Fix memory leaks in function cmdopts_parse (#332) (CVE-2022-2963).
+* imgcmp:
+  + Add quiet (-q) option.
+  + Add debug-level option.
+  + Fix memory leak.
+* imginfo:
+  + Add quiet (-q) option.
+* Fix bug in parsing PGX header.
+
 3.0.6 (2022-07-13)
 ==================
 
