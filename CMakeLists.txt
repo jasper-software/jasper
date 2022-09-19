@@ -556,6 +556,9 @@ if(JAS_INCLUDE_JP2_CODEC AND NOT JAS_INCLUDE_JPC_CODEC)
 	  "The JPC codec must be included in order to include the JP2 codec.")
 endif()
 
+# Prepare variable for pkgconfig file
+set(JAS_PKGCONFIG_REQUIRES)
+
 ################################################################################
 # Configure threading support
 ################################################################################
@@ -737,6 +740,7 @@ if(JAS_ENABLE_LIBJPEG)
 		if(JAS_HAVE_JPEGLIB_H)
 			set(JAS_HAVE_LIBJPEG 1)
 			set(JAS_LIBJPEG_TARGET JPEG::JPEG)
+			list(APPEND JAS_PKGCONFIG_REQUIRES libjpeg)
 		else()
 			message(WARNING "The header file jpeglib.h is missing.")
 			message(WARNING "Disabling LIBJPEG.")
@@ -760,6 +764,7 @@ if(JAS_ENABLE_LIBHEIF)
 	if(HEIF_LIBRARY AND JAS_HAVE_HEIF_H)
 		set(JAS_HAVE_LIBHEIF 1)
 		set(HEIF_LIBRARIES "${HEIF_LIBRARY}")
+		list(APPEND JAS_PKGCONFIG_REQUIRES libheif)
 	endif()
 endif()
 if(NOT JAS_HAVE_LIBHEIF)
@@ -818,6 +823,7 @@ endif()
 
 # The package configuation (pc) file should be installed in
 # ${CMAKE_INSTALL_PREFIX}/lib/pkgconfig.
+string(JOIN " " JAS_PKGCONFIG_REQUIRES ${JAS_PKGCONFIG_REQUIRES})
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/build/jasper.pc.in"
   "${CMAKE_CURRENT_BINARY_DIR}/build/jasper.pc" @ONLY)
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/build/jasper.pc"

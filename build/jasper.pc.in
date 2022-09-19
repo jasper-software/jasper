@@ -7,5 +7,6 @@ Description: Image Processing/Coding Tool Kit with JPEG-2000 Support
 Version: @JAS_VERSION@
 
 Libs: -L${libdir} -ljasper
+Requires.private: @JAS_PKGCONFIG_REQUIRES@
 Cflags: -I${includedir}/jasper -I${includedir}
 Cflags.private: -DLIBJASPER_STATIC_DEFINE
