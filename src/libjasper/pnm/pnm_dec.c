@@ -186,8 +186,12 @@ jas_image_t *pnm_decode(jas_stream_t *in, const char *optstr)
 		goto error;
 	}
 	JAS_LOGDEBUGF(10,
-	  "magic %lx; width %lu; height %ld; numcmpts %d; maxval %ld; sgnd %d\n",
-	  JAS_CAST(unsigned long, hdr.magic), JAS_CAST(long, hdr.width),
+	  "magic %lx; format %s; "
+	  "width %lu; height %ld; "
+	  "numcmpts %d; maxval %ld; sgnd %d\n",
+	  JAS_CAST(unsigned long, hdr.magic),
+	  JAS_CAST(long, pnm_fmt(hdr.magic)) == PNM_FMT_BIN ? "binary" : "text",
+	  JAS_CAST(long, hdr.width),
 	  JAS_CAST(long, hdr.height), hdr.numcmpts, JAS_CAST(long, hdr.maxval),
 	  hdr.sgnd
 	  );
@@ -306,6 +310,9 @@ static int pnm_gethdr(jas_stream_t *in, pnm_hdr_t *hdr)
 	} else {
 		hdr->maxval = maxval;
 		hdr->sgnd = false;
+	}
+	if (maxval >= 65536) {
+		return -1;
 	}
 
 	switch (type) {
@@ -576,7 +583,6 @@ static int pnm_getsintstr(jas_stream_t *in, int_fast32_t *val)
 {
 	int c;
 	int s;
-	int_fast32_t v;
 
 	/* Discard any leading whitespace. */
 	do {
@@ -597,12 +603,21 @@ static int pnm_getsintstr(jas_stream_t *in, int_fast32_t *val)
 			return -1;
 		}
 	}
-	v = 0;
+
+	jas_safeui32_t sv = jas_safeui32_from_ulong(0);
 	while (isdigit(JAS_CAST(unsigned char, c))) {
-		v = 10 * v + c - '0';
+		// sv = 10 * sv + c - '0';
+		sv = jas_safeui32_add(
+		  jas_safeui32_mul(sv, jas_safeui32_from_ulong(10)),
+		  jas_safeui32_sub(jas_safeui32_from_ulong(c),
+		  jas_safeui32_from_ulong('0')));
 		if ((c = pnm_getc(in)) < 0) {
 			return -1;
 		}
+	}
+	int_fast32_t v;
+	if (!jas_safeui32_to_intfast32(sv, &v)) {
+		return -1;
 	}
 
 	/* The number must be followed by whitespace. */

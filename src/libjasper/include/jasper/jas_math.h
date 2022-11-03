@@ -404,7 +404,90 @@ inline static bool jas_safe_uint_mul(unsigned x, unsigned y, unsigned *result)
 #endif
 
 /******************************************************************************\
-* Safe integer arithmetic (i.e., with overflow checking).
+* Safe 32-bit unsigned integer arithmetic (i.e., with overflow checking).
+\******************************************************************************/
+
+#define JAS_SAFEUI32_MAX (0xffffffffU)
+
+typedef struct {
+	bool valid;
+	uint_least32_t value;
+} jas_safeui32_t;
+
+JAS_ATTRIBUTE_CONST
+static inline jas_safeui32_t jas_safeui32_from_ulong(unsigned long x)
+{
+	jas_safeui32_t result;
+	if (x <= JAS_SAFEUI32_MAX) {
+		result.valid = 1;
+		result.value = JAS_CAST(uint_least32_t, x);
+	} else {
+		result.valid = 0;
+		result.value = 0;
+	}
+	return result;
+}
+
+JAS_ATTRIBUTE_PURE
+static inline bool jas_safeui32_to_intfast32(jas_safeui32_t x,
+  int_fast32_t* y)
+{
+	if (x.value <= INT_FAST32_MAX) {
+		*y = x.value;
+		return true;
+	} else {
+		return false;
+	}
+}
+
+JAS_ATTRIBUTE_CONST
+static inline jas_safeui32_t jas_safeui32_add(jas_safeui32_t x,
+  jas_safeui32_t y)
+{
+	jas_safeui32_t result;
+	if (x.valid && y.valid && y.value <= UINT_LEAST32_MAX - x.value) {
+		result.valid = true;
+		result.value = x.value + y.value;
+	} else {
+		result.valid = false;
+		result.value = 0;
+	}
+	return result;
+}
+
+JAS_ATTRIBUTE_CONST
+static inline
+jas_safeui32_t jas_safeui32_sub(jas_safeui32_t x, jas_safeui32_t y)
+{
+	jas_safeui32_t result;
+	if (x.valid && y.valid && y.value <= x.value) {
+		result.valid = true;
+		result.value = x.value - y.value;
+	} else {
+		result.valid = false;
+		result.value = 0;
+	}
+	return result;
+}
+
+JAS_ATTRIBUTE_CONST
+static inline jas_safeui32_t jas_safeui32_mul(jas_safeui32_t x,
+  jas_safeui32_t y)
+{
+	jas_safeui32_t result;
+	if (!x.valid || !y.valid || (x.value && y.value > UINT_LEAST32_MAX /
+	  x.value)) {
+		result.valid = false;
+		result.value = 0;
+	} else {
+		result.valid = true;
+		result.value = x.value * y.value;
+	}
+	return result;
+}
+
+/******************************************************************************\
+* Safe 64-bit unsigned integer arithmetic (i.e., with overflow checking).
 \******************************************************************************/
 
 typedef struct {
@@ -412,6 +495,7 @@ typedef struct {
 	uint_least64_t value;
 } jas_safeui64_t;
 
+JAS_ATTRIBUTE_CONST
 static inline
 jas_safeui64_t jas_safeui64_from_intmax(intmax_t x)
 {
@@ -426,6 +510,7 @@ jas_safeui64_t jas_safeui64_from_intmax(intmax_t x)
 	return result;
 }
 
+JAS_ATTRIBUTE_CONST
 static inline
 jas_safeui64_t jas_safeui64_add(jas_safeui64_t x, jas_safeui64_t y)
 {
@@ -440,6 +525,7 @@ jas_safeui64_t jas_safeui64_add(jas_safeui64_t x, jas_safeui64_t y)
 	return result;
 }
 
+JAS_ATTRIBUTE_CONST
 static inline
 jas_safeui64_t jas_safeui64_sub(jas_safeui64_t x, jas_safeui64_t y)
 {
@@ -454,6 +540,7 @@ jas_safeui64_t jas_safeui64_sub(jas_safeui64_t x, jas_safeui64_t y)
 	return result;
 }
 
+JAS_ATTRIBUTE_CONST
 static inline
 jas_safeui64_t jas_safeui64_mul(jas_safeui64_t x, jas_safeui64_t y)
 {
@@ -469,6 +556,7 @@ jas_safeui64_t jas_safeui64_mul(jas_safeui64_t x, jas_safeui64_t y)
 	return result;
 }
 
+JAS_ATTRIBUTE_CONST
 static inline
 jas_safeui64_t jas_safeui64_div(jas_safeui64_t x, jas_safeui64_t y)
 {
@@ -483,6 +571,7 @@ jas_safeui64_t jas_safeui64_div(jas_safeui64_t x, jas_safeui64_t y)
 	return result;
 }
 
+JAS_ATTRIBUTE_CONST
 static inline
 jas_safeui64_t jas_safeui64_pow2_intmax(intmax_t x)
 {
@@ -497,6 +586,7 @@ jas_safeui64_t jas_safeui64_pow2_intmax(intmax_t x)
 	return result;
 }
 
+JAS_ATTRIBUTE_CONST
 static inline
 int jas_safeui64_to_int(jas_safeui64_t x, int invalid_value)
 {
