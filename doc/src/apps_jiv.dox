@@ -26,8 +26,20 @@ The following options are supported:
   - `--help`
     - Print help information and exit.
 
+  - `--version`
+    - Display the version information and exit.
+
   - `--wait $n`
     - Automatically step from one image to the next,
       pausing for `$n` seconds in between.
+
+  - `--loop`
+    - Repeatedly cycle through the specified images.
+
+  - `--memory-limit $n`
+    - Set the memory limit to `$n` bytes.
+
+  - `--debug-level $level`
+    - Set the debug level to `$level`.
 
 */

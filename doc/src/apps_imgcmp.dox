@@ -18,6 +18,15 @@ components, component subsampling factors, etc.).
 
 The following options are supported:
 
+  - `--help`
+    - Print help information and exit.
+
+  - `--version`
+    - Display the version information and exit.
+
+  - `--verbose`
+    - Increase the verbosity level.
+
   - `-f $file`
     - Read the primary (i.e., reference) image (for comparison purposes)
       from the file named `$file`.
@@ -36,6 +45,12 @@ The following options are supported:
         - `pae`: peak absolute error (PAE)
         - `mae`: mean absolute error (MAE)
         - `equal`: equality
+
+  - `--memory-limit $n`
+    - Set the memory limit to `$n` bytes.
+
+  - `--debug-level $level`
+    - Set the debug level to `$level`.
 
 The `-f` and `-F` options must always be specified.
 There is currently no way to explicitly specify the format of the images.

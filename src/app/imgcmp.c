@@ -694,14 +694,24 @@ void cmdinfo()
 
 void usage()
 {
+	static const char helpinfo[] = {
+		"Some of the supported options include:\n"
+		"    -f $file\n"
+		"        Set the pathname of reference image file to $file.\n"
+		"    -F $other_image_file\n"
+		"        Set pathname of the other image file to $file.\n"
+		"    -m $metric\n"
+		"        Set the metric to $metric.\n"
+		"For additional information, please see the online documentation.\n"
+	};
 	cmdinfo();
-	fprintf(stderr, "usage:\n");
-	fprintf(stderr,"%s ", cmdname);
+	fprintf(stderr, "\n");
+	fprintf(stderr, "%s\n", JAS_NOTES);
+	fprintf(stderr, "usage: %s [options]\n", cmdname);
+	fprintf(stderr, "\n");
+	fprintf(stderr, "%s\n", helpinfo);
 	fprintf(stderr,
-	  "-f reference_image_file -F other_image_file [-m metric]\n"
-	  );
-	fprintf(stderr,
-	  "The metric argument may assume one of the following values:\n"
+	  "The metric specifier may assume one of the following values:\n"
 	  "    psnr .... peak signal to noise ratio\n"
 	  "    mse ..... mean squared error\n"
 	  "    rmse .... root mean squared error\n"

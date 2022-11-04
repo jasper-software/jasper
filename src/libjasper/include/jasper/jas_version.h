@@ -87,11 +87,11 @@ extern "C" {
 	"All rights reserved.\n"
 
 #define	JAS_NOTES \
-	"For more information about this software, please visit the following\n" \
-	"web sites/pages:\n" \
+	"For information about the JasPer project, see:\n" \
 	"    https://jasper-software.github.io/jasper\n" \
-	"    https://jasper-software.github.io/jasper-manual\n" \
 	"    https://www.ece.uvic.ca/~mdadams/jasper\n" \
+	"For online documentation on the JasPer software, see:\n" \
+	"    https://jasper-software.github.io/jasper-manual\n" \
 	"Please submit bug reports using the bug-tracker at:\n" \
 	"    https://github.com/jasper-software/jasper/issues\n"
 

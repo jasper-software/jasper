@@ -592,7 +592,7 @@ void cmdinfo()
 }
 
 static const char *const helpinfo[] = {
-"The following options are supported:\n",
+"Some of the supported options include:\n",
 "    --help                  Print this help information and exit.\n",
 "    --version               Print version information and exit.\n",
 "    --verbose               Enable verbose mode.\n",
@@ -608,9 +608,7 @@ static const char *const helpinfo[] = {
 "                            (See below for the list of supported formats.)\n",
 "    --output-option $opt    Provide the option $opt to the encoder.\n",
 "    --force-srgb            Force conversion to the sRGB color space.\n",
-"Some of the above option names can be abbreviated as follows:\n",
-"    --input = -f, --input-format = -t, --input-option = -o,\n",
-"    --output = -F, --output-format = -T, --output-option = -O\n",
+"For additional information, please see the online documentation.\n",
 0
 };
 
@@ -623,6 +621,7 @@ void cmdusage()
 	for (i = 0, s = helpinfo[i]; s; ++i, s = helpinfo[i]) {
 		fprintf(stderr, "%s", s);
 	}
+	fprintf(stderr, "\n");
 
 	fprintf(stderr, "The following formats are supported:\n");
 	int fmtind;

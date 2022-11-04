@@ -374,15 +374,17 @@ static void cmdinfo()
 	  JAS_VERSION);
 	fprintf(stderr, "Copyright (c) 2002-2003 Michael David Adams.\n"
 	  "All rights reserved.\n");
+	fprintf(stderr, "\n");
 	fprintf(stderr, "%s\n", JAS_NOTES);
 }
 
 static const char *const helpinfo[] = {
-"The following options are supported:\n",
+"Some of the supported options include:\n",
 "    --help                  Print this help information and exit.\n",
 "    --version               Print version information and exit.\n",
 "    --loop                  Loop indefinitely through images.\n",
 "    --wait N                Advance to next image after N seconds.\n",
+"For additional information, please see the online documentation.\n",
 0
 };
 

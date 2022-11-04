@@ -382,8 +382,16 @@ static void cmdinfo()
 static void usage()
 {
 	static const char help[] = {
-		"Options:\n"
+		"Some supported options include:\n"
 		"    --help\n"
+		"    --version\n"
+		"        Display the version information and exit.\n"
+		"    --verbose\n"
+		"        Increase the verbosity level.\n"
+		"    -f $file\n"
+		"        Read the input image from the file $file.\n"
+		"    --list-enabled-formats\n"
+		"        Print the names of all of the enabled image formats.\n"
 		"    --memory-limit $n\n"
 		"        Set the memory limit to $n bytes.\n"
 		"    --debug-level $level\n"
@@ -392,14 +400,11 @@ static void usage()
 		"        Set the maximum number of samples for decoding to $n\n"
 		"    --decoder-option $string\n"
 		"        Add the option $string to the list of decoder options.\n"
-		"    --verbose\n"
-		"        Increase the verbosity level.\n"
-		"    --version\n"
-		"        Display the version information and exit.\n"
-		"    -f $file\n"
-		"        Read the input image from the file $file.\n"
+		"For additional information, please see the online documentation.\n"
 	};
 	cmdinfo();
+	fprintf(stderr, "\n");
+	fprintf(stderr, "%s\n", JAS_NOTES);
 	fprintf(stderr, "usage:\n");
 	fprintf(stderr,"%s ", cmdname);
 	fprintf(stderr, "[-f image_file]\n");
