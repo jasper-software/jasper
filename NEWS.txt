@@ -14,6 +14,7 @@ unreleased
 * imginfo:
   + Add quiet (-q) option.
 * Fix bug in parsing PGX header.
+* Fix integer overflow bug (#345) (CVE-2022-40755).
 
 3.0.6 (2022-07-13)
 ==================
