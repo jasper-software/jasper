@@ -7,9 +7,12 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
-        compiler: [gcc, clang]
         include:
           - os: [windows-2022]
+          - c_compiler: gcc
+            cxx_compiler: g++
+          - c_compiler: clang
+            cxx_compiler: clang++
       fail-fast: false
     runs-on: ${{ matrix.os }}
     steps:
@@ -21,7 +24,8 @@ jobs:
     ############################################################
     - name: testing
       env:
-        CC: ${{ matrix.compiler }}
+        CC: ${{ matrix.c_compiler }}
+        CXX: ${{ matrix.cxx_compiler }}
       shell: bash
       #run: build/build_all -v -d 2
       run: build/build_all -C '${{runner.temp}}'/commands
