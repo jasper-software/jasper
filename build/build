@@ -443,6 +443,9 @@ echo "install directory: $install_dir"
 if [ -n "$CC" ]; then
 	echo "C compiler $CC"
 fi
+if [ -n "$CXX" ]; then
+	echo "CXX compiler $CXX"
+fi
 
 if [ -n "$sde_top_dir" ]; then
 	#sde_gcc="$sde_top_dir/bin/gcc"
