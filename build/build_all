@@ -319,7 +319,7 @@ if [ -n "$RUNNER_OS" ]; then
 		esac
 	fi
 fi
-ubuntu_clang_hack=0
+#ubuntu_clang_hack=0
 
 ################################################################################
 
@@ -400,18 +400,18 @@ if [ "${#tests[@]}" -eq 0 ]; then
 	tests=()
 
 	# debug builds
-	if [ "$ubuntu_clang_hack" -eq 0 ]; then
-		tests+=(static_debug_mt0)
-		tests+=(static_debug_mt1)
-		tests+=(static_debug_ji_mt0)
-		tests+=(static_debug_ji_mt1)
-		tests+=(tsan)
-	fi
+	#if [ "$ubuntu_clang_hack" -eq 0 ]; then
+	#fi
+	tests+=(static_debug_mt0)
+	tests+=(static_debug_mt1)
+	tests+=(static_debug_ji_mt0)
+	tests+=(static_debug_ji_mt1)
+	tests+=(tsan)
 
 	# release builds
-	tests+=(shared_release_mt0)
-	tests+=(shared_release_mt1)
 	if [ "$ubuntu_clang_hack" -eq 0 ]; then
+		tests+=(shared_release_mt0)
+		tests+=(shared_release_mt1)
 		tests+=(static_release_mt0)
 		tests+=(static_release_mt1)
 	fi

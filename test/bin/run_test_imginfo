@@ -33,15 +33,7 @@ fi
 
 ################################################################################
 
-is_supported_format()
-{
-	local format="$1"
-	local supported=0
-	"$jasper" --list-enabled-formats | grep -q '^'"$format"'$' && supported=1
-	echo "$supported"
-}
-
-formats=($("$jasper" --list-enabled-formats)) || \
+formats=($("$jasper" --enable-all-formats --list-enabled-formats)) || \
   panic "cannot get supported formats"
 if [ "$verbose" -ge 2 ]; then
 	echo "The following formats are supported:"
@@ -49,13 +41,16 @@ if [ "$verbose" -ge 2 ]; then
 		echo "    $format"
 	done
 fi
-has_jpg=$(is_supported_format jpg) || panic "cannot check if JPG supported"
-has_mif=$(is_supported_format mif) || panic "cannot check if MIF supported"
-#has_png=$(is_supported_format png) || panic "cannot check if PNG supported"
+has_jpg=$(is_supported_format jpg) || \
+  panic "cannot determine if JPG is supported format"
+has_mif=$(is_supported_format mif) || \
+  panic "cannot determine if MIF is supported format"
+has_png=$(is_supported_format png) || \
+  panic "cannot determine if PNG is supported format"
 if [ "$verbose" -ge 1 ]; then
 	echo "JPG: $has_jpg"
 	echo "MIF: $has_mif"
-	#echo "PNG: $has_png"
+	echo "PNG: $has_png"
 fi
 
 failed_tests=()
@@ -100,6 +95,7 @@ while IFS= read -r line; do
 	fi
 
 	imginfo_options=()
+	imginfo_options+=(--enable-all-formats)
 	if [ -n "$imginfo_debug_level" ]; then
 		imginfo_options+=(--debug-level "$imginfo_debug_level")
 	fi

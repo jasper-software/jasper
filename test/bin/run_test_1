@@ -41,8 +41,10 @@ fi
 
 ################################################################################
 
-has_jpg="$(is_supported_format jpg)" || panic
-has_mif="$(is_supported_format mif)" || panic
+has_jpg="$(is_supported_format jpg)" || \
+  panic "cannot determine if JPG is supported format"
+has_mif="$(is_supported_format mif)" || \
+  panic "cannot determine if MIF is supported format"
 
 if [ "$internal_testing_mode" -ne 0 -a "$has_mif" -eq 0 ]; then
 	echo "warning: MIF support is missing"

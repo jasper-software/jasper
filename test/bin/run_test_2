@@ -38,8 +38,10 @@ debug=0
 
 image_path="$data_dir/images"
 
-has_jpg=$(is_supported_format jpg) || panic
-has_mif=$(is_supported_format mif) || panic
+has_jpg=$(is_supported_format jpg) || \
+  panic "cannot determine if JPG is supported format"
+has_mif=$(is_supported_format mif) || \
+  panic "cannot determine if MIF is supported format"
 
 in_files=()
 #in_files+=(feep2.pnm)
