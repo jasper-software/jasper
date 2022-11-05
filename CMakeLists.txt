@@ -8,14 +8,14 @@ cmake_minimum_required(VERSION 3.12)
 ################################################################################
 
 # The major, minor, and micro version numbers of the project.
-set(JAS_VERSION_MAJOR 3)
+set(JAS_VERSION_MAJOR 4)
 set(JAS_VERSION_MINOR 0)
-set(JAS_VERSION_PATCH 6)
+set(JAS_VERSION_PATCH 0)
 
 # The shared library versioning information.
 # Guidelines on how to change this information can be found below.
-# The shared library version was set to 6.0.0 for JasPer version 3.0.0.
-set(JAS_SO_VERSION 6)
+# The shared library version was set to 7.0.0 for JasPer version 4.0.0.
+set(JAS_SO_VERSION 7)
 set(JAS_SO_MINOR 0)
 set(JAS_SO_RELEASE 0)
 
