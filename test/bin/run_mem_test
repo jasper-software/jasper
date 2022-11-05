@@ -45,6 +45,8 @@ else
 	imginfo_program="$program_dir/../../tmp_cmake/build/src/app/imginfo"
 	jasper_program="$program_dir/../../tmp_cmake/build/src/app/jasper"
 fi
+export IMGINFO_COMMAND="$imginfo_program"
+export JASPER_COMMAND="$jasper_program"
 image_file=
 
 while getopts s:e:d:p:i:D:m:T:h opt; do

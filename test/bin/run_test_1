@@ -25,18 +25,10 @@ set_source_and_build_dirs || panic "cannot set source and build directories"
 top_dir="$cmd_dir/../.."
 data_dir="$top_dir/data"
 
-imginfo="$abs_top_builddir/src/app/imginfo"
 jasper="$abs_top_builddir/src/app/jasper"
-
-################################################################################
-
-is_supported_format()
-{
-	local format="$1"
-	local supported=0
-	"$jasper" --list-enabled-formats | grep -q '^'"$format"'$' && supported=1
-	echo "$supported"
-}
+imginfo="$abs_top_builddir/src/app/imginfo"
+export JASPER_COMMAND="$jasper"
+export IMGINFO_COMMAND="$imginfo"
 
 ################################################################################
 
@@ -139,7 +131,7 @@ for in_file in "${good_list[@]}"; do
 	expected_status=0
 	test_case="part1-$(basename "$in_file")"
 	echo "Input file: $in_file"
-	"$imginfo" < "$in_file"
+	"$imginfo" --enable-all-formats < "$in_file"
 	status=$?
 	echo "actual exit status: $status"
 	echo "expected exit status: $expected_status"
@@ -198,12 +190,12 @@ for in_file in "${bad_list[@]}"; do
 	esac
 
 	# The following allows for extra debugging for certain specific test cases.
-	imginfo_debug_level=
-	case "$name" in
-	*abort*)
-		imginfo_debug_level=20
-		;;
-	esac
+	#imginfo_debug_level=
+	#case "$name" in
+	#*abort*)
+	#	imginfo_debug_level=20
+	#	;;
+	#esac
 
 	echo "Input file: $in_file"
 	case "$name" in
@@ -212,6 +204,7 @@ for in_file in "${bad_list[@]}"; do
 		;;
 	esac
 	imginfo_opts=()
+	imginfo_opts+=(--enable-all-formats)
 	imginfo_opts+=(--max-samples "$max_samples")
 	if [ -n "$imginfo_debug_level" ]; then
 		echo "Setting imginfo debug level to $imginfo_debug_level"
@@ -242,6 +235,8 @@ echo "PART 3: Encoder tests"
 echo "############################################################"
 
 for in_file in "${enc_list[@]}"; do
+	jasper_options=()
+	jasper_options+=(--enable-all-formats)
 	test_case="part3-$(basename "$in_file")"
 	echo "############################################################"
 	echo "Input file: $in_file"
@@ -252,11 +247,11 @@ for in_file in "${enc_list[@]}"; do
 	expected_status=1
 	if [ "$verbose" -ge 1 ]; then
 		#echo "Running ASAN_OPTIONS=${special_asan_options[*]} $jasper -f $in_file -T jp2 -F - > /dev/null"
-		echo "Running $jasper -f $in_file -T jp2 -F - > /dev/null"
+		echo "Running $jasper ${jasper_options[*]} -f $in_file -T jp2 -F - > /dev/null"
 	fi
 	#ASAN_OPTIONS="${special_asan_options[*]}" \
 	#  "$jasper" -f "$in_file" -T jp2 -F - > /dev/null
-	"$jasper" -f "$in_file" -T jp2 -F - > /dev/null
+	"$jasper" "${jasper_options[@]}" -f "$in_file" -T jp2 -F - > /dev/null
 	status=$?
 	if [ "$status" -ne "$expected_status" ]; then
 		echo "ERROR: imginfo command had unexpected exit status " \

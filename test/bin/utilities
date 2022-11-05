@@ -103,14 +103,16 @@ function image_info()
 	local file="$1"
 	local key="$2"
 	local value
-	local imginfo="${IMGINFO_COMMAND:-imginfo}"
+	#local imginfo="${IMGINFO_COMMAND:-imginfo}"
+	local imginfo="$IMGINFO_COMMAND"
+	[ -n "$imginfo" ] || return 1
 	#eecho "invoked image_info with file=$file key=$key"
 	if [ ! -x "$imginfo" ]; then
 		eecho "cannot find command $imginfo"
 		return 1
 	fi
 	#local buffer=$("$imginfo" -q < "$file" 2> /dev/null) || return 1
-	local buffer=$("$imginfo" -q < "$file") || return 1
+	local buffer=$("$imginfo" --enable-all-formats -q < "$file") || return 1
 	case "$key" in
 	format)
 		value=$(awk '{print $1}' <<< "$buffer") || return 1
@@ -237,4 +239,16 @@ function evaluate_expression()
 	[ $# -eq 1 ] || return 1
 	local expr="$1"
 	bc -l <<< "$expr"
+}
+
+is_supported_format()
+{
+	#local jasper="${JASPER_COMMAND:-jasper}"
+	local jasper="$JASPER_COMMAND"
+	[ -n "$jasper" ] || return 1
+	local format="$1"
+	local supported=0
+	"$jasper" --enable-all-formats --list-enabled-formats | \
+	  grep -q '^'"$format"'$' && supported=1
+	echo "$supported"
 }

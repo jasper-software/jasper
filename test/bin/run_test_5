@@ -22,6 +22,8 @@ data_dir="$abs_top_srcdir/data"
 
 test_program="$abs_top_builddir/src/app/multithread"
 jasper_program="$abs_top_builddir/src/app/jasper"
+#export IMGINFO_COMMAND="$imginfo"
+export JASPER_COMMAND="$jasper_program"
 
 ################################################################################
 
@@ -34,6 +36,7 @@ tmp_dir=$(make_tmp_dir)
 
 log_file=$tmp_dir/log
 
+# TODO: replace this with is_supported_format
 "$jasper_program" --list-enabled-formats | grep -q jpg
 if [ $? -eq 0 ]; then
 	has_jpg_codec=1

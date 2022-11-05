@@ -186,10 +186,12 @@ fi
 
 jpdec="$cmd_dir/jpdec"
 dec=jasper
-imgcmp="$abs_top_builddir/src/app/imgcmp"
-imginfo="$abs_top_builddir/src/app/imginfo"
-export IMGINFO_COMMAND="$imginfo"
+
 jasper="$abs_top_builddir/src/app/jasper"
+imginfo="$abs_top_builddir/src/app/imginfo"
+imgcmp="$abs_top_builddir/src/app/imgcmp"
+export IMGINFO_COMMAND="$imginfo"
+export JASPER_COMMAND="$jasper"
 
 testcase_file="$cmd_dir/conformance_tests"
 if [ "${#testcases[@]}" -eq 0 ]; then

@@ -15,8 +15,9 @@ tmp_dir=$(make_tmp_dir)
 
 init
 
-export IMGINFO_COMMAND="$abs_top_builddir/src/app/imginfo"
 IMGCMP="$abs_top_builddir/src/app/imgcmp"
+export IMGINFO_COMMAND="$abs_top_builddir/src/app/imginfo"
+export JASPER_COMMAND="$abs_top_builddir/src/app/jasper"
 
 MKDATA=1
 DATADIR="$tmp_dir"

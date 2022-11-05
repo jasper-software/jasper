@@ -15,14 +15,6 @@ fi
 set_source_and_build_dirs || panic "cannot set source and build directories"
 tmp_dir=$(make_tmp_dir)
 
-is_supported_format()
-{
-	local format="$1"
-	local supported=0
-	"$jasper" --list-enabled-formats | grep -q '^'"$format"'$' && supported=1
-	echo "$supported"
-}
-
 ################################################################################
 
 #abs_source_dir="$1"
@@ -33,10 +25,12 @@ tmp_file=$tmp_dir/data
 top_dir="$cmd_dir/../.."
 data_dir="$top_dir/data"
 
-export IMGINFO_COMMAND="$abs_top_builddir/src/app/imginfo"
 jasper="$abs_top_builddir/src/app/jasper"
+imginfo="$abs_top_builddir/src/app/imginfo"
 imgcmp="$abs_top_builddir/src/app/imgcmp"
 jiv="$abs_top_builddir/src/app/jiv"
+export JASPER_COMMAND="$jasper"
+export IMGINFO_COMMAND="$imginfo"
 
 internal_testing_mode="${JAS_INTERNAL_TESTING_MODE:-0}"
 
