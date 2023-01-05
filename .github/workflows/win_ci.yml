@@ -11,7 +11,7 @@ jobs:
       fail-fast: false
     runs-on: ${{ matrix.os }}
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: testing
       shell: bash
       run: build/build --debug-level 10 --shared --test --verbose
