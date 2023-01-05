@@ -68,18 +68,48 @@ linux)
 	sudo apt-get install "${packages[@]}" || panic "apt-get install failed"
 	;;
 macos)
+
 	packages=()
-	packages+=(findutils)
-	packages+=(netpbm)
-	packages+=(wget)
-	packages+=(unzip)
+
+	# Check for find program.
+	program="$(type -P find)" || program=
+	if [ -z "$program" ]; then
+		echo "$program not found"
+		packages+=(findutils)
+	fi
+
+	# Check for Netpbm tools.
+	program="$(type -P ppmtopnm)" || program=
+	if [ -z "$program" ]; then
+		echo "$program not found"
+		packages+=(netpbm)
+	fi
+
+	# Check for wget program.
+	program="$(type -P wget)" || program=
+	if [ -z "$program" ]; then
+		echo "$program not found"
+		packages+=(wget)
+	fi
+
+	# Check for unzip program.
+	program="$(type -P unzip)" || program=
+	if [ -z "$program" ]; then
+		echo "$program not found"
+		packages+=(unzip)
+	fi
+
 	brew update || panic "brew update failed"
-	brew install "${packages[@]}" || panic "brew install failed"
+	if [ "${#packages[@]}" -ne 0 ]; then
+		echo "Installing packages ${packages[@]}"
+		brew install "${packages[@]}" || panic "brew install failed"
+	fi
 	cat >> "$out_file" <<- EOF
 	export PATH=\$(brew --prefix)/opt/findutils/libexec/gnubin:\$PATH
 	EOF
 	[ $? -eq 0 ] || panic "cat failed"
 	;;
+
 windows)
 	;;
 *)
