@@ -76,6 +76,8 @@ macos)
 	if [ -z "$program" ]; then
 		echo "$program not found"
 		packages+=(findutils)
+	else
+		echo "program: $program"
 	fi
 
 	# Check for Netpbm tools.
@@ -83,6 +85,8 @@ macos)
 	if [ -z "$program" ]; then
 		echo "$program not found"
 		packages+=(netpbm)
+	else
+		echo "program: $program"
 	fi
 
 	# Check for wget program.
@@ -90,6 +94,8 @@ macos)
 	if [ -z "$program" ]; then
 		echo "$program not found"
 		packages+=(wget)
+	else
+		echo "program: $program"
 	fi
 
 	# Check for unzip program.
@@ -97,8 +103,12 @@ macos)
 	if [ -z "$program" ]; then
 		echo "$program not found"
 		packages+=(unzip)
+	else
+		echo "program: $program"
 	fi
 
+	export HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1
+	export HOMEBREW_NO_INSTALL_CLEANUP=1
 	brew update || panic "brew update failed"
 	if [ "${#packages[@]}" -ne 0 ]; then
 		echo "Installing packages ${packages[@]}"
