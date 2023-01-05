@@ -70,27 +70,33 @@ linux)
 macos)
 
 	packages=()
-
-	for program_name in find ppmtoppm wget unzip; do
-		program_pathname="$(type -P "$program_name")" || program_pathname=
-		if [ -z "$program_pathname" ]; then
-			echo "$program_name program not found"
-			case "$program_name" in
-			find)
-				packages+=(findutils);;
-			ppmtoppm)
-				packages+=(netpbm);;
-			wget)
-				packages+=(wget);;
-			unzip)
-				packages+=(unzip);;
-			*)
-				panic "invalid program name $program_name";;
-			esac
-		else
-			echo "$program_name program: $program_pathname"
-		fi
-	done
+	if [ 0 -ne 0 ]; then
+		for program_name in find ppmtoppm wget unzip; do
+			program_pathname="$(type -P "$program_name")" || program_pathname=
+			if [ -z "$program_pathname" ]; then
+				echo "$program_name program not found"
+				case "$program_name" in
+				find)
+					packages+=(findutils);;
+				ppmtoppm)
+					packages+=(netpbm);;
+				wget)
+					packages+=(wget);;
+				unzip)
+					packages+=(unzip);;
+				*)
+					panic "invalid program name $program_name";;
+				esac
+			else
+				echo "$program_name program: $program_pathname"
+			fi
+		done
+	else
+		packages+=(findutils)
+		packages+=(netpbm)
+		packages+=(wget)
+		packages+=(unzip)
+	fi
 
 	export HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1
 	export HOMEBREW_NO_INSTALL_CLEANUP=1
