@@ -130,7 +130,7 @@ option(JAS_INCLUDE_JPC_CODEC "Include (native) JPC codec support" ON)
 option(JAS_INCLUDE_JPG_CODEC
   "Include JPG codec support (via IJG JPEG Library)" ON)
 option(JAS_INCLUDE_HEIC_CODEC
-	"Include experimental HEIC codec support (via Libheif Library)" ON)
+  "Include experimental HEIC codec support (via Libheif Library)" ON)
 option(JAS_INCLUDE_MIF_CODEC "Include (native) MIF codec support" ON)
 option(JAS_INCLUDE_PGX_CODEC "Include (native) PGX codec support" ON)
 option(JAS_INCLUDE_PNM_CODEC "Include (native) PNM codec support" ON)
@@ -144,7 +144,7 @@ option(JAS_ENABLE_JPC_CODEC "Enable (native) JPC codec support" ON)
 option(JAS_ENABLE_JPG_CODEC
   "Enable JPG codec support (via IJG JPEG Library)" ON)
 option(JAS_ENABLE_HEIC_CODEC
-	"Enable experimental HEIC codec support (via Libheif Library)" OFF)
+  "Enable experimental HEIC codec support (via Libheif Library)" OFF)
 option(JAS_ENABLE_MIF_CODEC "Enable (native) MIF codec support" OFF)
 option(JAS_ENABLE_PGX_CODEC "Enable (native) PGX codec support" ON)
 option(JAS_ENABLE_PNM_CODEC "Enable (native) PNM codec support" ON)
@@ -263,9 +263,6 @@ endif()
 # files are not placed in subdirectories (such as Debug and Release)
 # as this will cause the CTest test suite to fail.
 if(JAS_MULTICONFIGURATION_GENERATOR)
-	if(CMAKE_CONFIGURATION_TYPES)
-		set(CMAKE_DEBUG_POSTFIX d)
-	endif()
 	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY .)
 	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY .)
 	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY .)
