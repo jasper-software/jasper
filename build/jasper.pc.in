@@ -1,6 +1,7 @@
 prefix=@CMAKE_INSTALL_PREFIX@
-libdir=@CMAKE_INSTALL_FULL_LIBDIR@
-includedir=@CMAKE_INSTALL_FULL_INCLUDEDIR@
+exec_prefix=${prefix}
+libdir=@JAS_PC_LIBDIR@
+includedir=@JAS_PC_INCLUDEDIR@
 
 Name: JasPer
 Description: Image Processing/Coding Tool Kit with JPEG-2000 Support
