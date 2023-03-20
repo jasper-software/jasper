@@ -201,6 +201,15 @@ this behavior.
 #endif
 #endif
 
+/* 32-bit unsigned integer type */
+typedef uint_least32_t jas_ui32_t;
+#define JAS_UI32_MAX UINT_LEAST32_MAX
+
+/* 32-bit signed integer type */
+typedef int_least32_t jas_i32_t;
+#define JAS_I32_MIN INT_LEAST32_MIN
+#define JAS_I32_MAX INT_LEAST32_MAX
+
 #ifdef __cplusplus
 }
 #endif

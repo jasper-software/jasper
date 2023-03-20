@@ -549,7 +549,6 @@ static int pnm_getbitstr(jas_stream_t *in, int *val)
 
 static int pnm_getuintstr(jas_stream_t *in, uint_fast32_t *val)
 {
-	uint_fast32_t v;
 	int c;
 
 	/* Discard any leading whitespace. */
@@ -560,12 +559,19 @@ static int pnm_getuintstr(jas_stream_t *in, uint_fast32_t *val)
 	} while (isspace(JAS_CAST(unsigned char, c)));
 
 	/* Parse the number. */
-	v = 0;
+	jas_safeui64_t value = jas_safeui64_from_intmax(0);
 	while (isdigit(JAS_CAST(unsigned char, c))) {
-		v = 10 * v + c - '0';
+		int d = c - '0';
+		value = jas_safeui64_mul(value, jas_safeui64_from_intmax(10));
+		value = jas_safeui64_add(value, jas_safeui64_from_intmax(d));
 		if ((c = pnm_getc(in)) < 0) {
 			return -1;
 		}
+	}
+
+	uint_fast32_t v = jas_safeui64_to_ui32(value, JAS_UI32_MAX);
+	if (v == JAS_UI32_MAX) {
+		return -1;
 	}
 
 	/* The number must be followed by whitespace. */
@@ -604,19 +610,18 @@ static int pnm_getsintstr(jas_stream_t *in, int_fast32_t *val)
 		}
 	}
 
-	jas_safeui32_t sv = jas_safeui32_from_ulong(0);
+	jas_safei64_t sv = jas_safei64_from_intmax(0);
 	while (isdigit(JAS_CAST(unsigned char, c))) {
 		// sv = 10 * sv + c - '0';
-		sv = jas_safeui32_add(
-		  jas_safeui32_mul(sv, jas_safeui32_from_ulong(10)),
-		  jas_safeui32_sub(jas_safeui32_from_ulong(c),
-		  jas_safeui32_from_ulong('0')));
+		int d = c - '0';
+		sv = jas_safei64_mul(sv, jas_safei64_from_intmax(10));
+		sv = jas_safei64_add(sv, jas_safei64_from_intmax(d));
 		if ((c = pnm_getc(in)) < 0) {
 			return -1;
 		}
 	}
-	int_fast32_t v;
-	if (!jas_safeui32_to_intfast32(sv, &v)) {
+	int_fast32_t v = jas_safei64_to_i32(sv, JAS_I32_MAX);
+	if (v == JAS_I32_MAX) {
 		return -1;
 	}
 

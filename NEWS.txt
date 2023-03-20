@@ -1,3 +1,8 @@
+4.0.1 (YYYY-MM-DD)
+==================
+
+* Fix integer overflow bug in PNM decoder (#353).
+
 4.0.0 (2022-11-05)
 ==================
 

@@ -487,6 +487,123 @@ static inline jas_safeui32_t jas_safeui32_mul(jas_safeui32_t x,
 }
 
 /******************************************************************************\
+* Safe 64-bit signed integer arithmetic (i.e., with overflow checking).
+\******************************************************************************/
+
+typedef struct {
+	bool valid;
+	int_least64_t value;
+} jas_safei64_t;
+
+JAS_ATTRIBUTE_CONST
+static inline
+jas_safei64_t jas_safei64_from_intmax(intmax_t x)
+{
+	jas_safei64_t result;
+	if (x >= INT_LEAST64_MIN && x <= INT_LEAST64_MAX) {
+		result.valid = true;
+		result.value = JAS_CAST(int_least64_t, x);
+	} else {
+		result.valid = false;
+		result.value = 0;
+	}
+	return result;
+}
+
+JAS_ATTRIBUTE_CONST
+static inline
+jas_safei64_t jas_safei64_add(jas_safei64_t x, jas_safei64_t y)
+{
+	jas_safei64_t result;
+	if (((y.value > 0) && (x.value > (INT_LEAST64_MAX - y.value))) ||
+	  ((y.value < 0) && (x.value < (INT_LEAST64_MIN - y.value)))) {
+		result.value = false;
+		result.value = 0;
+	} else {
+		result.valid = true;
+		result.value = x.value + y.value;
+	}
+	return result;
+}
+
+JAS_ATTRIBUTE_CONST
+static inline
+jas_safei64_t jas_safei64_sub(jas_safei64_t x, jas_safei64_t y)
+{
+	jas_safei64_t result;
+	if ((y.value > 0 && x.value < INT_LEAST64_MIN + y.value) ||
+	(y.value < 0 && x.value > INT_LEAST64_MAX + y.value)) {
+		result.valid = false;
+		result.value = 0;
+	} else {
+		result.valid = true;
+		result.value = x.value - y.value;
+	}
+	return result;
+}
+
+JAS_ATTRIBUTE_CONST
+static inline
+jas_safei64_t jas_safei64_mul(jas_safei64_t x, jas_safei64_t y)
+{
+	jas_safei64_t result;
+	if (x.value > 0) {  /* x.value is positive */
+		if (y.value > 0) {  /* x.value and y.value are positive */
+			if (x.value > (INT_LEAST64_MAX / y.value)) {
+				goto error;
+			}
+		} else { /* x.value positive, y.value nonpositive */
+			if (y.value < (INT_LEAST64_MIN / x.value)) {
+				goto error;
+			}
+		} /* x.value positive, y.value nonpositive */
+	} else { /* x.value is nonpositive */
+		if (y.value > 0) { /* x.value is nonpositive, y.value is positive */
+			if (x.value < (INT_LEAST64_MIN / y.value)) {
+				goto error;
+			}
+		} else { /* x.value and y.value are nonpositive */
+			if ( (x.value != 0) && (y.value < (INT_LEAST64_MAX / x.value))) {
+				goto error;
+			}
+		} /* End if x.value and y.value are nonpositive */
+	} /* End if x.value is nonpositive */
+	result.valid = true;
+	result.value = x.value * y.value;
+	return result;
+error:
+	result.valid = false;
+	result.value = 0;
+	return result;
+}
+
+#if 0
+JAS_ATTRIBUTE_CONST
+static inline
+jas_safei64_t jas_safei64_div(jas_safei64_t x, jas_safei64_t y)
+{
+	// TODO/FIXME: Not yet implemented.
+	jas_safei64_t result;
+	result.valid = false;
+	result.value = 0;
+	return result;
+}
+#endif
+
+JAS_ATTRIBUTE_CONST
+static inline
+jas_i32_t jas_safei64_to_i32(jas_safei64_t x, jas_i32_t invalid_value)
+{
+	jas_i32_t result;
+	if (x.valid && x.value >= JAS_I32_MIN && x.value <= JAS_I32_MAX) {
+		result = JAS_CAST(jas_i32_t, x.value);
+	} else {
+		result = invalid_value;
+	}
+	return result;
+}
+
+/******************************************************************************\
 * Safe 64-bit unsigned integer arithmetic (i.e., with overflow checking).
 \******************************************************************************/
 
@@ -593,6 +710,32 @@ int jas_safeui64_to_int(jas_safeui64_t x, int invalid_value)
 	int result;
 	if (x.valid && x.value <= INT_MAX) {
 		result = JAS_CAST(int, x.value);
+	} else {
+		result = invalid_value;
+	}
+	return result;
+}
+
+JAS_ATTRIBUTE_CONST
+static inline
+jas_ui32_t jas_safeui64_to_ui32(jas_safeui64_t x, jas_ui32_t invalid_value)
+{
+	jas_ui32_t result;
+	if (x.valid && x.value <= JAS_UI32_MAX) {
+		result = JAS_CAST(jas_ui32_t, x.value);
+	} else {
+		result = invalid_value;
+	}
+	return result;
+}
+
+JAS_ATTRIBUTE_CONST
+static inline
+jas_i32_t jas_safeui64_to_i32(jas_safeui64_t x, jas_i32_t invalid_value)
+{
+	jas_i32_t result;
+	if (x.valid && x.value >= JAS_I32_MIN && x.value <= JAS_I32_MAX) {
+		result = JAS_CAST(jas_i32_t, x.value);
 	} else {
 		result = invalid_value;
 	}
