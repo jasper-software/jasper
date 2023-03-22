@@ -821,6 +821,17 @@ endif()
 # The package configuation (pc) file should be installed in
 # ${CMAKE_INSTALL_PREFIX}/lib/pkgconfig.
 string(JOIN " " JAS_PKGCONFIG_REQUIRES ${JAS_PKGCONFIG_REQUIRES})
+# Handle both relative and absolute paths (e.g. NixOS) for a relocatable package
+if(IS_ABSOLUTE "${CMAKE_INSTALL_INCLUDEDIR}")
+    set(JAS_PC_INCLUDEDIR "${CMAKE_INSTALL_INCLUDEDIR}")
+else()
+    set(JAS_PC_INCLUDEDIR "\${prefix}/${CMAKE_INSTALL_INCLUDEDIR}")
+endif()
+if(IS_ABSOLUTE "${CMAKE_INSTALL_LIBDIR}")
+    set(JAS_PC_LIBDIR "${CMAKE_INSTALL_LIBDIR}")
+else()
+    set(JAS_PC_LIBDIR "\${exec_prefix}/${CMAKE_INSTALL_LIBDIR}")
+endif()
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/build/jasper.pc.in"
   "${CMAKE_CURRENT_BINARY_DIR}/build/jasper.pc" @ONLY)
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/build/jasper.pc"
