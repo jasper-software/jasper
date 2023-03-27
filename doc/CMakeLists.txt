@@ -44,7 +44,7 @@ if(DOXYGEN_FOUND)
 		add_custom_command(OUTPUT "latex/refman.pdf"
 		  COMMAND "${PDFLATEX_COMPILER}" refman.tex
 		  WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/latex"
-		  DEPENDS "latex/index.tex"
+		  DEPENDS "doc"
 		)
 
 		add_custom_target(manual_pdf ALL
