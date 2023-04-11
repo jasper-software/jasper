@@ -225,8 +225,10 @@ set(CMAKE_C_EXTENSIONS ON)
 # This policy was added in CMake 3.8.
 cmake_policy(SET CMP0067 NEW)
 
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_EXTENSIONS ON)
+if(JAS_ENABLE_CXX)
+	set(CMAKE_CXX_STANDARD 11)
+	set(CMAKE_CXX_EXTENSIONS ON)
+endif()
 
 # Eliminate a CMake warning.
 # Note: This policy was added in CMake 3.20.  Do not add this for now,
