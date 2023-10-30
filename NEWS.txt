@@ -103,6 +103,7 @@ this manual is available online (for various JasPer releases) at:
 ===================
 
 * Fix potential null pointer dereference in the JP2/JPC decoder. (#269)
+  (CVE-2021-3443)
 * Fix ignoring of JAS_STREAM_FILEOBJ_NOCLOSE at stream close time. (#286)
 * Fix integral type sizing problem in JP2 codec. (#284)
 
