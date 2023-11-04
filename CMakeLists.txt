@@ -191,6 +191,15 @@ option(JAS_ENABLE_DANGEROUS_INTERNAL_TESTING_MODE
 option(JAS_ENABLE_CXX "Enable C++ code (for testing)." OFF)
 option(JAS_ENABLE_CONFORMANCE_TESTS "Enable conformance tests." OFF)
 
+option(JAS_WASM "Enable WebAssembly mode" OFF)
+if(JAS_WASM)
+	set(JAS_CROSSCOMPILING 1)
+	set(JAS_STDC_VERSION "201112L")
+	set(JAS_ENABLE_MULTITHREADING_SUPPORT 0)
+	set(JAS_ENABLE_SHARED 0)
+	add_compile_definitions(JAS_WASI_LIBC)
+endif()
+
 ################################################################################
 #
 ################################################################################
@@ -412,6 +421,7 @@ if((DEFINED JAS_CROSSCOMPILING AND JAS_CROSSCOMPILING) OR
 	# cross-compiling.  If cross-compiling, the value of JAS_STDC_VERSION
 	# will need to be set manually from the command line
 	# (e.g., using -DJAS_STDC_VERSION=YYYYMML) or by changing the line below.
+if(NOT JAS_WASM)
 	set(JAS_STDC_VERSION "0L" CACHE INTERNAL "The value of __STDC_VERSION__.")
 	if (JAS_STDC_VERSION STREQUAL "0L")
 		message(FATAL_ERROR
@@ -421,6 +431,7 @@ if((DEFINED JAS_CROSSCOMPILING AND JAS_CROSSCOMPILING) OR
 		  "option -DJAS_STDC_VERSION=...) or modify the CMakeLists.txt "
 		  "appropriately.")
 	endif()
+endif()
 else()
 	jas_get_stdc_version(status JAS_STDC_VERSION)
 	if(NOT status)
