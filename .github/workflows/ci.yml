@@ -10,6 +10,9 @@ jobs:
         compiler: [ {cc: gcc, cxx: g++}, {cc: clang, cxx: clang++} ]
         include:
           - os: [windows-2022]
+        exclude:
+          - {os: ubuntu-20.04, compiler: [{cc: gcc, cxx: g++}]}
+          #- {os: ubuntu-20.04}
       fail-fast: false
     runs-on: ${{ matrix.os }}
     steps:
