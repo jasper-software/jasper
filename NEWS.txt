@@ -1,12 +1,13 @@
-4.0.1 (YYYY-MM-DD)
+4.0.1 (2023-11-04)
 ==================
 
 * Fix integer overflow bug in PNM decoder (#353).
+* Fix a few minor build issues.
 
 4.0.0 (2022-11-05)
 ==================
 
-* Improve static linking (##336).
+* Improve static linking (#336).
 * Fix path relocation in mingw environment (#335).
 * Improve logging and build scripts.
 * Improve JPEG-2000 conformance test results.
