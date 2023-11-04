@@ -258,6 +258,9 @@ typedef struct {
 typedef struct {
 	int fd;
 	int flags;
+#if defined(JAS_WASI_LIBC)
+#define L_tmpnam 4096
+#endif
 	char pathname[L_tmpnam + 1];
 } jas_stream_fileobj_t;
 

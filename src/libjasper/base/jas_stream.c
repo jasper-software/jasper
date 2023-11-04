@@ -459,6 +459,8 @@ static int easy_mkstemp(char *buffer, size_t size)
 	return open(buffer,
 	  O_CREAT | O_EXCL | O_RDWR | O_TRUNC | O_BINARY | O_CLOEXEC,
 	  JAS_STREAM_PERMS);
+#elif defined(JAS_WASI_LIBC)
+	return -1;
 #else
 #ifdef JAS_HAVE_MKOSTEMP
 	return mkostemp(buffer, O_CLOEXEC);
