@@ -97,6 +97,10 @@ wasmtime="$wasmtime_dir/bin/wasmtime"
 export WASI_SDK_ROOT_DIR="$wasi_sdk_dir"
 export CC="$wasm_cc"
 export CXX="$wasm_cxx"
+export PATH="$wasi_sdk_dir/bin:$PATH"
+
+lld="$(type -P lld)" || lld=
+echo "lld program: $lld"
 
 #source_dir="$tmp_dir/git"
 build_dir="$tmp_dir/build"
