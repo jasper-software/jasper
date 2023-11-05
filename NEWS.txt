@@ -1,3 +1,9 @@
+4.1.0 (2023-11-04)
+==================
+
+* Add support for building several JasPer application programs for
+  WebAssembly target with WASI support.
+
 4.0.1 (2023-11-04)
 ==================
 
