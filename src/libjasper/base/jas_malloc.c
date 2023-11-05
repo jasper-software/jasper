@@ -626,7 +626,15 @@ void jas_basic_free(jas_allocator_t *allocator, void *ptr)
 
 size_t jas_get_total_mem_size()
 {
-#if defined(__linux__)
+#if defined(JAS_WASI_LIBC)
+	/*
+	NOTE: On the 32-bit WebAssembly platform, the unsigned integral type
+	size_t is likely to have a size of 32 bits.  So, choose the maximum
+	memory to be less than 2 ^ 32 in order to avoid overflow.
+	*/
+	return JAS_CAST(size_t, 4096) * JAS_CAST(size_t, 1024) *
+	  JAS_CAST(size_t, 1024) - 1;
+#elif defined(__linux__)
 	struct sysinfo buf;
 	if (sysinfo(&buf)) {
 		return 0;
