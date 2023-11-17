@@ -661,11 +661,12 @@ size_t jas_get_total_mem_size()
 	Reference:
 	https://docs.microsoft.com/en-us/windows/win32/api/sysinfoapi/nf-sysinfoapi-getphysicallyinstalledsystemmemory
 	*/
-	ULONGLONG size;
-	if (!GetPhysicallyInstalledSystemMemory(&size)) {
+	ULONGLONG mem_size_in_kb;
+	if (!GetPhysicallyInstalledSystemMemory(&mem_size_in_kb)) {
 		return 0;
 	}
-	return 1024 * size;
+	return (mem_size_in_kb < SIZE_MAX / JAS_CAST(size_t, 1024)) ?
+	  JAS_CAST(size_t, 1024) * mem_size_in_kb : SIZE_MAX;
 #else
 	return 0;
 #endif
