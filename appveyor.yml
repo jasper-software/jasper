@@ -3,8 +3,9 @@ version: 1.0.{build}
 
 # build worker image (VM template)
 image:
-    - Visual Studio 2015
-    - Visual Studio 2013
+    - Visual Studio 2022
+    #- Visual Studio 2015
+    #- Visual Studio 2013
 
 configuration:
     - Release
