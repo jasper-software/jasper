@@ -41,7 +41,8 @@ rem cmake -G "Visual Studio 12 2013 Win64" ^
 cmake ^
   -H%source_dir% -B%build_dir_shared% %allow_in_source_build% ^
   -DCMAKE_INSTALL_PREFIX=%install_dir_shared% ^
-  -DJAS_ENABLE_SHARED=true || exit /B 1
+  -DJAS_ENABLE_SHARED=true ^
+  -DJAS_ENABLE_DOC=false || exit /B 1
 
 rem msbuild %build_dir_shared%\INSTALL.vcxproj || exit /B 1
 cmake --build %build_dir_shared% --clean-first || exit /B 1
