@@ -10,8 +10,20 @@ function(prevent_in_source_build)
 	# If an in-source build is in progress, and the build directory is not
 	# chosen in a very specific way, then stop the build.
 	if(result)
-		cmake_path(GET binary_dir FILENAME binary_dir_base)
-		if(NOT (binary_dir_base MATCHES "^tmp"))
+		cmake_path(RELATIVE_PATH binary_dir BASE_DIRECTORY "${source_dir}"
+		  OUTPUT_VARIABLE cur_path)
+		#message("cur_path ${cur_path}")
+		while(true)
+			cmake_path(HAS_PARENT_PATH cur_path has_parent)
+			if(NOT has_parent)
+				break()
+			endif()
+			cmake_path(GET cur_path PARENT_PATH cur_path)
+			#message("cur_path ${cur_path}")
+		endwhile()
+		cmake_path(GET cur_path FILENAME top_dir_name)
+		#message("top_dir_name ${top_dir_name}")
+		if(NOT (top_dir_name MATCHES "^tmp"))
 			message(FATAL_ERROR
 				"The use of an in-source build has been detected "
 				"(i.e., the binary directory specified to CMake is located "
@@ -26,7 +38,7 @@ function(prevent_in_source_build)
 				"CMake option ALLOW_IN_SOURCE_BUILD.\n"
 				"CMake source directory: ${CMAKE_SOURCE_DIR}\n"
 				"CMake binary directory: ${CMAKE_BINARY_DIR}\n"
-				"CMake binary directory base: ${binary_dir_base}\n"
+				"CMake binary directory root: ${CMAKE_SOURCE_DIR}/${top_dir_name}\n"
 			)
 		endif()
 	endif()
