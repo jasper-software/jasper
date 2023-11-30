@@ -6,4 +6,8 @@ if [ $# -ne 1 ]; then
 fi
 
 path="$1"
-python -c 'import os,sys;print(os.path.realpath(sys.argv[1]))' "$path"
+if ! command -v python &> /dev/null; then 
+    python3 -c 'import os,sys;print(os.path.realpath(sys.argv[1]))' "$path"
+else
+    python -c 'import os,sys;print(os.path.realpath(sys.argv[1]))' "$path"
+fi
