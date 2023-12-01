@@ -407,7 +407,7 @@ inline static bool jas_safe_uint_mul(unsigned x, unsigned y, unsigned *result)
 * Safe 32-bit unsigned integer arithmetic (i.e., with overflow checking).
 \******************************************************************************/
 
-#define JAS_SAFEUI32_MAX (0xffffffffU)
+#define JAS_SAFEUI32_MAX (0xffffffffUL)
 
 typedef struct {
 	bool valid;
@@ -432,7 +432,8 @@ JAS_ATTRIBUTE_PURE
 static inline bool jas_safeui32_to_intfast32(jas_safeui32_t x,
   int_fast32_t* y)
 {
-	if (x.value <= INT_FAST32_MAX) {
+	const long I32_MAX = 0x7fffffffL;
+	if (x.value <= I32_MAX) {
 		*y = x.value;
 		return true;
 	} else {
