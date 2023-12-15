@@ -1324,12 +1324,22 @@ static int jas_icctxt_input(jas_iccattrval_t *attrval, jas_stream_t *in,
 {
 	jas_icctxt_t *txt = &attrval->data.txt;
 	txt->string = 0;
+	/* The string must at least contain a single null character. */
+	if (cnt < 1) {
+		goto error;
+	}
 	if (!(txt->string = jas_malloc(cnt))) {
 		goto error;
 	}
 	if (jas_stream_read(in, txt->string, cnt) != cnt) {
 		goto error;
 	}
+	/* Ensure that the string is null terminated. */
+	if (txt->string[cnt - 1] != '\0') {
+		goto error;
+	}
+	/* The following line is redundant, unless we do not enforce that
+	  the last character must be null. */
 	txt->string[cnt - 1] = '\0';
 	if (strlen(txt->string) + 1 != cnt) {
 		goto error;
