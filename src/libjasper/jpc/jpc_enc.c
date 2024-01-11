@@ -566,6 +566,14 @@ static jpc_enc_cp_t *cp_create(const char *optstr, jas_image_t *image)
 				jas_logwarnf("warning: invalid intermediate layer rates specifier ignored (%s)\n",
 				  jas_tvparser_getval(tvp));
 			}
+			/* Ensure that the intermediate layer rates are nonnegative. */
+			for (i = 0; i < numilyrrates; ++i) {
+				if (ilyrrates[i] < 0) {
+					jas_logerrorf(
+					  "intermediate layer rate must be nonnegative\n");
+					goto error;
+				}
+			}
 			break;
 
 		case OPT_JP2OVERHEAD:
