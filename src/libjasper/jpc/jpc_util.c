@@ -74,6 +74,7 @@
 
 #include "jasper/jas_math.h"
 #include "jasper/jas_malloc.h"
+#include "jasper/jas_string.h"
 
 #include <assert.h>
 #include <string.h>
@@ -95,9 +96,10 @@ int jpc_atoaf(const char *s, int *numvalues, double **values)
 	strncpy(buf, s, sizeof(buf));
 	buf[sizeof(buf) - 1] = '\0';
 	n = 0;
-	if ((cp = strtok(buf, delim))) {
+	char* saveptr = 0;
+	if ((cp = jas_strtok(buf, delim, &saveptr))) {
 		++n;
-		while ((cp = strtok(0, delim))) {
+		while ((cp = jas_strtok(0, delim, &saveptr))) {
 			if (*cp != '\0') {
 				++n;
 			}
@@ -112,10 +114,11 @@ int jpc_atoaf(const char *s, int *numvalues, double **values)
 		strncpy(buf, s, sizeof(buf));
 		buf[sizeof(buf) - 1] = '\0';
 		n = 0;
-		if ((cp = strtok(buf, delim))) {
+		saveptr = 0;
+		if ((cp = jas_strtok(buf, delim, &saveptr))) {
 			vs[n] = atof(cp);
 			++n;
-			while ((cp = strtok(0, delim))) {
+			while ((cp = jas_strtok(0, delim, &saveptr))) {
 				if (*cp != '\0') {
 					vs[n] = atof(cp);
 					++n;
