@@ -36,8 +36,8 @@ set_source_and_build_dirs || panic "cannot set source and build directories"
 
 #$CMDDIR/rundectests jasper || exit 1
 
-oj_compress=$(which opj2_compress) || oj_compress=""
-oj_decompress=$(which opj2_decompress) || oj_decompress=""
+oj_compress=$(type -P opj2_compress) || oj_compress=""
+oj_decompress=$(type -P opj2_decompress) || oj_decompress=""
 
 run_test="$cmd_dir/run_codec_test"
 
