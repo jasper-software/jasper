@@ -592,6 +592,7 @@ set(JAS_HAVE_WIN32_THREADS FALSE)
 if(JAS_ENABLE_MULTITHREADING_SUPPORT)
 	check_c_source_compiles("
 	#include <threads.h>
+	#include <stdatomic.h>
 	int main() {
 		thrd_t thread;
 		mtx_t mutex;
