@@ -603,6 +603,7 @@ static int jpc_encrawsigpass(jpc_bitstream_t *out, int bitpos, bool vcausalflag,
 
 #define	refpass_step(fp, dp, bitpos, one, nmsedec, mqenc, vcausalflag) \
 { \
+	jpc_fix_t d; \
 	if (((*(fp)) & (JPC_SIG | JPC_VISIT)) == JPC_SIG) { \
 		(d) = *(dp); \
 		*(nmsedec) += JPC_GETREFNMSEDEC(JAS_ABS(d), (bitpos) + JPC_NUMEXTRABITS); \
@@ -618,7 +619,6 @@ static int jpc_encrefpass(jpc_mqenc_t *mqenc, int bitpos, jas_matrix_t *flags, c
 {
 	int i;
 	int one;
-	int d;
 	jpc_fix_t *fstripestart;
 	jpc_fix_t *fvscanstart;
 	jpc_fix_t *fp;
