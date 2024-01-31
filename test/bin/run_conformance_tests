@@ -364,8 +364,8 @@ if [ "$enable_jasper_tests" -ne 0 ]; then
 		fi
 
 		if [ "$verbose" -ge 3 ]; then
-			python -c 'print("*" * 80)'
 			cat <<- EOF
+			$(repeat_string 80 '*')
 			test case ID: $testcase
 			encoded file: $enc_file
 			reference file: $orig_file
@@ -373,8 +373,8 @@ if [ "$enable_jasper_tests" -ne 0 ]; then
 			number of components: $num_comps
 			size: $width $height
 			precision: $prec
+			$(repeat_string 80 '*')
 			EOF
-			python -c 'print("*" * 80)'
 		fi
 
 		buffer=$("$imginfo" -q < "$enc_file" 2> /dev/null)
