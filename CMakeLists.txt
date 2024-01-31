@@ -849,9 +849,9 @@ if(IS_ABSOLUTE "${CMAKE_INSTALL_LIBDIR}")
 else()
     set(JAS_PC_LIBDIR "\${exec_prefix}/${CMAKE_INSTALL_LIBDIR}")
 endif()
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/build/jasper.pc.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/build/jasper.pc" @ONLY)
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/build/jasper.pc"
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/build/pkgconfig/jasper.pc.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/build/pkgconfig/jasper.pc" @ONLY)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/build/pkgconfig/jasper.pc"
   DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
 
 install(FILES "README.md" DESTINATION "${CMAKE_INSTALL_DOCDIR}")
