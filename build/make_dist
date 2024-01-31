@@ -104,7 +104,6 @@ mv "$build_dir/doc/latex/refman.pdf" "$source_dir/doc/manual.pdf" || \
   panic "cannot generate changelog"
 
 remove_list=()
-remove_list+=(build/my_build)
 remove_list+=(build/appveyor)
 remove_list+=(build/travis)
 remove_list+=(build/make_dist)

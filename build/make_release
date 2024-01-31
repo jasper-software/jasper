@@ -229,7 +229,6 @@ remove_list+=(build/extract_release_notes)
 remove_list+=(build/github)
 remove_list+=(build/make_dist)
 remove_list+=(build/make_release)
-remove_list+=(build/my_build)
 remove_list+=(build/travis)
 
 remove_list+=(data/test/bad/1_crash.jpg)
