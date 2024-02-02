@@ -106,6 +106,8 @@ else()
 	option(JAS_ENABLE_SHARED "Enable building of shared library" ON)
 endif()
 
+option(JAS_PACKAGING "Enable packaging mode (e.g., disable RPATH)" OFF)
+
 option(JAS_ENABLE_PIC "Enable position-independent code" ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ${JAS_ENABLE_PIC})
 
@@ -268,10 +270,6 @@ else()
 	set(JAS_MULTICONFIGURATION_GENERATOR FALSE)
 endif()
 message("JAS_MULTICONFIGURATION_GENERATOR ${JAS_MULTICONFIGURATION_GENERATOR}")
-
-if(JAS_ENABLE_SHARED AND MACOS)
-	set(CMAKE_MACOSX_RPATH TRUE)
-endif()
 
 # If a multiconfiguration generator is used, ensure that various output
 # files are not placed in subdirectories (such as Debug and Release)
@@ -799,28 +797,37 @@ endif()
 # Perform shared library setup.
 ################################################################################
 
-if(JAS_ENABLE_SHARED)
-	# use, i.e. don't skip the full RPATH for the build tree
+if(JAS_ENABLE_SHARED AND NOT JAS_PACKAGING)
+
+	if(MACOS)
+		# On MacOS, the target is located at runtime using rpaths.
+		set(CMAKE_MACOSX_RPATH TRUE)
+	endif()
+
+	# Adjust the runtime search path (rpath) for binaries in the build tree
+	# (i.e., do not skip build rpaths).
 	set(CMAKE_SKIP_BUILD_RPATH FALSE)
 
-	# when building, don't use the install RPATH already
-	# (but later on when installing)
+	# Do not use the install rpath for binaries in the build tree.
+	# We want to use the build rpath (not install rpath) for binaries in the
+	# build tree.
 	set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
 
-	set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
-
-	# add the automatically determined parts of the RPATH
-	# which point to directories outside the build tree to the install RPATH
+	# Append to the rpath of installed binaries any directories outside the
+	# project that are in the linker search path or contain linked library
+	# files.
 	set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
-	# The RPATH to be used when installing, but only if it's not a
-	# system directory
+	# Specify the rpath for the installed targets.
+	# We only want to include directories in the installed rpath if they
+	# will not be considered implicitly.
 	list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES
-	  "${CMAKE_INSTALL_PREFIX}/lib" isSystemDir)
-	if(isSystemDir EQUAL -1)
+	  "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}" jas_is_system_dir)
+	if(jas_is_system_dir EQUAL -1)
 	   set(CMAKE_INSTALL_RPATH
 		  "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 	endif()
+
 endif()
 
 ################################################################################
