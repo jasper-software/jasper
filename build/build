@@ -6,7 +6,7 @@
 
 panic()
 {
-	echo "ERROR: $@"
+	echo "FATAL ERROR: $*" 1>& 2
 	exit 1
 }
 
@@ -82,10 +82,14 @@ usage()
 # Early initialization.
 ################################################################################
 
-program_dir=$(dirname "$0") || exit 1
-jas_realpath="$program_dir/jas_realpath"
-abs_program_dir=$("$jas_realpath" "$program_dir") || panic
-sysinfo_program="$program_dir/sysinfo"
+self_dir="$(dirname "$0")" || \
+  panic "cannot get self directory"
+source "$self_dir/base_utilities" || \
+  panic "cannot load base utilities"
+self_dir="$(real_path "$self_dir")" || \
+  panic "cannot get self directory"
+
+sysinfo_program="$self_dir/sysinfo"
 
 ################################################################################
 # Process command line.
@@ -424,7 +428,7 @@ fi
 # Perform some initialization.
 ################################################################################
 
-source_dir="$abs_program_dir/.."
+source_dir="$self_dir/.."
 
 if [ -z "$out_dir" ]; then
 	out_dir="$source_dir/tmp_cmake"

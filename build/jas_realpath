@@ -1,9 +1,0 @@
-#! /usr/bin/env bash
-
-if [ $# -ne 1 ]; then
-	echo "bad usage: no path specified"
-	exit 1
-fi
-
-path="$1"
-python -c 'import os,sys;print(os.path.realpath(sys.argv[1]))' "$path"

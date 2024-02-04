@@ -2,15 +2,19 @@
 
 panic()
 {
-	echo "ERROR: $@"
+	echo "FATAL ERROR: $*" 1>& 2
 	exit 1
 }
 
-program_dir=$(dirname "$0") || exit 1
-jas_realpath="$program_dir/jas_realpath"
-abs_program_dir=$("$jas_realpath" "$program_dir") || panic
-build_program="$program_dir/build"
-sysinfo_program="$program_dir/sysinfo"
+self_dir="$(dirname "$0")" || \
+  panic "cannot get self directory"
+source "$self_dir/base_utilities" || \
+  panic "cannot load base utilities"
+self_dir="$(real_path "$self_dir")" || \
+  panic "cannot get self directory"
+
+build_program="$self_dir/build"
+sysinfo_program="$self_dir/sysinfo"
 
 list_directory()
 {
@@ -278,7 +282,7 @@ if [ "$debug_level" -ge 1 -a "$verbose" -eq 0 ]; then
 fi
 
 if [ -z "$build_dir" ]; then
-	build_dir="$abs_program_dir/../tmp_cmake"
+	build_dir="$self_dir/../tmp_cmake"
 fi
 
 if [ -n "$command_file" ]; then

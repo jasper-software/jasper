@@ -7,7 +7,8 @@ if [ "$debug_level" -ge 1 ]; then
 fi
 
 cmd_dir=$(dirname "$0") || exit 1
-source "$cmd_dir/utilities" || exit 1
+source "$cmd_dir/base_utilities" || exit 1
+source "$cmd_dir/test_utilities" || exit 1
 source "$cmd_dir/jpcod" || exit 1
 
 set_source_and_build_dirs || panic "cannot set source and build directories"

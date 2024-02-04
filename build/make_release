@@ -4,7 +4,7 @@
 
 panic()
 {
-	echo "ERROR: $*" 1>& 2
+	echo "FATAL ERROR: $*" 1>& 2
 	exit 1
 }
 
@@ -36,7 +36,13 @@ usage()
 
 ################################################################################
 
-self_dir="$(dirname "$0")" || panic
+self_dir="$(dirname "$0")" || \
+  panic "cannot get self directory"
+source "$self_dir/base_utilities" || \
+  panic "cannot load base utilities"
+self_dir="$(real_path "$self_dir")" || \
+  panic "cannot get self directory"
+
 build_wasi_jasper="$self_dir/build_wasi_jasper"
 
 ################################################################################
@@ -83,7 +89,7 @@ if [ -z "$tmp_dir" ]; then
 fi
 
 # Ensure an absolute pathname.
-workspace_dir="$(readlink -f "$workspace_dir")" || \
+workspace_dir="$(real_path "$workspace_dir")" || \
   panic "cannot get absolute pathname"
 
 if [ ! -d "$workspace_dir" ]; then

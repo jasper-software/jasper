@@ -2,7 +2,7 @@
 
 panic()
 {
-	echo "FATAL ERROR: $@"
+	echo "FATAL ERROR: $*" 1>& 2
 	exit 1
 }
 

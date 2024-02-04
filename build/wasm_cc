@@ -7,7 +7,7 @@ eecho()
 
 panic()
 {
-	eecho "$*"
+	echo "FATAL ERROR: $*" 1>& 2
 	exit 1
 }
 

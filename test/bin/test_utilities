@@ -5,17 +5,6 @@
 #
 ################################################################################
 
-panic()
-{
-	echo "ERROR: $@" 1>&2
-	exit 1
-}
-
-eecho()
-{
-	echo "$@" 1>&2
-}
-
 set_source_and_build_dirs()
 {
 	#eecho "JAS_ABS_TOP_BUILDDIR $JAS_ABS_TOP_BUILDDIR"
@@ -251,16 +240,4 @@ is_supported_format()
 	"$jasper" --enable-all-formats --list-enabled-formats | \
 	  grep -q '^'"$format"'$' && supported=1
 	echo "$supported"
-}
-
-repeat_string()
-{
-	[ $# -eq 2 ] || return 1
-	local n="$1"
-	local string="$2"
-	local buffer=
-	for((i = 0; i < $n; ++i)); do
-		buffer="$buffer$string"
-	done
-	echo "$buffer"
 }
