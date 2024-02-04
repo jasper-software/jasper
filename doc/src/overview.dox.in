@@ -20,29 +20,29 @@ Some of the features of the JasPer library are as follows:
 
   - has multithreading support (e.g., the JasPer library can be used
     concurrently in multiple threads)
-  - native support for several image codecs, including:
+  - has native support for several image codecs, including:
       - JPEG-2000 JP2 File Format Syntax (ISO/IEC 15444-1)
       - JPEG-2000 Code Stream Syntax (ISO/IEC 15444-1)
       - Portable Graymap/Pixmap (PNM)
       - Microsoft Bitmap (BMP)
       - Sun Rasterfile (RAS)
       - JPEG-2000 VM Format (PGX)
-  - non-native support for following image codecs:
+  - has non-native support for the following image codecs:
       - JPEG (ISO/IEC 10918-1) via IJG JPEG Library
-      - HEIC via the libheif Library
+      - HEIC (ISO/IEC 23008-12) via the libheif Library
   - can add new codecs (or enable/disable codecs) at run time
-  - can specify memory allocator to be used by library
-  - can specify logging function to be used by library for
+  - can specify a memory allocator to be used by the library
+  - can specify a logging function to be used by the library for
     error, warning, informational, and debugging messages
-  - can place upper limit on total amount of memory used by library
-    (which is useful in protecting against malicious image streams
-    during decoding)
+  - can place an upper limit on the total amount of memory that can be
+    used by the library (which is useful in protecting against malicious
+    image streams during decoding)
   - can decode from a non-seekable source stream (which is useful for
     filtering pipelines)
   - can manage ICC profiles
-  - portable code known to work on many platforms
+  - portable code, known to work on many platforms
     (e.g., Linux, Windows, MacOS, BSD, etc.)
-  - can autodetect image format during decoding
+  - can autodetect the image format during decoding
 
 Several application programs are also provided:
 
