@@ -1,3 +1,15 @@
+4.2.0 (2024-02-05)
+==================
+
+* Add the JAS_PACKAGING option to the CMake build in an attempt to allow
+  easier control over rpath settings by packagers of JasPer.
+* Remove a number of obsolete scripts.
+* Make some cosmetic changes to the code for the JPC codec in order
+  to improve readability (#371).
+* Fix a portability bug related to threads/atomics.
+* Replace some lingering uses of strtok in the JPC coder with jas_strtok,
+  since the use of strtok is problematic in multithreading contexts.
+
 4.1.2 (2024-01-11)
 ==================
 
