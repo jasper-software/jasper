@@ -648,7 +648,7 @@ size_t jas_get_total_mem_size()
 		return 0;
 	}
 	return JAS_CAST(size_t, value);
-#elif defined(__unix__) && (!defined(__linux__) && !defined(__APPLE__) && !(defined(__DJGPP__))
+#elif defined(__unix__) && (!defined(__linux__) && !defined(__APPLE__) && !defined(__DJGPP__))
 	/*
 	Reference:
 	https://stackoverflow.com/questions/2513505/how-to-get-available-memory-c-g
