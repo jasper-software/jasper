@@ -1,6 +1,13 @@
 name: ci
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - '**'
+      - '!mdadams-joss'
+    tags-ignore:
+      - '**'
+  pull_request:
 
 jobs:
   build:
