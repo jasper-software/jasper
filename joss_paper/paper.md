@@ -53,7 +53,7 @@ It is also highly configurable, allowing a number of key
 The library is also extensible, providing an application programming interface
   (API) whereby additional user-defined codecs can be employed with the
   library.
-The JasPer software includes several application programs:
+The JasPer software provides several application programs, including:
 
   - jasper, an image transcoder program for converting between image formats;
   - imginfo, a program for querying the properties of an image, such as:
@@ -188,7 +188,7 @@ At present, however, the OpenJPEG software is not as well maintained as
   some of which are associated with security vulnerabilities that
   are quite old.
 Moreover, at the time of this writing, the last official release of
-  OpenJPEG (namely, 2.5.0) is dated on May 13, 2022, which is
+  OpenJPEG (namely, 2.5.0) on GitHub is dated May 13, 2022, which is
   almost two years ago.
 
 # Acknowledgements
