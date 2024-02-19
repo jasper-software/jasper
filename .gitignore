@@ -25,3 +25,6 @@ Makefile.in
 # src/libjasper/include/jasper directory
 /src/libjasper/include/jasper/jas_config.h
 /src/libjasper/include/jasper/stamp-h1
+
+# joss_paper directory
+!joss_paper/Makefile

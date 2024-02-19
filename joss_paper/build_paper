@@ -1,0 +1,109 @@
+#! /usr/bin/env bash
+
+eecho()
+{
+	echo "$@" 1>&2
+}
+
+panic()
+{
+	eecho "FATAL ERROR: $*"
+	exit 1
+}
+
+perform_cleanup()
+{
+	if [ -n "$tmp_dir" -a -d "$tmp_dir" ]; then
+		rm -rf "$tmp_dir" || \
+		  eecho "warning: cannot remove temporary directory $tmp_dir"
+	fi
+}
+
+usage()
+{
+	cat <<- EOF
+	usage:
+	$0 -d \$doc_dir -o $out_file
+	EOF
+	if [ $# -ne 0 ]; then
+		echo "BAD USAGE: $*"
+	fi
+	exit 2
+}
+
+self_path="$(realpath "$0")" || \
+  panic "cannot get realpath"
+
+tmp_dir_template="/tmp/build_paper-XXXXXXXX"
+
+tmp_dir=
+cleanup=1
+out_file=
+doc_dir=
+execute=1
+
+while getopts :d:o:n option; do
+	case "$option" in
+	o)
+		out_file="$OPTARG";;
+	d)
+		doc_dir="$OPTARG";;
+	n)
+		execute=0;;
+	*)
+		usage "invalid option $option";;
+	esac
+done
+shift $((OPTIND - 1))
+
+if [ -z "$doc_dir" ]; then
+	usage "not document directory specified"
+fi
+
+if [ -z "$out_file" ]; then
+	usage "not output file specified"
+fi
+
+if [ ! -d "$doc_dir" ]; then
+	panic "document directory does not exist"
+fi
+
+tmp_dir="$(mktemp -d "$tmp_dir_template")" || \
+  panic "cannot create temporary directory"
+if [ "$cleanup" -ne 0 ]; then
+	trap perform_cleanup EXIT
+fi
+
+command=(
+	cp -a "$doc_dir/." "$tmp_dir"
+)
+echo "RUNNING: ${command[*]}"
+if [ "$execute" -ne 0 ]; then
+	"${command[@]}" || 
+	  panic "cannot copy document files"
+fi
+
+command=(
+	podman run
+	#--interactive
+	#--tty
+	--rm
+	--volume "$tmp_dir":/data
+	--env JOURNAL=joss
+	--security-opt label=disable
+	docker.io/openjournals/inara:latest
+)
+echo "RUNNING: ${command[*]}"
+if [ "$execute" -ne 0 ]; then
+	"${command[@]}" || \
+	  panic "cannot build document"
+fi
+
+command=(
+	cp --archive --force "$tmp_dir/paper.pdf" "$out_file"
+)
+echo "RUNNING: ${command[*]}"
+if [ "$execute" -ne 0 ]; then
+	"${command[@]}" || \
+	  panic "cannot copy output file"
+fi
