@@ -822,10 +822,10 @@ if(JAS_ENABLE_SHARED AND NOT JAS_PACKAGING)
 	# We only want to include directories in the installed rpath if they
 	# will not be considered implicitly.
 	list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES
-	  "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}" jas_is_system_dir)
+	  "${CMAKE_INSTALL_FULL_LIBDIR}" jas_is_system_dir)
 	if(jas_is_system_dir EQUAL -1)
 	   set(CMAKE_INSTALL_RPATH
-		  "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
+		  "${CMAKE_INSTALL_FULL_LIBDIR}")
 	endif()
 
 endif()
