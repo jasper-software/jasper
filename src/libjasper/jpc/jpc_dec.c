@@ -611,7 +611,9 @@ static int jpc_dec_process_sod(jpc_dec_t *dec, jpc_ms_t *ms)
 	if (dec->pkthdrstreams) {
 		/* Get the stream containing the packet header data for this
 		  tile-part. */
-		if (!(tile->pkthdrstream = jpc_streamlist_remove(dec->pkthdrstreams, 0))) {
+		if (jpc_streamlist_numstreams(dec->pkthdrstreams) != 0 &&
+		  !(tile->pkthdrstream = jpc_streamlist_remove(dec->pkthdrstreams,
+		  0))) {
 			return -1;
 		}
 	}
