@@ -188,12 +188,20 @@ jas_image_t *jas_heic_decode(jas_stream_t *in, const char *optstr)
 		jas_logerrorf("heif_context_alloc failed\n");
 		goto error;
 	}
-#if 0
-#endif
-	heif_context_read_from_memory_without_copy(ctx, ptr, size, 0);
+
+	struct heif_error err;
+	err = heif_context_read_from_memory_without_copy(ctx, ptr, size, 0);
+	if (err.code != 0) {
+		jas_logerrorf("heif_context_read_from_memory_without_copy failed\n");
+		goto error;
+	}
 
 	/* Get a handle to the primary image. */
-	heif_context_get_primary_image_handle(ctx, &handle);
+	err = heif_context_get_primary_image_handle(ctx, &handle);
+	if (err.code != 0) {
+		jas_logerrorf("heif_context_get_primary_image_handle failed\n");
+		goto error;
+	}
 
 	int width = heif_image_handle_get_width(handle);
 	int height = heif_image_handle_get_height(handle);
@@ -218,7 +226,6 @@ jas_image_t *jas_heic_decode(jas_stream_t *in, const char *optstr)
 
 	/* Decode the image and convert the colorspace to RGB,
 	  saved as 24bit interleaved. */
-	struct heif_error err;
 	err = heif_decode_image(handle, &img, heif_colorspace_RGB,
 	  heif_chroma_interleaved_RGB, 0);
 	if (err.code != 0) {
@@ -247,6 +254,7 @@ jas_image_t *jas_heic_decode(jas_stream_t *in, const char *optstr)
 	for (cmptno = 0; cmptno < numcmpts; ++cmptno) {
 		if (width > JAS_IMAGE_COORD_MAX ||
 		  height > JAS_IMAGE_COORD_MAX) {
+			jas_logerrorf("image size too large\n");
 			goto error;
 		}
 		cmptparm.tlx = 0;
@@ -290,6 +298,8 @@ jas_image_t *jas_heic_decode(jas_stream_t *in, const char *optstr)
 				  data[3 * width * y + 3 * x + cmptno]);
 			}
 			if (jas_image_writecmpt(image, cmptno, 0, y, width, 1, matrix)) {
+				jas_logerrorf("jas_image_writecmpt failed\n");
+				goto error;
 			}
 		}
 	}

@@ -46,9 +46,14 @@ has_jpg="$(is_supported_format jpg)" || \
   panic "cannot determine if JPG is supported format"
 has_mif="$(is_supported_format mif)" || \
   panic "cannot determine if MIF is supported format"
+has_heic="$(is_supported_format heic)" || \
+  panic "cannot determine if HEIF is supported format"
 
 if [ "$internal_testing_mode" -ne 0 -a "$has_mif" -eq 0 ]; then
 	echo "warning: MIF support is missing"
+fi
+if [ "$internal_testing_mode" -ne 0 -a "$has_heic" -eq 0 ]; then
+	echo "warning: HEIF support is missing"
 fi
 if [ "$has_jpg" -eq 0 ]; then
 	echo "warning: JPEG support is missing"
@@ -67,6 +72,11 @@ for file in "$data_dir"/test/good/*.*; do
 		;;
 	*.mif)
 		if [ "$has_mif" -eq 0 ]; then
+			skip=1
+		fi
+		;;
+	*.heic)
+		if [ "$has_heic" -eq 0 ]; then
 			skip=1
 		fi
 		;;
