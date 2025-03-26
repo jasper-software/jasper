@@ -12,7 +12,7 @@ cmake_minimum_required(VERSION 3.20)
 # The major, minor, and micro version numbers of the project.
 set(JAS_VERSION_MAJOR 4)
 set(JAS_VERSION_MINOR 2)
-set(JAS_VERSION_PATCH 4)
+set(JAS_VERSION_PATCH 5)
 
 # The shared library versioning information.
 # Guidelines on how to change this information can be found below.
