@@ -13,7 +13,7 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ubuntu-22.04, ubuntu-20.04, macos-13, macos-12]
+        os: [ubuntu-22.04, ubuntu-20.04, macos-15, macos-13]
         compiler: [ {cc: gcc, cxx: g++}, {cc: clang, cxx: clang++} ]
         include:
           - os: [windows-2022]
