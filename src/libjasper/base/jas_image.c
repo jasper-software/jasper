@@ -118,6 +118,8 @@ static void jas_image_calcbbox2(const jas_image_t *image,
   jas_image_coord_t *bry);
 static void jas_image_fmtinfo_init(jas_image_fmtinfo_t *fmtinfo);
 static void jas_image_fmtinfo_cleanup(jas_image_fmtinfo_t *fmtinfo);
+static jas_cmcmptfmt_t* jas_cmcmptfmt_array_create(int n);
+static void jas_cmcmptfmt_array_destroy(jas_cmcmptfmt_t* cmptfmts, int n);
 
 /******************************************************************************\
 * Create and destroy operations.
@@ -411,6 +413,36 @@ static void jas_image_cmpt_destroy(jas_image_cmpt_t *cmpt)
 		jas_stream_close(cmpt->stream_);
 	}
 	jas_free(cmpt);
+}
+
+static jas_cmcmptfmt_t* jas_cmcmptfmt_array_create(int n)
+{
+	jas_cmcmptfmt_t* cmptfmts;
+	JAS_LOGDEBUGF(10, "jas_cmcmptfmt_array_create(%d)\n", n);
+	if (!(cmptfmts = jas_alloc2(n, sizeof(jas_cmcmptfmt_t)))) {
+		return 0;
+	}
+	for (int i = 0; i < n; ++i) {
+		cmptfmts[i].buf = 0;
+	}
+	JAS_LOGDEBUGF(10, "jas_cmcmptfmt_array_create(%d) returning %p\n", n,
+	  JAS_CAST(void *, cmptfmts));
+	return cmptfmts;
+}
+
+static void jas_cmcmptfmt_array_destroy(jas_cmcmptfmt_t* cmptfmts, int n)
+{
+	assert(cmptfmts);
+	assert(n > 0);
+	JAS_LOGDEBUGF(10, "jas_cmcmptfmt_array_destroy(%p, %d)\n",
+	  JAS_CAST(void *, cmptfmts), n);
+	for (int i = 0; i < n; ++i) {
+		if (cmptfmts[i].buf) {
+			jas_free(cmptfmts[i].buf);
+		}
+		cmptfmts[i].buf = 0;
+	}
+	jas_free(cmptfmts);
 }
 
 /******************************************************************************\
@@ -1588,12 +1620,15 @@ jas_image_t *jas_image_chclrspc(jas_image_t *image,
 	jas_cmcmptfmt_t *incmptfmts;
 	jas_cmcmptfmt_t *outcmptfmts;
 
+	assert(image);
+	assert(outprof);
+
 #if 0
 	jas_eprintf("IMAGE\n");
 	jas_image_dump(image, stderr);
 #endif
 
-	if (image->numcmpts_ == 0) {
+	if (!jas_image_numcmpts(image)) {
 		/*
 		can't work with a file with no components;
 		continuing would crash because we'd attempt to
@@ -1604,6 +1639,8 @@ jas_image_t *jas_image_chclrspc(jas_image_t *image,
 
 	outimage = 0;
 	xform = 0;
+	incmptfmts = 0;
+	outcmptfmts = 0;
 	if (!(inimage = jas_image_copy(image))) {
 		goto error;
 	}
@@ -1694,16 +1731,22 @@ jas_image_t *jas_image_chclrspc(jas_image_t *image,
 	}
 
 	inpixmap.numcmpts = numinclrchans;
-	if (!(incmptfmts = jas_alloc2(numinclrchans, sizeof(jas_cmcmptfmt_t)))) {
+	assert(numinclrchans != 0);
+	if (!(incmptfmts = jas_cmcmptfmt_array_create(numinclrchans))) {
 		// formerly call to abort()
 		goto error;
 	}
 	inpixmap.cmptfmts = incmptfmts;
 	for (unsigned i = 0; i < numinclrchans; ++i) {
 		const int j = jas_image_getcmptbytype(inimage, JAS_IMAGE_CT_COLOR(i));
+		if (j < 0) {
+			jas_logerrorf("missing color component %d\n", i);
+			goto error;
+		}
 		if (!(incmptfmts[i].buf = jas_alloc2(width, sizeof(long)))) {
 			goto error;
 		}
+		assert(j >= 0 && j < jas_image_numcmpts(inimage));
 		incmptfmts[i].prec = jas_image_cmptprec(inimage, j);
 		incmptfmts[i].sgnd = jas_image_cmptsgnd(inimage, j);
 		incmptfmts[i].width = width;
@@ -1711,7 +1754,7 @@ jas_image_t *jas_image_chclrspc(jas_image_t *image,
 	}
 
 	outpixmap.numcmpts = numoutclrchans;
-	if (!(outcmptfmts = jas_alloc2(numoutclrchans, sizeof(jas_cmcmptfmt_t)))) {
+	if (!(outcmptfmts = jas_cmcmptfmt_array_create(numoutclrchans))) {
 		// formerly call to abort()
 		goto error;
 	}
@@ -1719,9 +1762,14 @@ jas_image_t *jas_image_chclrspc(jas_image_t *image,
 
 	for (unsigned i = 0; i < numoutclrchans; ++i) {
 		const int j = jas_image_getcmptbytype(outimage, JAS_IMAGE_CT_COLOR(i));
+		if (j < 0) {
+			jas_logerrorf("missing color component %d\n", i);
+			goto error;
+		}
 		if (!(outcmptfmts[i].buf = jas_alloc2(width, sizeof(long)))) {
 			goto error;
 		}
+		assert(j >= 0 && j < jas_image_numcmpts(outimage));
 		outcmptfmts[i].prec = jas_image_cmptprec(outimage, j);
 		outcmptfmts[i].sgnd = jas_image_cmptsgnd(outimage, j);
 		outcmptfmts[i].width = width;
@@ -1746,14 +1794,8 @@ jas_image_t *jas_image_chclrspc(jas_image_t *image,
 		}
 	}
 
-	for (unsigned i = 0; i < numoutclrchans; ++i) {
-		jas_free(outcmptfmts[i].buf);
-	}
-	jas_free(outcmptfmts);
-	for (unsigned i = 0; i < numinclrchans; ++i) {
-		jas_free(incmptfmts[i].buf);
-	}
-	jas_free(incmptfmts);
+	jas_cmcmptfmt_array_destroy(outcmptfmts, numoutclrchans);
+	jas_cmcmptfmt_array_destroy(incmptfmts, numinclrchans);
 	jas_cmxform_destroy(xform);
 	jas_image_destroy(inimage);
 
@@ -1765,6 +1807,14 @@ jas_image_t *jas_image_chclrspc(jas_image_t *image,
 #endif
 	return outimage;
 error:
+	if (incmptfmts) {
+		assert(numinclrchans);
+		jas_cmcmptfmt_array_destroy(incmptfmts, numinclrchans);
+	}
+	if (outcmptfmts) {
+		assert(numoutclrchans);
+		jas_cmcmptfmt_array_destroy(outcmptfmts, numoutclrchans);
+	}
 	if (xform) {
 		jas_cmxform_destroy(xform);
 	}
