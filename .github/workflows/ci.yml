@@ -17,14 +17,14 @@ jobs:
         compiler: [ {cc: gcc, cxx: g++}, {cc: clang, cxx: clang++} ]
         include:
           - os: [windows-2025]
-        exclude:
-          # Temporarily disable Ubuntu 20.04 with GCC since linking with
-          # TSan fails due the linker being unable to find libtsan_preinit.o.
-          # This used to work previously.
-          # Perhaps, the cause is related to the following Ubuntu issue:
-          # https://bugs.launchpad.net/ubuntu/+source/gcc-9/+bug/2029910
-          #- os: ubuntu-20.04
-          #  compiler: {cc: gcc, cxx: g++}
+        #exclude:
+        #  # Temporarily disable Ubuntu 20.04 with GCC since linking with
+        #  # TSan fails due the linker being unable to find libtsan_preinit.o.
+        #  # This used to work previously.
+        #  # Perhaps, the cause is related to the following Ubuntu issue:
+        #  # https://bugs.launchpad.net/ubuntu/+source/gcc-9/+bug/2029910
+        #  - os: ubuntu-20.04
+        #    compiler: {cc: gcc, cxx: g++}
       fail-fast: false
     runs-on: ${{ matrix.os }}
     steps:
