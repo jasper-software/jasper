@@ -314,6 +314,7 @@ message("CMAKE_LINKER: ${CMAKE_LINKER}")
 
 # Customize the compiler flags for warning messages.
 if(CMAKE_C_COMPILER_ID STREQUAL "Clang" OR CMAKE_C_COMPILER_ID STREQUAL "GNU")
+
 	check_c_compiler_flag("-Wno-stringop-truncation"
 	  JAS_GCC_WARN_NO_STRINGOP_TRUNCATION)
 	check_c_compiler_flag("-Wno-stringop-overflow"
@@ -331,7 +332,16 @@ if(CMAKE_C_COMPILER_ID STREQUAL "Clang" OR CMAKE_C_COMPILER_ID STREQUAL "GNU")
 	add_c_compile_options(-Wno-sign-compare)
 	add_c_compile_options(-Wformat)
 	add_c_compile_options(-Wmissing-prototypes)
-	add_c_compile_options(-Wstrict-prototypes)
+
+	# NOTE: The semantics of -Wstrict-prototypes differs in GCC and Clang.
+	# GCC does not warn about empty parameter lists in function definitions,
+	# while Clang does warn about this.
+	if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
+		add_c_compile_options(-Wstrict-prototypes)
+	elseif(CMAKE_C_COMPILER_ID STREQUAL "Clang")
+		add_c_compile_options(-Wno-strict-prototypes)
+	endif()
+
 	add_c_compile_options(-Wno-type-limits)
 	if (JAS_CLANG_WARN_NO_OUT_OF_RANGE_COMPARE)
 		add_c_compile_options(-Wno-tautological-constant-out-of-range-compare)
@@ -357,7 +367,9 @@ if(CMAKE_C_COMPILER_ID STREQUAL "Clang" OR CMAKE_C_COMPILER_ID STREQUAL "GNU")
 		#add_c_compile_options(-Werror)
 		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror")
 	endif()
+
 elseif(CMAKE_C_COMPILER_ID STREQUAL "MSVC")
+
 	# possibly lossy conversion
 	add_c_compile_options(/wd4244)
 	# different const qualifiers
@@ -372,6 +384,7 @@ elseif(CMAKE_C_COMPILER_ID STREQUAL "MSVC")
 		# Treat all compiler warnings as errors.
 		add_c_compile_options(/WX)
 	endif()
+
 endif()
 
 if(JAS_ENABLE_HIDDEN)

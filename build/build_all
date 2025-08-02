@@ -233,10 +233,11 @@ debug_level=0
 strict=1
 command_file=
 enable_test=1
+enable_conformance_test=1
 requested_tests=()
 hard_fail=0
 
-while getopts hvb:cnd:swC:Xqt:F option; do
+while getopts hvb:cnd:swC:XYqt:F option; do
 	case "$option" in
 	n)
 		enable=0;;
@@ -265,6 +266,8 @@ while getopts hvb:cnd:swC:Xqt:F option; do
 		strict=1;;
 	X)
 		enable_test=0;;
+	Y)
+		enable_conformance_test=0;;
 	h)
 		usage;;
 	*)
@@ -298,6 +301,13 @@ $sysinfo_data
 ================================================================================
 EOF
 
+if [ -n "$RUNNER_OS" ]; then
+	echo "RUNNER_NAME: $RUNNER_NAME"
+	echo "RUNNER_OS: $RUNNER_OS"
+	echo "RUNNER_ACTION: $RUNNER_ACTION"
+fi
+
+
 os=unknown
 if [ -n "$RUNNER_OS" ]; then
 	case "$RUNNER_OS" in
@@ -322,6 +332,15 @@ if [ -n "$RUNNER_OS" ]; then
 			;;
 		esac
 	fi
+
+	# Disable conformance tests for ARM since these tests take too long.
+	# Do similarly for Windows.
+	case "$RUNNER_NAME" in
+	ubuntu-*-arm|windows-*)
+		echo "WARNING: disabling conformance tests"
+		enable_conformance_test=0
+		;;
+	esac
 fi
 #ubuntu_clang_hack=0
 
@@ -366,16 +385,14 @@ esac
 
 if [ "$enable_test" -ne 0 ]; then
 	test_option=(--test)
-	conformance_tests_option=(--conformance-tests)
 else
 	test_option=(--no-test)
+fi
+if [ "$enable_conformance_test" -ne 0 ]; then
+	conformance_tests_option=(--conformance-tests)
+else
 	conformance_tests_option=(--no-conformance-tests)
 fi
-case "$os" in
-windows)
-	conformance_tests_option=(--no-conformance-tests)
-	;;
-esac
 
 ################################################################################
 
