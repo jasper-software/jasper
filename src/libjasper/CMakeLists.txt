@@ -168,6 +168,16 @@ add_library(libjasper ${libjasper_type}
 	${libjasper_ras_sources}
 )
 
+if(JAS_ENABLE_CMAKE_PACKAGE_CONFIG)
+	install(TARGETS libjasper
+	  EXPORT JasPerTargets
+	  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+	  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+	  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+	  INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+	)
+endif()
+
 # The JasPer include directories in the source and build tree must be included
 # before any other directories that may contain the include directory for an
 # already installed version of the JasPer library.

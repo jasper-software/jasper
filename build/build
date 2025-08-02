@@ -125,6 +125,7 @@ enable_strict=1
 cmake_generator=
 enable_32bit=0
 enable_cxx=1
+enable_cmake_package_config=0
 
 while [ $# -gt 0 ]; do
 	option="$1"
@@ -142,6 +143,15 @@ while [ $# -gt 0 ]; do
 	--ninja)
 		shift 1
 		cmake_generator="Ninja"
+		;;
+
+	--cmake-package-config)
+		shift 1
+		enable_cmake_package_config=1
+		;;
+	--no-cmake-package-config)
+		shift 1
+		enable_cmake_package_config=0
 		;;
 
 	--clean-build-dir)
@@ -485,6 +495,14 @@ configure_opts=()
 
 configure_opts+=(-B"$build_dir")
 configure_opts+=(-H"$source_dir")
+
+#configure_opts+=(--trace-expand)
+
+if [ -n "$enable_cmake_package_config" ]; then
+	configure_opts+=(
+	  -D "JAS_ENABLE_CMAKE_PACKAGE_CONFIG=$enable_cmake_package_config"
+	)
+fi
 
 if [ -n "$cmake_generator" ]; then
 	configure_opts+=(-G "$cmake_generator")

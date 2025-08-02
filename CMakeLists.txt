@@ -108,6 +108,8 @@ endif()
 
 option(JAS_PACKAGING "Enable packaging mode (e.g., disable RPATH)" OFF)
 
+option(JAS_ENABLE_CMAKE_PACKAGE_CONFIG "Enable CMake package config file generation" OFF)
+
 option(JAS_ENABLE_PIC "Enable position-independent code" ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ${JAS_ENABLE_PIC})
 
@@ -756,11 +758,13 @@ if(JAS_ENABLE_LIBJPEG)
 		# (e.g., stdio.h and stdint.h).  So, we cannot reliably use
 		# check_include_file here.
 		jas_get_includes_from_targets(CMAKE_REQUIRED_INCLUDES JPEG::JPEG)
+		message("JPEG include directories: ${CMAKE_REQUIRED_INCLUDES}")
 		check_c_source_compiles("
 			#include <stdio.h>
 			#include <stdint.h>
+			#include <stddef.h>
 			#include <jpeglib.h>
-			int main() {}
+			int main(void) {}
 		" JAS_HAVE_JPEGLIB_H)
 		if(JAS_HAVE_JPEGLIB_H)
 			set(JAS_HAVE_LIBJPEG 1)
@@ -875,3 +879,43 @@ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/build/pkgconfig/jasper.pc"
   DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
 
 install(FILES "README.md" DESTINATION "${CMAKE_INSTALL_DOCDIR}")
+
+################################################################################
+# CMake package config files for find_package(JasPer CONFIG ...)
+################################################################################
+
+if(JAS_ENABLE_CMAKE_PACKAGE_CONFIG)
+
+	include(CMakePackageConfigHelpers)
+
+	# Create a version file for the package.
+	write_basic_package_version_file(
+	  "${CMAKE_CURRENT_BINARY_DIR}/JasPerConfigVersion.cmake"
+	  VERSION ${JAS_VERSION}
+	  COMPATIBILITY AnyNewerVersion
+	)
+
+	# Configure the config file that downstream projects will include.
+	configure_package_config_file(
+	  "${CMAKE_CURRENT_SOURCE_DIR}/build/cmake/modules/JasPerConfig.cmake.in"
+	  "${CMAKE_CURRENT_BINARY_DIR}/JasPerConfig.cmake"
+	  INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/JasPer"
+	)
+
+	# Export the targets.
+	install(EXPORT JasPerTargets
+	  FILE JasPerTargets.cmake
+	  NAMESPACE JasPer::
+	  DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/JasPer"
+	)
+
+	# Install the config and version files.
+	install(FILES
+	  "${CMAKE_CURRENT_BINARY_DIR}/JasPerConfig.cmake"
+	  "${CMAKE_CURRENT_BINARY_DIR}/JasPerConfigVersion.cmake"
+	  DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/JasPer"
+	)
+
+endif()
+
+################################################################################
