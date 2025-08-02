@@ -352,7 +352,7 @@ if [ -n "$RUNNER_OS" ]; then
 		;;
 	esac
 	echo "ARM architecture: $is_arm"
-	if [ "$is_arm" -ne 0 ]; then
+	if [ "$os" = "windows" -o "$is_arm" -ne 0 ]; then
 		echo "WARNING: disabling conformance tests"
 		enable_conformance_test=0
 	fi
