@@ -1,3 +1,12 @@
+4.2.6 (2025-08-02)
+==================
+
+* Added a check for a missing color component in the jas_image_chclrspc
+  function (#400).
+
+* Fixed a minor build problem related to the use of -Wstrict-prototypes
+  with Clang.
+
 4.2.5 (2025-03-26)
 ==================
 
