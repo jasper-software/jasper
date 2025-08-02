@@ -304,9 +304,7 @@ EOF
 if [ -n "$RUNNER_OS" ]; then
 	echo "RUNNER_NAME: $RUNNER_NAME"
 	echo "RUNNER_OS: $RUNNER_OS"
-	echo "RUNNER_ACTION: $RUNNER_ACTION"
 fi
-
 
 os=unknown
 if [ -n "$RUNNER_OS" ]; then
@@ -324,6 +322,7 @@ fi
 ubuntu_clang_hack=0
 # If invoked by GitHub Actions CI...
 if [ -n "$RUNNER_OS" ]; then
+
 	if [ "$os" = linux ]; then
 		# Assume that the OS being Linux means Ubuntu.
 		case "$CC" in
@@ -333,14 +332,31 @@ if [ -n "$RUNNER_OS" ]; then
 		esac
 	fi
 
-	# Disable conformance tests for ARM since these tests take too long.
-	# Do similarly for Windows.
-	case "$RUNNER_NAME" in
-	ubuntu-*-arm|windows-*)
-		echo "WARNING: disabling conformance tests"
-		enable_conformance_test=0
+	# Disable conformance tests in the following situations since the tests
+	# take too long:
+	#   - on the ARM architecture
+	#   - on Windows
+	case "$os" in
+	linux)
+		arch="$(uname -m)" || panic "uname failed"
+		echo "architecture: $arch"
+		case "$arch" in
+		aarch*|arm*)
+			is_arm=1;;
+		*)
+			is_arm=0;;
+		esac
+		;;
+	windows)
+		is_arm=0
 		;;
 	esac
+	echo "ARM architecture: $is_arm"
+	if [ "$is_arm" -ne 0 ]; then
+		echo "WARNING: disabling conformance tests"
+		enable_conformance_test=0
+	fi
+
 fi
 #ubuntu_clang_hack=0
 
