@@ -484,18 +484,36 @@ static jpc_enc_cp_t *cp_create(const char *optstr, jas_image_t *image)
 			cp->tileheight = atoi(jas_tvparser_getval(tvp));
 			break;
 		case OPT_PRCWIDTH:
-			prcwidthexpn = jpc_floorlog2(atoi(jas_tvparser_getval(tvp)));
+			i = atoi(jas_tvparser_getval(tvp));
+			if (i <= 0) {
+				jas_logerrorf("invalid precinct width (%d)\n", i);
+				goto error;
+			}
+			prcwidthexpn = jpc_floorlog2(i);
 			break;
 		case OPT_PRCHEIGHT:
-			prcheightexpn = jpc_floorlog2(atoi(jas_tvparser_getval(tvp)));
+			i = atoi(jas_tvparser_getval(tvp));
+			if (i <= 0) {
+				jas_logerrorf("invalid precinct height (%d)\n", i);
+				goto error;
+			}
+			prcheightexpn = jpc_floorlog2(i);
 			break;
 		case OPT_CBLKWIDTH:
-			tccp->cblkwidthexpn =
-			  jpc_floorlog2(atoi(jas_tvparser_getval(tvp)));
+			i = atoi(jas_tvparser_getval(tvp));
+			if (i <= 0) {
+				jas_logerrorf("invalid code block width (%d)\n", i);
+				goto error;
+			}
+			tccp->cblkwidthexpn = jpc_floorlog2(i);
 			break;
 		case OPT_CBLKHEIGHT:
-			tccp->cblkheightexpn =
-			  jpc_floorlog2(atoi(jas_tvparser_getval(tvp)));
+			i = atoi(jas_tvparser_getval(tvp));
+			if (i <= 0) {
+				jas_logerrorf("invalid code block height (%d)\n", i);
+				goto error;
+			}
+			tccp->cblkheightexpn = jpc_floorlog2(i);
 			break;
 		case OPT_MODE:
 			if ((tagid = jas_taginfo_nonull(jas_taginfos_lookup(modetab,

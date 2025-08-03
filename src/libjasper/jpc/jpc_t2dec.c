@@ -348,7 +348,8 @@ static int jpc_dec_decodepkt(jpc_dec_t *dec, jas_stream_t *pkthdrstream, jas_str
 						const unsigned n = JAS_MIN((unsigned)numnewpasses, maxpasses);
 						mycounter += n;
 						numnewpasses -= n;
-						if ((len = jpc_bitstream_getbits(inb, cblk->numlenbits + jpc_floorlog2(n))) < 0) {
+						if ((len = jpc_bitstream_getbits(inb,
+						  cblk->numlenbits + jpc_floorlog2(n))) < 0) {
 							jpc_bitstream_close(inb);
 							jas_logerrorf("cannot get bits\n");
 							return -1;
