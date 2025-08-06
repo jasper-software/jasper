@@ -1136,23 +1136,23 @@ static int jpc_dec_tilefini(jpc_dec_t *dec, jpc_dec_tile_t *tile)
 
 	if (tile->cp) {
 		jpc_dec_cp_destroy(tile->cp);
-		//tile->cp = 0;
+		tile->cp = 0;
 	}
 	if (tile->tcomps) {
 		jas_free(tile->tcomps);
-		//tile->tcomps = 0;
+		tile->tcomps = 0;
 	}
 	if (tile->pi) {
 		jpc_pi_destroy(tile->pi);
-		//tile->pi = 0;
+		tile->pi = 0;
 	}
 	if (tile->pkthdrstream) {
 		jas_stream_close(tile->pkthdrstream);
-		//tile->pkthdrstream = 0;
+		tile->pkthdrstream = 0;
 	}
 	if (tile->pptstab) {
 		jpc_ppxstab_destroy(tile->pptstab);
-		//tile->pptstab = 0;
+		tile->pptstab = 0;
 	}
 
 	tile->state = JPC_TILE_DONE;
@@ -2288,6 +2288,9 @@ static int jpc_dec_dump(const jpc_dec_t *dec)
 	const jpc_dec_tile_t *tile;
 	for (tileno = 0, tile = dec->tiles; tileno < dec->numtiles;
 	  ++tileno, ++tile) {
+		if (!tile->tcomps) {
+			continue;
+		}
 		assert(!dec->numcomps || tile->tcomps);
 		unsigned compno;
 		const jpc_dec_tcomp_t *tcomp;
