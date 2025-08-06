@@ -1,3 +1,9 @@
+4.2.8 (2025-08-05)
+==================
+
+* Fixed a bug in the JPC decoder that could cause bad memory accesses
+  if the debug level is set sufficiently high (#402, #403).
+
 4.2.7 (2025-08-02)
 ==================
 
