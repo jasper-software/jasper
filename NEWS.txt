@@ -14,7 +14,7 @@
 ==================
 
 * Added a check for a missing color component in the jas_image_chclrspc
-  function (#400).
+  function (#400) (CVE-2025-8835).
 
 * Fixed a minor build problem related to the use of -Wstrict-prototypes
   with Clang.
