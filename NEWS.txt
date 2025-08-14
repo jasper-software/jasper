@@ -2,13 +2,13 @@
 ==================
 
 * Fixed a bug in the JPC decoder that could cause bad memory accesses
-  if the debug level is set sufficiently high (#402, #403).
+  if the debug level is set sufficiently high (#402, #403) (CVE-2025-8837).
 
 4.2.7 (2025-08-02)
 ==================
 
 * Added some missing range checking on several coding parameters in the
-  JPC encoder (#401).
+  JPC encoder (#401) (CVE-2025-8836).
 
 4.2.6 (2025-08-02)
 ==================
