@@ -1,5 +1,14 @@
 @PACKAGE_INIT@
 
-set(JasPer_FOUND TRUE)
+INCLUDE(CMakeFindDependencyMacro)
 
-include("${CMAKE_CURRENT_LIST_DIR}/JasPerTargets.cmake")
+# Ensure that the JPEG::JPEG imported target is defined (if appropriate).
+IF(@JAS_INCLUDE_JPG_CODEC@)
+	FIND_DEPENDENCY(JPEG)
+ENDIF()
+
+# Mark the JasPer library as found.
+SET(JasPer_FOUND TRUE)
+
+# Include the exported targets.
+INCLUDE("${CMAKE_CURRENT_LIST_DIR}/JasPerTargets.cmake")
