@@ -709,6 +709,10 @@ unsigned jas_stream_peek(jas_stream_t *stream, void *buf, size_t cnt)
 
 	const size_t n = jas_stream_read(stream, bufptr, cnt);
 
+	if (n == 0) {
+		return 0;
+	}
+
 	/* Put the characters read back onto the stream. */
 	for (size_t i = n; i-- > 0;) {
 		if (jas_stream_ungetc(stream, bufptr[i]) == EOF) {
