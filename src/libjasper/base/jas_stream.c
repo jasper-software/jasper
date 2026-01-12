@@ -707,11 +707,22 @@ unsigned jas_stream_peek(jas_stream_t *stream, void *buf, size_t cnt)
 {
 	char *bufptr = buf;
 
+	/*
+	TODO/NOTE:
+	Changing the return type from unsigned to size_t would break ABI.
+	So, to avoid the possibility that n (which is of type size_t) could
+	overflow the return value (which is of type unsigned) we add the
+	following check.
+	*/
+	if (cnt > UINT_MAX) {
+		return 0;
+	}
+
 	const size_t n = jas_stream_read(stream, bufptr, cnt);
 
 	/* Put the characters read back onto the stream. */
-	for (size_t i = n; i-- > 0;) {
-		if (jas_stream_ungetc(stream, bufptr[i]) == EOF) {
+	for (size_t i = n; i > 0; --i) {
+		if (jas_stream_ungetc(stream, bufptr[i - 1]) == EOF) {
 			return 0;
 		}
 	}
