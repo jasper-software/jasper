@@ -177,7 +177,7 @@ typedef struct {
 	uint_fast8_t pri;
 	uint_fast8_t approx;
 	uint_fast32_t csid;
-	uint_fast8_t *iccp;
+	jas_uchar *iccp;
 	size_t iccplen;
 	/* XXX - Someday we ought to add ICC profile data here. */
 } jp2_colr_t;

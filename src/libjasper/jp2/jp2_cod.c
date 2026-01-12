@@ -483,7 +483,7 @@ static int jp2_colr_getdata(jp2_box_t *box, jas_stream_t *in)
 			return -1;
 		}
 #endif
-		if (!(colr->iccp = jas_alloc2(colr->iccplen, sizeof(uint_fast8_t)))) {
+		if (!(colr->iccp = jas_alloc2(colr->iccplen, sizeof(jas_uchar)))) {
 			return -1;
 		}
 		if (jas_stream_read(in, colr->iccp, colr->iccplen) != colr->iccplen) {
