@@ -2074,6 +2074,9 @@ static void jpc_undo_roi(jas_matrix_t *x, int roishift, int bgshift, unsigned nu
 	jpc_fix_t mag;
 	bool warn;
 	uint_fast32_t mask;
+	const int int_bits = (int)(sizeof(int) * 8);
+	const int jpc_fix_bits = (int)(sizeof(jpc_fix_t) * 8);
+	const unsigned uint_fast32_bits = (unsigned)(sizeof(uint_fast32_t) * 8U);
 
 	if (roishift < 0) {
 		/* We could instead return an error here. */
@@ -2082,6 +2085,26 @@ static void jpc_undo_roi(jas_matrix_t *x, int roishift, int bgshift, unsigned nu
 		  "(bitstream is probably corrupt)\n");
 		roishift = 0;
 	}
+	/* Avoid undefined behaviour when computing 1 << roishift, so clamp roishift to 0. */
+	if (roishift >= int_bits - 1) {
+		jas_logwarnf("warning: limiting ROI shift from %d to %d "
+		  "(bitstream is probably corrupt)\n", roishift, 0);
+		roishift = 0;
+	}
+
+	/* Also validate the background shift to avoid negative or excessively
+	  large shift counts when using it as an exponent. */
+	if (bgshift < 0) {
+		jas_logwarnf("warning: forcing negative background shift to zero "
+		  "(bitstream is probably corrupt)\n");
+		bgshift = 0;
+	}
+	if (bgshift >= jpc_fix_bits) {
+		jas_logwarnf("warning: limiting background shift from %d to %d "
+		  "(bitstream is probably corrupt)\n", bgshift, jpc_fix_bits - 1);
+		bgshift = jpc_fix_bits - 1;
+	}
+
 	if (roishift == 0 && bgshift == 0) {
 		return;
 	}
@@ -2104,7 +2127,18 @@ static void jpc_undo_roi(jas_matrix_t *x, int roishift, int bgshift, unsigned nu
 			} else {
 				/* We are dealing with non-ROI (i.e., background) data. */
 				mag <<= bgshift;
-				mask = (JAS_CAST(uint_fast32_t, 1) << numbps) - 1;
+				/* Compute a mask for the lower numbps bits, being careful
+				  to avoid undefined behaviour for large shift counts. */
+				if (numbps == 0) {
+					mask = 0;
+				} else if (numbps >= uint_fast32_bits) {
+					jas_logwarnf("warning: limiting number of bits per sample "
+					  "from %u to %u (bitstream is probably corrupt)\n",
+					  numbps, uint_fast32_bits);
+					mask = (uint_fast32_t)~(uint_fast32_t)0;
+				} else {
+					mask = (JAS_CAST(uint_fast32_t, 1) << numbps) - 1;
+				}
 				/* Perform a basic sanity check on the sample value. */
 				/* Some implementations write garbage in the unused
 				  most-significant bit planes introduced by ROI shifting.
