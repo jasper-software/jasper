@@ -382,6 +382,8 @@ elseif(CMAKE_C_COMPILER_ID STREQUAL "MSVC")
 	add_c_compile_options(/wd4996)
 	# allow some kinds of narrowing conversions
 	add_c_compile_options(/wd4267)
+	# ~ zero extending to type of greater size
+	add_c_compile_options(/wd4319)
 	if(JAS_STRICT)
 		# Treat all compiler warnings as errors.
 		add_c_compile_options(/WX)
