@@ -297,7 +297,7 @@ int jp2_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 	needcdef = 1;
 	switch (jas_clrspc_fam(jas_image_clrspc(image))) {
 	case JAS_CLRSPC_FAM_RGB:
-		if (jas_image_numcmpts(image) >= 3 &&
+		if (jas_image_numcmpts(image) == 3 &&
 		  jas_image_cmpttype(image, 0) ==
 		  JAS_IMAGE_CT_COLOR(JAS_CLRSPC_CHANIND_RGB_R) &&
 		  jas_image_cmpttype(image, 1) ==
@@ -307,7 +307,7 @@ int jp2_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 			needcdef = 0;
 		break;
 	case JAS_CLRSPC_FAM_YCBCR:
-		if (jas_image_numcmpts(image) >= 3 &&
+		if (jas_image_numcmpts(image) == 3 &&
 		  jas_image_cmpttype(image, 0) ==
 		  JAS_IMAGE_CT_COLOR(JAS_CLRSPC_CHANIND_YCBCR_Y) &&
 		  jas_image_cmpttype(image, 1) ==
@@ -317,7 +317,7 @@ int jp2_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 			needcdef = 0;
 		break;
 	case JAS_CLRSPC_FAM_GRAY:
-		if (jas_image_numcmpts(image) >= 1 &&
+		if (jas_image_numcmpts(image) == 1 &&
 		  jas_image_cmpttype(image, 0) ==
 		  JAS_IMAGE_CT_COLOR(JAS_IMAGE_CT_GRAY_Y))
 			needcdef = 0;
@@ -341,7 +341,8 @@ int jp2_encode(jas_image_t *image, jas_stream_t *out, const char *optstr)
 		for (unsigned i = 0; i < jas_image_numcmpts(image); ++i) {
 			cdefchanent = &cdef->ents[i];
 			cdefchanent->channo = i;
-			typeasoc = jp2_gettypeasoc(jas_image_clrspc(image), jas_image_cmpttype(image, i));
+			typeasoc = jp2_gettypeasoc(jas_image_clrspc(image),
+			  jas_image_cmpttype(image, i));
 			cdefchanent->type = typeasoc >> 16;
 			cdefchanent->assoc = typeasoc & 0x7fff;
 		}
