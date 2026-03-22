@@ -109,6 +109,7 @@ endif()
 option(JAS_PACKAGING "Enable packaging mode (e.g., disable RPATH)" OFF)
 
 option(JAS_ENABLE_CMAKE_PACKAGE_CONFIG "Enable CMake package config file generation" OFF)
+option(JAS_ENABLE_CMAKE_PACKAGE_CONFIG_CPS "Enable CPS support" ON)
 
 option(JAS_ENABLE_PIC "Enable position-independent code" ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ${JAS_ENABLE_PIC})
